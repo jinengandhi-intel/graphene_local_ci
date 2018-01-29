@@ -19,6 +19,6 @@ stage('Docker images cleanup') {
     sh '''
         docker stop $(docker ps -aq)
         docker rm $(docker ps -aq)
-        docker image prune -f
+        docker image prune -af
     '''
 }
