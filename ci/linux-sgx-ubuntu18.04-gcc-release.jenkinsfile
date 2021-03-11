@@ -1,0 +1,25 @@
+node ('sgx_slave_2.6') {
+
+    checkout scm
+    
+    dir ("graphene") {
+        load '../ci/config.jenkinsfile'
+        load '.ci/lib/config-ubuntu18.04.jenkinsfile'
+        load '.ci/lib/config-release.jenkinsfile'
+        env.SGX = '1'
+        sh '../ci/disable_attestation_tests'
+        sh 'cp -rf $HOME/sandstone-50-bin $WORKSPACE/graphene/Examples'
+
+        docker.build(
+            "local:${env.BUILD_TAG}",
+            '-f .ci/ubuntu18.04.dockerfile .'
+        ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
+            // load '.ci/lib/stage-lint.jenkinsfile'
+            // load '.ci/lib/stage-clean-check-prepare.jenkinsfile'
+            load '../ci/stage-build-sgx.jenkinsfile'
+            load '../ci/stage-test-sandstone.jenkinsfile'
+            load '.ci/lib/stage-test.jenkinsfile'
+            // load '.ci/lib/stage-clean-check.jenkinsfile'
+        }    
+    }
+}
