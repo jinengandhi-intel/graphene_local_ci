@@ -1,6 +1,8 @@
 node('nonsgx_slave') {
     checkout scm
     // sh 'git submodule foreach git pull origin master'
+
+    sh 'cd ~/test/graphene && git fetch && git rebase'
     
     dir ("graphene") {
         load '.ci/lib/config.jenkinsfile'
