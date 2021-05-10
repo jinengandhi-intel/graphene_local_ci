@@ -1,17 +1,15 @@
 stage('build') {
     sh '''
-        cd Pal/src/host/Linux-SGX/signer/ && openssl genrsa -3 -out enclave-key.pem 3072
-	cd -
-        make ${MAKEOPTS} ISGX_DRIVER_PATH="" SGX=1
-	
+        make ${MAKEOPTS}
+        make ${MAKEOPTS} -C Pal/src PAL_HOST=Skeleton
     '''
 
     try {
         sh '''
-            meson setup build \
+            meson build \
                 --prefix="$PREFIX" \
-                -Ddirect=disabled \
-                -Dsgx=enabled
+                -Ddirect=enabled \
+                -Dsgx=disabled
             ninja -C build
             ninja -C build install
         '''
@@ -29,4 +27,3 @@ stage('build') {
     // prevent cheating and testing from repo
     sh 'make ${MAKEOPTS} -C Runtime clean'
 }
-

@@ -1,6 +1,10 @@
-env.DOCKER_ARGS_COMMON = '''
+env.PREFIX = '/home/intel/graphene_install/usr'
+
+// don't mess with PATH before reading this: https://issues.jenkins.io/browse/JENKINS-49076
+env.DOCKER_ARGS_COMMON = """
     --device=/dev/kmsg:/dev/kmsg
-'''
+    --env=PATH=${env.PREFIX}/bin:${env.PATH}
+"""
 env.DOCKER_ARGS_SGX = '''
     --volume=/lib/modules:/lib/modules:ro
     --volume=/usr/src:/usr/src:ro
@@ -18,6 +22,3 @@ if (fileExists('/dev/gsgx')) {
 if (fileExists('/var/run/aesmd/aesm.socket')) {
     env.DOCKER_ARGS_SGX += ' --volume=/var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket'
 }
-
-env.WERROR = '1'
-env.MAKEOPTS = '-j8'

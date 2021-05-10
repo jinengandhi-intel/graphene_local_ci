@@ -1,40 +1,25 @@
 node ('sgx_slave_2.6') {
     checkout scm
-    // EXAMPLE_CREDS=credentials('Graphene_Local_CI')
-    //     sh """
-    //         git config credential.username $EXAMPLE_CREDS_USR
-    //         git config credential.helper "!echo password=$EXAMPLE_CREDS_PSW; echo"
-    //         git submodule foreach git pull https://$EXAMPLE_CREDS_USR:$EXAMPLE_CREDS_PSW@github.com/oscarlab/graphene.git master
-    //     """
-    // withCredentials([usernamePassword(credentialsId: 'Graphene_Local_CI',
-    //              usernameVariable: 'username',
-    //              passwordVariable: 'password')]) {
-    //     sh """
-    //     echo $username
-    //     echo $password
-    //     git config credential.username $username
-    //     git config credential.helper "!echo password=$password; echo"
-    //     git submodule foreach git pull https://$username:$password@github.com/oscarlab/graphene.git master
-    //     """
-    // }
+
+    sh 'cp -rf ~/jenkins/graphene_master graphene'
+    env.WORKSPACE = env.WORKSPACE + "/graphene"
+    env.SGX = '1'
 
     dir ("graphene") {
-        load '../ci/config.jenkinsfile'
-        load '.ci/lib/config-ubuntu18.04.jenkinsfile'
-        load '.ci/lib/config-release.jenkinsfile'
-        env.SGX = '1'
-        sh 'cp -f ../ci/ltp_mmap_sgx.patch $WORKSPACE/graphene/'
-        sh 'git apply ltp_mmap_sgx.patch'
+        load '../ci/config-docker.jenkinsfile'
+        //sh 'cp -f ../ci/ltp_mmap_sgx.patch $WORKSPACE'
+        //sh 'git apply ltp_mmap_sgx.patch'
 
         docker.build(
             "local:${env.BUILD_TAG}",
-            '-f .ci/ubuntu18.04.dockerfile .'
+            '-f ../ci/ubuntu18.04.dockerfile .'
         ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
-            // load '.ci/lib/stage-lint.jenkinsfile'
-            // load '.ci/lib/stage-clean-check-prepare.jenkinsfile'
+            load '.ci/lib/config.jenkinsfile'
+            load '.ci/lib/config-ubuntu18.04.jenkinsfile'
+            load '.ci/lib/config-release.jenkinsfile'
+
             load '../ci/stage-build-sgx.jenkinsfile'
             load '../ci/stage-test-sgx.jenkinsfile'
-            // load '.ci/lib/stage-clean-check.jenkinsfile'
         }    
     }
 }
