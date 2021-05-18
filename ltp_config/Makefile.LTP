@@ -6,6 +6,8 @@ exec_target =
 clean-extra += clean-build
 SRCDIR = $(ROOTDIR)/ltp_src
 LTPSCENARIO = $(INSTALLDIR)/runtest/syscalls-new
+VERSION = $(shell uname -r)
+export VERSION
 
 include ../../../../Scripts/Makefile.rules
 include ../../../../Scripts/Makefile.configs
@@ -27,6 +29,7 @@ $(SRCDIR)/configure: $(SRCDIR)/Makefile
 $(BUILDDIR)/BUILD_SUCCESS: $(SRCDIR)/configure
 	# Out-of-tree build steps were taken from ltp/INSTALL.
 	# The instructions below assume that SRCDIR and BUILDDIR are absolute.
+	sed -i 's/un.release/"$(VERSION)"/g' $(SRCDIR)/lib/tst_kconfig.c
 	mkdir -p $(BUILDDIR)
 	# Kernel module tests are not meaningful for our LibOS and building them causes troubles on
 	# incompatible host kernels.
