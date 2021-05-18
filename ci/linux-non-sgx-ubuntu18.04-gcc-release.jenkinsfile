@@ -2,6 +2,8 @@ node('nonsgx_slave') {
     checkout scm
     
     sh 'cp -rf ~/jenkins/graphene_master graphene'
+    sh 'cp -rf $WORKSPACE/ltp_src graphene/LibOS/shim/test/ltp/'
+    sh 'cp -rf $WORKSPACE/ltp_config/* graphene/LibOS/shim/test/ltp/'
     env.WORKSPACE = env.WORKSPACE + "/graphene"
     
     dir ("graphene") {
@@ -17,7 +19,7 @@ node('nonsgx_slave') {
 
             load '.ci/lib/stage-build-nosgx.jenkinsfile'
             load '.ci/lib/stage-test.jenkinsfile'
-            load '.ci/lib/stage-test-direct.jenkinsfile'
+            load '../ci/stage-test-direct.jenkinsfile'
         }
     }
 

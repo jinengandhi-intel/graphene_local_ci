@@ -2,13 +2,13 @@ node ('sgx_slave_2.6') {
     checkout scm
 
     sh 'cp -rf ~/jenkins/graphene_master graphene'
+    sh 'cp -rf $WORKSPACE/ltp_src graphene/LibOS/shim/test/ltp/'
+    sh 'cp -rf $WORKSPACE/ltp_config/* graphene/LibOS/shim/test/ltp/'
     env.WORKSPACE = env.WORKSPACE + "/graphene"
     env.SGX = '1'
 
     dir ("graphene") {
         load '../ci/config-docker.jenkinsfile'
-        //sh 'cp -f ../ci/ltp_mmap_sgx.patch $WORKSPACE'
-        //sh 'git apply ltp_mmap_sgx.patch'
 
         docker.build(
             "local:${env.BUILD_TAG}",
