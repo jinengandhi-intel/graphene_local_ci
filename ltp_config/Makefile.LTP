@@ -4,7 +4,14 @@ target = $(INSTALLDIR)/INSTALL_SUCCESS build-manifest
 exec_target =
 
 clean-extra += clean-build
-SRCDIR = $(ROOTDIR)/ltp_src
+ifeq ($(SGX),1)
+	BUILDDIR:=$(BUILDDIR)-sgx
+	INSTALLDIR:=$(INSTALLDIR)-sgx
+	LTPROOT = install-sgx
+else
+	SRCDIR = $(ROOTDIR)/ltp_src
+endif
+
 LTPSCENARIO = $(INSTALLDIR)/runtest/syscalls-new
 VERSION = $(shell uname -r)
 export VERSION
@@ -57,7 +64,7 @@ sgx-tokens: build-manifest
 
 .PHONY: regression
 regression:
-ifeq ($(SGX),"1")
+ifeq ($(SGX),1)
 	$(RM) ltp-sgx.xml
 	$(MAKE) ltp-sgx.xml
 else
@@ -66,11 +73,11 @@ else
 endif
 
 ltp.xml: CFG = ltp_tests.cfg
-ltp-sgx.xml: CFG = ltp_tests.cfg ltp-sgx.cfg ltp-bug-1075.cfg
+ltp-sgx.xml: CFG = ltp_tests.cfg ltp-sgx_tests.cfg ltp-bug-1075_tests.cfg
 
 %.xml: $(CFG) $(target) $(INSTALLDIR)/INSTALL_SUCCESS
 	./contrib/conf_lint.py $(CFG) --scenario $(LTPSCENARIO)
-	./runltp_tests.py $(RUNLTPOPTS) $(foreach cfg,$(CFG),-c $(cfg)) $(LTPSCENARIO) -O $@
+	./runltp_tests.py $(RUNLTPOPTS) $(foreach cfg,$(CFG),-c $(cfg)) $(LTPSCENARIO) -o ltproot=$(LTPROOT) -O $@
 
 .PHONY: clean-build
 clean-build:
