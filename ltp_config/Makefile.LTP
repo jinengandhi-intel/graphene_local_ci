@@ -10,6 +10,7 @@ ifeq ($(SGX),1)
 	LTPROOT = install-sgx
 else
 	SRCDIR = $(ROOTDIR)/ltp_src
+	LTPROOT = install
 endif
 
 LTPSCENARIO = $(INSTALLDIR)/runtest/syscalls-new

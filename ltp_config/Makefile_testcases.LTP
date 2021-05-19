@@ -1,9 +1,13 @@
 include ../../../makevars.mk
 
+ifeq ($(SGX),1)
+	INSTALLDIR:=$(INSTALLDIR)-sgx
+endif
+
 LTPSCENARIO = $(INSTALLDIR)/runtest/syscalls-new
 
 testcases = $(shell cd $(ROOTDIR); \
-	./runltp_xml.py $(RUNLTPOPTS) -c ltp_tests.cfg --list-executables $(LTPSCENARIO))
+	./runltp_tests.py $(RUNLTPOPTS) -c ltp_tests.cfg --list-executables $(LTPSCENARIO))
 
 exec_target = $(testcases)
 manifests = $(addsuffix .manifest,$(testcases))

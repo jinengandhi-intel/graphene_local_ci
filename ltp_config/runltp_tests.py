@@ -238,68 +238,7 @@ class TestRunner:
         else:
             return self.cmd[0]
 
-    async def run_test_setup(self):
-        exec_name = os.path.join(self.suite.bindir.resolve(), 
-        self.get_executable_name()).replace("run", "setup")
-        cmd = [exec_name]
-
-        timeout = self.cfgsection.getfloat('timeout')
-        self.log.info('starting %r with timeout %d', cmd, timeout)
-
-        # pylint: disable=subprocess-popen-preexec-fn
-        proc = await asyncio.create_subprocess_exec(
-            *cmd,
-            cwd=fspath(self.suite.bindir),
-            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-            preexec_fn=os.setsid,
-            close_fds=True)
-
-        tasks = [asyncio.ensure_future(i) for i in [proc.wait(),
-            proc.communicate()]]
-
-        done, pending = await asyncio.wait(tasks, timeout=timeout,
-            return_when=asyncio.FIRST_COMPLETED)
-        
-        try:
-            # after `setsid` pgid should be the same as pid
-            if proc.pid != os.getpgid(proc.pid):
-                self.log.warning('main process changed pgid, this might '
-                    'indicate an error and prevent all processes from being '
-                    'cleaned up')
-        except ProcessLookupError:
-            pass
-
-        try:
-            os.killpg(proc.pid, signal.SIGKILL)
-        except ProcessLookupError:
-            pass
-
-        if pending:
-            _, pending = await asyncio.wait(pending)
-            assert not pending
-
-        assert tasks[1].done()
-
-        stdout, stderr = (stream.decode(errors=ERRORHANDLER)
-            for stream in tasks[1].result())
-
-        if any(x in str(stdout) for x in ["TCONF", "TFAIL", "TBROK"]):
-            raise Error("Failed in setup function for {}".format(cmd)) 
-
-        if any(x in str(stderr) for x in ["TCONF", "TFAIL", "TBROK"]):
-            raise Error("Failed in setup function for {}".format(cmd)) 
-
-    async def _run_cmd(self):
-        '''Actually run the test and possibly set various attributes that result
-        from the test run.
-
-        Raises:
-            AbnormalTestResult: for assorted failures
-        '''
-        if "_run" in self.cmd[0]:
-            await self.run_test_setup()
-        
-        cmd = [self.suite.loader, *self.cmd]
+    async def cmd_execute(self, cmd):
         timeout = self.cfgsection.getfloat('timeout')
         self.log.info('starting %r with timeout %d', cmd, timeout)
         start_time = time.time()
@@ -312,10 +251,6 @@ class TestRunner:
             preexec_fn=os.setsid,
             close_fds=True)
 
-        # try:
-        #     stdout, stderr = await asyncio.wait_for(
-        #         proc.communicate(), timeout=timeout)
-    
         # XXX: change `ensure_future` to `create_task` once versions < 3.7 are
         # deprecated
         tasks = [asyncio.ensure_future(i) for i in [proc.wait(),
@@ -352,6 +287,33 @@ class TestRunner:
 
         if timedout:
             raise Error('Timed out after {} s.'.format(timeout))
+        
+        return proc
+
+    async def run_test_setup(self):
+        exec_name = os.path.join(self.suite.bindir.resolve(), 
+        self.get_executable_name()).replace("run", "setup")
+        cmd = [exec_name]
+
+        proc = await self.cmd_execute(cmd)
+
+        if any(x in str(self.stdout) for x in ["TCONF", "TFAIL", "TBROK"]) or any(x in str(self.stderr) for x in ["TCONF", "TFAIL", "TBROK"]):
+            self.props['returncode'] = proc.returncode
+            raise Error("Failed in setup function for {}".format(cmd))
+
+    async def _run_cmd(self):
+        '''Actually run the test and possibly set various attributes that result
+        from the test run.
+
+        Raises:
+            AbnormalTestResult: for assorted failures
+        '''
+        if "_run" in self.cmd[0]:
+            await self.run_test_setup()
+        
+        cmd = [self.suite.loader, *self.cmd]
+        
+        proc = await self.cmd_execute(cmd)
 
         self.log.info('finished pid=%d time=%.3f returncode=%d stdout=%s',
             proc.pid, self.time, proc.returncode, self.stdout)
