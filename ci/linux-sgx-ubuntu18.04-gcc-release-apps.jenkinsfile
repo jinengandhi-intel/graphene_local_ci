@@ -5,10 +5,10 @@ node ('sgx_slave_2.6') {
     sh 'cp -rf $WORKSPACE/ltp_src graphene/LibOS/shim/test/ltp/'
     sh 'cp -rf $WORKSPACE/ltp_config/* graphene/LibOS/shim/test/ltp/'
     env.WORKSPACE = env.WORKSPACE + "/graphene"
-    sed -i -e '1h;8,$H;$!d;g' -e 's/if (dent != g_dentry_root && dent->state & DENTRY_VALID) {/assert(dent == g_dentry_root || !(dent->state \& DENTRY_VALID));/' \
-        "$env.WORKSPACE/LibOS/shim/src/fs/shim_fs.c"
-    sed -i 's/.release  = "3.10.0"/.release  = "5.10.0"/' \
-        "$env.WORKSPACE/LibOS/shim/src/sys/shim_uname.c"
+    sh 'sed -i -e "1h;8,$H;$!d;g" -e "s/if (dent != g_dentry_root && dent->state & DENTRY_VALID) {/assert(dent == g_dentry_root || !(dent->state \& DENTRY_VALID));/" \
+        "$env.WORKSPACE/LibOS/shim/src/fs/shim_fs.c"'
+    sh 'sed -i "s/.release  = "3.10.0"/.release  = "5.10.0"/" \
+        "$env.WORKSPACE/LibOS/shim/src/sys/shim_uname.c"'
     env.SGX = '1'
 
     dir ("graphene") {
