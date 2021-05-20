@@ -147,33 +147,10 @@ static void access_test(struct tcase *tc, const char *user)
 static void verify_access(unsigned int n)
 {
 	tst_res(TPASS, "NO test function here");
-	/*
-	struct tcase *tc = &tcases[n];
-	pid_t pid;
-	*/
-	/* test as root */
-	//access_test(tc, "root");
-
-	/* test as nobody 
-	pid = SAFE_FORK();
-	if (pid) {
-		SAFE_WAITPID(pid, NULL, 0);
-	} else {
-		SAFE_SETUID(uid);
-		access_test(tc, "nobody");
-	}
-	*/
 }
 
 static void setup(void)
 {
-	/*
-	struct passwd *pw;
-
-	pw = SAFE_GETPWNAM("nobody");
-
-	uid = pw->pw_uid;
-	*/
 	SAFE_TOUCH(FNAME_F, 0000, NULL);
 	SAFE_TOUCH(FNAME_R, 0444, NULL);
 	SAFE_TOUCH(FNAME_W, 0222, NULL);
@@ -189,8 +166,6 @@ static void setup(void)
 static struct tst_test test = {
 	.tcnt = ARRAY_SIZE(tcases),
 	.needs_tmpdir = 1,
-	.needs_root = 1,
-	.forks_child = 1,
 	.setup = setup,
 	.test = verify_access,
 };

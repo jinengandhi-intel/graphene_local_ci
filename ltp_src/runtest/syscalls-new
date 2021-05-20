@@ -7,7 +7,6 @@ accept02 accept02
 accept4_01 accept4_01
 
 access01_run access01_run
-access02_run access02_run
 access03 access03
 access04 access04
 
@@ -350,7 +349,6 @@ fork08 fork08
 fork09 fork09
 fork10 fork10
 fork11 fork11
-fork13 fork13 -i 1000000
 fork14 fork14
 
 fpathconf01 fpathconf01
@@ -703,7 +701,6 @@ mkdir03 mkdir03
 mkdir04 mkdir04
 mkdir05 mkdir05
 mkdir05A symlink01 -T mkdir05
-mkdir09 mkdir09
 
 #mkdirat test cases
 mkdirat01 mkdirat01
@@ -856,7 +853,6 @@ nice04 nice04
 
 open01 open01
 open01A symlink01 -T open01
-open02_run open02_run
 open03 open03
 open04 open04
 open05 open05
@@ -865,7 +861,6 @@ open07_run open07_run
 open08 open08
 open09 open09
 open10 open10
-open11_run open11_run
 open12 open12
 open13_run open13_run
 open14 open14
@@ -901,8 +896,6 @@ newuname01 newuname01
 pathconf01 pathconf01
 
 pause01 pause01
-pause02 pause02
-pause03 pause03
 
 personality01 personality01
 personality02 personality02
@@ -1438,8 +1431,6 @@ stat01 stat01
 stat01_64 stat01_64
 stat02 stat02
 stat02_64 stat02_64
-stat03_run stat03_run
-stat03_run_64 stat03_run_64
 stat04 symlink01 -T stat04
 stat04_64 symlink01 -T stat04_64
 

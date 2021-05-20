@@ -1,17 +1,26 @@
 stage('test-direct') {
     try {
-        timeout(time: 20, unit: 'MINUTES') {
+        timeout(time: 30, unit: 'MINUTES') {
             sh '''
                 cd LibOS/shim/test/ltp
-                make ${MAKEOPTS} -f Makefile.LTP all
-                make -f Makefile.LTP ltp.xml
+                export CFG=ltp_tests.cfg
+                export LTPSCENARIO=$PWD/install/runtest/syscalls-new
+                make ${MAKEOPTS} -f Makefile.LTP all LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
+                make -f Makefile.LTP ltp_results_1.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
             '''
+            /*
+            sh '''
+                export CFG=ltp-sudo-syscalls.cfg
+                export LTPSCENARIO=$PWD/install/runtest/syscalls-sudo
+                make -f Makefile.LTP ltp_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
+            '''
+            */
         }
     } finally {
-        archiveArtifacts 'LibOS/shim/test/ltp/ltp.xml'
-        junit 'LibOS/shim/test/ltp/ltp.xml'
+        archiveArtifacts 'LibOS/shim/test/ltp/ltp_results_*.xml'
+        junit 'LibOS/shim/test/ltp/ltp_results_*.xml'
     }
-    timeout(time: 5, unit: 'MINUTES') {
+    /*timeout(time: 5, unit: 'MINUTES') {
         sh '''
             cd Examples/python-simple
             make ${MAKEOPTS} all
@@ -21,6 +30,13 @@ stage('test-direct') {
     timeout(time: 5, unit: 'MINUTES') {
         sh '''
             cd Examples/python-scipy
+            make ${MAKEOPTS} all
+            make check
+        '''
+    }*/
+    timeout(time: 5, unit: 'MINUTES') {
+        sh '''
+            cd Examples/python
             make ${MAKEOPTS} all
             make check
         '''

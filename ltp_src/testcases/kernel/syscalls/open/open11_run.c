@@ -303,7 +303,4 @@ static struct tst_test test = {
 	.tcnt = ARRAY_SIZE(tc),
 	.setup = setup,
 	.test = verify_open,
-	// .needs_devfs = 1,
-	// .mntpoint = MNTPOINT,
-	.needs_root = 1,
 };

@@ -109,5 +109,4 @@ static struct tst_test test = {
 	.test = verify_open,
 	.needs_devfs = 1,
 	.mntpoint = MNTPOINT,
-	.needs_root = 1,
 };

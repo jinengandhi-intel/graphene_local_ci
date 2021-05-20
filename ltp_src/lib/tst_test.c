@@ -105,7 +105,7 @@ static void setup_ipc(void)
 
 	SAFE_FTRUNCATE(ipc_fd, size);
 
-	results = SAFE_MMAP(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, ipc_fd, 0);
+	results = SAFE_MMAP(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, ipc_fd, 0);
 
 	/* Checkpoints needs to be accessible from processes started by exec() */
 	if (tst_test->needs_checkpoints || tst_test->child_needs_reinit) {
@@ -154,7 +154,7 @@ void tst_reinit(void)
 
 	fd = SAFE_OPEN(path, O_RDWR);
 
-	results = SAFE_MMAP(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+	results = SAFE_MMAP(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	tst_futexes = (char*)results + sizeof(struct results);
 	tst_max_futexes = (size - sizeof(struct results))/sizeof(futex_t);
 

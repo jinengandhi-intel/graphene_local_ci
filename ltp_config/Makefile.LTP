@@ -13,7 +13,6 @@ else
 	LTPROOT = install
 endif
 
-LTPSCENARIO = $(INSTALLDIR)/runtest/syscalls-new
 VERSION = $(shell uname -r)
 export VERSION
 
@@ -73,12 +72,9 @@ else
 	$(MAKE) ltp.xml
 endif
 
-ltp.xml: CFG = ltp_tests.cfg
-ltp-sgx.xml: CFG = ltp_tests.cfg ltp-sgx_tests.cfg ltp-bug-1075_tests.cfg
-
-%.xml: $(CFG) $(target) $(INSTALLDIR)/INSTALL_SUCCESS
-	./contrib/conf_lint.py $(CFG) --scenario $(LTPSCENARIO)
-	./runltp_tests.py $(RUNLTPOPTS) $(foreach cfg,$(CFG),-c $(cfg)) $(LTPSCENARIO) -o ltproot=$(LTPROOT) -O $@
+%.xml: $(LTPCFG) $(target) $(INSTALLDIR)/INSTALL_SUCCESS
+	./contrib/conf_lint.py $(LTPCFG) --scenario $(LTPTESTFILE)
+	./runltp_tests.py $(RUNLTPOPTS) $(foreach cfg,$(LTPCFG),-c $(cfg)) $(LTPTESTFILE) -o ltproot=$(LTPROOT) -O $@
 
 .PHONY: clean-build
 clean-build:

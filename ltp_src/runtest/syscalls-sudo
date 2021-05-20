@@ -1,0 +1,15 @@
+# Kernel Syscalls which needs to run with sudo
+access02_run access02_run
+
+fork13 fork13 -i 1000000
+
+mkdir09 mkdir09
+
+open02_run open02_run
+open11_run open11_run
+
+pause02 pause02
+pause03 pause03
+
+stat03_run stat03_run
+stat03_run_64 stat03_run_64

@@ -42,7 +42,7 @@ static const char *kconfig_path(char *path_buf, size_t path_buf_len)
 	if (!access(path_buf, F_OK))
 		return path_buf;
 
-	tst_res(TINFO, "Couldn't locate kernel config!");
+	tst_res(TINFO, "Couldn't locate kernel config!: %s", path_buf);
 
 	return NULL;
 }

@@ -125,9 +125,7 @@ static void access_test(struct tcase *tc, const char *user)
 		 * has execute access, attempt to execute the executable
 		 * file, if successful, access() behaviour is correct.
 		 */
-		sprintf(command, "./%s", tc->targetname);
-
-		TEST(system(command));
+		TEST(system(tc->targetname));
 
 		if (TST_RET != 0) {
 			tst_res(TFAIL | TTERRNO, "execute %s as %s failed",
@@ -175,18 +173,6 @@ static void setup(void)
 	pw = SAFE_GETPWNAM("nobody");
 
 	uid = pw->pw_uid;
-
-	/*SAFE_TOUCH(FNAME_F, 0000, NULL);
-	SAFE_TOUCH(FNAME_R, 0444, NULL);
-	SAFE_TOUCH(FNAME_W, 0222, NULL);
-	SAFE_TOUCH(FNAME_X, 0555, NULL);
-	SAFE_FILE_PRINTF(FNAME_X, "#!%s\n", _PATH_BSHELL);
-
-	SAFE_SYMLINK(FNAME_F, SNAME_F);
-	SAFE_SYMLINK(FNAME_R, SNAME_R);
-	SAFE_SYMLINK(FNAME_W, SNAME_W);
-	SAFE_SYMLINK(FNAME_X, SNAME_X);
-	*/
 }
 
 static struct tst_test test = {

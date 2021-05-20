@@ -47,24 +47,6 @@ void setup(void)
 static void verify_open(unsigned int n)
 {
     tst_res(TPASS, "No test functions here");
-	// struct tcase *tc = &tcases[n];
-
-	// TEST(open(tc->filename, tc->flag, 0444));
-
-	// if (TST_RET != -1) {
-	// 	tst_res(TFAIL, "open(%s) succeeded unexpectedly",
-	// 		tc->filename);
-	// 	return;
-	// }
-
-	// if (tc->exp_errno != TST_ERR) {
-	// 	tst_res(TFAIL | TTERRNO,
-	// 		"open() should fail with %s",
-	// 		tst_strerrno(tc->exp_errno));
-	// 	return;
-	// }
-
-	// tst_res(TPASS | TTERRNO, "open() failed as expected");
 }
 
 void cleanup(void)
@@ -74,7 +56,6 @@ void cleanup(void)
 
 static struct tst_test test = {
 	.tcnt = ARRAY_SIZE(tcases),
-	.needs_root = 1,
 	.needs_tmpdir = 1,
 	.setup = setup,
 	.cleanup = cleanup,
