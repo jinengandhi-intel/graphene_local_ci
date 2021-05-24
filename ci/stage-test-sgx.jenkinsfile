@@ -3,13 +3,12 @@ stage('test-sgx') {
         try {
             sh '''
                 cd LibOS/shim/test/ltp
-                export CFG=ltp_tests.cfg ltp-sgx_tests.cfg ltp-bug-1075_tests.cfg
-                export LTPSCENARIO=$PWD/install-sgx/runtest/syscalls-new
-                make ${MAKEOPTS} -f Makefile.LTP all sgx-tokens LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
-                make -f Makefile.LTP ltp-sgx_results_1.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
+                make ${MAKEOPTS} -f Makefile.LTP SGX=1 all sgx-tokens LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
+                make -f Makefile.LTP ltp-sgx_results_1.xml SGX=1 LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
             '''
             /*
             sh '''
+                cd LibOS/shim/test/ltp
                 export CFG=ltp-sudo-syscalls.cfg
                 export LTPSCENARIO=$PWD/install-sgx/runtest/syscalls-sudo
                 make -f Makefile.LTP ltp-sgx_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO

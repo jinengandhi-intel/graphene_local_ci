@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 				 "writing to %s failed", filename);
 		}
 
-		array = mmap(0, memsize, PROT_WRITE, MAP_SHARED, fd, 0);
+		array = mmap(0, memsize, PROT_WRITE, MAP_PRIVATE, fd, 0);
 		if (array == MAP_FAILED) {
 			TEST_ERRNO = errno;
 			close(fd);

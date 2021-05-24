@@ -4,12 +4,12 @@ target = $(INSTALLDIR)/INSTALL_SUCCESS build-manifest
 exec_target =
 
 clean-extra += clean-build
+SRCDIR = $(ROOTDIR)/ltp_src
 ifeq ($(SGX),1)
 	BUILDDIR:=$(BUILDDIR)-sgx
 	INSTALLDIR:=$(INSTALLDIR)-sgx
 	LTPROOT = install-sgx
 else
-	SRCDIR = $(ROOTDIR)/ltp_src
 	LTPROOT = install
 endif
 
@@ -37,6 +37,9 @@ $(BUILDDIR)/BUILD_SUCCESS: $(SRCDIR)/configure
 	# Out-of-tree build steps were taken from ltp/INSTALL.
 	# The instructions below assume that SRCDIR and BUILDDIR are absolute.
 	sed -i 's/un.release/"$(VERSION)"/g' $(SRCDIR)/lib/tst_kconfig.c
+	@if [ $(SGX) = 1 ]; then \
+		sed -i 's/MAP_SHARED/MAP_PRIVATE/g' $(SRCDIR)/lib/tst_test.c;\
+	fi
 	mkdir -p $(BUILDDIR)
 	# Kernel module tests are not meaningful for our LibOS and building them causes troubles on
 	# incompatible host kernels.
@@ -55,7 +58,7 @@ build-manifest: $(TESTCASEDIR)/manifest.template $(INSTALLDIR)/INSTALL_SUCCESS
 	$(MAKE) -C $(TESTCASEDIR)
 
 $(TESTCASEDIR)/manifest.template: manifest.LTP $(INSTALLDIR)/INSTALL_SUCCESS
-	sed -e 's|$$(ARCH_LIBDIR)|'"$(ARCH_LIBDIR)"'|g' \
+	sed -e 's|$$(ARCH_LIBDIR)|'"$(ARCH_LIBDIR)"'|g; s|TESTCASEDIR|$(TESTCASEDIR)|g' \
 		$< > $@
 
 .PHONY: sgx-tokens
@@ -79,4 +82,4 @@ endif
 .PHONY: clean-build
 clean-build:
 	$(MAKE) -C $(SRCDIR) clean
-	$(RM) -r $(BUILDDIR) $(INSTALLDIR) ltp*.xml
+	$(RM) -r build* install* ltp*.xml

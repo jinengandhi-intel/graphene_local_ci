@@ -5,7 +5,7 @@ node ('sgx_slave_2.6') {
     sh 'cp -rf ~/jenkins/graphene_master graphene'
     env.WORKSPACE = env.WORKSPACE + "/graphene"
     env.SGX = '1'
-    
+            
     dir ("graphene") {
         load '../ci/config-docker.jenkinsfile'
         sh '../ci/disable_attestation_tests'

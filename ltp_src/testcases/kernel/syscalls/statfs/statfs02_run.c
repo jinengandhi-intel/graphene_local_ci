@@ -95,14 +95,6 @@ int main(int ac, char **av)
 
 static void setup(void)
 {
-// 	tst_sig(NOFORK, DEF_HANDLER, cleanup);
-
-// 	TEST_PAUSE;
-
-// 	tst_tmpdir();
-
-// 	fd = SAFE_CREAT(cleanup, TEST_FILE, 0444);
-
 	memset(test_toolong, 'a', PATH_MAX+1);
 
 #if !defined(UCLINUX)
@@ -110,8 +102,6 @@ static void setup(void)
 			       MAP_PRIVATE | MAP_ANONYMOUS, 0, 0);
 #endif
 
-	// SAFE_SYMLINK(cleanup, TEST_SYMLINK, "/tmp/statfs_symlink_2");
-	// SAFE_SYMLINK(cleanup, "/tmp/statfs_symlink_2", TEST_SYMLINK);
 }
 
 static void statfs_verify(const struct test_case_t *test)
