@@ -8,10 +8,12 @@ stage('build') {
         sh '''
             meson build \
                 --prefix="$PREFIX" \
+                --buildtype="$BUILDTYPE" \
+                -Dskeleton=enabled \
                 -Ddirect=enabled \
                 -Dsgx=disabled
-            ninja -C build
-            ninja -C build install
+            ninja -vC build
+            ninja -vC build install
         '''
     } finally {
         archiveArtifacts 'build/meson-logs/**/*'

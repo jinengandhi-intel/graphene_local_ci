@@ -5,7 +5,7 @@ ifeq ($(SGX),1)
 endif
 
 testcases = $(shell cd $(ROOTDIR); \
-	./runltp_tests.py $(RUNLTPOPTS) -c ltp_tests.cfg --list-executables $(LTPTESTFILE))
+	./runltp_tests.py $(RUNLTPOPTS) $(foreach cfg,$(LTPCFG),-c $(cfg)) --list-executables $(LTPTESTFILE))
 
 exec_target = $(testcases)
 manifests = $(addsuffix .manifest,$(testcases))

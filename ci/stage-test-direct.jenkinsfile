@@ -19,20 +19,6 @@ stage('test-direct') {
         archiveArtifacts 'LibOS/shim/test/ltp/ltp_results_*.xml'
         junit 'LibOS/shim/test/ltp/ltp_results_*.xml'
     }
-    /*timeout(time: 5, unit: 'MINUTES') {
-        sh '''
-            cd Examples/python-simple
-            make ${MAKEOPTS} all
-            make check
-        '''
-    }
-    timeout(time: 5, unit: 'MINUTES') {
-        sh '''
-            cd Examples/python-scipy
-            make ${MAKEOPTS} all
-            make check
-        '''
-    }*/
     timeout(time: 5, unit: 'MINUTES') {
         sh '''
             cd Examples/python
@@ -105,6 +91,7 @@ stage('test-direct') {
             LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8002
         '''
     }
+    /*
     timeout(time: 20, unit: 'MINUTES') {
         sh '''
             cd Examples/apache
@@ -116,6 +103,7 @@ stage('test-direct') {
             LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh https://127.0.0.1:8443
         '''
     }
+    */
     timeout(time: 5, unit: 'MINUTES') {
         sh '''
             cd Examples/blender

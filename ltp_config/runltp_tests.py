@@ -15,6 +15,7 @@ import signal
 import subprocess
 import sys
 import time
+import re
 
 from lxml import etree
 
@@ -156,7 +157,11 @@ class TestRunner:
             self.suite.inc('time', self.time, type=float, fmt='.3f')
 
         if self.stdout is not None:
-            etree.SubElement(element, 'system-out').text = self.stdout
+            try:
+                etree.SubElement(element, 'system-out').text = self.stdout
+            except ValueError:
+                res = re.sub(u'[^\u0020-\uD7FF\u0009\u000A\u000D\uE000-\uFFFD\U00010000-\U0010FFFF]+', '', self.stdout)
+                etree.SubElement(element, 'system-out').text = res
         if self.stderr is not None:
             etree.SubElement(element, 'system-err').text = self.stderr
 
