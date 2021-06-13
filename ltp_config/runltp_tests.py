@@ -343,13 +343,13 @@ class TestRunner:
                 returncode = await self._run_cmd()
 
             must_pass = self.cfgsection.getintset('must-pass')
-            if must_pass is not None:
+            if not self.stdout:
+                raise Fail('returncode={}'.format(returncode))
+            elif must_pass is not None:
                 self._parse_test_output(must_pass)
-            elif returncode != 0:
-                raise Fail('returncode={}'.format(returncode))
-            elif self.stdout == None:
-                raise Fail('returncode={}'.format(returncode))
             elif ("TFAIL" in self.stdout or "TBROK" in self.stdout):
+                raise Fail('returncode={}'.format(returncode))
+            elif ("TCONF" in self.stdout and "TPASS" not in self.stdout):
                 raise Fail('returncode={}'.format(returncode))
 
         except AbnormalTestResult as result:

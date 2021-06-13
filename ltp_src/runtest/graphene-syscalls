@@ -3,7 +3,6 @@ accept02 accept02
 
 access01_run access01_run
 access02_run access02_run
-access03 access03
 access04 access04
 
 acct01 acct01
@@ -44,8 +43,6 @@ chdir01 chdir01
 chdir01A symlink01 -T chdir01
 
 chmod01A symlink01 -T chmod01
-chmod03 chmod03
-chmod04 chmod04
 chmod05 chmod05
 chmod06 chmod06
 chmod07 chmod07
@@ -69,9 +66,9 @@ clock_adjtime01 clock_adjtime01
 clock_adjtime02 clock_adjtime02
 
 clock_nanosleep01 clock_nanosleep01
+clock_nanosleep02 clock_nanosleep02
 clock_nanosleep03 clock_nanosleep03
 
-clock_gettime02 clock_gettime02
 clock_gettime03 clock_gettime03
 leapsec01 leapsec01
 
@@ -100,7 +97,7 @@ delete_module03 delete_module03
 
 epoll01 epoll-ltp
 epoll_wait01 epoll_wait01
-epoll_wait03 epoll_wait03
+epoll_wait02 epoll_wait02
 
 eventfd01 eventfd01
 
@@ -166,6 +163,8 @@ fchown05_16 fchown05_16
 #fchownat test case
 fchownat02_run fchownat02_run
 
+fcntl01 fcntl01
+fcntl01_64 fcntl01_64
 fcntl05 fcntl05
 fcntl05_64 fcntl05_64
 fcntl06 fcntl06
@@ -526,6 +525,7 @@ mlock202 mlock202
 mlock203 mlock203
 
 mmap01 mmap01
+mmap03 mmap03
 mmap05 mmap05
 mmap12 mmap12
 mmap13 mmap13
@@ -533,7 +533,6 @@ mmap14 mmap14
 # test is broken, mask it for now.
 #mmap11 mmap11 -i 30000
 mmap16 mmap16
-mmap17 mmap17
 mmap18 mmap18
 
 modify_ldt01 modify_ldt01
@@ -672,6 +671,7 @@ pipe2_04 pipe2_04
 
 pivot_root01 pivot_root01
 
+poll02 poll02
 ppoll01 ppoll01
 
 prctl01 prctl01
@@ -711,6 +711,9 @@ process_vm_writev02 process_vm_writev02
 
 prot_hsymlinks prot_hsymlinks
 dirtyc0w dirtyc0w
+
+pselect01 pselect01
+pselect01_64 pselect01_64
 
 ptrace01 ptrace01
 ptrace03 ptrace03
@@ -776,7 +779,6 @@ rename04 rename04
 rename05 rename05
 rename06 rename06
 rename07 rename07
-rename08_run rename08_run
 rename09 rename09
 rename11 rename11
 rename12 rename12
@@ -799,7 +801,6 @@ rmdir03 rmdir03
 rmdir03A symlink01 -T rmdir03
 
 rt_sigqueueinfo01 rt_sigqueueinfo01
-rt_sigtimedwait01 rt_sigtimedwait01
 rt_tgsigqueueinfo01 rt_tgsigqueueinfo01
 
 sbrk03 sbrk03
@@ -826,7 +827,6 @@ sched_setscheduler02 sched_setscheduler02
 sched_setscheduler03 sched_setscheduler03
 
 sched_setaffinity01 sched_setaffinity01
-sched_getaffinity01 sched_getaffinity01
 
 sched_setattr01 sched_setattr01
 sched_getattr01 sched_getattr01
@@ -957,7 +957,6 @@ setreuid06_16 setreuid06_16
 setreuid07 setreuid07
 setreuid07_16 setreuid07_16
 
-setrlimit02 setrlimit02
 setrlimit05 setrlimit05
 setrlimit06 setrlimit06
 
@@ -1012,13 +1011,6 @@ signalfd01 signalfd01
 
 signalfd4_01 signalfd4_01
 signalfd4_02 signalfd4_02
-
-sigpending02 sigpending02
-
-sigtimedwait01 sigtimedwait01
-
-sigwait01 sigwait01
-sigwaitinfo01 sigwaitinfo01
 
 socketcall01 socketcall01
 socketcall02 socketcall02
@@ -1200,13 +1192,7 @@ waitpid13 waitpid13
 
 waitid02 waitid02
 
-write03 write03
 write04 write04
-write05 write05
-
-writev02 writev02
-writev05 writev05
-writev07 writev07
 
 perf_event_open01 perf_event_open01
 perf_event_open02 perf_event_open02
@@ -1214,6 +1200,7 @@ perf_event_open02 perf_event_open02
 futex_cmp_requeue01 futex_cmp_requeue01
 futex_wait02 futex_wait02
 futex_wait03 futex_wait03
+futex_wait05 futex_wait05
 futex_wake02 futex_wake02
 futex_wake03 futex_wake03
 futex_wake04 futex_wake04
