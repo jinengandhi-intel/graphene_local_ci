@@ -347,6 +347,10 @@ class TestRunner:
                 self._parse_test_output(must_pass)
             elif returncode != 0:
                 raise Fail('returncode={}'.format(returncode))
+            elif self.stdout == None:
+                raise Fail('returncode={}'.format(returncode))
+            elif ("TFAIL" in self.stdout or "TBROK" in self.stdout):
+                raise Fail('returncode={}'.format(returncode))
 
         except AbnormalTestResult as result:
             result.apply_to(self)
