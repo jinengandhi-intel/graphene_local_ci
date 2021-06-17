@@ -1,29 +1,44 @@
 node ('sgx_slave_2.6') {
-    checkout scm
+    env.ORIG_WKSP = env.WORKSPACE
+    try {
+        stage('checkout'){
+            dir ('./') {
+                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
+            }
 
-    sh 'cp -rf ~/jenkins/graphene_master graphene'
-    sh 'cp -rf $WORKSPACE/ltp_src graphene/LibOS/shim/test/ltp/'
-    sh 'cp -rf $WORKSPACE/ltp_config/* graphene/LibOS/shim/test/ltp/'
-    env.WORKSPACE = env.WORKSPACE + "/graphene"
-    env.SGX = '1'
+            dir('graphene') {
+                git url: 'https://github.com/oscarlab/graphene.git'
+            }
+        }
 
-    sh 'sed -i -e \'s/dent != g_dentry_root && dent->state & DENTRY_VALID/0/\' \
-        $WORKSPACE/LibOS/shim/src/fs/shim_fs.c'
-    sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
-        $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
-    dir ("graphene") {
-        load '../ci/config-docker.jenkinsfile'
+        dir ("graphene") {
+            sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
+            sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
+            env.WORKSPACE = env.WORKSPACE + "/graphene"
+            env.SGX = '1'
 
-        docker.build(
-            "local:${env.BUILD_TAG}",
-            '-f ../ci/ubuntu18.04.dockerfile .'
-        ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
-            load '.ci/lib/config.jenkinsfile'
-            load '.ci/lib/config-ubuntu18.04.jenkinsfile'
-            load '.ci/lib/config-release.jenkinsfile'
+            sh 'sed -i -e \'s/dent != g_dentry_root && dent->state & DENTRY_VALID/0/\' \
+                $WORKSPACE/LibOS/shim/src/fs/shim_fs.c'
+            sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
+                $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
 
-            load '../ci/stage-build-sgx.jenkinsfile'
-            load '../ci/stage-test-sgx.jenkinsfile'
-        }    
+            load '../ci/config-docker.jenkinsfile'
+
+            docker.build(
+                "local:${env.BUILD_TAG}",
+                '-f ../ci/ubuntu18.04.dockerfile .'
+            ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
+                load '.ci/lib/config.jenkinsfile'
+                load '.ci/lib/config-ubuntu18.04.jenkinsfile'
+                load '.ci/lib/config-release.jenkinsfile'
+
+                load '../ci/stage-build-sgx.jenkinsfile'
+                load '../ci/stage-test-sgx.jenkinsfile'
+            }
+        }
+    } finally {
+        stage('cleanup'){
+            sh 'rm -rf $ORIG_WKSP/*'
+        }
     }
 }
