@@ -328,7 +328,7 @@ class TestRunner:
         self.props['returncode'] = proc.returncode
 
         try:
-            os.system("rm -rf /tmp/*")
+            os.system("rm -rf /tmp/*  > /dev/null 2>&1")
         except:
             pass
 
