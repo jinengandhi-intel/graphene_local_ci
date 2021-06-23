@@ -1,9 +1,10 @@
-node('nonsgx_slave') {
+node('graphene_icl_04') {
     env.ORIG_WKSP = env.WORKSPACE
     try {
         stage('checkout'){
             dir('./') {
-                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
+                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git',
+                branch: 'jinengan_stress_ng'
             }
 
             dir('graphene') {
@@ -14,6 +15,7 @@ node('nonsgx_slave') {
         dir ("graphene") {
             sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
+            sh 'cp -rf $WORKSPACE/stress-ng Examples/'
             env.WORKSPACE = env.WORKSPACE + "/graphene"
     
             sh 'sed -i -e \'s/dent != g_dentry_root && dent->state & DENTRY_VALID/0/\' \
@@ -32,8 +34,7 @@ node('nonsgx_slave') {
                 load '.ci/lib/config-release.jenkinsfile'
 
                 load '.ci/lib/stage-build-nosgx.jenkinsfile'
-                load '../ci/stage-test.jenkinsfile'
-                load '../ci/stage-test-direct.jenkinsfile'
+                load '../ci/stage-test-stress-ng.jenkinsfile'
             }
         }
     } finally {

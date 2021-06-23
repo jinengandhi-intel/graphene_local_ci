@@ -1,0 +1,18 @@
+stage('test') {
+    timeout(time: 90, unit: 'MINUTES') {
+        sh '''
+            export cmd=graphene-direct
+            cd Examples/stress-ng
+            if test -n "$SGX"
+            then
+                make SGX=1
+                export cmd=graphene-sgx
+            else
+                make
+            fi
+            
+            $cmd stress-ng --job io.job 
+        '''
+    }
+}
+            

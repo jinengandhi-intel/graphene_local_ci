@@ -8,6 +8,7 @@ env.DOCKER_ARGS_COMMON = """
 env.DOCKER_ARGS_SGX = '''
     --volume=/lib/modules:/lib/modules:ro
     --volume=/usr/src:/usr/src:ro
+    --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
 '''
 
 if (fileExists('/dev/sgx/enclave')) {
