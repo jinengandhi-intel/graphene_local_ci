@@ -1,9 +1,19 @@
 stage('build') {
-    sh '''
-        cd "$WORKSPACE"
-        openssl genrsa -3 -out Pal/src/host/Linux-SGX/signer/enclave-key.pem 3072
-        make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=""
-    '''
+    script {
+        if (env.node_label == "graphene_oot") {
+            sh '''
+                cd Pal/src/host/Linux-SGX/signer/ && openssl genrsa -3 -out enclave-key.pem 3072
+                cd "$WORKSPACE"
+                make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=/opt/intel/linux-sgx-driver
+            '''
+        } else {
+            sh '''
+                cd "$WORKSPACE"
+                openssl genrsa -3 -out Pal/src/host/Linux-SGX/signer/enclave-key.pem 3072
+                make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=""
+            '''
+        }
+    }
 
     try {
         sh '''
