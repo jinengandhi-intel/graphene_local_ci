@@ -34,8 +34,8 @@ node (node_label) {
                 load '.ci/lib/config-release.jenkinsfile'
 
                 load '../ci/stage-build-sgx.jenkinsfile'
-                load '../ci/stage-test-node.jenkinsfile'
-                load '../ci/stage-test-sgx-node.jenkinsfile'
+                load '../ci/stage-test.jenkinsfile'
+                load '../ci/stage-test-sgx.jenkinsfile'
             }
         }
     } finally {

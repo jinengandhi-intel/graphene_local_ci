@@ -33,8 +33,8 @@ node(node_label) {
                 load '.ci/lib/config-release.jenkinsfile'
 
                 load '.ci/lib/stage-build-nosgx.jenkinsfile'
-                load '../ci/stage-test-node.jenkinsfile'
-                load '../ci/stage-test-direct-node.jenkinsfile'
+                load '../ci/stage-test.jenkinsfile'
+                load '../ci/stage-test-direct.jenkinsfile'
             }
         }
     } finally {

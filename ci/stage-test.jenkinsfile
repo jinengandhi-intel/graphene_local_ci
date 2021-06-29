@@ -6,9 +6,8 @@ stage('test') {
                 PREFIX=../../../../../../LibOS/shim/test/fs
         fi
     '''
-
-    timeout(time: 15, unit: 'MINUTES') {
         try {
+    timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 if test -n "$SGX"
                 then
@@ -25,13 +24,17 @@ stage('test') {
                 fi
                 python3 -m pytest -v --junit-xml pal-regression.xml test_pal.py
             '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "PAL Test Failed"'
         } finally {
             junit 'Pal/regression/pal-regression.xml'
         }
-    }
 
+    try {
     timeout(time: 15, unit: 'MINUTES') {
-        try {
+
             sh '''
                 cd LibOS/shim/test/regression
                 make ${MAKEOPTS} RA_CLIENT_SPID=${ra_client_spid} all
@@ -41,13 +44,16 @@ stage('test') {
                 fi
                 python3 -m pytest -v -k "not attestation" --junit-xml libos-regression.xml test_libos.py
             '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "LibOS Test Failed"'
         } finally {
             junit 'LibOS/shim/test/regression/libos-regression.xml'
         }
-    }
 
+    try {
     timeout(time: 15, unit: 'MINUTES') {
-        try {
             sh '''
                 cd LibOS/shim/test/fs
                 make ${MAKEOPTS} all
@@ -57,8 +63,11 @@ stage('test') {
                 fi
                 python3 -m pytest -v --junit-xml fs.xml test_fs.py test_tmpfs.py test_pf.py
             '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "LibOS Test Failed"'
         } finally {
             junit 'LibOS/shim/test/fs/*.xml'
-        }
     }
 }

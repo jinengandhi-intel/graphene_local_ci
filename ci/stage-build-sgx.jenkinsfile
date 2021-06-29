@@ -3,6 +3,12 @@ stage('build') {
         if (env.node_label == "graphene_oot") {
             sh '''
                 cd Pal/src/host/Linux-SGX/signer/ && openssl genrsa -3 -out enclave-key.pem 3072
+
+                cd /opt/intel
+                git clone https://github.com/intel/linux-sgx-driver.git
+                cd linux-sgx-driver
+                git checkout 276c5c6a064d22358542f5e0aa96b1c0ace5d695
+
                 cd "$WORKSPACE"
                 make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=/opt/intel/linux-sgx-driver
             '''

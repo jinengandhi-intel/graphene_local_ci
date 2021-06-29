@@ -11,7 +11,7 @@ node(node_label) {
                 git url: 'https://github.com/oscarlab/graphene.git'
             }
         }
-    
+
         dir ("graphene") {
             sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
@@ -23,15 +23,18 @@ node(node_label) {
                 $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
 
             load '../ci/config-docker.jenkinsfile'
-            env.PREFIX = '/home/intel1/graphene_install/usr'
+            docker.build(
+                "local:${env.BUILD_TAG}",
+                '-f ../ci/ubuntu20.04.dockerfile .'
+            ).inside("${env.DOCKER_ARGS_COMMON}") {
+                load '.ci/lib/config.jenkinsfile'
+                load '.ci/lib/config-ubuntu20.04.jenkinsfile'
+                load '.ci/lib/config-release.jenkinsfile'
 
-            load '.ci/lib/config.jenkinsfile'
-            load '.ci/lib/config-ubuntu18.04.jenkinsfile'
-            load '.ci/lib/config-release.jenkinsfile'
-
-            load '.ci/lib/stage-build-nosgx.jenkinsfile'
-            load '../ci/stage-test.jenkinsfile'
-            load '../ci/stage-test-direct.jenkinsfile'
+                load '.ci/lib/stage-build-nosgx.jenkinsfile'
+                load '../ci/stage-test.jenkinsfile'
+                load '../ci/stage-test-direct.jenkinsfile'
+            }
         }
     } finally {
         stage('cleanup'){
