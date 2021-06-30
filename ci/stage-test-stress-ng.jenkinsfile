@@ -11,55 +11,15 @@ stage('test') {
                 make
             fi
             
-            $cmd stress-ng --job io.job 
-            $cmd stress-ng --job scheduler.job
-            $cmd stress-ng --job interrupt.job
-            $cmd stress-ng --job filesystem.job
-            $cmd stress-ng --job io_all.job
-            $cmd stress-ng --job scheduler_all.job
-            $cmd stress-ng --job interrupt_all.job
-            $cmd stress-ng --job filesystem_all.job
-            $cmd stress-ng --hdd 1 --hdd-ops 1000000 --timeout 60s
-            $cmd stress-ng --hdd 0 --hdd-ops 1000000 --timeout 60s
-            $cmd stress-ng --hdd 0 --seek 0 --timeout 120s
-            $cmd stress-ng --seek 0 --timeout 60s
-            $cmd stress-ng --hdd 3 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s
-            $cmd stress-ng --hdd 0 --timeout 60s
-            $cmd stress-ng --seek 8 --hdd 8 --parallel 2 --timeout 90s
-            $cmd stress-ng --seek 0 --hdd 0 --parallel 5 --timeout 90s
-            $cmd stress-ng --seek 8 --hdd 8 --parallel 5 --aggressive --timeout 90s
-            $cmd stress-ng --seek 0 --hdd 0 --parallel 8 --aggressive --timeout 120s
-            $cmd stress-ng --hdd 0 --aggressive --timeout 60s
-            $cmd stress-ng --hdd 3 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s
-            $cmd stress-ng --hdd 1 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s
-            $cmd stress-ng --chmod 1 --timeout 60s
-            $cmd stress-ng --chmod 2 --timeout 60s
-            $cmd stress-ng --chmod 3 --timeout 60s
-            $cmd stress-ng --chmod 4 --timeout 60s
-            $cmd stress-ng --hdd 3 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s --all 1
-            $cmd stress-ng --timeout 60s --seek 0 --seek-ops 1000000
-            $cmd stress-ng --timeout 60s --seek 0 --seek-ops 5000000
-            $cmd stress-ng --timeout 60s --seek 0 --seek-ops 5000000 --seek-punch
-            $cmd stress-ng --timeout 60s --seek 0 --seek-punch
-            $cmd stress-ng --timeout 60s --seek 16 --seek-punch --aggressive
-            $cmd stress-ng --timeout 60s --seek 16 --seek-size 2048M --all 16
-            $cmd stress-ng --hdd 0 --hdd-ops 1000000 --seek 0 --timeout 60s
-            $cmd stress-ng --hdd 1 --hdd-ops 1000000 --seek 0 --timeout 60s
-            $cmd stress-ng --hdd 0 --hdd-bytes 1G --hdd-ops 1000000 --seek 0 --timeout 60s
-            $cmd stress-ng --hdd 0 --hdd-bytes 10% --hdd-ops 1000000 --seek 0 --timeout 90s
-            $cmd stress-ng --hdd 0 --hdd-ops 1000000 --hdd-bytes 1G --timeout 30s
-            $cmd stress-ng --hdd 0 --hdd-ops 1000000 --hdd-bytes 10% --timeout 15s
-            $cmd stress-ng --hdd 3 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s
-            $cmd stress-ng --hdd 3 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s --all 1
-            $cmd stress-ng --hdd 5 --hdd-opts direct --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s --all 1
-            $cmd stress-ng --hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s --hdd-opts dsync
-            $cmd stress-ng --hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s --hdd-opts fadv-normal --aggressive
-            $cmd stress-ng --hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s --hdd-opts fadv-rand --ignite-cpu
-            $cmd stress-ng --hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --timeout 60s --hdd-opts iovec --keep-name
-            $cmd stress-ng --hdd 0 --hdd-ops 2000000 --hdd-bytes 30% --timeout 90s --hdd-opts syncfs
-            $cmd stress-ng --hdd 0 --hdd-ops 2000000 --hdd-bytes 30% --timeout 90s --hdd-opts fadv-dontneed --hdd-write-size 4K
-            $cmd stress-ng --hdd 0 --hdd-ops 2000000 --hdd-bytes 30% --timeout 90s --hdd-opts fadv-dontneed --hdd-write-size 16K
-        '''
+            $cmd stress-ng --job hdd.job 2>&1 | tee hdd.log
+            $cmd stress-ng --job seek.job 2>&1 | tee seek.log
+            $cmd stress-ng --job seek-hdd.job 2>&1 | tee seek-hdd.log
+            $cmd stress-ng --job scheduler.job 2>&1 | tee scheduler.log
+            $cmd stress-ng --job interrupt.job 2>&1 | tee interrupt.log
+            $cmd stress-ng --job filesystem.job 2>&1 | tee filesystem.log
+            $cmd stress-ng --job scheduler_all.job 2>&1 | tee scheduler_all.log
+            $cmd stress-ng --job interrupt_all.job 2>&1 | tee interrupt_all.log
+            $cmd stress-ng --job filesystem_all.job 2>&1 | tee filesystem_all.log
     }
 }
             

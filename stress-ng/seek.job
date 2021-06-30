@@ -1,0 +1,38 @@
+#
+# run the following tests in parallel or sequentially
+#
+run sequential
+
+#
+# metrics-brief:
+#   enable metrics and only output metrics that are non-zero.
+#
+metrics-brief
+
+#
+# verbose
+#   show all debug, warnings and normal information output.
+#
+verbose
+
+#
+# run each of the tests for 60 seconds
+#  stop stress test after N seconds. One can also specify the units
+#  of time in seconds, minutes, hours, days or years with the  suf‐
+#  fix s, m, h, d or y.
+#
+timeout 60s
+
+#
+# seek stressor options:
+#   start  N  workers  that  randomly  seeks  and  performs 512 byte
+#   read/write I/O operations on a file. The default file size is 16
+#   GB.
+#
+seek 0			# 0 means 1 stressor per CPU
+seek 0 seek-ops 1000000
+seek 0 seek-ops 5000000
+seek 0 seek-ops 5000000 seek-punch
+seek 0 seek-punch
+seek 16 seek-punch aggressive
+seek 16 seek-size 2048M all 16

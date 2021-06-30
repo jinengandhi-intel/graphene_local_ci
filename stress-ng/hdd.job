@@ -1,0 +1,51 @@
+#
+# run the following tests in parallel or sequentially
+#
+run sequential
+
+#
+# metrics-brief:
+#   enable metrics and only output metrics that are non-zero.
+#
+metrics-brief
+
+#
+# verbose
+#   show all debug, warnings and normal information output.
+#
+verbose
+
+#
+# run each of the tests for 60 seconds
+#  stop stress test after N seconds. One can also specify the units
+#  of time in seconds, minutes, hours, days or years with the  suf‐
+#  fix s, m, h, d or y.
+#
+timeout 60s
+
+#
+# hdd stressor options:
+#   start N workers continually writing, reading and removing tempo‐
+#   rary files. The default mode is to stress test sequential writes
+#   and  reads.   With  the  --ggressive  option enabled without any
+#   --hdd-opts options the hdd stressor will work  through  all  the
+#   --hdd-opt options one by one to cover a range of I/O options.
+#
+hdd 0			# 0 means 1 stressor per CPU
+hdd 0 aggressive
+hdd 0 hdd-ops 1000000
+hdd 0 hdd-ops 1000000 hdd-bytes 1G
+hdd 0 hdd-ops 2000000 hdd-bytes 30% hdd-opts syncfs
+hdd 0 hdd-ops 2000000 hdd-bytes 30% hdd-opts fadv-dontneed hdd-write-size 4K
+hdd 0 hdd-ops 2000000 hdd-bytes 30% hdd-opts fadv-dontneed hdd-write-size 16K
+
+hdd 1 hdd-ops 1000000
+hdd 1 hdd-ops 1000000 hdd-bytes 10%
+
+hdd 3 hdd-ops 1000000 hdd-bytes 10%
+hdd 3 hdd-ops 1000000 hdd-bytes 10% all 1
+
+hdd 5 hdd-ops 1000000 hdd-bytes 10% hdd-opts dsync
+hdd 5 hdd-ops 1000000 hdd-bytes 10% hdd-opts fadv-normal aggressive
+hdd 5 hdd-ops 1000000 hdd-bytes 10% hdd-opts fadv-rand ignite-cpu
+hdd 5 hdd-ops 1000000 hdd-bytes 10% hdd-opts iovec keep-name
