@@ -13,6 +13,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     gettext \
     git \
     jq \
+    libaio1 \
     libapr1-dev \
     libaprutil1-dev \
     libcurl4-openssl-dev \
@@ -61,6 +62,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     shellcheck \
     sphinx-doc \
     texinfo \
+    vim \
     wget \
     zlib1g \
     zlib1g-dev

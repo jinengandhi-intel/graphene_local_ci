@@ -1,6 +1,5 @@
-node(node_label) {
+node (node_label) {
     env.ORIG_WKSP = env.WORKSPACE
-    def build_ok = true
     try {
         stage('checkout'){
             dir ('./') {
@@ -13,39 +12,29 @@ node(node_label) {
         }
 
         dir ("graphene") {
-            sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
-            sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
+            // sh 'cp -rf $WORKSPACE/stress-ng Examples/'
             env.WORKSPACE = env.WORKSPACE + "/graphene"
             env.SGX = '1'
 
-            sh 'sed -i -e \'s/dent != g_dentry_root && dent->state & DENTRY_VALID/0/\' \
-                $WORKSPACE/LibOS/shim/src/fs/shim_fs.c'
-            sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
-                $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
-
             load '../ci/config-docker.jenkinsfile'
+            sh 'cp -rf ~/jenkins/sandstone-50-bin $WORKSPACE/Examples'
+
             docker.build(
                 "local:${env.BUILD_TAG}",
                 '-f ../ci/ubuntu20.04.dockerfile .'
             ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
                 load '.ci/lib/config.jenkinsfile'
-                load '.ci/lib/config-ubuntu20.04.jenkinsfile'
+                load '.ci/lib/config-ubuntu18.04.jenkinsfile'
                 load '.ci/lib/config-release.jenkinsfile'
 
                 load '../ci/stage-build-sgx.jenkinsfile'
-                load '../ci/stage-test.jenkinsfile'
-                load '../ci/stage-test-sgx.jenkinsfile'
+                load '../ci/stage-test-sandstone.jenkinsfile'
+                // load '../ci/stage-test-stress-ng.jenkinsfile'
             }
         }
     } finally {
         stage('cleanup'){
             sh 'rm -rf $ORIG_WKSP/*'
         }
-    }
-
-    if(build_ok) {
-        currentBuild.result = "SUCCESS"
-    } else {
-        currentBuild.result = "FAILURE"
     }
 }
