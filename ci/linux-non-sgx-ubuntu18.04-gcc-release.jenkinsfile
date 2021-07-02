@@ -31,9 +31,10 @@ node('nonsgx_slave') {
                 load '.ci/lib/config-ubuntu18.04.jenkinsfile'
                 load '.ci/lib/config-release.jenkinsfile'
 
-                load '.ci/lib/stage-build-nosgx.jenkinsfile'
-                load '../ci/stage-test.jenkinsfile'
+                load '../ci/stage-build-nosgx.jenkinsfile'
                 load '../ci/stage-test-direct.jenkinsfile'
+                load '../ci/stage-test.jenkinsfile'
+
             }
         }
     } finally {

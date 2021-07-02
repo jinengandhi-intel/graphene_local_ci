@@ -74,7 +74,7 @@ RUN python3 -m pip install \
 
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -m -d /intel -c "intel Jenkins" intel && \
-    chmod 755 /intel
+    chmod 777 /intel
 
 # Make sure /intel can be written by intel
 RUN chown 1000 /intel

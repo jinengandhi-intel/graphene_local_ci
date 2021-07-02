@@ -1,31 +1,43 @@
 stage('build') {
-    sh '''
-        make ${MAKEOPTS}
-        make ${MAKEOPTS} -C Pal/src PAL_HOST=Skeleton
-    '''
 
-    try {
-        sh '''
-            meson build \
-                --prefix="$PREFIX" \
-                --buildtype="$BUILDTYPE" \
-                -Dskeleton=enabled \
-                -Ddirect=enabled \
-                -Dsgx=disabled
-            ninja -vC build
-            ninja -vC build install
-        '''
-    } finally {
-        archiveArtifacts 'build/meson-logs/**/*'
+    script {
+        if (env.build_type == "manual") {
+            sh '''
+                make ${MAKEOPTS}
+                make ${MAKEOPTS} -C Pal/src PAL_HOST=Skeleton
+            '''
+
+            try {
+                sh '''
+                    meson build \
+                        --prefix="$PREFIX" \
+                        --buildtype="$BUILDTYPE" \
+                        -Dskeleton=enabled \
+                        -Ddirect=enabled \
+                        -Dsgx=disabled
+                    ninja -vC build
+                    ninja -vC build install
+                '''
+            } finally {
+                archiveArtifacts 'build/meson-logs/**/*'
+            }
+
+            env.GRAPHENE_PKGLIBDIR = sh(returnStdout: true, script: '''
+            meson introspect build --buildoptions \
+            | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
+            ''').trim() + '/graphene'
+
+            sh 'rm -rf build'
+
+            // prevent cheating and testing from repo
+            sh 'make ${MAKEOPTS} -C Runtime clean'
+        } else {
+
+            //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
+            //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
+            
+            env.GRAPHENE_PKGLIBDIR = '/usr/lib/x86_64-linux-gnu/graphene'
+        }
     }
-
-    env.GRAPHENE_PKGLIBDIR = sh(returnStdout: true, script: '''
-    meson introspect build --buildoptions \
-    | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
-    ''').trim() + '/graphene'
-
-    sh 'rm -rf build'
-
-    // prevent cheating and testing from repo
-    sh 'make ${MAKEOPTS} -C Runtime clean'
+            
 }

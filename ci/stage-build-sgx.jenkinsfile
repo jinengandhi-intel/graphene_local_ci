@@ -1,48 +1,58 @@
 stage('build') {
+
     script {
-        if (env.node_label == "graphene_oot") {
-            sh '''
-                cd Pal/src/host/Linux-SGX/signer/ && openssl genrsa -3 -out enclave-key.pem 3072
+        if (env.build_type == "manual") {
 
-                cd /opt/intel
-                git clone https://github.com/intel/linux-sgx-driver.git
-                cd linux-sgx-driver
-                git checkout 276c5c6a064d22358542f5e0aa96b1c0ace5d695
+            if (env.node_label == "graphene_oot") {
+                sh '''
+                    cd Pal/src/host/Linux-SGX/signer/ && openssl genrsa -3 -out enclave-key.pem 3072
 
-                cd "$WORKSPACE"
-                make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=/opt/intel/linux-sgx-driver
-            '''
+                    cd /opt/intel
+                    git clone https://github.com/intel/linux-sgx-driver.git
+                    cd linux-sgx-driver
+                    git checkout 276c5c6a064d22358542f5e0aa96b1c0ace5d695
+
+                    cd "$WORKSPACE"
+                    make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=/opt/intel/linux-sgx-driver
+                '''
+            } else {
+                sh '''
+                    cd "$WORKSPACE"
+                    openssl genrsa -3 -out Pal/src/host/Linux-SGX/signer/enclave-key.pem 3072
+                    make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=""
+                '''
+            }
+
+            try {
+                sh '''
+                    meson setup build \
+                        --prefix="$PREFIX" \
+                        --buildtype="$BUILDTYPE" \
+                        -Ddirect=disabled \
+                        -Dsgx=enabled
+                    ninja -vC build
+                    ninja -vC build install
+                '''
+            } finally {
+                archiveArtifacts 'build/meson-logs/**/*'
+            }
+
+            env.GRAPHENE_PKGLIBDIR = sh(returnStdout: true, script: '''
+            meson introspect build --buildoptions \
+            | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
+            ''').trim() + '/graphene'
+
+            sh 'rm -rf build'
+
+            // prevent cheating and testing from repo
+            sh 'make ${MAKEOPTS} -C Runtime clean'
         } else {
-            sh '''
-                cd "$WORKSPACE"
-                openssl genrsa -3 -out Pal/src/host/Linux-SGX/signer/enclave-key.pem 3072
-                make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=""
-            '''
+
+            //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
+            //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
+            
+            env.GRAPHENE_PKGLIBDIR = '/usr/lib/x86_64-linux-gnu/graphene'
         }
     }
-
-    try {
-        sh '''
-            meson setup build \
-                --prefix="$PREFIX" \
-                --buildtype="$BUILDTYPE" \
-                -Ddirect=disabled \
-                -Dsgx=enabled
-            ninja -vC build
-            ninja -vC build install
-        '''
-    } finally {
-        archiveArtifacts 'build/meson-logs/**/*'
-    }
-
-    env.GRAPHENE_PKGLIBDIR = sh(returnStdout: true, script: '''
-    meson introspect build --buildoptions \
-    | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
-    ''').trim() + '/graphene'
-
-    sh 'rm -rf build'
-
-    // prevent cheating and testing from repo
-    sh 'make ${MAKEOPTS} -C Runtime clean'
 }
 
