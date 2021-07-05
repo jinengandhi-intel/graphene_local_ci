@@ -334,6 +334,17 @@ class TestRunner:
 
         return proc.returncode
 
+    def check_system_error_output(self, stderr):
+        error_list = []
+        error_list = stderr.split("\n")
+        for error in error_list:
+            if error == "":
+                pass
+            elif "Using insecure argv source" in error:
+                pass
+            else:
+                raise Fail('Error Message={}'.format(error))
+
     async def execute(self):
         '''Execute the test, parse the results and add report in the suite.'''
         try:
@@ -351,6 +362,8 @@ class TestRunner:
                 raise Fail('returncode={}'.format(returncode))
             elif ("TCONF" in self.stdout and "TPASS" not in self.stdout):
                 raise Fail('returncode={}'.format(returncode))
+
+            self.check_system_error_output(self.stderr)
 
         except AbnormalTestResult as result:
             result.apply_to(self)
