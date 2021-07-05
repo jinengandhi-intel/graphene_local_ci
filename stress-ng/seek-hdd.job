@@ -5,10 +5,23 @@
 metrics-brief
 
 #
+# run the following tests in parallel or sequentially
+#
+run sequential
+
+#
 # verbose
 #   show all debug, warnings and normal information output.
 #
 verbose
+
+#
+# run each of the tests for 60 seconds
+#  stop stress test after N seconds. One can also specify the units
+#  of time in seconds, minutes, hours, days or years with the  suf‐
+#  fix s, m, h, d or y.
+#
+timeout 60s
 
 seek 8 hdd 8 parallel 2 timeout 90s
 seek 0 hdd 0 parallel 5 timeout 90s
