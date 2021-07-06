@@ -337,7 +337,7 @@ locka 0			# 0 means 1 stressor per CPU
 #   rent  locks.  Old  locks  are  unlocked in a first-in, first-out
 #   basis.
 #
-lockf 0			# 0 means 1 stressor per CPU
+#lockf 0			# 0 means 1 stressor per CPU
 # lockf-ops 1000000	# stop after 1000000 bogo ops
 # lockf-nonblock	# use non-blocking F_TLOCK and retry unlocks
 
