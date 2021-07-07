@@ -8,7 +8,8 @@ node(node_label) {
             }
 
             dir('graphene') {
-                git url: 'https://github.com/oscarlab/graphene.git'
+                git url: 'https://github.com/oscarlab/graphene.git',
+                branch: 'mkow/version-bump-to-1.2-rc1'
             }
         }
 
