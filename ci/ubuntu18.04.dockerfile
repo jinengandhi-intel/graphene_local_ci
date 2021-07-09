@@ -72,12 +72,17 @@ RUN python3 -m pip install \
     sphinx_rtd_theme \
     toml>=0.10
 
-# Add the user UID:1000, GID:1000, home at /intel
-RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -m -d /intel -c "intel Jenkins" intel && \
-    chmod 777 /intel
+# # Add the user UID:1000, GID:1000, home at /intel
+# RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -m -d /intel -c "intel Jenkins" intel && \
+#     chmod 777 /intel
 
-# Make sure /intel can be written by intel
-RUN chown 1000 /intel
+# # Make sure /intel can be written by intel
+# RUN chown 1000 /intel
+
+RUN adduser --disabled-password --gecos '' intel
+RUN adduser intel sudo
+RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN echo 'Acquire::http::proxy "http://proxy-chain.intel.com:911/"; Acquire::https::proxy "http://proxy-chain.intel.com:912/"; Acquire::ftp::proxy "ftp://proxy-chain.intel.com:911/";' >> /etc/apt/apt.conf.d/proxy.conf
 
 # Blow away any random state
 RUN rm -f /intel/.rnd

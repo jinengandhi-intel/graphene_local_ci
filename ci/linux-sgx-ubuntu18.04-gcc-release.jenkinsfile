@@ -1,5 +1,6 @@
-node ('sgx_slave_2.6') {
+node (node_label) {
     env.ORIG_WKSP = env.WORKSPACE
+    def build_ok = true
     try {
         stage('checkout'){
             dir ('./') {
@@ -8,7 +9,7 @@ node ('sgx_slave_2.6') {
 
             dir('graphene') {
                 git url: 'https://github.com/oscarlab/graphene.git',
-                branch: 'mkow/version-bump-to-1.2-rc1'
+                tag: 'v1.2-rc1'
             }
         }
 
@@ -42,5 +43,11 @@ node ('sgx_slave_2.6') {
         stage('cleanup'){
             sh 'rm -rf $ORIG_WKSP/*'
         }
+    }
+
+    if(build_ok) {
+        currentBuild.result = "SUCCESS"
+    } else {
+        currentBuild.result = "FAILURE"
     }
 }

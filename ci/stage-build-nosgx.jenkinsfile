@@ -33,6 +33,24 @@ stage('build') {
             sh 'make ${MAKEOPTS} -C Runtime clean'
         } else {
 
+            sh '''sudo apt-key adv --keyserver-options http-proxy=http://proxy-chain.intel.com:911 \
+             --fetch-keys https://packages.grapheneproject.io/graphene.asc
+             echo "deb [arch=amd64 signed-by=EA3C2D624681AC968521587A5EE1171912234070] \
+             https://packages.grapheneproject.io/ unstable main" | sudo tee /etc/apt/sources.list.d/graphene-unstable.list
+             sudo apt update
+            '''
+
+            if (env.build_type == "package_in_kernel") {
+                sh 'sudo apt install graphene-inkernel'
+            } else if (env.build_type == "package_oot") {
+                sh 'sudo apt install graphene-oot'
+            } else if (env.build_type == "package_dcap") {
+                sh 'sudo apt install graphene-dcap'
+            } else {
+                currentBuild.result = "ABORTED"
+                error("Aborting the build")
+            }
+
             //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
             //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
             
