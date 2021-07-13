@@ -1,0 +1,43 @@
+node(node_label) {
+    env.ORIG_WKSP = env.WORKSPACE
+    def build_ok = true
+    try {
+        stage('checkout'){
+            dir ('./') {
+                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
+            }
+
+            dir('graphene') {
+                git url: 'https://github.com/oscarlab/graphene.git',
+                tag: 'v1.2-rc1'
+            }
+        }
+    
+        dir ("graphene") {
+            env.WORKSPACE = env.WORKSPACE + "/graphene"
+
+            load '../ci/config-docker.jenkinsfile'
+
+            docker.build(
+                "local:${env.BUILD_TAG}",
+                '-f ../ci/ubuntu18.04.dockerfile .'
+            ).inside("${env.DOCKER_ARGS_COMMON}") {
+                load '.ci/lib/config.jenkinsfile'
+                load '.ci/lib/config-ubuntu18.04.jenkinsfile'
+                load '.ci/lib/config-release.jenkinsfile'
+
+                load '../ci/stage-build-kw.jenkinsfile'
+            }
+        }
+    } finally {
+        stage('cleanup'){
+            sh 'rm -rf $ORIG_WKSP/*'
+        }
+    }
+
+    if(build_ok) {
+        currentBuild.result = "SUCCESS"
+    } else {
+        currentBuild.result = "FAILURE"
+    }
+}

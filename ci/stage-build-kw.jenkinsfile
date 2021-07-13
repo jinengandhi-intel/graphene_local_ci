@@ -5,7 +5,7 @@ stage('build-kw') {
         export KW_SERVER=https://klocwork-iind2.devtools.intel.com:8080
         export KW_PROJECT=Graphene
         $KW_INSTALL/kwinject -o $LOCAL_WORKSPACE/kwinject_graphene.out make SGX=1 ISGX_DRIVER_PATH="" -j32
-        $KW_INSTALL/kwbuildproject --tables-directory $LOCAL_WORKSPACE/kwtables --url $KW_SERVER/$KW_PROJECT --license-host klocwork03p.elic.intel.com --license-port 7500 --incremental /home/intel/graphene_klockwork/graphene/kwinject_graphene.out
+        $KW_INSTALL/kwbuildproject --tables-directory $LOCAL_WORKSPACE/kwtables --url $KW_SERVER/$KW_PROJECT --license-host klocwork03p.elic.intel.com --license-port 7500 --incremental $LOCAL_WORKSPACE/kwinject_graphene.out
         $KW_INSTALL/kwadmin --url $KW_SERVER load $KW_PROJECT $LOCAL_WORKSPACE/kwtables --force
     '''
 }
