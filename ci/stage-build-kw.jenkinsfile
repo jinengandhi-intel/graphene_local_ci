@@ -1,6 +1,6 @@
 stage('build-kw') {
     sh '''
-        export KW_INSTALL=~/klocwork/bin/
+        export KW_INSTALL=/home/intel/klocwork/bin
         export LOCAL_WORKSPACE=`pwd`
         export KW_SERVER=https://klocwork-iind2.devtools.intel.com:8080
         export KW_PROJECT=Graphene
