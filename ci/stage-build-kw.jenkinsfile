@@ -1,11 +1,17 @@
 stage('build-kw') {
-    sh '''
-        export KW_INSTALL=/home/intel/klocwork/bin
-        export LOCAL_WORKSPACE=`pwd`
-        export KW_SERVER=https://klocwork-iind2.devtools.intel.com:8080
-        export KW_PROJECT=Graphene
-        $KW_INSTALL/kwinject -o $LOCAL_WORKSPACE/kwinject_graphene.out make SGX=1 ISGX_DRIVER_PATH="" -j32
-        $KW_INSTALL/kwbuildproject --tables-directory $LOCAL_WORKSPACE/kwtables --url $KW_SERVER/$KW_PROJECT --license-host klocwork03p.elic.intel.com --license-port 7500 --incremental $LOCAL_WORKSPACE/kwinject_graphene.out
-        $KW_INSTALL/kwadmin --url $KW_SERVER load $KW_PROJECT $LOCAL_WORKSPACE/kwtables --force
-    '''
+    env.KW_INSTALL="/home/intel/klocwork/bin"
+    env.KW_SERVER="https://klocwork-iind2.devtools.intel.com:8080"
+    env.KW_PROJECT="Graphene"
+
+    try {
+        sh '$KW_INSTALL/kwinject -o $WORKSPACE/kwinject_graphene.out make SGX=1 ISGX_DRIVER_PATH="" -j32'
+    } catch (Exception e) {}
+
+    try {
+        sh '$KW_INSTALL/kwbuildproject --tables-directory $WORKSPACE/kwtables --url $KW_SERVER/$KW_PROJECT --license-host klocwork03p.elic.intel.com --license-port 7500 --incremental $WORKSPACE/kwinject_graphene.out'
+    } catch (Exception e) {}
+
+    try {
+        sh '$KW_INSTALL/kwadmin --url $KW_SERVER load $KW_PROJECT $WORKSPACE/kwtables --force'
+    } catch (Exception e) {}
 }
