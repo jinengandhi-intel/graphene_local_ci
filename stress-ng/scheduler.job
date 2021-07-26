@@ -209,7 +209,7 @@ mmapfork 0		# 0 means 1 stressor per CPU
 #   start N sender and receiver processes that continually send  and
 #   receive messages using POSIX message queues. (Linux only)
 #
-mq 0			# 0 means 1 stressor per CPU
+#mq 0			# 0 means 1 stressor per CPU
 # mq-ops 1000000	# stop after 1000000 bogo ops
 # mq-size 10		# 10 messages in message queue
 
@@ -292,7 +292,7 @@ sem 0			# 0 means 1 stressor per CPU
 #   stresses  fast  semaphore  operations and produces rapid context
 #   switching.
 #
-sem-sysv  0		# 0 means 1 stressor per CPU
+#sem-sysv  0		# 0 means 1 stressor per CPU
 # sem-sysv-ops 1000000	# stop after 1000000 bogo ops
 # sem-sysv-procs 4	# start 4 processes per stressor exercising
 
