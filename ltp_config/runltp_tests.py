@@ -340,7 +340,7 @@ class TestRunner:
         for error in error_list:
             if error == "":
                 pass
-            elif "Using insecure argv source" in error:
+            elif "Using insecure argv source" in error or "error: Mounting file:/proc may expose unsanitized" in error:
                 pass
             else:
                 raise Fail('Error Message={}'.format(error))
