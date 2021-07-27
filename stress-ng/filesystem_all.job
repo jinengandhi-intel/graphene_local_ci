@@ -239,7 +239,7 @@ dirdeep-ops 1000000	# stop after 1000000 bogo ops
 #
 fstat 0			# 0 means 1 stressor per CPU
 fstat-ops 1000000	# stop after 1000000 bogo ops
-fstat-dir /path	# fstat on the directory named '/path'
+#fstat-dir /path	# fstat on the directory named '/path'
 
 #
 # getdent stressor options:
@@ -337,9 +337,9 @@ locka-ops 1000000	# stop after 1000000 bogo ops
 #   rent  locks.  Old  locks  are  unlocked in a first-in, first-out
 #   basis.
 #
-lockf 0			# 0 means 1 stressor per CPU
-lockf-ops 1000000	# stop after 1000000 bogo ops
-lockf-nonblock	# use non-blocking F_TLOCK and retry unlocks
+#lockf 0			# 0 means 1 stressor per CPU
+#lockf-ops 1000000	# stop after 1000000 bogo ops
+#lockf-nonblock	# use non-blocking F_TLOCK and retry unlocks
 
 #
 # lockofd stressor options:
@@ -358,8 +358,8 @@ lockofd-ops 1000000	# stop after 1000000 bogo ops
 #   start N workers that create and remove fifos,  empty  files  and
 #   named sockets using mknod and unlink.
 #
-mknod 0			# 0 means 1 stressor per CPU
-mknod-ops 1000000	# stop after 1000000 bogo ops
+#mknod 0			# 0 means 1 stressor per CPU
+#mknod-ops 1000000	# stop after 1000000 bogo ops
 
 #
 # open stressor options:
@@ -376,8 +376,8 @@ open-ops 1000000	# stop after 1000000 bogo ops
 #   start  N workers that read files from /proc and recursively read
 #   files from /proc/self (Linux only).
 #
-procfs 0		# 0 means 1 stressor per CPU
-procfs-ops 1000000	# stop after 1000000 bogo ops
+#procfs 0		# 0 means 1 stressor per CPU
+#procfs-ops 1000000	# stop after 1000000 bogo ops
 
 #
 # rename stressor options:
