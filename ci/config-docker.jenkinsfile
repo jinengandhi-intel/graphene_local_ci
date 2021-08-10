@@ -4,6 +4,7 @@ env.PREFIX = '/home/intel/graphene_install/usr'
 env.DOCKER_ARGS_COMMON = """
     --device=/dev/kmsg:/dev/kmsg
     --env=PATH=${env.PREFIX}/bin:${env.PATH}
+    --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
 """
 env.DOCKER_ARGS_SGX = '''
     --volume=/lib/modules:/lib/modules:ro

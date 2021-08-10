@@ -15,6 +15,7 @@ node (node_label) {
         dir ("graphene") {
             sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
+            sh 'cp -rf $WORKSPACE/stress-ng Examples/'
             env.WORKSPACE = env.WORKSPACE + "/graphene"
             env.SGX = '1'
 
@@ -33,6 +34,7 @@ node (node_label) {
             load '../ci/stage-build-sgx-centos.jenkinsfile'
             load '../ci/stage-test.jenkinsfile'
             load '../ci/stage-test-sgx.jenkinsfile'
+            load '../ci/stage-test-stress-ng.jenkinsfile'
         }
     } finally {
         stage('cleanup'){
