@@ -3,7 +3,7 @@ stage('stress-ng') {
         if (env.stress_ng_run == "True") {
 
             try {
-                timeout(time: 360, unit: 'MINUTES') {
+                timeout(time: 240, unit: 'MINUTES') {
                     sh '''
                         export cmd=graphene-direct
                         cd Examples/stress-ng
