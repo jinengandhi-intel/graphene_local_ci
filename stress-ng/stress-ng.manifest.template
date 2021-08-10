@@ -4,7 +4,7 @@ loader.log_level = "error"
 loader.pal_internal_mem_size = "512MB"
 sys.stack.size = "8M"
 sgx.enclave_size = "4G"
-sgx.thread_num = 256
+sgx.thread_num = 512
 
 sgx.nonpie_binary = 1
 loader.insecure__use_cmdline_argv = 1

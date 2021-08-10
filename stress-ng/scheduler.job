@@ -201,7 +201,7 @@ kill 0			# 0 means 1 stressor per CPU
 #   madvise before exiting.  This produces significant amounts of VM
 #   activity, a lot of cache misses and with minimal swapping.
 #
-mmapfork 0		# 0 means 1 stressor per CPU
+# mmapfork 0		# 0 means 1 stressor per CPU
 # mmapfork-ops 1000000	# stop after 1000000 bogo ops
 
 #
@@ -218,7 +218,7 @@ mmapfork 0		# 0 means 1 stressor per CPU
 #   start  N sender and receiver processes that continually send and
 #   receive messages using System V message IPC.
 #
-msg 0			# 0 means 1 stressor per CPU
+# msg 0			# 0 means 1 stressor per CPU
 # msg-ops 1000000	# stop after 1000000 bogo ops
 
 #
@@ -228,7 +228,7 @@ msg 0			# 0 means 1 stressor per CPU
 #   Each  event  received is counted as a bogo op. This stressor can
 #   only be run on Linux and with root privilege.
 #
-netlink-proc 0		# 0 means 1 stressor per CPU
+# netlink-proc 0		# 0 means 1 stressor per CPU
 # netlink-proc-ops 1000000 # stop after 1000000 bogo ops
 
 #
@@ -269,7 +269,7 @@ pthread 0		# 0 means 1 stressor per CPU
 #   a random sched priority is selected between the minimum and max‐
 #   imum scheduling priority settings.
 #
-schedpolicy 0		# 0 means 1 stressor per CPU
+# schedpolicy 0		# 0 means 1 stressor per CPU
 # schedpolicy-ops 1000000 # stop after 1000000 bogo ops
 
 #
@@ -312,7 +312,7 @@ sleep 0			# 0 means 1 stressor per CPU
 #   that  exec stress-ng and then exit almost immediately. Currently
 #   Linux only.
 #
-spawn 0			# 0 means 1 stressor per CPU
+# spawn 0			# 0 means 1 stressor per CPU
 # spawn-ops 1000000	# stop after 1000000 bogo ops
 
 #
@@ -330,7 +330,7 @@ switch 0		# 0 means 1 stressor per CPU
 #   address  space and user address space using tee(2). This is only
 #   available for Linux.
 #
-tee 0			# 0 means 1 stressor per CPU
+# tee 0			# 0 means 1 stressor per CPU
 # tee-ops 1000000	# stop after 1000000 bogo ops
 
 #
