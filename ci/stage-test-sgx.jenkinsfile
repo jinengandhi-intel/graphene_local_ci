@@ -1,4 +1,10 @@
 stage('test-sgx') {
+    env.gcc_dump_machine = sh(script:'gcc -dumpmachine', returnStdout: true).trim()
+    env.ARCH_LIB_OPT = ""
+    if(env.gcc_dump_machine == "x86_64-redhat-linux") 
+    {
+        env.ARCH_LIB_OPT = "ARCH_LIBDIR=/lib64"
+    }    
     env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
     try {
         timeout(time: 60, unit: 'MINUTES') {
@@ -28,7 +34,7 @@ stage('test-sgx') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd Examples/python
-                make ${MAKEOPTS} all
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 check
             '''
         }
@@ -41,7 +47,7 @@ stage('test-sgx') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd Examples/bash
-                make ${MAKEOPTS} all
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 regression
             '''
         }
@@ -54,7 +60,7 @@ stage('test-sgx') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd Examples/curl
-                make ${MAKEOPTS} all
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 check
             '''
         }
@@ -67,7 +73,7 @@ stage('test-sgx') {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
                 cd Examples/gcc
-                make ${MAKEOPTS} all
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 check
             '''
         }
@@ -80,7 +86,7 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd Examples/memcached
-                make ${MAKEOPTS} all
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make SGX=1 start-graphene-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 11211
                 # memcslap populates server but doesn't report errors, use
@@ -106,7 +112,7 @@ stage('test-sgx') {
                 fi
 
                 cd Examples/redis
-                make ${MAKEOPTS}
+                make ${MAKEOPTS} ${ARCH_LIB_OPT}
                 make ${MAKEOPTS} SGX=1 start-graphene-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 6379
                 ./src/src/redis-benchmark
@@ -121,7 +127,7 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd Examples/lighttpd
-                make ${MAKEOPTS} all
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 start-graphene-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 8003
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8003
@@ -136,7 +142,7 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd Examples/nginx
-                make ${MAKEOPTS} all
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 start-graphene-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 8002
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8002
@@ -170,7 +176,7 @@ stage('test-sgx') {
                 sed -i "s/sgx.enclave_size = "2048M"/sgx.enclave_size = "4G"/g" blender.manifest.template
                 sed -i "s/sgx.thread_num = 64/sgx.thread_num = 256/g" blender.manifest.template
             fi
-            make ${MAKEOPTS} all
+            make ${MAKEOPTS} ${ARCH_LIB_OPT} all
             make ${MAKEOPTS} SGX=1 check	
             '''
         }
@@ -183,7 +189,7 @@ stage('test-sgx') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd Examples/r
-                make ${MAKEOPTS} all
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 check
             '''
         }
