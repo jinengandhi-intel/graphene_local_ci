@@ -82,7 +82,7 @@ RUN python3 -m pip install \
 RUN adduser --disabled-password --gecos '' intel
 RUN adduser intel sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-RUN echo 'Acquire::http::proxy "http://proxy-chain.intel.com:911/"; Acquire::https::proxy "http://proxy-chain.intel.com:912/"; Acquire::ftp::proxy "ftp://proxy-chain.intel.com:911/";' >> /etc/apt/apt.conf.d/proxy.conf
+RUN echo 'Acquire::http::proxy "http://proxy-dmz.intel.com:911/"; Acquire::https::proxy "http://proxy-dmz.intel.com:912/"; Acquire::ftp::proxy "ftp://proxy-chain.intel.com:911/";' >> /etc/apt/apt.conf.d/proxy.conf
 
 # Blow away any random state
 RUN rm -f /intel/.rnd
