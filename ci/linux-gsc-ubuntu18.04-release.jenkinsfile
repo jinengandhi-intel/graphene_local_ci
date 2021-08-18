@@ -1,0 +1,33 @@
+node(node_label) {
+    env.ORIG_WKSP = env.WORKSPACE
+    def build_ok = true
+    try {
+        stage('checkout'){
+            dir ('./') {
+                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
+            }
+
+            dir('graphene') {
+                git url: 'https://github.com/oscarlab/graphene.git'
+            }
+        }
+    
+        dir ("graphene") {
+            sh 'cp -rf $WORKSPACE/gsc/* Tools/gsc/templates/'
+            env.WORKSPACE = env.WORKSPACE + "/graphene"
+
+            load '../ci/gsc.jenkinsfile'
+            
+        }
+    } finally {
+        stage('Workspace cleanup'){
+            sh 'rm -rf $ORIG_WKSP/*'
+        }
+    }
+
+    if(build_ok) {
+        currentBuild.result = "SUCCESS"
+    } else {
+        currentBuild.result = "FAILURE"
+    }
+}
