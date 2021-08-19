@@ -23,6 +23,8 @@ node(node_label) {
             sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
                 $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
 
+            sh 'sed -i -e \'/dist\\|apport/c\\\' $WORKSPACE/Examples/python/python.manifest.template'
+
             load '../ci/config-docker.jenkinsfile'
             env.PREFIX = '/home/intel1/graphene_install/usr'
 

@@ -24,14 +24,16 @@ node (node_label) {
             sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
                 $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
 
+            sh 'sed -i -e \'/dist\\|apport/c\\\' $WORKSPACE/Examples/python/python.manifest.template'
+
             load '../ci/config-docker.jenkinsfile'
-            env.PREFIX = '/usr/local'
+            env.PREFIX = '/home/intel1/graphene_install/usr'
             
             load '.ci/lib/config.jenkinsfile'
             load '.ci/lib/config-ubuntu18.04.jenkinsfile'
             load '.ci/lib/config-release.jenkinsfile'
 
-            load '../ci/stage-build-sgx-centos.jenkinsfile'
+            load '../ci/stage-build-sgx.jenkinsfile'
             load '../ci/stage-test.jenkinsfile'
             load '../ci/stage-test-sgx.jenkinsfile'
             load '../ci/stage-test-stress-ng.jenkinsfile'
