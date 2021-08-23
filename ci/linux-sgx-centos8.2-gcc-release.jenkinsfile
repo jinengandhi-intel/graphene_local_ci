@@ -16,6 +16,7 @@ node (node_label) {
             sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/stress-ng Examples/'
+            sh 'cp -f $WORKSPACE/test_workloads.py . '
             env.WORKSPACE = env.WORKSPACE + "/graphene"
             env.SGX = '1'
 

@@ -46,6 +46,7 @@ stage('test-direct') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd Examples/bash
+                sed -i '/@rm OUTPUT/d' Makefile
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} regression
             '''
@@ -59,6 +60,7 @@ stage('test-direct') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd Examples/curl
+                sed -i '/@rm OUTPUT/d' Makefile
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} check
             '''
@@ -111,7 +113,7 @@ stage('test-direct') {
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make start-graphene-server &
                 ../../Scripts/wait_for_server 5 127.0.0.1 6379
-                ./src/src/redis-benchmark
+                ./src/src/redis-benchmark 2>&1 | tee OUTPUT
             '''
         }
     } catch (Exception e){
@@ -180,6 +182,7 @@ stage('test-direct') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd Examples/r
+                sed -i '/@$(RM) OUTPUT/d' Makefile
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make check
             '''
@@ -187,5 +190,16 @@ stage('test-direct') {
     } catch (Exception e){
         build_ok = false
         sh 'echo "R Example Test Failed"'
+    }
+
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 -m pytest -v --junit-xml workload-regression.xml test_workloads.py'
+        }
+    } catch (Exception e){
+        build_ok = true
+        sh 'echo "Workload parser failed"'
+    } finally {
+        junit 'workload-regression.xml'
     }
 }
