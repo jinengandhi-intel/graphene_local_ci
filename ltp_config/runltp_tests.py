@@ -342,7 +342,8 @@ class TestRunner:
                 pass
             elif "Using insecure argv source" in error or \
                 "error: Mounting file:/proc may expose unsanitized" in error or \
-                "error: Failed to read ELF header" in error:
+                "error: Failed to read ELF header" in error or \
+                "error: Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error :
                 pass 
             else:
                 raise Fail('Error Message={}'.format(error))
