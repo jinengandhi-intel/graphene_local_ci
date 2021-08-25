@@ -8,8 +8,7 @@ node(node_label) {
             }
 
             dir('graphene') {
-                git url: 'https://github.com/oscarlab/graphene.git',
-                tag: env.build_tag,
+                git url: 'https://github.com/oscarlab/graphene.git'
             }
         }
     
