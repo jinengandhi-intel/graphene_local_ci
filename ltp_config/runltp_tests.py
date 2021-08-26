@@ -345,7 +345,8 @@ class TestRunner:
                 "error: Failed to read ELF header" in error or \
                 "Disallowing access to file '/usr/bin/systemd-detect-virt'" in error or \
                 "Disallowing access to file '/lib64/libtinfo.so.6'" in error or \
-                "Disallowing access to file '/usr/lib64/libtinfo.so.6'" in error:
+                "Disallowing access to file '/usr/lib64/libtinfo.so.6'" in error or \
+                "error: Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error :
                 pass 
             else:
                 raise Fail('Error Message={}'.format(error))

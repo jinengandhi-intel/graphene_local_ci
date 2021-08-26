@@ -27,7 +27,6 @@ node(node_label) {
             sh 'sed -i -e \'/dist\\|apport/c\\\' $WORKSPACE/Examples/python/python.manifest.template'
 
             load '../ci/config-docker.jenkinsfile'
-            env.PREFIX = '/home/intel1/graphene_install/usr'
 
             load '.ci/lib/config.jenkinsfile'
             load '.ci/lib/config-ubuntu18.04.jenkinsfile'
