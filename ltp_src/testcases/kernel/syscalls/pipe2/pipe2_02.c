@@ -60,9 +60,9 @@ static const char *const resfile[] = {
 };
 
 static struct tst_test test = {
-	.resource_files = resfile,
+	// .resource_files = resfile,
 	.cleanup = cleanup,
 	.forks_child = 1,
-	.needs_root = 1,
+	// .needs_root = 1,
 	.test_all = verify_pipe2,
 };

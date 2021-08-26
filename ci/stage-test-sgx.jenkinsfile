@@ -11,6 +11,11 @@ stage('test-sgx') {
             sh '''
                 cd LibOS/shim/test/ltp
                 make ${MAKEOPTS} -f Makefile.LTP SGX=1 all sgx-tokens LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
+                sed -i '77 a sgx.allowed_files.pipe202child = "file:pipe2_02_child"' $PWD/install-sgx/testcases/bin/pipe2_02.manifest
+                sed -i '78 a sgx.allowed_files.execvpchild = "file:execvp01_child"' $PWD/install-sgx/testcases/bin/execvp01.manifest
+                sed -i '79 a sgx.allowed_files.execvchild = "file:execv01_child"' $PWD/install-sgx/testcases/bin/execv01.manifest
+                sed -i '80 a sgx.allowed_files.execlpchild = "file:execlp01_child"' $PWD/install-sgx/testcases/bin/execlp01.manifest
+                sed -i '81 a sgx.allowed_files.execlchild = "file:execl01_child"' $PWD/install-sgx/testcases/bin/execl01.manifest
                 make -f Makefile.LTP ltp-sgx_results_1.xml SGX=1 LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
             '''
             /*
