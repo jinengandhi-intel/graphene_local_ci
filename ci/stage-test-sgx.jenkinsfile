@@ -192,6 +192,11 @@ stage('test-sgx') {
             sh '''
                 cd Examples/r
                 sed -i '/@$(RM) OUTPUT/d' Makefile
+                os_release_id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+                if [ "${os_release_id}" == 'rhel' ]
+                then
+                	sed -i '13 a loader.pal_internal_mem_size = "64M"' R.manifest.template 
+                fi                 
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 check
             '''
