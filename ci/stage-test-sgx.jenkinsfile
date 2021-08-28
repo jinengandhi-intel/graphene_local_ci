@@ -76,36 +76,38 @@ stage('test-sgx') {
         env.build_ok = false
         sh 'echo "Curl Example Test Failed"'
     }
-
-    try {
-        timeout(time: 10, unit: 'MINUTES') {
-            sh '''
-                cd Examples/gcc
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                make ${MAKEOPTS} SGX=1 check
-            '''
+    if(env.gcc_dump_machine != "x86_64-redhat-linux") 
+    {  
+        try {
+            timeout(time: 10, unit: 'MINUTES') {
+                sh '''
+                    cd Examples/gcc
+                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make ${MAKEOPTS} SGX=1 check
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "GCC Example Test Failed"'
         }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "GCC Example Test Failed"'
-    }
 
-    try {
-        timeout(time: 15, unit: 'MINUTES') {
-            sh '''
-                cd Examples/memcached
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                make SGX=1 start-graphene-server &
-                ../../Scripts/wait_for_server 60 127.0.0.1 11211
-                # memcslap populates server but doesn't report errors, use
-                # memcached-tool for this (must return two lines of stats)
-                memcslap --servers=127.0.0.1 --concurrency=8
-                src/scripts/memcached-tool 127.0.0.1 | wc -l | grep -w "2"
-            '''
+        try {
+            timeout(time: 15, unit: 'MINUTES') {
+                sh '''
+                    cd Examples/memcached
+                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make SGX=1 start-graphene-server &
+                    ../../Scripts/wait_for_server 60 127.0.0.1 11211
+                    # memcslap populates server but doesn't report errors, use
+                    # memcached-tool for this (must return two lines of stats)
+                    memcslap --servers=127.0.0.1 --concurrency=8
+                    src/scripts/memcached-tool 127.0.0.1 | wc -l | grep -w "2"
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "Memcached Example Test Failed"'
         }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Memcached Example Test Failed"'
     }
 
     try {
