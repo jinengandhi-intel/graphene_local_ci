@@ -11,11 +11,13 @@ stage('test-sgx') {
             sh '''
                 cd LibOS/shim/test/ltp
                 make ${MAKEOPTS} -f Makefile.LTP SGX=1 all LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
-                sed -i '76 a sgx.allowed_files.pipe202child = "file:pipe2_02_child"' $PWD/install-sgx/testcases/bin/pipe2_02.manifest
-                sed -i '76 a sgx.allowed_files.execvpchild = "file:execvp01_child"' $PWD/install-sgx/testcases/bin/execvp01.manifest
-                sed -i '76 a sgx.allowed_files.execvchild = "file:execv01_child"' $PWD/install-sgx/testcases/bin/execv01.manifest
-                sed -i '76 a sgx.allowed_files.execlpchild = "file:execlp01_child"' $PWD/install-sgx/testcases/bin/execlp01.manifest
-                sed -i '76 a sgx.allowed_files.execlchild = "file:execl01_child"' $PWD/install-sgx/testcases/bin/execl01.manifest
+                if [[ $LTPSCENARIO == *"syscalls-new"* ]]; then
+                    sed -i '76 a sgx.allowed_files.pipe202child = "file:pipe2_02_child"' $PWD/install-sgx/testcases/bin/pipe2_02.manifest
+                    sed -i '76 a sgx.allowed_files.execvpchild = "file:execvp01_child"' $PWD/install-sgx/testcases/bin/execvp01.manifest
+                    sed -i '76 a sgx.allowed_files.execvchild = "file:execv01_child"' $PWD/install-sgx/testcases/bin/execv01.manifest
+                    sed -i '76 a sgx.allowed_files.execlpchild = "file:execlp01_child"' $PWD/install-sgx/testcases/bin/execlp01.manifest
+                    sed -i '76 a sgx.allowed_files.execlchild = "file:execl01_child"' $PWD/install-sgx/testcases/bin/execl01.manifest
+                fi
                 make ${MAKEOPTS} -f Makefile.LTP SGX=1 sgx-tokens LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
                 make -f Makefile.LTP ltp-sgx_results_1.xml SGX=1 LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
             '''
