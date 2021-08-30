@@ -1,23 +1,11 @@
 stage('test-sgx') {
-    env.gcc_dump_machine = sh(script:'gcc -dumpmachine', returnStdout: true).trim()
-    env.ARCH_LIB_OPT = ""
-    if(env.gcc_dump_machine == "x86_64-redhat-linux") 
-    {
-        env.ARCH_LIB_OPT = "ARCH_LIBDIR=/lib64"
-    }    
     env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
     try {
         timeout(time: 60, unit: 'MINUTES') {
             sh '''
                 cd LibOS/shim/test/ltp
                 make ${MAKEOPTS} -f Makefile.LTP SGX=1 all LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
-                if [[ $LTPSCENARIO == *"syscalls-new"* ]]; then
-                    sed -i '76 a sgx.allowed_files.pipe202child = "file:pipe2_02_child"' $PWD/install-sgx/testcases/bin/pipe2_02.manifest
-                    sed -i '76 a sgx.allowed_files.execvpchild = "file:execvp01_child"' $PWD/install-sgx/testcases/bin/execvp01.manifest
-                    sed -i '76 a sgx.allowed_files.execvchild = "file:execv01_child"' $PWD/install-sgx/testcases/bin/execv01.manifest
-                    sed -i '76 a sgx.allowed_files.execlpchild = "file:execlp01_child"' $PWD/install-sgx/testcases/bin/execlp01.manifest
-                    sed -i '76 a sgx.allowed_files.execlchild = "file:execl01_child"' $PWD/install-sgx/testcases/bin/execl01.manifest
-                fi
+                bash update_manifest.sh
                 make ${MAKEOPTS} -f Makefile.LTP SGX=1 sgx-tokens LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
                 make -f Makefile.LTP ltp-sgx_results_1.xml SGX=1 LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
             '''
@@ -258,7 +246,7 @@ stage('test-sgx') {
             sh 'python3 -m pytest -v --junit-xml workload-regression.xml test_workloads.py'
         }
     } catch (Exception e){
-        build_ok = true
+        env.build_ok = true
         sh 'echo "Workload parser failed"'
     } finally {
         junit 'workload-regression.xml'

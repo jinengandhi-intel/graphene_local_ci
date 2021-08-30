@@ -29,7 +29,7 @@ stage('stress-ng') {
                     '''
                 }
             } catch (Exception e){
-                build_ok = false
+                env.build_ok = false
                 sh 'echo "Stress-ng Failed"'
             } finally {
                 archiveArtifacts 'Examples/stress-ng/*.log'

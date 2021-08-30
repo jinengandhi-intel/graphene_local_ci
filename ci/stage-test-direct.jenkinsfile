@@ -1,10 +1,4 @@
 stage('test-direct') {
-    env.gcc_dump_machine = sh(script:'gcc -dumpmachine', returnStdout: true).trim()
-    env.ARCH_LIB_OPT = ""
-    if(env.gcc_dump_machine == "x86_64-redhat-linux") 
-    {
-        env.ARCH_LIB_OPT = "ARCH_LIBDIR=/lib64"
-    }
     try {
         timeout(time: 30, unit: 'MINUTES') {
             sh '''
@@ -22,7 +16,7 @@ stage('test-direct') {
             */
         }
     } catch (Exception e){
-        build_ok = false
+        env.build_ok = false
         sh 'echo "LTP Test Failed"'
     } finally {
         archiveArtifacts 'LibOS/shim/test/ltp/ltp_results_*.xml'
@@ -38,7 +32,7 @@ stage('test-direct') {
             '''
         }
     } catch (Exception e){
-        build_ok = false
+        env.build_ok = false
         sh 'echo "Python Example Test Failed"'
     }
 
@@ -52,7 +46,7 @@ stage('test-direct') {
             '''
         }
     } catch (Exception e){
-        build_ok = false
+        env.build_ok = false
         sh 'echo "Bash Example Test Failed"'
     }
 
@@ -66,7 +60,7 @@ stage('test-direct') {
             '''
         }
     } catch (Exception e){
-        build_ok = false
+        env.build_ok = false
         sh 'echo "Curl Example Test Failed"'
     }
     if(env.gcc_dump_machine != "x86_64-redhat-linux") 
@@ -80,7 +74,7 @@ stage('test-direct') {
                 '''
             }
         } catch (Exception e){
-            build_ok = false
+            env.build_ok = false
             sh 'echo "GCC Example Test Failed"'
         }
 
@@ -98,7 +92,7 @@ stage('test-direct') {
                 '''
             }
         } catch (Exception e){
-            build_ok = false
+            env.build_ok = false
             sh 'echo "Memcached Example Test Failed"'
         }
     }
@@ -119,7 +113,7 @@ stage('test-direct') {
             '''
         }
     } catch (Exception e){
-        build_ok = false
+        env.build_ok = false
         sh 'echo "Redis Example Test Failed"'
     }
 
@@ -134,7 +128,7 @@ stage('test-direct') {
             '''
         }
     } catch (Exception e){
-        build_ok = false
+        env.build_ok = false
         sh 'echo "Lighttpd Example Test Failed"'
     }
 
@@ -149,7 +143,7 @@ stage('test-direct') {
             '''
         }
     } catch (Exception e){
-        build_ok = false
+        env.build_ok = false
         sh 'echo "NGINX Example Test Failed"'
     }
 
@@ -176,7 +170,7 @@ stage('test-direct') {
             '''
         }
     } catch (Exception e){
-        build_ok = false
+        env.build_ok = false
         sh 'echo "Blender Example Test Failed"'
     }
 
@@ -190,7 +184,7 @@ stage('test-direct') {
             '''
         }
     } catch (Exception e){
-        build_ok = false
+        env.build_ok = false
         sh 'echo "R Example Test Failed"'
     }
 
@@ -199,7 +193,7 @@ stage('test-direct') {
             sh 'python3 -m pytest -v --junit-xml workload-regression.xml test_workloads.py'
         }
     } catch (Exception e){
-        build_ok = true
+        env.build_ok = true
         sh 'echo "Workload parser failed"'
     } finally {
         junit 'workload-regression.xml'

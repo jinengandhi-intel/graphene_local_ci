@@ -1,6 +1,6 @@
 node (node_label) {
     env.ORIG_WKSP = env.WORKSPACE
-    def build_ok = true
+    env.build_ok = true
     try {
         stage('checkout'){
             dir ('./') {
@@ -47,7 +47,7 @@ node (node_label) {
         }
     }
 
-    if(build_ok) {
+    if(env.build_ok) {
         currentBuild.result = "SUCCESS"
     } else {
         currentBuild.result = "FAILURE"

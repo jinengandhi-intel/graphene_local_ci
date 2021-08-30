@@ -25,7 +25,7 @@ node(node_label) {
         }
     }
 
-    if(build_ok) {
+    if(env.build_ok) {
         currentBuild.result = "SUCCESS"
     } else {
         currentBuild.result = "FAILURE"

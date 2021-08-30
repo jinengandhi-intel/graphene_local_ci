@@ -12,6 +12,10 @@ env.DOCKER_ARGS_SGX = '''
     --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
 '''
 
+env.gcc_dump_machine = sh(script:'gcc -dumpmachine', returnStdout: true).trim()
+
+env.ARCH_LIB_OPT = ""
+
 if (fileExists('/dev/sgx/enclave')) {
     env.DOCKER_ARGS_SGX += ' --device=/dev/sgx/enclave:/dev/sgx/enclave'
 }
@@ -26,4 +30,9 @@ if (fileExists('/dev/gsgx')) {
 }
 if (fileExists('/var/run/aesmd/aesm.socket')) {
     env.DOCKER_ARGS_SGX += ' --volume=/var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket'
+}
+
+if(env.gcc_dump_machine == "x86_64-redhat-linux") 
+{
+    env.ARCH_LIB_OPT = "ARCH_LIBDIR=/lib64"
 }
