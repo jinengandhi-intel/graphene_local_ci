@@ -6,6 +6,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     autoconf \
     bison \
     build-essential \
+    clang \
     curl \
     flex \
     gawk \
@@ -16,6 +17,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libaio1 \
     libapr1-dev \
     libaprutil1-dev \
+    libcjson-dev \
     libcurl4-openssl-dev \
     libelf-dev \
     libevent-dev \
@@ -36,9 +38,9 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libxrender1 \
     libxxf86vm1 \
     linux-headers-generic \
-    meson \
     net-tools \
     netcat-openbsd \
+    ninja-build \
     pkg-config \
     protobuf-c-compiler \
     pylint3 \
@@ -62,14 +64,19 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     shellcheck \
     sphinx-doc \
     texinfo \
+    uthash-dev \
     vim \
     wget \
     zlib1g \
     sudo \
     zlib1g-dev
 
-RUN python3 -m pip install \
-    asv
+# NOTE about meson version: we support "0.55 or newer", so in CI we pin to latest patch version of
+# the earliest supported minor version (pip implicitly installs latest version satisfying the
+# specification)
+RUN python3 -m pip install -U \
+    asv \
+    'meson>=0.55,<0.56'
 
 # # Add the user UID:1000, GID:1000, home at /intel
 # RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -m -d /intel -c "intel Jenkins" intel && \
