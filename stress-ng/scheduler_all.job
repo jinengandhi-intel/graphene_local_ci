@@ -349,8 +349,8 @@ switch-ops 1000000	# stop after 1000000 bogo ops
 #   wait until the child dies, so this stressor rapidly fills up the
 #   process table.
 #
-vforkmany 0		# 0 means 1 stressor per CPU
-vforkmany-ops 1000000	# stop after 1000000 bogo ops
+# vforkmany 0		# 0 means 1 stressor per CPU
+# vforkmany-ops 1000000	# stop after 1000000 bogo ops
 
 #
 # wait stressor options:
