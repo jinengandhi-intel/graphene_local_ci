@@ -383,6 +383,6 @@ yield-ops 1000000	# stop after 1000000 bogo ops
 #   est child is reaped and a new  process  is  then  created  in  a
 #   first-in first-out manner, and then repeated.
 #
-zombie 0		# 0 means 1 stressor per CPU
-zombie-ops 1000000	# stop after 1000000 bogo ops
-zombie-max 8192	# create 8192 processes per zombie iteration
+#zombie 0		# 0 means 1 stressor per CPU
+#zombie-ops 1000000	# stop after 1000000 bogo ops
+#zombie-max 8192	# create 8192 processes per zombie iteration
