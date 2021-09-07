@@ -7,14 +7,14 @@ node(node_label) {
                 git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
             }
 
-            dir('graphene') {
-                git url: 'https://github.com/oscarlab/graphene.git'
+            dir('gramine') {
+                git url: 'https://github.com/gramineproject/gramine.git'
             }
         }
     
-        dir ("graphene") {
+        dir ("gramine") {
             sh 'cp -rf $WORKSPACE/gsc/* Tools/gsc/templates/'
-            env.WORKSPACE = env.WORKSPACE + "/graphene"
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
 
             load '../ci/gsc.jenkinsfile'
             

@@ -347,7 +347,8 @@ class TestRunner:
                 "Disallowing access to file '/lib64/libtinfo.so.6'" in error or \
                 "Disallowing access to file '/usr/lib64/libtinfo.so.6'" in error or \
                 "Detected deprecated syntax. Consider switching to new syntax: 'sgx.allowed_files" in error or \
-                "error: Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error :
+                "error: Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error or \
+                "Disallowing access to file '/lib/x86_64-linux-gnu/libnss_nis.so.2" in error :
                 pass 
             else:
                 raise Fail('Error Message={}'.format(error))

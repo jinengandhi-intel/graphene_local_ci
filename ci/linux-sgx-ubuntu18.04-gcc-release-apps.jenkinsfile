@@ -6,14 +6,14 @@ node (node_label) {
                 git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
             }
 
-            dir('graphene') {
-                git url: 'https://github.com/oscarlab/graphene.git'
+            dir ("gramine") {
+                git url: 'https://github.com/gramineproject/gramine.git'
             }
         }
 
-        dir ("graphene") {
-            // sh 'cp -rf $WORKSPACE/stress-ng Examples/'
-            env.WORKSPACE = env.WORKSPACE + "/graphene"
+        dir ("gramine") {
+            sh 'cp -rf $WORKSPACE/stress-ng Examples/'
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 
             load '../ci/config-docker.jenkinsfile'
@@ -29,6 +29,7 @@ node (node_label) {
 
                 load '../ci/stage-build-sgx.jenkinsfile'
                 load '../ci/stage-test-sandstone.jenkinsfile'
+                load '../ci/stage-test-stress-ng.jenkinsfile'
             }
         }
     } finally {

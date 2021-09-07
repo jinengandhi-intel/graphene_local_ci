@@ -7,17 +7,17 @@ node(node_label) {
                 git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
             }
 
-            dir('graphene') {
-                git url: 'https://github.com/oscarlab/graphene.git'
+            dir ("gramine") {
+                git url: 'https://github.com/gramineproject/gramine.git'
             }
         }
 
-        dir ("graphene") {
+        dir ("gramine") {
             sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/stress-ng Examples/'
             sh 'cp -f $WORKSPACE/test_workloads.py . '
-            env.WORKSPACE = env.WORKSPACE + "/graphene"
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
 
             sh 'sed -i -e \'s/dent != g_dentry_root && dent->state & DENTRY_VALID/0/\' \
                 $WORKSPACE/LibOS/shim/src/fs/shim_fs.c'
