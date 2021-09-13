@@ -15,14 +15,14 @@ stage('stress-ng') {
                             make
                         fi
 
-                        $cmd stress-ng --job hdd.job 2>&1 | tee hdd.log
-                        $cmd stress-ng --job seek.job 2>&1 | tee seek.log
-                        $cmd stress-ng --job seek-hdd.job 2>&1 | tee seek-hdd.log
-                        $cmd stress-ng --job interrupt.job 2>&1 | tee interrupt.log
-                        $cmd stress-ng --job filesystem.job 2>&1 | tee filesystem.log
-                        $cmd stress-ng --job filesystem_all.job 2>&1 | tee filesystem_all.log
-                        $cmd stress-ng --job scheduler.job 2>&1 | tee scheduler.log
-                        $cmd stress-ng --job scheduler_all.job 2>&1 | tee scheduler_all.log
+                        $cmd stress-ng --job hdd.job --temp-path /tmp 2>&1 | tee hdd.log
+                        $cmd stress-ng --job seek.job --temp-path /tmp 2>&1 | tee seek.log
+                        $cmd stress-ng --job seek-hdd.job --temp-path /tmp 2>&1 | tee seek-hdd.log
+                        $cmd stress-ng --job interrupt.job --temp-path /tmp 2>&1 | tee interrupt.log
+                        $cmd stress-ng --job filesystem.job --temp-path /tmp 2>&1 | tee filesystem.log
+                        $cmd stress-ng --job filesystem_all.job --temp-path /tmp 2>&1 | tee filesystem_all.log
+                        $cmd stress-ng --job scheduler.job --temp-path /tmp 2>&1 | tee scheduler.log
+                        $cmd stress-ng --job scheduler_all.job --temp-path /tmp 2>&1 | tee scheduler_all.log
 
                         python3 parser_stressng.py --path=.
 
