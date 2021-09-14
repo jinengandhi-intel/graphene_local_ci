@@ -701,6 +701,7 @@ mkdir03 mkdir03
 mkdir04 mkdir04
 mkdir05 mkdir05
 mkdir05A symlink01 -T mkdir05
+mkdir09 mkdir09
 
 #mkdirat test cases
 mkdirat01 mkdirat01
