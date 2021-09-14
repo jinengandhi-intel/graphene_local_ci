@@ -230,9 +230,6 @@ fsopen02 fsopen02
 fspick01 fspick01
 fspick02 fspick02
 
-fstat02 fstat02
-fstat02_64 fstat02_64
-
 fsync01 fsync01
 fsync04 fsync04
 
@@ -466,7 +463,6 @@ mkdir03 mkdir03
 mkdir04 mkdir04
 mkdir05 mkdir05
 mkdir05A symlink01 -T mkdir05
-mkdir09 mkdir09
 
 #mkdirat test cases
 mkdirat02 mkdirat02
@@ -573,7 +569,6 @@ nice02 nice02
 nice03 nice03
 nice04 nice04
 
-open01 open01
 open01A symlink01 -T open01
 open02_run open02_run
 open05 open05
