@@ -18,6 +18,16 @@ stage('build') {
                     cd "$WORKSPACE"
                     make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=/opt/intel/linux-sgx-driver
                 '''
+            } else if (env.node_label == "graphene_dcap") {
+                sh '''
+                    cd /opt/intel
+                    git clone https://github.com/intel/SGXDataCenterAttestationPrimitives.git
+                    cd SGXDataCenterAttestationPrimitives
+                    git checkout DCAP_1.6
+
+                    cd "$WORKSPACE"
+                    make ${MAKEOPTS} SGX=1 ISGX_DRIVER_PATH=/opt/intel/SGXDataCenterAttestationPrimitives/driver/linux
+                '''
             } else {
                 sh '''
                     cd "$WORKSPACE"
