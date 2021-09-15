@@ -58,6 +58,10 @@ stage('test-sgx') {
             sh '''
                 cd Examples/curl
                 sed -i '/@rm OUTPUT/d' Makefile
+                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                then
+                    sed -i '$ a loader.pal_internal_mem_size = "64M"' curl.manifest.template 
+                fi
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 check
             '''
@@ -112,6 +116,10 @@ stage('test-sgx') {
                 fi
 
                 cd Examples/redis
+                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                then
+                    sed -i '$ a loader.pal_internal_mem_size = "64M"' redis-server.manifest.template 
+                fi                
                 make ${MAKEOPTS} ${ARCH_LIB_OPT}
                 make ${MAKEOPTS} SGX=1 start-graphene-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 6379
@@ -127,6 +135,10 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd Examples/lighttpd
+                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                then
+                    sed -i '$ a loader.pal_internal_mem_size = "64M"' lighttpd.manifest.template 
+                fi                
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 start-graphene-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 8003
@@ -142,6 +154,10 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd Examples/nginx
+                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                then
+                    sed -i '$ a loader.pal_internal_mem_size = "64M"' nginx.manifest.template 
+                fi                
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 start-graphene-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 8002
@@ -176,6 +192,10 @@ stage('test-sgx') {
                 sed -i 's/sgx.enclave_size = "2048M"/sgx.enclave_size = "4G"/g' blender.manifest.template
                 sed -i 's/sgx.thread_num = 64/sgx.thread_num = 256/g' blender.manifest.template
             fi
+            if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+            then
+                sed -i '$ a loader.pal_internal_mem_size = "64M"' blender.manifest.template 
+            fi
             make ${MAKEOPTS} ${ARCH_LIB_OPT} all
             make ${MAKEOPTS} SGX=1 check	
             '''
@@ -190,11 +210,10 @@ stage('test-sgx') {
             sh '''
                 cd Examples/r
                 sed -i '/@$(RM) OUTPUT/d' Makefile
-                os_release_id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
-                if [ "${os_release_id}" == 'rhel' ]
+                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
                 then
-                	sed -i '13 a loader.pal_internal_mem_size = "64M"' R.manifest.template 
-                fi                 
+                    sed -i '$ a loader.pal_internal_mem_size = "128M"' R.manifest.template 
+                fi            
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 check
             '''
