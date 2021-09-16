@@ -6,8 +6,8 @@
 #
 # run the following tests in parallel or sequentially
 #
-# run sequential
-run parallel
+run sequential
+# run parallel
 
 #
 # aggressive:

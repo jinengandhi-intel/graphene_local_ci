@@ -14,7 +14,9 @@ stage('stress-ng') {
                         else
                             make
                         fi
-
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
                         $cmd stress-ng --job hdd.job --temp-path /tmp 2>&1 | tee hdd.log
                         $cmd stress-ng --job seek.job --temp-path /tmp 2>&1 | tee seek.log
                         $cmd stress-ng --job seek-hdd.job --temp-path /tmp 2>&1 | tee seek-hdd.log
