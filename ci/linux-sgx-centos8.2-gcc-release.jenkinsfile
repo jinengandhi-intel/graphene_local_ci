@@ -15,7 +15,7 @@ node (node_label) {
         dir ("gramine") {
             sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
-            sh 'cp -rf $WORKSPACE/stress-ng Examples/'
+            sh 'cp -rf $WORKSPACE/stress-ng CI-Examples/'
             sh 'cp -f $WORKSPACE/test_workloads.py . '
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
@@ -34,7 +34,7 @@ node (node_label) {
             load '../ci/config-docker.jenkinsfile'
 
             if (env.gcc_dump_machine == "x86_64-redhat-linux") {  
-                sh 'sed -i -e \'/dist\\|apport/c\\\' $WORKSPACE/Examples/python/python.manifest.template'
+                sh 'sed -i -e \'/dist\\|apport/c\\\' $WORKSPACE/CI-Examples/python/python.manifest.template'
             }
             
             load '.ci/lib/config.jenkinsfile'

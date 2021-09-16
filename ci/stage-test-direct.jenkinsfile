@@ -26,7 +26,7 @@ stage('test-direct') {
     try{
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd Examples/python
+                cd CI-Examples/python
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make check
             '''
@@ -39,7 +39,7 @@ stage('test-direct') {
     try{
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd Examples/bash
+                cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} regression
@@ -50,38 +50,12 @@ stage('test-direct') {
         sh 'echo "Bash Example Test Failed"'
     }
 
-    try {
-        timeout(time: 5, unit: 'MINUTES') {
-            sh '''
-                cd Examples/curl
-                sed -i '/@rm OUTPUT/d' Makefile
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                make ${MAKEOPTS} check
-            '''
-        }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Curl Example Test Failed"'
-    }
     if(env.gcc_dump_machine != "x86_64-redhat-linux") 
     {
         try {
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    cd Examples/gcc
-                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                    make ${MAKEOPTS} check
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "GCC Example Test Failed"'
-        }
-
-        try {
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''
-                    cd Examples/memcached
+                    cd CI-Examples/memcached
                     make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                     make start-graphene-server &
                     ../../Scripts/wait_for_server 5 127.0.0.1 11211
@@ -100,7 +74,7 @@ stage('test-direct') {
     try {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
-                cd Examples/redis
+                cd CI-Examples/redis
                 if .ci/isdistro xenial
                 then
                     USE_SELECT=1
@@ -120,7 +94,7 @@ stage('test-direct') {
     try {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
-                cd Examples/lighttpd
+                cd CI-Examples/lighttpd
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} start-graphene-server &
                 ../../Scripts/wait_for_server 5 127.0.0.1 8003
@@ -135,7 +109,7 @@ stage('test-direct') {
     try {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
-                cd Examples/nginx
+                cd CI-Examples/nginx
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} start-graphene-server &
                 ../../Scripts/wait_for_server 5 127.0.0.1 8002
@@ -147,24 +121,10 @@ stage('test-direct') {
         sh 'echo "NGINX Example Test Failed"'
     }
 
-        /*
-        timeout(time: 20, unit: 'MINUTES') {
-            sh '''
-                cd Examples/apache
-                make ${MAKEOPTS} all
-                make ${MAKEOPTS} start-graphene-server &
-                ../../Scripts/wait_for_server 5 127.0.0.1 8001
-                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8001
-                ../../Scripts/wait_for_server 5 127.0.0.1 8443
-                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh https://127.0.0.1:8443
-            '''
-        }
-        */
-
     try {    
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd Examples/blender
+                cd CI-Examples/blender
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make check
             '''
@@ -174,18 +134,17 @@ stage('test-direct') {
         sh 'echo "Blender Example Test Failed"'
     }
 
-    try {
+    try{
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd Examples/r
-                sed -i '/@$(RM) OUTPUT/d' Makefile
+                cd CI-Examples/sqlite
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                make check
+                make ${MAKEOPTS} regression
             '''
         }
     } catch (Exception e){
         env.build_ok = false
-        sh 'echo "R Example Test Failed"'
+        sh 'echo "SQLite Example Test Failed"'
     }
 
     try {

@@ -15,7 +15,7 @@ node(node_label) {
         dir ("gramine") {
             sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
-            sh 'cp -rf $WORKSPACE/stress-ng Examples/'
+            sh 'cp -rf $WORKSPACE/stress-ng CI-Examples/'
             sh 'cp -f $WORKSPACE/test_workloads.py . '
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'

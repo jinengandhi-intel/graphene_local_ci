@@ -29,7 +29,7 @@ stage('test-sgx') {
     try{
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd Examples/python
+                cd CI-Examples/python
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 check
             '''
@@ -42,7 +42,7 @@ stage('test-sgx') {
     try{
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd Examples/bash
+                cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 regression
@@ -52,43 +52,13 @@ stage('test-sgx') {
         env.build_ok = false
         sh 'echo "Bash Example Test Failed"'
     }
-
-    try {
-        timeout(time: 5, unit: 'MINUTES') {
-            sh '''
-                cd Examples/curl
-                sed -i '/@rm OUTPUT/d' Makefile
-                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
-                then
-                    sed -i '$ a loader.pal_internal_mem_size = "64M"' curl.manifest.template 
-                fi
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                make ${MAKEOPTS} SGX=1 check
-            '''
-        }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Curl Example Test Failed"'
-    }
+ 
     if(env.gcc_dump_machine != "x86_64-redhat-linux") 
     {  
         try {
-            timeout(time: 10, unit: 'MINUTES') {
-                sh '''
-                    cd Examples/gcc
-                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                    make ${MAKEOPTS} SGX=1 check
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "GCC Example Test Failed"'
-        }
-
-        try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
-                    cd Examples/memcached
+                    cd CI-Examples/memcached
                     make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                     make SGX=1 start-graphene-server &
                     ../../Scripts/wait_for_server 60 127.0.0.1 11211
@@ -115,7 +85,7 @@ stage('test-sgx') {
                     export USE_SELECT
                 fi
 
-                cd Examples/redis
+                cd CI-Examples/redis
                 if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "64M"' redis-server.manifest.template 
@@ -134,7 +104,7 @@ stage('test-sgx') {
     try {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
-                cd Examples/lighttpd
+                cd CI-Examples/lighttpd
                 if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "64M"' lighttpd.manifest.template 
@@ -153,7 +123,7 @@ stage('test-sgx') {
     try {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
-                cd Examples/nginx
+                cd CI-Examples/nginx
                 if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "64M"' nginx.manifest.template 
@@ -169,24 +139,10 @@ stage('test-sgx') {
         sh 'echo "NGINX Example Test Failed"'
     }
 
-        /*
-        timeout(time: 25, unit: 'MINUTES') {
-            sh '''
-                cd Examples/apache
-                make ${MAKEOPTS} all
-                make ${MAKEOPTS} start-graphene-server &
-                ../../Scripts/wait_for_server 60 127.0.0.1 8001
-                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8001
-                ../../Scripts/wait_for_server 60 127.0.0.1 8443
-                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh https://127.0.0.1:8443
-            '''
-        }
-        */
-
     try {    
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-            cd Examples/blender
+            cd CI-Examples/blender
             if [ "${no_cpu}" -gt 16 ]
             then
                 sed -i 's/sgx.enclave_size = "2048M"/sgx.enclave_size = "4G"/g' blender.manifest.template
@@ -205,29 +161,25 @@ stage('test-sgx') {
         sh 'echo "Blender Example Test Failed"'
     }
 
-    try {
+    try{
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd Examples/r
-                sed -i '/@$(RM) OUTPUT/d' Makefile
-                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
-                then
-                    sed -i '$ a loader.pal_internal_mem_size = "128M"' R.manifest.template 
-                fi            
+                cd CI-Examples/sqlite
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                make ${MAKEOPTS} SGX=1 check
+                make ${MAKEOPTS} SGX=1 regression
             '''
         }
     } catch (Exception e){
         env.build_ok = false
-        sh 'echo "R Example Test Failed"'
+        sh 'echo "SQLite Example Test Failed"'
     }
+
     /*timeout(time: 5, unit: 'MINUTES') {
         sh '''
             # test SGX remote attestation only on Ubuntu 18.04 to keep internet requests to minimum
             .ci/isdistro bionic || exit 0
 
-            cd Examples/ra-tls-mbedtls
+            cd CI-Examples/ra-tls-mbedtls
             if [ "${ra_client_spid}" != "" ] && [ "${ra_client_key}" != "" ]; \
             then \
                 make check_epid RA_CLIENT_SPID=${ra_client_spid} \
@@ -247,7 +199,7 @@ stage('test-sgx') {
             # test SGX remote attestation only on Ubuntu 18.04 to keep internet requests to minimum
             .ci/isdistro bionic || exit 0
 
-            cd Examples/ra-tls-secret-prov
+            cd CI-Examples/ra-tls-secret-prov
             if [ "${ra_client_spid}" != "" ] && [ "${ra_client_key}" != "" ]; \
             then \
                 make SGX=1 check_epid RA_CLIENT_SPID=${ra_client_spid} \

@@ -12,12 +12,12 @@ node (node_label) {
         }
 
         dir ("gramine") {
-            sh 'cp -rf $WORKSPACE/stress-ng Examples/'
+            sh 'cp -rf $WORKSPACE/stress-ng CI-Examples/'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 
             load '../ci/config-docker.jenkinsfile'
-            sh 'cp -rf ~/jenkins/sandstone-50-bin $WORKSPACE/Examples'
+            sh 'cp -rf ~/jenkins/sandstone-50-bin $WORKSPACE/CI-Examples'
 
             docker.build(
                 "local:${env.BUILD_TAG}",

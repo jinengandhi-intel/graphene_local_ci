@@ -6,7 +6,7 @@ stage('stress-ng') {
                 timeout(time: 240, unit: 'MINUTES') {
                     sh '''
                         export cmd=graphene-direct
-                        cd Examples/stress-ng
+                        cd CI-Examples/stress-ng
                         if test -n "$SGX"
                         then
                             make SGX=1
@@ -32,7 +32,7 @@ stage('stress-ng') {
                 env.build_ok = false
                 sh 'echo "Stress-ng Failed"'
             } finally {
-                archiveArtifacts 'Examples/stress-ng/*.log'
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
             }
         } else {
             sh 'echo "Ignoring stress-ng run. For enabling pass True from Jenkins build parameters"'
