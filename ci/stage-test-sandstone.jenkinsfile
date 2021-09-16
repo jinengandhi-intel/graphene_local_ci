@@ -1,7 +1,7 @@
 stage('test') {
     timeout(time: 90, unit: 'MINUTES') {
         sh '''
-            cd Examples/sandstone-50-bin
+            cd CI-Examples/sandstone-50-bin
             if test -n "$SGX"
             then
                 make SGX=1 
