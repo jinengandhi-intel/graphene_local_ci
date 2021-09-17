@@ -1,46 +1,24 @@
 stage('Build') {
     sh '''
-        cd Tools/gsc/test
-        # Jenkins may automatically merge master into submitted commit (but
-        # maybe not): choose the original submitted commit for GSC (third
-        # commit in below git-log output if merged or first commit if not
-        # merged)
-        export COMMIT=`git log --pretty="%H %P" -n 1 | awk '{if(!$3) \
-                                            {print $1} else {print $3}}'`
-        make TESTCASES='python3 python3-trusted-args base-python3' \
-                DISTRIBUTIONS='ubuntu18.04' \
-                IMAGE_SUFFIX=-${COMMIT} GRAPHENE_BRANCH=${COMMIT}
+        openssl genrsa -3 -out enclave-key.pem 3072
+        cp -f config.yaml.template config.yaml
+        docker build --tag ubuntu18.04-bash --file test/ubuntu18.04-bash.dockerfile .
+        ./gsc build --insecure-args ubuntu18.04-bash test/ubuntu18.04-bash.manifest
+        ./gsc sign-image ubuntu18.04-bash enclave-key.pem
+        ./gsc info-image gsc-ubuntu18.04-bash
     '''
 } 
 stage('Test') {
     sh '''
-        cd Tools/gsc/test
-        # Jenkins may automatically merge master into submitted commit (but
-        # maybe not): choose the original submitted commit for GSC (third
-        # commit in below git-log output if merged or first commit if not merged)
-        export COMMIT=`git log --pretty="%H %P" -n 1 | awk '{if(!$3) \
-                                            {print $1} else {print $3}}'`
-        # Test Linux Pal
-        make test ENV_VARS='GSC_PAL=Linux' MAXTESTNUM=2 TESTCASES=python3 \
-                    DISTRIBUTIONS='ubuntu18.04' IMAGE_SUFFIX=-${COMMIT}
-        # Test Linux-SGX PAL
-        make test MAXTESTNUM=3 TESTCASES='python3 python3-trusted-args' \
-                    DISTRIBUTIONS='ubuntu18.04' IMAGE_SUFFIX=-${COMMIT}
-        # Test use of base Graphene Image
-        make test MAXTESTNUM=2 TESTCASES='python3' \
-                    DISTRIBUTIONS='ubuntu18.04-base' IMAGE_SUFFIX=-${COMMIT}
+        docker run --device=/dev/sgx_enclave \
+            -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+            gsc-ubuntu18.04-bash -c ls
     '''
 }
 stage('Docker images cleanup') {
     sh '''
-        cd Tools/gsc/test
-        # Jenkins may automatically merge master into submitted commit (but
-        # maybe not): choose the original submitted commit for GSC (third
-        # commit in below git-log output if merged or first commit if not merged)
-        export COMMIT=`git log --pretty="%H %P" -n 1 | awk '{if(!$3) \
-                                            {print $1} else {print $3}}'`
-        make clean TESTCASES='python3 python3-trusted-args base-python3' \
-                    DISTRIBUTIONS='ubuntu18.04' IMAGE_SUFFIX=-${COMMIT}
+        docker stop $(docker ps -aq)
+        docker rm $(docker ps -aq)
         docker image prune -f
     '''
 }
