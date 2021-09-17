@@ -1,20 +1,20 @@
 node(node_label) {
     env.ORIG_WKSP = env.WORKSPACE
-    def build_ok = true
+    env.build_ok = true
     try {
         stage('checkout'){
             dir ('./') {
                 git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
             }
 
-            dir('gramine') {
-                git url: 'https://github.com/gramineproject/gramine.git'
+            dir('gsc_dev_repo') {
+                git url: 'https://github.com/gramineproject/gsc.git'
             }
         }
     
-        dir ("gramine") {
-            sh 'cp -rf $WORKSPACE/gsc/* Tools/gsc/templates/'
-            env.WORKSPACE = env.WORKSPACE + "/gramine"
+        dir ("gsc_dev_repo") {
+            sh 'cp -rf $WORKSPACE/gsc/* templates'
+            env.WORKSPACE = env.WORKSPACE + "/gsc_dev_repo"
 
             load '../ci/gsc.jenkinsfile'
             
