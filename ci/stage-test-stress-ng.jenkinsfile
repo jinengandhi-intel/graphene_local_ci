@@ -26,13 +26,15 @@ stage('stress-ng') {
                         $cmd stress-ng --job scheduler.job --temp-path /tmp 2>&1 | tee scheduler.log
                         $cmd stress-ng --job scheduler_all.job --temp-path /tmp 2>&1 | tee scheduler_all.log
 
-                        python3 parser_stressng.py --path=.
-
                     '''
                 }
             } catch (Exception e){
                 env.build_ok = false
-                sh 'echo "Stress-ng Failed"'
+                sh '''
+                    echo "Stress-ng Failed"
+                    cd CI-Examples/stress-ng
+                    python3 parser_stressng.py --path=.
+                '''
             } finally {
                 archiveArtifacts 'CI-Examples/stress-ng/*.log'
             }
