@@ -7,13 +7,13 @@ node(node_label) {
                 git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
             }
 
-            dir ("graphene") {
-                git url: 'https://github.com/gramineproject/graphene.git'
+            dir ("gramine") {
+                git url: 'https://github.com/gramineproject/gramine.git'
             }
         }
     
-        dir ("graphene") {
-            env.WORKSPACE = env.WORKSPACE + "/graphene"
+        dir ("gramine") {
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
 
 
             load '.ci/lib/config.jenkinsfile'
