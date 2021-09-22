@@ -40,7 +40,7 @@ stage('test') {
                 if (env.node_label == "graphene_dcap") {
                     sh '''
                         cd LibOS/shim/test/regression
-                        python3 -m pytest -v --junit-xml libos-regression.xml test_libos.py
+                        python3 -m pytest -v -k "not large_mmap" --junit-xml libos-regression.xml test_libos.py
                     '''
                 } else {
                      sh '''
