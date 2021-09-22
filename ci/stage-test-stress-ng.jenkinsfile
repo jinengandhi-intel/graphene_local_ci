@@ -30,12 +30,12 @@ stage('stress-ng') {
                 }
             } catch (Exception e){
                 env.build_ok = false
+                sh 'echo "Stress-ng Failed"'
+            } finally {
                 sh '''
-                    echo "Stress-ng Failed"
                     cd CI-Examples/stress-ng
                     python3 parser_stressng.py --path=.
                 '''
-            } finally {
                 archiveArtifacts 'CI-Examples/stress-ng/*.log'
             }
         } else {
