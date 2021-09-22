@@ -38,6 +38,9 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libxrender1 \
     libxxf86vm1 \
     linux-headers-generic \
+    libjudy-dev \
+    libpixman-1-dev \
+    libipsec-mb-dev \
     net-tools \
     netcat-openbsd \
     ninja-build \

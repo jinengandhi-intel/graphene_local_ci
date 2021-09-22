@@ -36,6 +36,9 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libxml2-dev \
     libxrender1 \
     libxxf86vm1 \
+    libjudy-dev \
+    libpixman-1-dev \
+    libipsec-mb-dev \
     linux-headers-4.15.0-20-generic \
     net-tools \
     netcat-openbsd \
