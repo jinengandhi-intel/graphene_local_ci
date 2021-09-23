@@ -67,7 +67,6 @@ stage('build') {
             // prevent cheating and testing from repo
             sh 'rm -rf build'
             sh 'git clean -Xf subprojects'
-            sh 'make ${MAKEOPTS} -C Runtime clean'
         } else {
 
             sh '''sudo apt-key adv --keyserver-options http-proxy=http://proxy-chain.intel.com:911 \
