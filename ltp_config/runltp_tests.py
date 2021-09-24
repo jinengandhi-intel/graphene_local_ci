@@ -363,12 +363,29 @@ class TestRunner:
                 returncode = await self._run_cmd()
 
             must_pass = self.cfgsection.getintset('must-pass')
+            woken_string = re.compile(r'woken up early | \[\d+\,\d+\]')
+            woken_string_result  = woken_string.findall(self.stdout)
             if not self.stdout:
                 raise Fail('returncode={}'.format(returncode))
             elif must_pass is not None:
                 self._parse_test_output(must_pass)
-            elif ("TFAIL" in self.stdout or "TBROK" in self.stdout):
+            elif (("TFAIL" in self.stdout or "TBROK" in self.stdout) and not woken_string_result):
                 raise Fail('returncode={}'.format(returncode))
+            elif (woken_string_result):
+                flag_woken_issue = False
+                for entry in woken_string_result:
+                    find_num = re.findall(r'\d+', entry)
+                    if (find_num):
+                        num_list = list(map(int, find_num))
+                        num_list_1 = num_list[0]
+                        num_list_2 = num_list[1]
+                        if ( num_list_1 > 50000 and num_list_2 > 50000 ):
+                            raise Fail('returncode={}'.format(returncode))                            
+                        else:
+                            flag_woken_issue = True
+                            continue
+                if (flag_woken_issue == True):
+                   pass
             elif ("TCONF" in self.stdout and "TPASS" not in self.stdout):
                 raise Fail('returncode={}'.format(returncode))
 
