@@ -5,12 +5,12 @@ stage('stress-ng') {
             try {
                 timeout(time: 240, unit: 'MINUTES') {
                     sh '''
-                        export cmd=graphene-direct
+                        export cmd=gramine-direct
                         cd CI-Examples/stress-ng
                         if test -n "$SGX"
                         then
                             make SGX=1
-                            export cmd=graphene-sgx
+                            export cmd=gramine-sgx
                         else
                             make
                         fi

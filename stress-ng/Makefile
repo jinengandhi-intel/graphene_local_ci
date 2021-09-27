@@ -1,13 +1,13 @@
-# Relative path to Graphene root
+# Relative path to gramine root
 THIS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-#GRAPHENEDIR = ../..
-GRAPHENEDIR ?= $(THIS_DIR)../..
-SGX_SIGNER_KEY ?= $(GRAPHENEDIR)/Pal/src/host/Linux-SGX/signer/enclave-key.pem
+#GRAMINEDIR = ../..
+GRAMINEDIR ?= $(THIS_DIR)../..
+SGX_SIGNER_KEY ?= $(GRAMINEDIR)/Pal/src/host/Linux-SGX/signer/enclave-key.pem
 
 ifeq ($(DEBUG),1)
-GRAPHENE_LOG_LEVEL = debug
+GRAMINE_LOG_LEVEL = debug
 else
-GRAPHENE_LOG_LEVEL = error
+GRAMINE_LOG_LEVEL = error
 endif
 
 .PHONY: all
@@ -19,20 +19,20 @@ endif
 include ../../Scripts/Makefile.configs
 
 stress-ng.manifest: stress-ng.manifest.template
-			graphene-manifest \
-			-Dlog_level=$(GRAPHENE_LOG_LEVEL) \
+			gramine-manifest \
+			-Dlog_level=$(GRAMINE_LOG_LEVEL) \
 			-Darch_libdir=$(ARCH_LIBDIR) \
             $< > $@
 
 stress-ng.manifest.sgx: stress-ng.manifest
-			graphene-sgx-sign \
+			gramine-sgx-sign \
 			--key $(SGX_SIGNER_KEY) \
 			--manifest $< --output $@
 
 stress-ng.sig: stress-ng.manifest.sgx
 
 stress-ng.token: stress-ng.sig
-		graphene-sgx-get-token --output stress-ng.token --sig stress-ng.sig
+		gramine-sgx-get-token --output stress-ng.token --sig stress-ng.sig
 
 .PHONY: clean
 clean:

@@ -20,7 +20,7 @@ def main():
         fd = open(files, 'r')
         error_in_file = False
         for line in fd.readlines():
-            if ("error" in line) and ("Using insecure argv source" not in line) and ("Graphene will continue application execution" not in line):
+            if ("error" in line) and ("Using insecure argv source" not in line) and ("Gramine will continue application execution" not in line):
                 error_in_file = True
     
         if error_in_file:

@@ -100,8 +100,8 @@ RUN rm -f /intel/.rnd
 # Make a directory for the intel driver
 RUN mkdir -p /opt/intel && chown 1000 /opt/intel
 
-# Make a directory for the Graphene installation
-RUN mkdir -p /home/intel/graphene_install && chown 1000 /home/intel/graphene_install
+# Make a directory for the Gramine installation
+RUN mkdir -p /home/intel/gramine_install && chown 1000 /home/intel/gramine_install
 
 # Set the working directory to intel home directory
 WORKDIR /intel

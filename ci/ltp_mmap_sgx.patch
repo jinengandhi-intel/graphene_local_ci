@@ -881,14 +881,14 @@ index 52d6765c..5c0be3e4 100644
  skip = yes
  timeout = 80
  
--# WORKAROUND: test passes but TWARNs on cleanup of temp dir; bug in Graphene
+-# WORKAROUND: test passes but TWARNs on cleanup of temp dir; bug in Gramine
 -[pselect02]
 -must-pass =
 -    1
 -    2
 -    3
 -
--# WORKAROUND: test passes but TWARNs on cleanup of temp dir; bug in Graphene
+-# WORKAROUND: test passes but TWARNs on cleanup of temp dir; bug in Gramine
 -[pselect02_64]
 -must-pass =
 -    1
@@ -968,7 +968,7 @@ index 52d6765c..5c0be3e4 100644
 +[select04]
  skip = yes
  
--# WORKAROUND: test passes but TWARNs on cleanup of temp dir; bug in Graphene
+-# WORKAROUND: test passes but TWARNs on cleanup of temp dir; bug in Gramine
 -[select01]
 -must-pass =
 -    1
