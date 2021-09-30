@@ -349,6 +349,9 @@ class TestRunner:
                 "Disallowing access to file '/lib64/libtinfo.so.6'" in error or \
                 "Disallowing access to file '/usr/lib64/libtinfo.so.6'" in error or \
                 "Detected deprecated syntax. Consider switching to new syntax: 'sgx.allowed_files" in error or \
+                "-" in error or \
+                "Gramine detected the following insecure configurations:" in error or \
+                "Gramine will continue application execution, but this configuration must not be used in production!" in error or \
                 'WARNING! "allowed_files" is an insecure feature designed for debugging and prototyping, it must never be used in production!' in error or \
                 "error: Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error or \
                 "Disallowing access to file '/lib/x86_64-linux-gnu/libnss_nis.so.2" in error :
