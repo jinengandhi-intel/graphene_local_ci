@@ -344,6 +344,8 @@ class TestRunner:
                 "error: Mounting file:/proc may expose unsanitized" in error or \
                 "error: Failed to read ELF header" in error or \
                 "Disallowing access to file '/usr/bin/systemd-detect-virt'" in error or \
+                "Disallowing access to file '/lib64/libnss_nis.so.2'" in error or \
+                "Disallowing access to file '/usr/lib64/libnss_nis.so.2'" in error or \
                 "Disallowing access to file '/lib64/libtinfo.so.6'" in error or \
                 "Disallowing access to file '/usr/lib64/libtinfo.so.6'" in error or \
                 "Detected deprecated syntax. Consider switching to new syntax: 'sgx.allowed_files" in error or \
