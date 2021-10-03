@@ -8,7 +8,8 @@ node (node_label) {
             }
 
             dir ("gramine") {
-                git url: 'https://github.com/gramineproject/gramine.git'
+                git url: 'https://github.com/gramineproject/gramine.git',
+                commit: 'f15293dd26af9d7287a77cbd8d952b99639ec994'
             }
         }
 
