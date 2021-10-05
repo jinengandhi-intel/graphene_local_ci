@@ -71,11 +71,23 @@ stage('build') {
                 try {
                     sh '''
                     cd "$WORKSPACE"
-                    meson setup build \
+                    kernel_version=$(uname -r)
+                    os_release_version=$(grep -oP '(?<=^VERSION_ID=).+' /etc/os-release | tr -d '"')
+                    if [ "${kernel_version}" = '5.13.0-051300-generic' ] && [ "${os_release_version}" = '20.04' ]
+                    then
+                        meson setup build \
+                        --prefix="$PREFIX" \
+                        --buildtype="$BUILDTYPE" \
+                        -Ddirect=disabled \
+                        -Dsgx=enabled \
+                        -Dsgx_driver_include_path=/usr/src/linux-headers-5.13.0-051300/arch/x86/include/uapi
+                    else
+                        meson setup build \
                         --prefix="$PREFIX" \
                         --buildtype="$BUILDTYPE" \
                         -Ddirect=disabled \
                         -Dsgx=enabled
+                    fi                    
                     ninja -vC build
                     ninja -vC build install
                 '''
