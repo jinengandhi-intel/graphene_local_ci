@@ -4,7 +4,13 @@ stage('build-kw') {
     env.KW_PROJECT="Graphene"
 
     try {
-        sh '$KW_INSTALL/kwinject -o $WORKSPACE/kwinject_graphene.out make SGX=1 ISGX_DRIVER_PATH="" -j32'
+        sh '''
+        make SGX=1 -j8
+        make -j8
+        meson setup build --prefix=/home/intel/gramine_install/usr --buildtype=release -Ddirect=enabled -Dsgx=enabled
+        $KW_INSTALL/kwinject -o $WORKSPACE/kwinject_graphene.out ninja -vC build
+        ninja -vC build install
+        '''
     } catch (Exception e) {}
 
     try {
