@@ -4,7 +4,6 @@ stage('build') {
         if (env.build_type == "manual") {
             sh '''
                 make ${MAKEOPTS}
-                make ${MAKEOPTS} -C Pal/src PAL_HOST=Skeleton
             '''
 
             try {
