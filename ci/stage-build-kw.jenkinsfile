@@ -7,7 +7,7 @@ stage('build-kw') {
         sh '''
         make SGX=1 -j8
         make -j8
-        meson setup build --prefix=/home/intel/gramine_install/usr --buildtype=release -Ddirect=enabled -Dsgx=enabled
+        /home/intel/.local/bin/meson setup build --prefix=/home/intel/gramine_install/usr --buildtype=release -Ddirect=enabled -Dsgx=enabled
         $KW_INSTALL/kwinject -o $WORKSPACE/kwinject_graphene.out ninja -vC build
         ninja -vC build install
         '''
