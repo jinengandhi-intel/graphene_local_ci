@@ -2,10 +2,6 @@ stage('build') {
 
     script {
         if (env.build_type == "manual") {
-            sh '''
-                make ${MAKEOPTS}
-            '''
-
             try {
                 sh '''
                     meson build \
