@@ -6,6 +6,8 @@ loader.env.LD_PRELOAD = "{{ coreutils_libdir }}/libstdbuf.so"
 loader.env._STDBUF_O = "L"
 loader.insecure__use_cmdline_argv = true
 
+fs.experimental__enable_sysfs_topology = true
+
 fs.mount.shm.type = "chroot"
 fs.mount.shm.path = "/dev/shm"
 fs.mount.shm.uri = "file:/tmp"
