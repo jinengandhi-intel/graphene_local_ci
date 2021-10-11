@@ -25,12 +25,14 @@ stage('build') {
                         --buildtype="$BUILDTYPE" \
                         -Ddirect=disabled \
                         -Dsgx=enabled \
-                        -Dsgx_driver=oot
-                    ninja -vC build
-                    ninja -vC build install
+                        -Dsgx_driver=oot > meson_cmd_output.txt
+                    ninja -vC build > ninja_build_log.txt
+                    ninja -vC build install > ninja_install_log.txt
                     '''
                 } finally {
                     archiveArtifacts 'build/meson-logs/**/*'
+                    archiveArtifacts 'ninja_build_log.txt'
+                    archiveArtifacts 'ninja_install_log.txt'                    
                 }
 
             } else if (env.node_label == "graphene_dcap") {
@@ -49,12 +51,14 @@ stage('build') {
                         --buildtype="$BUILDTYPE" \
                         -Ddirect=disabled \
                         -Dsgx=enabled \
-                        -Dsgx_driver=dcap1.6
-                    ninja -vC build
-                    ninja -vC build install
+                        -Dsgx_driver=dcap1.6 > meson_cmd_output.txt
+                    ninja -vC build > ninja_build_log.txt
+                    ninja -vC build install > ninja_install_log.txt
                     '''
                 } finally {
                     archiveArtifacts 'build/meson-logs/**/*'
+                    archiveArtifacts 'ninja_build_log.txt'
+                    archiveArtifacts 'ninja_install_log.txt'                       
                 }
 
             } else {
@@ -65,12 +69,14 @@ stage('build') {
                         --prefix="$PREFIX" \
                         --buildtype="$BUILDTYPE" \
                         -Ddirect=disabled \
-                        -Dsgx=enabled
-                    ninja -vC build
-                    ninja -vC build install
+                        -Dsgx=enabled > meson_cmd_output.txt
+                    ninja -vC build > ninja_build_log.txt
+                    ninja -vC build install > ninja_install_log.txt
                 '''
                 } finally {
                     archiveArtifacts 'build/meson-logs/**/*'
+                    archiveArtifacts 'ninja_build_log.txt'
+                    archiveArtifacts 'ninja_install_log.txt'                      
                 }
             }
 
