@@ -12,6 +12,7 @@ env.DOCKER_ARGS_SGX = '''
     --volume=/lib/modules:/lib/modules:ro
     --volume=/usr/src:/usr/src:ro
     --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
+    --volume=/usr/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:ro
 '''
 
 env.gcc_dump_machine = sh(script:'gcc -dumpmachine', returnStdout: true).trim()

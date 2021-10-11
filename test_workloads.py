@@ -41,3 +41,10 @@ class Test_Workload_Results():
         redis_contents = redis_result_file.read()
         assert(("PING_INLINE" in redis_contents) and ("MSET" in redis_contents))
 
+    def test_ratls_workload(self):
+        if (os.getenv("node_label") == "graphene_dcap"):
+            ratls_result_file = open("CI-Examples/ra-tls-secret-prov/OUTPUT", "r")
+            ratls_contents = ratls_result_file.read()
+            assert("Received secret" in ratls_contents)
+            assert("Received secret1" in ratls_contents)
+            assert("Read from protected file" in ratls_contents)

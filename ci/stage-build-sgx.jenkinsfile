@@ -51,6 +51,7 @@ stage('build') {
                         --buildtype="$BUILDTYPE" \
                         -Ddirect=disabled \
                         -Dsgx=enabled \
+                        -Ddcap=enabled \
                         -Dsgx_driver=dcap1.6 > meson_cmd_output.txt
                     ninja -vC build > ninja_build_log.txt
                     ninja -vC build install > ninja_install_log.txt

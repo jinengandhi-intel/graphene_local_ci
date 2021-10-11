@@ -193,24 +193,24 @@ stage('test-sgx') {
                 exit 1; \
             fi
         '''
-    }
-    timeout(time: 5, unit: 'MINUTES') {
-        sh '''
-            # test SGX remote attestation only on Ubuntu 18.04 to keep internet requests to minimum
-            .ci/isdistro bionic || exit 0
-
-            cd CI-Examples/ra-tls-secret-prov
-            if [ "${ra_client_spid}" != "" ] && [ "${ra_client_key}" != "" ]; \
-            then \
-                make SGX=1 check_epid RA_CLIENT_SPID=${ra_client_spid} \
-                                        RA_TLS_EPID_API_KEY=${ra_client_key} \
-                                        RA_CLIENT_LINKABLE=0; \
-            else \
-                echo "Failure: no ra_client_spid and/or ra_client_key!"; \
-                exit 1; \
-            fi
-        '''
     }*/
+    try{
+        timeout(time: 5, unit: 'MINUTES') {
+            if (env.node_label == "graphene_dcap") {
+                sh '''
+                    # test SGX remote attestation only on Ubuntu 18.04 to keep internet requests to minimum
+                    .ci/isdistro bionic || exit 0
+
+                    cd CI-Examples/ra-tls-secret-prov
+                    sed -i '/@rm OUTPUT/d' Makefile
+                    make SGX=1 check_dcap RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1
+                '''
+            }
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "RA-TLS Secret Prov Example Test Failed"'
+    }
 
     try {
         timeout(time: 2, unit: 'MINUTES') {
