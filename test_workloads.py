@@ -4,7 +4,10 @@ import logging
 import glob
 from os import path
 import os
+import pytest
 
+gcc_dumpmachine = os.environ.get('gcc_dump_machine')
+sgx_mode = os.environ.get('SGX')
 
 class Test_Workload_Results():
     def test_bash_workload(self):
@@ -12,6 +15,8 @@ class Test_Workload_Results():
         bash_contents = bash_result_file.read()
         assert("readlink" in bash_contents)
 
+    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux' and sgx_mode == '1'),
+                    reason="Python Cent/RHEL issue")
     def test_python_workload(self):
         python_result_file = open("CI-Examples/python/TEST_STDOUT", "r")
         python_contents = python_result_file.read()
@@ -20,6 +25,13 @@ class Test_Workload_Results():
         assert("Success 3/4" in python_contents)
         assert("Success 4/4" in python_contents)
 
+    @pytest.mark.skipif(gcc_dumpmachine == 'x86_64-redhat-linux',
+                    reason="Memcached libraries not available for CENT/RHEL")
+    def test_memcached_workload(self):
+        memcached_result_file = open("CI-Examples/memcached/OUTPUT.txt", "r")
+        memcached_contents = memcached_result_file.read()
+        assert("2" in memcached_contents)
+        
     def test_lightppd_workload(self):
         for filename in glob.glob("CI-Examples/lighttpd/result-*"):
             lightppd_result_file = open(filename,"r")

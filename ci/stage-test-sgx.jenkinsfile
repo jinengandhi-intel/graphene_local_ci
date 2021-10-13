@@ -28,18 +28,7 @@ stage('test-sgx') {
         }
     }
 
-    try{
-        timeout(time: 5, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/python
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                make ${MAKEOPTS} SGX=1 check
-            '''
-        }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Python Example Test Failed"'
-    }
+
 
     try{
         timeout(time: 5, unit: 'MINUTES') {
@@ -67,12 +56,25 @@ stage('test-sgx') {
                     # memcslap populates server but doesn't report errors, use
                     # memcached-tool for this (must return two lines of stats)
                     memcslap --servers=127.0.0.1 --concurrency=8
-                    src/scripts/memcached-tool 127.0.0.1 | wc -l | grep -w "2"
+                    src/scripts/memcached-tool 127.0.0.1 | wc -l | grep -w "2" 2>&1 | tee OUTPUT.txt
                 '''
             }
         } catch (Exception e){
             env.build_ok = false
             sh 'echo "Memcached Example Test Failed"'
+        }
+
+        try{
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/python
+                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make ${MAKEOPTS} SGX=1 check
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "Python Example Test Failed"'
         }
     }
 
