@@ -41,3 +41,11 @@ class Test_Workload_Results():
         redis_contents = redis_result_file.read()
         assert(("PING_INLINE" in redis_contents) and ("MSET" in redis_contents))
 
+    def test_sqlite_workload(self):
+        sqlite_result_file = open("CI-Examples/sqlite/OUTPUT", "r")
+        sqlite_contents = sqlite_result_file.read()
+        assert(("row 4" in sqlite_contents) \
+                and ("row 3" in sqlite_contents) \
+                and ("row 2" in sqlite_contents) \
+                and ("row 1" in sqlite_contents))
+
