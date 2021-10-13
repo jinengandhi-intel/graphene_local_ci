@@ -1,29 +1,31 @@
 stage('test-sgx') {
     env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
-    try {
-        timeout(time: 60, unit: 'MINUTES') {
-            sh '''
-                cd LibOS/shim/test/ltp
-                make ${MAKEOPTS} -f Makefile.LTP SGX=1 all LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
-                bash update_manifest.sh
-                make ${MAKEOPTS} -f Makefile.LTP SGX=1 sgx-tokens LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
-                make -f Makefile.LTP ltp-sgx_results_1.xml SGX=1 LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
-            '''
-            /*
-            sh '''
-                cd LibOS/shim/test/ltp
-                export CFG=ltp-sudo-syscalls.cfg
-                export LTPSCENARIO=$PWD/install-sgx/runtest/syscalls-sudo
-                make -f Makefile.LTP ltp-sgx_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
-            '''
-            */
+    if (env.node_label != "graphene_oot") {
+        try {
+            timeout(time: 60, unit: 'MINUTES') {
+                sh '''
+                    cd LibOS/shim/test/ltp
+                    make ${MAKEOPTS} -f Makefile.LTP SGX=1 all LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
+                    bash update_manifest.sh
+                    make ${MAKEOPTS} -f Makefile.LTP SGX=1 sgx-tokens LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
+                    make -f Makefile.LTP ltp-sgx_results_1.xml SGX=1 LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
+                '''
+                /*
+                sh '''
+                    cd LibOS/shim/test/ltp
+                    export CFG=ltp-sudo-syscalls.cfg
+                    export LTPSCENARIO=$PWD/install-sgx/runtest/syscalls-sudo
+                    make -f Makefile.LTP ltp-sgx_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
+                '''
+                */
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "LTP Test Failed"'
+        } finally {
+            archiveArtifacts 'LibOS/shim/test/ltp/ltp-sgx_results_*.xml'
+            junit 'LibOS/shim/test/ltp/ltp-sgx_results_*.xml'
         }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "LTP Test Failed"'
-    } finally {
-        archiveArtifacts 'LibOS/shim/test/ltp/ltp-sgx_results_*.xml'
-        junit 'LibOS/shim/test/ltp/ltp-sgx_results_*.xml'
     }
 
     try{
