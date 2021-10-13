@@ -31,19 +31,6 @@ stage('test-sgx') {
     try{
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd CI-Examples/python
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                make ${MAKEOPTS} SGX=1 check
-            '''
-        }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Python Example Test Failed"'
-    }
-
-    try{
-        timeout(time: 5, unit: 'MINUTES') {
-            sh '''
                 cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
@@ -74,6 +61,19 @@ stage('test-sgx') {
             env.build_ok = false
             sh 'echo "Memcached Example Test Failed"'
         }
+        
+        try{
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/python
+                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make ${MAKEOPTS} SGX=1 check
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "Python Example Test Failed"'
+        }            
     }
 
     try {
