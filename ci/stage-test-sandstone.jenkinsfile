@@ -8,7 +8,7 @@ stage('test') {
                 if test -n "$SGX"
                 then
                     make SGX=1 
-                    SGX=1 make start-sandstone
+                    SGX=1 make start-sandstone 2>&1 | tee OUTPUT.txt
                 fi
             fi
         '''

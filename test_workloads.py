@@ -8,6 +8,7 @@ import pytest
 
 gcc_dumpmachine = os.environ.get('gcc_dump_machine')
 sgx_mode = os.environ.get('SGX')
+no_cores = os.environ.get('no_cpu')
 
 class Test_Workload_Results():
     def test_bash_workload(self):
@@ -60,4 +61,10 @@ class Test_Workload_Results():
                 and ("row 3" in sqlite_contents) \
                 and ("row 2" in sqlite_contents) \
                 and ("row 1" in sqlite_contents))
-
+    
+    @pytest.mark.skipif((int(no_cores) < 16 or sgx_mode != '1'),
+                    reason="Sandstone is enabled on servers with SGX")
+    def test_sandstone_workload(self):
+        sandstone_result_file = open("CI-Examples/sandstone-50-bin/OUTPUT.txt", "r")
+        sandstone_contents = sandstone_result_file.read()
+        assert(("Loop iteration 1 finished" in sandstone_contents) and ("exit: pass" in sandstone_contents))
