@@ -216,6 +216,22 @@ stage('test-sgx') {
         '''
     }*/
 
+    try{
+        timeout(time: 90, unit: 'MINUTES') {
+            sh '''
+                if [ "${no_cpu}" -gt 16 ]
+                then
+                    cd CI-Examples/sandstone-50-bin
+                    make SGX=1 
+                    SGX=1 make start-sandstone 2>&1 | tee OUTPUT.txt
+                fi
+            '''
+        }
+    } catch (Exception e) {
+        env.build_ok = false
+        sh 'echo "Sandstone workload Failed"'
+    }
+
     try {
         timeout(time: 2, unit: 'MINUTES') {
             sh 'python3 -m pytest -v --junit-xml workload-regression.xml test_workloads.py'

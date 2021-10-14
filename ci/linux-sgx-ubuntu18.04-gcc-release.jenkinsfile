@@ -44,7 +44,6 @@ node (node_label) {
                 load '../ci/stage-build-sgx.jenkinsfile'
                 load '../ci/stage-test.jenkinsfile'
                 load '../ci/stage-test-sgx.jenkinsfile'
-                load '../ci/stage-test-sandstone.jenkinsfile'
                 load '../ci/stage-test-stress-ng.jenkinsfile'
             }
         }
