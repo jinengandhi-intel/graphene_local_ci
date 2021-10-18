@@ -18,4 +18,15 @@ stage('build-kw') {
     try {
         sh '$KW_INSTALL/kwadmin --url $KW_SERVER load $KW_PROJECT $WORKSPACE/kwtables --force'
     } catch (Exception e) {}
+
+    try {
+        sh '''
+        cp -rf $KW_INSTALL/WebApiScripts_py3 .
+        cd WebApiScripts_py3
+        python3 kwmakereport.py --url https://klocwork-iind2.devtools.intel.com:8080/Graphene --query "state:New"
+        '''
+    } catch (Exception e) {}
+    finally {
+        archiveArtifacts 'WebApiScripts_py3/Graphene*.html'
+    }
 }
