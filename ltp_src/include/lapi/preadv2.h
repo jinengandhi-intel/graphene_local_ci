@@ -4,8 +4,8 @@
  * Author: Xiao Yang <yangx.jy@cn.fujitsu.com>
  */
 
-#ifndef PREADV2_H
-#define PREADV2_H
+#ifndef LAPI_PREADV2_H__
+#define LAPI_PREADV2_H__
 
 #include "config.h"
 #include "lapi/syscalls.h"
@@ -19,12 +19,12 @@
 /* LO_HI_LONG taken from glibc */
 # define LO_HI_LONG(val) (long) (val), (long) (((uint64_t) (val)) >> 32)
 
-ssize_t preadv2(int fd, const struct iovec *iov, int iovcnt, off_t offset,
-		int flags)
+static inline ssize_t preadv2(int fd, const struct iovec *iov, int iovcnt,
+                              off_t offset, int flags)
 {
 	return tst_syscall(__NR_preadv2, fd, iov, iovcnt,
 			   LO_HI_LONG(offset), flags);
 }
 #endif
 
-#endif /* PREADV2_H */
+#endif /* LAPI_PREADV2_H__ */

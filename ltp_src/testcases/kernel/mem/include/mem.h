@@ -4,6 +4,7 @@
 #include "tst_test.h"
 #include "tst_cgroup.h"
 #include "ksm_helper.h"
+#include "tst_memutils.h"
 
 #if defined(__powerpc__) || defined(__powerpc64__)
 #define MAXNODES		256
@@ -61,7 +62,7 @@ void check_hugepage(void);
 void write_memcg(void);
 
 /* cpuset/memcg - include/tst_cgroup.h */
-void write_cpusets(const char *cgroup_dir, long nd);
+void write_cpusets(const struct tst_cgroup_group *cg, long nd);
 
 /* shared */
 unsigned int get_a_numa_node(void);

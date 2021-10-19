@@ -4,8 +4,8 @@
  * Author: Viresh Kumar <viresh.kumar@linaro.org>
  */
 
-#ifndef IPC_SHMBUF_H
-#define IPC_SHMBUF_H
+#ifndef LAPI_SHMBUF_H__
+#define LAPI_SHMBUF_H__
 
 #include "lapi/posix_types.h"
 #include <sys/sem.h>
@@ -27,7 +27,7 @@
  * data structure when moving to 64-bit time_t.
  */
 
-#if defined(__arch64__)
+#if __BITS_PER_LONG == 64
 struct shmid64_ds {
 	struct ipc64_perm	shm_perm;	/* operation perms */
 	size_t			shm_segsz;	/* size of segment (bytes) */
@@ -270,4 +270,4 @@ struct shmid64_ds {
 
 #endif /* HAVE_SHMID64_DS */
 
-#endif /* IPC_SHMBUF_H */
+#endif /* LAPI_SHMBUF_H__ */

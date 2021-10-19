@@ -4,17 +4,18 @@
  * Copyright (c) 2014 Fujitsu Ltd.
  */
 
-#ifndef TEE_H
-#define TEE_H
+#ifndef LAPI_TEE_H__
+#define LAPI_TEE_H__
 
 #include "config.h"
 #include "lapi/syscalls.h"
 
 #if !defined(HAVE_TEE)
-ssize_t tee(int fd_in, int fd_out, size_t len, unsigned int flags)
+static inline ssize_t tee(int fd_in, int fd_out,
+                          size_t len, unsigned int flags)
 {
 	return tst_syscall(__NR_tee, fd_in, fd_out, len, flags);
 }
 #endif
 
-#endif /* TEE_H */
+#endif /* LAPI_TEE_H__ */

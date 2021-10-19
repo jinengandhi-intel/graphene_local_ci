@@ -3,31 +3,33 @@
  * Copyright (c) 2020 CTERA Networks. All Rights Reserved.
  *
  * Started by Amir Goldstein <amir73il@gmail.com>
- *
- * DESCRIPTION
- *     Check fanotify directory entry modification events, events on child and
- *     on self with group init flags:
- *     - FAN_REPORT_DFID_NAME (dir fid + name)
- *     - FAN_REPORT_DIR_FID   (dir fid)
- *     - FAN_REPORT_DIR_FID | FAN_REPORT_FID   (dir fid + child fid)
- *     - FAN_REPORT_DFID_NAME | FAN_REPORT_FID (dir fid + name + child fid)
  */
+
+/*\
+ * [Description]
+ * Check fanotify directory entry modification events, events on child and
+ * on self with group init flags:
+ *
+ * - FAN_REPORT_DFID_NAME (dir fid + name)
+ * - FAN_REPORT_DIR_FID   (dir fid)
+ * - FAN_REPORT_DIR_FID | FAN_REPORT_FID   (dir fid + child fid)
+ * - FAN_REPORT_DFID_NAME | FAN_REPORT_FID (dir fid + name + child fid)
+ */
+
 #define _GNU_SOURCE
 #include "config.h"
 
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/mount.h>
 #include <sys/syscall.h>
 #include "tst_test.h"
-#include "fanotify.h"
 
-#if defined(HAVE_SYS_FANOTIFY_H)
-#include <sys/fanotify.h>
+#ifdef HAVE_SYS_FANOTIFY_H
+#include "fanotify.h"
 
 #define EVENT_MAX 20
 
@@ -159,28 +161,13 @@ static void do_test(unsigned int number)
 
 	tst_res(TINFO, "Test #%d: %s", number, tc->tname);
 
-	fd_notify = fanotify_init(group->flag, 0);
-	if (fd_notify == -1) {
-		if (errno == EINVAL) {
-			tst_res(TCONF,
-				"%s not supported by kernel", group->name);
-			return;
-		}
-
-		tst_brk(TBROK | TERRNO,
-			"fanotify_init(%s, 0) failed", group->name);
-	}
+	fd_notify = SAFE_FANOTIFY_INIT(group->flag, 0);
 
 	/*
 	 * Watch dir modify events with name in filesystem/dir
 	 */
-	if (fanotify_mark(fd_notify, FAN_MARK_ADD | mark->flag, tc->mask,
-			  AT_FDCWD, MOUNT_PATH) < 0) {
-		tst_brk(TBROK | TERRNO,
-		    "fanotify_mark (%d, FAN_MARK_ADD | %s, 0x%lx, "
-		    "AT_FDCWD, '"MOUNT_PATH"') failed",
-		    fd_notify, mark->name, tc->mask);
-	}
+	SAFE_FANOTIFY_MARK(fd_notify, FAN_MARK_ADD | mark->flag, tc->mask,
+			   AT_FDCWD, MOUNT_PATH);
 
 	/* Save the mount root fid */
 	fanotify_save_fid(MOUNT_PATH, &root_fid);
@@ -195,14 +182,9 @@ static void do_test(unsigned int number)
 	/* Save the subdir fid */
 	fanotify_save_fid(dname1, &dir_fid);
 
-	if (tc->sub_mask &&
-	    fanotify_mark(fd_notify, FAN_MARK_ADD | sub_mark->flag, tc->sub_mask,
-			  AT_FDCWD, dname1) < 0) {
-		tst_brk(TBROK | TERRNO,
-		    "fanotify_mark (%d, FAN_MARK_ADD | %s, 0x%lx, "
-		    "AT_FDCWD, '%s') failed",
-		    fd_notify, sub_mark->name, tc->sub_mask, dname1);
-	}
+	if (tc->sub_mask)
+		SAFE_FANOTIFY_MARK(fd_notify, FAN_MARK_ADD | sub_mark->flag,
+				   tc->sub_mask, AT_FDCWD, dname1);
 
 	event_set[tst_count].mask = FAN_CREATE | FAN_ONDIR;
 	event_set[tst_count].fid = &root_fid;
@@ -435,7 +417,7 @@ check_match:
 		} else if (fhlen != expected_fid->handle.handle_bytes) {
 			tst_res(TFAIL,
 				"got event: mask=%llx pid=%u fd=%d name='%s' "
-				"len=%d info_type=%d info_len=%d fh_len=%d expected(%d)"
+				"len=%d info_type=%d info_len=%d fh_len=%d expected(%d) "
 				"fh_type=%d",
 				(unsigned long long)event->mask,
 				(unsigned)event->pid, event->fd, filename,
@@ -562,11 +544,7 @@ check_match:
 
 static void setup(void)
 {
-	int fd;
-
-	/* Check kernel for fanotify support */
-	fd = SAFE_FANOTIFY_INIT(FAN_CLASS_NOTIF, O_RDONLY);
-	SAFE_CLOSE(fd);
+	REQUIRE_FANOTIFY_INIT_FLAGS_SUPPORTED_ON_FS(FAN_REPORT_DIR_FID, MOUNT_PATH);
 
 	sprintf(dname1, "%s/%s", MOUNT_PATH, DIR_NAME1);
 	sprintf(dname2, "%s/%s", MOUNT_PATH, DIR_NAME2);
@@ -583,13 +561,11 @@ static void cleanup(void)
 static struct tst_test test = {
 	.test = do_test,
 	.tcnt = ARRAY_SIZE(test_cases),
-	.dev_fs_flags = TST_FS_SKIP_FUSE,
 	.setup = setup,
 	.cleanup = cleanup,
 	.mount_device = 1,
 	.mntpoint = MOUNT_PATH,
 	.all_filesystems = 1,
-	.needs_tmpdir = 1,
 	.needs_root = 1
 };
 

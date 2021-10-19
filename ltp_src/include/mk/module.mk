@@ -42,10 +42,12 @@ endif
 
 ifneq ($(filter install clean,$(MAKECMDGOALS)),)
 MAKE_TARGETS := $(filter-out %.ko, $(MAKE_TARGETS))
-MAKE_TARGETS += $(wildcard *.ko)
+MAKE_TARGETS += $(sort $(wildcard *.ko))
 endif
 
-CLEAN_TARGETS += .dep_modules
+CLEAN_TARGETS += .dep_modules *.mod built-in.a
+
+CHECK_TARGETS := $(filter-out %.ko, $(CHECK_TARGETS))
 
 MODULE_SOURCES := $(patsubst %.ko,%.c,$(filter %.ko, $(MAKE_TARGETS)))
 

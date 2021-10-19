@@ -11,10 +11,9 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <sys/sem.h>
 #include "tst_test.h"
 #include "libnewipc.h"
-#include "lapi/semun.h"
+#include "lapi/sem.h"
 #include "semop.h"
 
 static key_t semkey;
@@ -71,7 +70,7 @@ static void setup(void)
 	semop_supported_by_kernel(tv);
 
 	timeout.type = tv->ts_type;
-	tst_ts_set_sec(&timeout, 0);
+	tst_ts_set_sec(&timeout, 2);
 	tst_ts_set_nsec(&timeout, 10000000);
 
 	SAFE_SIGNAL(SIGHUP, sighandler);

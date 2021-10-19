@@ -25,8 +25,6 @@
 
 #include "config.h"
 #include "tst_test.h"
-#include "lapi/socket.h"
-#include "lapi/bpf.h"
 #include "bpf_common.h"
 
 const char MSG[] = "Ahoj!";
@@ -79,35 +77,17 @@ void setup(void)
 void run(void)
 {
 	int map_fd, prog_fd;
-	int sk[2];
 	uint32_t key = 0;
 	uint64_t val;
 
-	memset(attr, 0, sizeof(*attr));
-	attr->map_type = BPF_MAP_TYPE_ARRAY;
-	attr->key_size = 4;
-	attr->value_size = 8;
-	attr->max_entries = 1;
-
-	map_fd = bpf_map_create(attr);
-
+	map_fd = bpf_map_array_create(1);
 	prog_fd = load_prog(map_fd);
 
-	SAFE_SOCKETPAIR(AF_UNIX, SOCK_DGRAM, 0, sk);
-	SAFE_SETSOCKOPT(sk[1], SOL_SOCKET, SO_ATTACH_BPF,
-			&prog_fd, sizeof(prog_fd));
+	bpf_run_prog(prog_fd, msg, sizeof(MSG));
+	SAFE_CLOSE(prog_fd);
 
-	SAFE_WRITE(1, sk[0], msg, sizeof(MSG));
-
-	memset(attr, 0, sizeof(*attr));
-	attr->map_fd = map_fd;
-	attr->key = ptr_to_u64(&key);
-	attr->value = ptr_to_u64(&val);
-
-	TEST(bpf(BPF_MAP_LOOKUP_ELEM, attr, sizeof(*attr)));
-	if (TST_RET == -1) {
-		tst_res(TFAIL | TTERRNO, "array map lookup");
-	} else if (val != 1) {
+	bpf_map_array_get(map_fd, &key, &val);
+	if (val != 1) {
 		tst_res(TFAIL,
 			"val = %lu, but should be val = 1",
 			val);
@@ -115,10 +95,7 @@ void run(void)
 	        tst_res(TPASS, "val = 1");
 	}
 
-	SAFE_CLOSE(prog_fd);
 	SAFE_CLOSE(map_fd);
-	SAFE_CLOSE(sk[0]);
-	SAFE_CLOSE(sk[1]);
 }
 
 static struct tst_test test = {

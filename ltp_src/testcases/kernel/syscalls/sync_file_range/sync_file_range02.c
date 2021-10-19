@@ -4,12 +4,12 @@
  * Author: Sumit Garg <sumit.garg@linaro.org>
  */
 
-/*
- * sync_file_range02
+/*\
+ * [Description]
  *
- * It basically tests sync_file_range() to sync test file range having large
- * dirty file pages to block device. Also, it tests all supported filesystems
- * on a test block device.
+ * Tests if sync_file_range() does sync a test file range with a many dirty pages
+ * to a block device. Also, it tests all supported filesystems on a test block
+ * device.
  */
 
 #define _GNU_SOURCE
@@ -121,7 +121,12 @@ static struct tst_test test = {
 	.needs_root = 1,
 	.mount_device = 1,
 	.all_filesystems = 1,
-	.dev_fs_flags = TST_FS_SKIP_FUSE,
+	.skip_filesystems = (const char *const []){
+		"fuse",
+		"ntfs",
+		"tmpfs",
+		NULL
+	},
 	.mntpoint = MNTPOINT,
 	.setup = setup,
 	.test = run,

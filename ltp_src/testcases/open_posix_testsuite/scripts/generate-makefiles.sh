@@ -24,7 +24,7 @@ generate_locate_test_makefile() {
 
 	echo "Generating $maketype Makefiles"
 
-	locate-test --$maketype | sed -e 's,^./,,g' > make-gen.$maketype
+	locate-test --$maketype | sed -e 's,^./,,g' | sort > make-gen.$maketype
 
 	generate_makefiles make-gen.$maketype $*
 
@@ -148,9 +148,21 @@ EOF
 
 	fi
 
-	cat >> "$makefile.2" <<EOF
+	if [ ! -z "${tests}" ]; then
+		cat >> "$makefile.2" <<EOF
 INSTALL_TARGETS+=	${tests}
+EOF
+	fi
+	cat >> "$makefile.2" <<EOF
 MAKE_TARGETS+=		${targets}
+
+ifeq (\$V,1)
+VERBOSE=1
+endif
+
+ifndef VERBOSE
+v=@
+endif
 
 EOF
 
@@ -174,7 +186,7 @@ install: \$(INSTALL_DIR) run.sh
 	@if [ -d speculative ]; then \$(MAKE) -C speculative install; fi
 
 test: run.sh
-	@./run.sh
+	\$(v)./run.sh
 
 \$(INSTALL_DIR):
 	mkdir -p \$@
@@ -227,7 +239,7 @@ EOF
 
 		cat >> "$makefile.3" <<EOF
 $bin_file: \$(srcdir)/$c_file
-	@if $COMPILE_STR > logfile.\$\$\$\$ 2>&1; then \\
+	\$(v)if $COMPILE_STR > logfile.\$\$\$\$ 2>&1; then \\
 		 cat logfile.\$\$\$\$; \\
 		 echo "\$(subdir)/$test_name compile PASSED"; \\
 		 echo "\$(subdir)/$test_name compile PASSED" >> \$(LOGFILE); \\

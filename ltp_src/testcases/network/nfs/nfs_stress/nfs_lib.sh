@@ -30,6 +30,7 @@ TST_NEEDS_ROOT=1
 TST_NEEDS_CMDS="$TST_NEEDS_CMDS mount exportfs"
 TST_SETUP="${TST_SETUP:-nfs_setup}"
 TST_CLEANUP="${TST_CLEANUP:-nfs_cleanup}"
+TST_NEEDS_DRIVERS="nfsd"
 
 # When set and test is using netns ($TST_USE_NETNS set) NFS traffic will go
 # through lo interface instead of ltp_ns_veth* netns interfaces (useful for
@@ -83,30 +84,32 @@ nfs_mount()
 		mount_dir="$(tst_ipaddr $host_type):$remote_dir"
 	fi
 
-	local mnt_cmd="mount -t nfs $opts $mount_dir $local_dir"
+	local mnt_cmd="mount -v -t nfs $opts $mount_dir $local_dir"
 
 	tst_res TINFO "Mounting NFS: $mnt_cmd"
 	if [ -n "$LTP_NETNS" ] && [ -z "$LTP_NFS_NETNS_USE_LO" ]; then
-		tst_rhost_run -c "$mnt_cmd"
+		tst_rhost_run -c "$mnt_cmd" > mount.log
 	else
-		$mnt_cmd > /dev/null
+		$mnt_cmd > mount.log
 	fi
 
 	if [ $? -ne 0 ]; then
+		cat mount.log
+
 		if [ "$type" = "udp" -o "$type" = "udp6" ] && tst_kvcmp -ge 5.6; then
 			tst_brk TCONF "UDP support disabled with the kernel config NFS_DISABLE_UDP_SUPPORT?"
 		fi
+
+		if grep -iq "Protocol not supported" mount.log; then
+			tst_brk TCONF "Protocol not supported"
+		fi
+
 		tst_brk TBROK "mount command failed"
 	fi
 }
 
 nfs_setup()
 {
-	# Check if current filesystem is NFS
-	if [ "$(stat -f . | grep "Type: nfs")" ]; then
-		tst_brk TCONF "Cannot run nfs-stress test on mounted NFS"
-	fi
-
 	local i
 	local type
 	local n=0
@@ -114,6 +117,16 @@ nfs_setup()
 	local local_dir
 	local remote_dir
 	local mount_dir
+
+	if [ "$(stat -f . | grep "Type: nfs")" ]; then
+		tst_brk TCONF "Cannot run nfs-stress test on mounted NFS"
+	fi
+
+	if tst_cmd_available pgrep; then
+		for i in rpc.mountd rpc.statd; do
+			pgrep $i > /dev/null || tst_brk TCONF "$i not running"
+		done
+	fi
 
 	for i in $VERSION; do
 		type=$(get_socket_type $n)

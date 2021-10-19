@@ -45,7 +45,7 @@ static void setup(void)
 static void run(void)
 {
 	struct time64_variants *tv = &variants[tst_variant];
-	unsigned long long time = 0x7FFFFFFE; /* Time just before y2038 */
+	long long time = 0x7FFFFFFE; /* Time just before y2038 */
 	struct sigevent ev = {
 		.sigev_notify = SIGEV_SIGNAL,
 		.sigev_signo = SIGABRT,
@@ -61,7 +61,7 @@ static void run(void)
 
 	TEST(tst_syscall(__NR_timer_create, CLOCK_REALTIME, &ev, &timer));
 	if (TST_RET != 0)
-		tst_brk(TBROK | TERRNO, "timer_create() failed");
+		tst_brk(TBROK | TTERRNO, "timer_create() failed");
 
 	tst_ts_set_sec(&start, time);
 	tst_ts_set_nsec(&start, 0);

@@ -4,20 +4,20 @@
  * Copyright (c) 2014 Fujitsu Ltd.
  */
 
-#ifndef RENAMEAT_H
-#define RENAMEAT_H
+#ifndef LAPI_RENAMEAT_H__
+#define LAPI_RENAMEAT_H__
 
 #include <sys/types.h>
 #include "config.h"
 #include "lapi/syscalls.h"
 
 #if !defined(HAVE_RENAMEAT)
-int renameat(int olddirfd, const char *oldpath, int newdirfd,
-			const char *newpath)
+static inline int renameat(int olddirfd, const char *oldpath, int newdirfd,
+                           const char *newpath)
 {
 	return ltp_syscall(__NR_renameat, olddirfd, oldpath, newdirfd,
 					newpath);
 }
 #endif
 
-#endif /* RENAMEAT_H */
+#endif /* LAPI_RENAMEAT_H__ */

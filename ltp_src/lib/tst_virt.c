@@ -64,11 +64,54 @@ static int is_xen(void)
 	return 0;
 }
 
+static int is_ibmz(int virt_type)
+{
+	FILE *sysinfo;
+	char line[64];
+	int found_lpar, found_zvm;
+
+	if (access("/proc/sysinfo", F_OK) != 0)
+		return 0;
+
+	sysinfo = SAFE_FOPEN(NULL, "/proc/sysinfo", "r");
+	found_lpar = 0;
+	found_zvm = 0;
+	while (fgets(line, sizeof(line), sysinfo) != NULL) {
+		if (strstr(line, "LPAR"))
+			found_lpar = 1;
+		else if (strstr(line, "z/VM"))
+			found_zvm = 1;
+	}
+
+	SAFE_FCLOSE(NULL, sysinfo);
+
+	switch (virt_type) {
+	case VIRT_IBMZ:
+		return found_lpar;
+	case VIRT_IBMZ_LPAR:
+		return found_lpar && !found_zvm;
+	case VIRT_IBMZ_ZVM:
+		return found_lpar && found_zvm;
+	default:
+		return 0;
+	}
+}
+
 static int try_systemd_detect_virt(void)
 {
 	FILE *f;
-	char virt_type[64];
+	char virt_buf[64];
 	int ret;
+	char *virt_type = getenv("LTP_VIRT_OVERRIDE");
+
+	if (virt_type) {
+		if (!strcmp("", virt_type))
+			return 0;
+
+		goto cmp;
+	}
+
+	virt_type = virt_buf;
 
 	/* See tst_cmd.c */
 	void *old_handler = signal(SIGCHLD, SIG_DFL);
@@ -96,11 +139,18 @@ static int try_systemd_detect_virt(void)
 	if (ret)
 		return 0;
 
+cmp:
 	if (!strncmp("kvm", virt_type, 3))
 		return VIRT_KVM;
 
 	if (!strncmp("xen", virt_type, 3))
 		return VIRT_XEN;
+
+	if (!strncmp("zvm", virt_type, 3))
+		return VIRT_IBMZ_ZVM;
+
+	if (!strncmp("microsoft", virt_type, 9))
+		return VIRT_HYPERV;
 
 	return VIRT_OTHER;
 }
@@ -109,20 +159,25 @@ int tst_is_virt(int virt_type)
 {
 	int ret = try_systemd_detect_virt();
 
-	if (ret >= 0) {
+	if (ret > 0) {
 		if (virt_type == VIRT_ANY)
-			return ret != 0;
+			return 1;
 		else
 			return ret == virt_type;
 	}
 
 	switch (virt_type) {
 	case VIRT_ANY:
-		return is_xen() || is_kvm();
+		return is_xen() || is_kvm() || is_ibmz(VIRT_IBMZ);
 	case VIRT_XEN:
 		return is_xen();
 	case VIRT_KVM:
 		return is_kvm();
+	case VIRT_IBMZ:
+	case VIRT_IBMZ_LPAR:
+	case VIRT_IBMZ_ZVM:
+		return is_ibmz(virt_type);
+	case VIRT_HYPERV:
 	case VIRT_OTHER:
 		return 0;
 	}

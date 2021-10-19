@@ -3,21 +3,22 @@
  * Copyright (c) 2018 Matthew Bobrowski. All Rights Reserved.
  *
  * Started by Matthew Bobrowski <mbobrowski@mbobrowski.org>
- *
- * DESCRIPTION
- *	This test file has been designed to ensure that the fanotify
- *	system calls fanotify_init(2) and fanotify_mark(2) return the
- *	correct error code to the calling process when an invalid flag or
- *	mask value has been specified in conjunction with FAN_REPORT_FID.
  */
+
+/*\
+ * [Description]
+ * This test file has been designed to ensure that the fanotify
+ * system calls fanotify_init(2) and fanotify_mark(2) return the
+ * correct error code to the calling process when an invalid flag or
+ * mask value has been specified in conjunction with FAN_REPORT_FID.
+ */
+
 #define _GNU_SOURCE
 #include "tst_test.h"
-#include "fanotify.h"
-
 #include <errno.h>
 
-#if defined(HAVE_SYS_FANOTIFY_H)
-#include <sys/fanotify.h>
+#ifdef HAVE_SYS_FANOTIFY_H
+#include "fanotify.h"
 
 #define MNTPOINT "mntpoint"
 #define FILE1 MNTPOINT"/file1"
@@ -97,7 +98,7 @@ static void do_test(unsigned int number)
 	if (tc->mask == 0) {
 		tst_res(TFAIL,
 			"fanotify_fd=%d fanotify_init(%x, O_RDONLY) "
-			"unexpectedly succeeded when tests with mask 0 are"
+			"unexpectedly succeeded when tests with mask 0 are "
 			"expected to fail when calling fanotify_init()",
 			fanotify_fd,
 			tc->init_flags);

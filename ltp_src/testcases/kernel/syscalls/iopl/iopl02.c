@@ -52,6 +52,7 @@ static void verify_iopl(unsigned int i)
 static void setup(void)
 {
 	struct passwd *pw;
+
 	pw = SAFE_GETPWNAM("nobody");
 	SAFE_SETEUID(pw->pw_uid);
 }
@@ -65,6 +66,8 @@ static struct tst_test test = {
 	.tcnt = ARRAY_SIZE(tcases),
 	.test = verify_iopl,
 	.needs_root = 1,
+	/* iopl() is restricted under kernel lockdown. */
+	.skip_in_lockdown = 1,
 	.setup = setup,
 	.cleanup = cleanup,
 };

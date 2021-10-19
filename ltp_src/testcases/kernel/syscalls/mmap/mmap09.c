@@ -103,7 +103,7 @@ static void setup(void)
 		tst_brkm(TFAIL | TERRNO, cleanup, "ftruncate file failed");
 
 	maddr = mmap(0, mapsize, PROT_READ | PROT_WRITE,
-		     MAP_FILE | MAP_PRIVATE, fd, 0);
+		     MAP_FILE | MAP_SHARED, fd, 0);
 	if (maddr == MAP_FAILED)
 		tst_brkm(TFAIL | TERRNO, cleanup, "mmapping mmaptest failed");
 

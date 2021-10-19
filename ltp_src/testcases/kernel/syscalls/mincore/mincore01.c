@@ -180,7 +180,7 @@ static void setup(void)
 	free(buf);
 
 	global_pointer = SAFE_MMAP(cleanup, NULL, global_len * 2,
-				   PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
+				   PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
 	global_vec = SAFE_MALLOC(cleanup,
 				 (global_len + pagesize - 1) / pagesize);

@@ -20,7 +20,9 @@ void tst_pollute_memory(size_t maxsize, int fillchar)
 	struct sysinfo info;
 
 	SAFE_SYSINFO(&info);
-	safety = 4096 * SAFE_SYSCONF(_SC_PAGESIZE) / info.mem_unit;
+	safety = MAX(4096 * SAFE_SYSCONF(_SC_PAGESIZE), 128 * 1024 * 1024);
+	safety = MAX(safety, (info.freeram / 64));
+	safety /= info.mem_unit;
 
 	if (info.freeswap > safety)
 		safety = 0;
@@ -59,4 +61,17 @@ void tst_pollute_memory(size_t maxsize, int fillchar)
 		SAFE_MUNMAP(map_blocks[i], blocksize);
 
 	free(map_blocks);
+}
+
+long long tst_available_mem(void)
+{
+	unsigned long long mem_available = 0;
+
+	if (FILE_LINES_SCANF("/proc/meminfo", "MemAvailable: %llu",
+		&mem_available)) {
+		mem_available = SAFE_READ_MEMINFO("MemFree:")
+			+ SAFE_READ_MEMINFO("Cached:");
+	}
+
+	return mem_available;
 }

@@ -17,12 +17,12 @@ static void do_test(void)
 		tst_res(TPASS, "Test passed");
 	break;
 	case 2:
-		/* This exits the test immediatelly */
+		/* This exits the test immediately */
 		tst_brk(TBROK, "Test broken");
 	break;
 	}
 
-	tst_res(TINFO, "test() function exitting normaly");
+	tst_res(TINFO, "test() function exiting normally");
 }
 
 static void setup(void)

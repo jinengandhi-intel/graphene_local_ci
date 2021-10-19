@@ -23,8 +23,8 @@ static volatile int child_stopped;
 static volatile int child_continued;
 static volatile int notification;
 
-void handler(int signo LTP_ATTRIBUTE_UNUSED, siginfo_t *info,
-	void *context LTP_ATTRIBUTE_UNUSED)
+static void handler(int signo PTS_ATTRIBUTE_UNUSED, siginfo_t *info,
+	void *context PTS_ATTRIBUTE_UNUSED)
 {
 	if (!info)
 		return;
@@ -43,7 +43,7 @@ void handler(int signo LTP_ATTRIBUTE_UNUSED, siginfo_t *info,
 	}
 }
 
-void wait_for_notification(int val)
+static void wait_for_notification(int val)
 {
 	struct timeval tv;
 
@@ -66,7 +66,10 @@ int main(void)
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGCHLD, &act, 0);
 
-	if ((pid = fork()) == 0) {
+	if ((pid = fork()) < 0) {
+		printf("fork() did not return success\n");
+		return PTS_UNRESOLVED;
+	} else if (pid == 0) {
 		/* child */
 		while (1) {
 			/* wait forever, or until we are

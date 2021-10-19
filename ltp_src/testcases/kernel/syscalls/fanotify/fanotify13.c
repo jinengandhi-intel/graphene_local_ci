@@ -3,16 +3,20 @@
  * Copyright (c) 2018 Matthew Bobrowski. All Rights Reserved.
  *
  * Started by Matthew Bobrowski <mbobrowski@mbobrowski.org>
- *
- * DESCRIPTION
- *	Validate that the values returned within an event when
- *	FAN_REPORT_FID is specified matches those that are obtained via
- *	explicit invocation to system calls statfs(2) and
- *	name_to_handle_at(2).
- *
+ */
+
+/*\
+ * [Description]
+ * Validate that the values returned within an event when FAN_REPORT_FID is
+ * specified matches those that are obtained via explicit invocation to system
+ * calls statfs(2) and name_to_handle_at(2).
+ */
+
+ /*
  * This is also regression test for:
  *     c285a2f01d69 ("fanotify: update connector fsid cache on add mark")
  */
+
 #define _GNU_SOURCE
 #include "config.h"
 
@@ -21,14 +25,12 @@
 #include <sys/statfs.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <unistd.h>
 #include "tst_test.h"
-#include "fanotify.h"
 
-#if defined(HAVE_SYS_FANOTIFY_H)
-#include <sys/fanotify.h>
+#ifdef HAVE_SYS_FANOTIFY_H
+#include "fanotify.h"
 
 #define PATH_LEN 128
 #define BUF_SIZE 256
@@ -88,6 +90,7 @@ static struct test_case_t {
 
 static int nofid_fd;
 static int fanotify_fd;
+static int filesystem_mark_unsupported;
 static char events_buf[BUF_SIZE];
 static struct event_t event_set[EVENT_MAX];
 
@@ -116,28 +119,8 @@ static int setup_marks(unsigned int fd, struct test_case_t *tc)
 	struct fanotify_mark_type *mark = &tc->mark;
 
 	for (i = 0; i < ARRAY_SIZE(objects); i++) {
-		if (fanotify_mark(fd, FAN_MARK_ADD | mark->flag, tc->mask,
-					AT_FDCWD, objects[i].path) == -1) {
-			if (errno == EINVAL &&
-				mark->flag & FAN_MARK_FILESYSTEM) {
-				tst_res(TCONF,
-					"FAN_MARK_FILESYSTEM not supported by "
-					"kernel");
-				return 1;
-			} else if (errno == ENODEV &&
-				   !objects[i].fid.fsid.val[0] &&
-				   !objects[i].fid.fsid.val[1]) {
-				tst_res(TCONF,
-					"FAN_REPORT_FID not supported on "
-					"filesystem type %s",
-					tst_device->fs_type);
-				return 1;
-			}
-			tst_brk(TBROK | TERRNO,
-				"fanotify_mark(%d, FAN_MARK_ADD, FAN_OPEN, "
-				"AT_FDCWD, %s) failed",
-				fanotify_fd, objects[i].path);
-		}
+		SAFE_FANOTIFY_MARK(fd, FAN_MARK_ADD | mark->flag, tc->mask,
+				   AT_FDCWD, objects[i].path);
 
 		/* Setup the expected mask for each generated event */
 		event_set[i].expected_mask = tc->mask;
@@ -162,17 +145,12 @@ static void do_test(unsigned int number)
 		"Test #%d: FAN_REPORT_FID with mark flag: %s",
 		number, mark->name);
 
-	fanotify_fd = fanotify_init(FAN_CLASS_NOTIF | FAN_REPORT_FID, O_RDONLY);
-	if (fanotify_fd == -1) {
-		if (errno == EINVAL) {
-			tst_res(TCONF,
-				"FAN_REPORT_FID not supported by kernel");
-			return;
-		}
-		tst_brk(TBROK | TERRNO,
-			"fanotify_init(FAN_CLASS_NOTIF | FAN_REPORT_FID, "
-			"O_RDONLY) failed");
+	if (filesystem_mark_unsupported && mark->flag & FAN_MARK_FILESYSTEM) {
+		tst_res(TCONF, "FAN_MARK_FILESYSTEM not supported in kernel?");
+		return;
 	}
+
+	fanotify_fd = SAFE_FANOTIFY_INIT(FAN_CLASS_NOTIF | FAN_REPORT_FID, O_RDONLY);
 
 	/*
 	 * Place marks on a set of objects and setup the expected masks
@@ -281,7 +259,10 @@ out:
 
 static void do_setup(void)
 {
-	/* Check for kernel fanotify support */
+	REQUIRE_FANOTIFY_INIT_FLAGS_SUPPORTED_ON_FS(FAN_REPORT_FID, MOUNT_PATH);
+
+	filesystem_mark_unsupported = fanotify_mark_supported_by_kernel(FAN_MARK_FILESYSTEM);
+
 	nofid_fd = SAFE_FANOTIFY_INIT(FAN_CLASS_NOTIF, O_RDONLY);
 
 	/* Create file and directory objects for testing */
@@ -292,13 +273,8 @@ static void do_setup(void)
 	 * uninitialized connector->fsid cache. This mark remains for all test
 	 * cases and is not expected to get any events (no writes in this test).
 	 */
-	if (fanotify_mark(nofid_fd, FAN_MARK_ADD, FAN_CLOSE_WRITE, AT_FDCWD,
-			  FILE_PATH_ONE) == -1) {
-		tst_brk(TBROK | TERRNO,
-			"fanotify_mark(%d, FAN_MARK_ADD, FAN_CLOSE_WRITE, "
-			"AT_FDCWD, "FILE_PATH_ONE") failed",
-			nofid_fd);
-	}
+	SAFE_FANOTIFY_MARK(nofid_fd, FAN_MARK_ADD, FAN_CLOSE_WRITE, AT_FDCWD,
+			  FILE_PATH_ONE);
 
 	/* Get the filesystem fsid and file handle for each created object */
 	get_object_stats();
@@ -317,7 +293,6 @@ static struct tst_test test = {
 	.setup = do_setup,
 	.cleanup = do_cleanup,
 	.needs_root = 1,
-	.needs_tmpdir = 1,
 	.mount_device = 1,
 	.mntpoint = MOUNT_PATH,
 	.all_filesystems = 1,
