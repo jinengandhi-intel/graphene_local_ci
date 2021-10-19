@@ -3,8 +3,8 @@
  * Copyright (c) 2015 Cui Bixuan <cuibixuan@huawei.com>
  */
 
-#ifndef __SCHED_H__
-#define __SCHED_H__
+#ifndef LAPI_SCHED_H__
+#define LAPI_SCHED_H__
 
 #include "lapi/syscalls.h"
 #include <stdint.h>
@@ -28,17 +28,14 @@ struct sched_attr {
 	uint64_t sched_period;
 };
 
-int sched_setattr(pid_t pid,
-	const struct sched_attr *attr,
-	unsigned int flags)
+static inline int sched_setattr(pid_t pid, const struct sched_attr *attr,
+                                unsigned int flags)
 {
 	return syscall(__NR_sched_setattr, pid, attr, flags);
 }
 
-int sched_getattr(pid_t pid,
-	struct sched_attr *attr,
-	unsigned int size,
-	unsigned int flags)
+static inline int sched_getattr(pid_t pid, struct sched_attr *attr,
+                                unsigned int size, unsigned int flags)
 {
 	return syscall(__NR_sched_getattr, pid, attr, size, flags);
 }
@@ -59,4 +56,4 @@ int sched_getattr(pid_t pid,
 #define CLONE_IO        0x80000000
 #endif
 
-#endif /* __SCHED_H__ */
+#endif /* LAPI_SCHED_H__ */

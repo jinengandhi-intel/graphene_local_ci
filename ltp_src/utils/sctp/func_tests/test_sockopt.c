@@ -56,6 +56,7 @@
 #include <netinet/in.h>
 #include <netinet/sctp.h>
 #include <sctputil.h>
+#include "tst_kernel.h"
 
 char *TCID = __FILE__;
 int TST_TOTAL = 29;
@@ -100,6 +101,9 @@ main(void)
 	socklen_t optlen, addrlen;
 	struct sctp_status status;
 	struct sctp_assoc_value value;
+
+	if (tst_check_driver("sctp"))
+		tst_brkm(TCONF, tst_exit, "sctp driver not available");
 
         /* Rather than fflush() throughout the code, set stdout to
 	 * be unbuffered.
@@ -333,8 +337,7 @@ main(void)
 			    MSG_EOR, 0, 0);
 	/* Verify that we received the msg without any ancillary data. */
 	if (inmessage.msg_controllen != 0)
-		tst_brkm(TBROK, tst_exit, "Receive unexpected ancillary"
-			 "data");
+		tst_brkm(TBROK, tst_exit, "Receive unexpected ancillary data");
 
 	/* Enable SCTP_SHUTDOWN_EVENTs on udp_svr_sk. */
 	memset(&subscribe, 0, sizeof(struct sctp_event_subscribe));
@@ -431,7 +434,7 @@ main(void)
 				 "getsockopt(SCTP_STATUS): %s", 
 				 strerror(errno));
 		if (strncmp((char *)&status1, (char *)&status2, optlen))
-	                tst_brkm(TBROK, tst_exit, "sctp_opt_info(SCTP_STAUS)"
+	                tst_brkm(TBROK, tst_exit, "sctp_opt_info(SCTP_STAUS) "
 			       "doesn't match getsockopt(SCTP_STATUS)");
 
                 tst_resm(TPASS, "sctp_opt_info(SCTP_STATUS)");

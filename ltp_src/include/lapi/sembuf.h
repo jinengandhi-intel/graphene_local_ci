@@ -4,8 +4,8 @@
  * Author: Viresh Kumar <viresh.kumar@linaro.org>
  */
 
-#ifndef IPC_SEMBUF_H
-#define IPC_SEMBUF_H
+#ifndef LAPI_SEMBUF_H__
+#define LAPI_SEMBUF_H__
 
 #include "lapi/posix_types.h"
 #include <sys/sem.h>
@@ -24,7 +24,7 @@
  * Pad space is left for 2 miscellaneous 64-bit values on mips64,
  * but used for the upper 32 bit of the time values on mips32.
  */
-#if defined(__arch64__)
+#if __BITS_PER_LONG == 64
 struct semid64_ds {
 	struct ipc64_perm sem_perm;		/* permissions .. see ipc.h */
 	long		 sem_otime;		/* last semop time */
@@ -231,4 +231,4 @@ struct semid64_ds {
 
 #endif /* HAVE_SEMID64_DS */
 
-#endif /* IPC_SEMBUF_H */
+#endif /* LAPI_SEMBUF_H__ */

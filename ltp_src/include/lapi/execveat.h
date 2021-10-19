@@ -3,20 +3,20 @@
  * Copyright (C) 2018 MediaTek Inc.  All Rights Reserved.
  */
 
-#ifndef EXECVEAT_H
-#define EXECVEAT_H
+#ifndef LAPI_EXECVEAT_H__
+#define LAPI_EXECVEAT_H__
 
 #include <sys/types.h>
 #include "config.h"
 #include "lapi/syscalls.h"
 
 #if !defined(HAVE_EXECVEAT)
-int execveat(int dirfd, const char *pathname,
-			char *const argv[], char *const envp[],
-			int flags)
+static inline int execveat(int dirfd, const char *pathname,
+			   char *const argv[], char *const envp[],
+			   int flags)
 {
 	return tst_syscall(__NR_execveat, dirfd, pathname, argv, envp, flags);
 }
 #endif
 
-#endif /* EXECVEAT_H */
+#endif /* LAPI_EXECVEAT_H__ */

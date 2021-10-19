@@ -37,6 +37,12 @@ stop_dhcp()
 
 dhcp_lib_setup()
 {
+	if [ $HAVE_SYSTEMCTL -eq 1 ] && \
+		systemctl --no-pager -p Id show network.service | grep -q Id=wicked.service; then
+		[ $TST_IPV6 ] && tst_brk TCONF "wicked not supported on IPv6"
+		is_wicked=1
+	fi
+
 	[ -z "$log" ] && log="$PWD/$(basename $0 '.sh').log"
 
 	if [ $TST_IPV6 ]; then
@@ -52,12 +58,12 @@ dhcp_lib_setup()
 	lsmod | grep -q '^veth ' && veth_loaded=yes || veth_loaded=no
 
 	tst_res TINFO "create veth interfaces"
-	ip li add $iface0 type veth peer name $iface1 || \
+	ip link add $iface0 type veth peer name $iface1 || \
 		tst_brk TBROK "failed to add veth $iface0"
 
 	veth_added=1
-	ip li set up $iface0 || tst_brk TBROK "failed to bring $iface0 up"
-	ip li set up $iface1 || tst_brk TBROK "failed to bring $iface1 up"
+	ip link set up $iface0 || tst_brk TBROK "failed to bring $iface0 up"
+	ip link set up $iface1 || tst_brk TBROK "failed to bring $iface1 up"
 
 	stop_dhcp || tst_brk TBROK "Failed to stop dhcp server"
 
@@ -96,7 +102,7 @@ dhcp_lib_cleanup()
 	[ -f "dhclient${TST_IPV6}.leases" ] && \
 		mv dhclient${TST_IPV6}.leases $dhclient_lease
 
-	[ $veth_added ] && ip li del $iface0
+	[ $veth_added ] && ip link del $iface0
 
 	[ "$veth_loaded" = "no" ] && lsmod | grep -q '^veth ' && rmmod veth
 }
@@ -129,8 +135,7 @@ test01()
 		tst_brk TBROK "Failed to start $dhcp_name"
 	fi
 
-	if [ $HAVE_SYSTEMCTL -eq 1 ] && \
-		systemctl --no-pager -p Id show network.service | grep -q Id=wicked.service; then
+	if [ "$is_wicked" ]; then
 		tst_res TINFO "wicked is running, don't start dhclient"
 		if [ ! -f "$wicked_cfg" ]; then
 			cat <<EOF > $wicked_cfg

@@ -1,9 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright (c) 2020 Viresh Kumar <viresh.kumar@linaro.org>
+ */
+
+/*\
+ * [Description]
  *
  * Basic clone3() test.
  */
+
 #define _GNU_SOURCE
 
 #include <stdlib.h>
@@ -172,7 +177,6 @@ static struct tst_test test = {
 	.test = run,
 	.setup = setup,
 	.needs_root = 1,
-	.needs_tmpdir = 1,
 	.needs_checkpoints = 1,
 	.bufs = (struct tst_buffers []) {
 		{&args, .size = sizeof(*args)},

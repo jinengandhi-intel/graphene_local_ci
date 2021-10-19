@@ -8,9 +8,9 @@
  * for tv_sec & tv_nsec.
  */
 
-#include <sched.h>
 #include "time64_variants.h"
 #include "tst_timer.h"
+#include "tst_sched.h"
 
 static struct tst_ts tp;
 
@@ -35,8 +35,8 @@ static void setup(void)
 
 	tp.type = tv->ts_type;
 
-	if ((sched_setscheduler(0, SCHED_FIFO, &p)) == -1)
-		tst_res(TFAIL | TTERRNO, "sched_setscheduler() failed");
+	if ((sys_sched_setscheduler(0, SCHED_FIFO, &p)) == -1)
+		tst_res(TFAIL | TERRNO, "sched_setscheduler() failed");
 }
 
 static void run(void)

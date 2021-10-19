@@ -7,6 +7,9 @@
 
 #include "safe_file_ops_fn.h"
 
+#define FILE_SCANF(path, fmt, ...) \
+	file_scanf(__FILE__, __LINE__, (path), (fmt), ## __VA_ARGS__)
+
 #define SAFE_FILE_SCANF(path, fmt, ...) \
 	safe_file_scanf(__FILE__, __LINE__, NULL, \
 	                (path), (fmt), ## __VA_ARGS__)
@@ -25,6 +28,14 @@
                         &tst_rval); \
         tst_rval;})
 
+#define SAFE_READ_PROC_STATUS(pid, item) \
+       ({long tst_rval_; \
+        char tst_path_[128]; \
+        sprintf(tst_path_, "/proc/%d/status", pid); \
+        SAFE_FILE_LINES_SCANF(tst_path_, item " %ld", \
+                        &tst_rval_); \
+        tst_rval_;})
+
 #define FILE_PRINTF(path, fmt, ...) \
 	file_printf(__FILE__, __LINE__, \
 		    (path), (fmt), ## __VA_ARGS__)
@@ -32,6 +43,11 @@
 #define SAFE_FILE_PRINTF(path, fmt, ...) \
 	safe_file_printf(__FILE__, __LINE__, NULL, \
 	                 (path), (fmt), ## __VA_ARGS__)
+
+/* Same as SAFE_FILE_PRINTF() but returns quietly if the path doesn't exist */
+#define SAFE_TRY_FILE_PRINTF(path, fmt, ...) \
+	safe_try_file_printf(__FILE__, __LINE__, NULL, \
+		(path), (fmt), ## __VA_ARGS__)
 
 #define SAFE_CP(src, dst) \
 	safe_cp(__FILE__, __LINE__, NULL, (src), (dst))

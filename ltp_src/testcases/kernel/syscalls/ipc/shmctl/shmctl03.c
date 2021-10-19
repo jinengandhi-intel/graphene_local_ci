@@ -2,7 +2,10 @@
 /*
  * Copyright (C) 2020 Cyril Hrubis <chrubis@suse.cz>
  */
-/*
+
+/*\
+ * [Description]
+ *
  * Call shmctl() with IPC_INFO flag and check that the data are consistent with
  * /proc/sys/kernel/shm*.
  */

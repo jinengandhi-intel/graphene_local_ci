@@ -3,14 +3,18 @@
  * Copyright (c) 2018 Google, Inc.
  */
 
-/*
- * Regression test for commit 3f05317d9889 ("ipc/shm: fix use-after-free of shm
- * file via remap_file_pages()").  This bug allowed the remap_file_pages()
- * syscall to use the file of a System V shared memory segment after its ID had
- * been reallocated and the file freed.  This test reproduces the bug as a NULL
- * pointer dereference in touch_atime(), although it's a race condition so it's
- * not guaranteed to work.  This test is based on the reproducer provided in the
- * fix's commit message.
+/*\
+ * [Description]
+ *
+ * Regression test for commit
+ * 3f05317d9889 (ipc/shm: fix use-after-free of shm file via remap_file_pages()).
+ *
+ * This bug allowed the remap_file_pages() syscall to use the file of a System
+ * V shared memory segment after its ID had been reallocated and the file
+ * freed. This test reproduces the bug as a NULL pointer dereference in
+ * touch_atime(), although it's a race condition so it's not guaranteed to
+ * work. This test is based on the reproducer provided in the fix's commit
+ * message.
  */
 
 #include "lapi/syscalls.h"
@@ -87,8 +91,18 @@ static void do_test(void)
 
 static void cleanup(void)
 {
+	int id;
+
 	tst_fzsync_pair_cleanup(&fzsync_pair);
-	shmctl(0xF00F, IPC_RMID, NULL);
+
+	id = shmget(0xF00F, 4096, 0);
+	if (id == -1) {
+		if (errno != ENOENT)
+			tst_res(TWARN | TERRNO, "shmget()");
+		return;
+	}
+
+	SAFE_SHMCTL(id, IPC_RMID, NULL);
 }
 
 static struct tst_test test = {

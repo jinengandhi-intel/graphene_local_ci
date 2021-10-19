@@ -124,7 +124,7 @@ int main(int ac, char **av)
 					 "correct");
 			}
 		}
-#if defined(__ia64__) || defined(__hppa__)
+#if defined(__ia64__) || defined(__hppa__) || defined(__mips__)
 		if (pass) {
 			tst_resm(TPASS, "Got SIGSEGV as expected");
 		} else {
@@ -175,7 +175,7 @@ static void setup(void)
 	}
 
 	/* Write test buffer contents into temporary file */
-	if (write(fildes, tst_buff, page_sz) < page_sz) {
+	if (write(fildes, tst_buff, page_sz) < (long)page_sz) {
 		free(tst_buff);
 		tst_brkm(TFAIL | TERRNO, cleanup, "writing to %s failed",
 			 TEMPFILE);

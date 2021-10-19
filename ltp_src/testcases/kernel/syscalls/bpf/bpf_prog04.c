@@ -26,8 +26,6 @@
 #include "tst_test.h"
 #include "tst_taint.h"
 #include "tst_capability.h"
-#include "lapi/socket.h"
-#include "lapi/bpf.h"
 #include "bpf_common.h"
 
 #define BUFSIZE 8192
@@ -92,27 +90,14 @@ static void setup(void)
 static void run(void)
 {
 	int map_fd, prog_fd;
-	int sk[2];
 
-	memset(attr, 0, sizeof(*attr));
-	attr->map_type = BPF_MAP_TYPE_ARRAY;
-	attr->key_size = 4;
-	attr->value_size = 8;
-	attr->max_entries = 1;
-
-	map_fd = bpf_map_create(attr);
+	map_fd = bpf_map_array_create(1);
 	prog_fd = load_prog(map_fd);
 
 	if (prog_fd >= 0) {
 		tst_res(TFAIL, "Malicious eBPF code passed verification. "
 			"Now let's try crashing the kernel.");
-		SAFE_SOCKETPAIR(AF_UNIX, SOCK_DGRAM, 0, sk);
-		SAFE_SETSOCKOPT(sk[1], SOL_SOCKET, SO_ATTACH_BPF, &prog_fd,
-			sizeof(prog_fd));
-
-		SAFE_WRITE(1, sk[0], msg, sizeof(MSG));
-		SAFE_CLOSE(sk[0]);
-		SAFE_CLOSE(sk[1]);
+		bpf_run_prog(prog_fd, msg, sizeof(MSG));
 	}
 
 	if (prog_fd >= 0)

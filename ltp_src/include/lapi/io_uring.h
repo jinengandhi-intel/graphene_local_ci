@@ -6,8 +6,8 @@
  * Mostly copied/adapted from <linux/io_uring.h>
  */
 
-#ifndef IO_URING_H__
-#define IO_URING_H__
+#ifndef LAPI_IO_URING_H__
+#define LAPI_IO_URING_H__
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -17,6 +17,10 @@
 #include <linux/fs.h>
 
 #include "lapi/syscalls.h"
+
+#ifdef HAVE_LINUX_IO_URING_H
+#include <linux/io_uring.h>
+#endif
 
 #ifndef IOSQE_FIXED_FILE
 
@@ -67,8 +71,6 @@ enum {
 	IOSQE_FIXED_FILE_BIT,
 	IOSQE_IO_DRAIN_BIT,
 	IOSQE_IO_LINK_BIT,
-	IOSQE_IO_HARDLINK_BIT,
-	IOSQE_ASYNC_BIT,
 };
 
 /*
@@ -80,10 +82,6 @@ enum {
 #define IOSQE_IO_DRAIN		(1U << IOSQE_IO_DRAIN_BIT)
 /* links next sqe */
 #define IOSQE_IO_LINK		(1U << IOSQE_IO_LINK_BIT)
-/* like LINK, but stronger */
-#define IOSQE_IO_HARDLINK	(1U << IOSQE_IO_HARDLINK_BIT)
-/* always go async */
-#define IOSQE_ASYNC		(1U << IOSQE_ASYNC_BIT)
 
 /*
  * io_uring_setup() flags
@@ -258,10 +256,21 @@ struct io_uring_probe {
 
 #endif /* IOSQE_FIXED_FILE */
 
+#ifndef IOSQE_IO_HADRLINK
+/* like LINK, but stronger */
+#define IOSQE_IO_HARDLINK_BIT	3
+#define IOSQE_IO_HARDLINK	(1U << IOSQE_IO_HARDLINK_BIT)
+#endif /* IOSQE_IO_HADRLINK */
+
+#ifndef IOSQE_ASYNC
+/* always go async */
+#define IOSQE_ASYNC_BIT		4
+#define IOSQE_ASYNC		(1U << IOSQE_ASYNC_BIT)
+#endif /* IOSQE_ASYNC */
 
 #ifndef HAVE_IO_URING_REGISTER
-int io_uring_register(int fd, unsigned int opcode, void *arg,
-		      unsigned int nr_args)
+static inline int io_uring_register(int fd, unsigned int opcode, void *arg,
+	unsigned int nr_args)
 {
 	return tst_syscall(__NR_io_uring_register, fd, opcode, arg, nr_args);
 }
@@ -269,31 +278,33 @@ int io_uring_register(int fd, unsigned int opcode, void *arg,
 
 
 #ifndef HAVE_IO_URING_SETUP
-int io_uring_setup(unsigned int entries, struct io_uring_params *p)
+static inline int io_uring_setup(unsigned int entries,
+	struct io_uring_params *p)
 {
 	return tst_syscall(__NR_io_uring_setup, entries, p);
 }
 #endif /* HAVE_IO_URING_SETUP */
 
 #ifndef HAVE_IO_URING_ENTER
-int io_uring_enter(int fd, unsigned int to_submit, unsigned int min_complete,
-		   unsigned int flags, sigset_t *sig)
+static inline int io_uring_enter(int fd, unsigned int to_submit,
+	unsigned int min_complete, unsigned int flags, sigset_t *sig)
 {
 	return tst_syscall(__NR_io_uring_enter, fd, to_submit, min_complete,
 			flags, sig, _NSIG / 8);
 }
 #endif /* HAVE_IO_URING_ENTER */
 
-void io_uring_setup_supported_by_kernel(void)
+static inline void io_uring_setup_supported_by_kernel(void)
 {
+	long ret;
 	if ((tst_kvercmp(5, 1, 0)) < 0) {
-		TEST(syscall(__NR_io_uring_setup, NULL, 0));
-		if (TST_RET != -1)
-			SAFE_CLOSE(TST_RET);
-		else if (TST_ERR == ENOSYS)
+		ret = syscall(__NR_io_uring_setup, NULL, 0);
+		if (ret != -1)
+			SAFE_CLOSE(ret);
+		else if (errno == ENOSYS)
 			tst_brk(TCONF,
 				"Test not supported on kernel version < v5.1");
 	}
 }
 
-#endif /* IO_URING_H__ */
+#endif /* LAPI_IO_URING_H__ */

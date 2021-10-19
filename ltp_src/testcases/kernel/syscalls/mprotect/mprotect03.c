@@ -84,7 +84,7 @@ int main(int ac, char **av)
 		/*
 		 * mmap the PAGESIZE bytes as read only.
 		 */
-		addr = mmap(0, strlen(buf), PROT_READ | PROT_WRITE, MAP_PRIVATE,
+		addr = mmap(0, strlen(buf), PROT_READ | PROT_WRITE, MAP_SHARED,
 			    fd, 0);
 		if (addr == MAP_FAILED)
 			tst_brkm(TBROK, cleanup, "mmap failed");

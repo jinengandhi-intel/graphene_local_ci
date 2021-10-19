@@ -13,6 +13,8 @@ AC_CONFIG_FILES([ \
     execltp \
 ])
 
+AC_ARG_VAR(HOSTCC, [The C compiler on the host])
+
 AM_MAINTAINER_MODE([enable])
 
 AC_CANONICAL_HOST
@@ -28,11 +30,15 @@ AC_DEFUN([AC_PROG_STRIP], [AC_CHECK_TOOL(STRIP, strip, :)])
 AC_PROG_STRIP
 AC_PROG_YACC
 
+m4_ifndef([PKG_CHECK_EXISTS],
+	[m4_fatal([must install pkg-config or pkgconfig and pkg.m4 macro (usual dependency), see INSTALL])])
+
 AC_PREFIX_DEFAULT(/opt/ltp)
 
 AC_CHECK_DECLS([IFLA_NET_NS_PID],,,[#include <linux/if_link.h>])
 AC_CHECK_DECLS([MADV_MERGEABLE],,,[#include <sys/mman.h>])
 AC_CHECK_DECLS([PR_CAPBSET_DROP, PR_CAPBSET_READ],,,[#include <sys/prctl.h>])
+AC_CHECK_DECLS([SEM_STAT_ANY],,,[#include <sys/sem.h>])
 
 AC_CHECK_HEADERS_ONCE([ \
     asm/ldt.h \
@@ -41,12 +47,14 @@ AC_CHECK_HEADERS_ONCE([ \
     linux/can.h \
     linux/cgroupstats.h \
     linux/cryptouser.h \
+    linux/close_range.h \
     linux/dccp.h \
     linux/fs.h \
     linux/genetlink.h \
     linux/if_alg.h \
     linux/if_ether.h \
     linux/if_packet.h \
+    linux/io_uring.h \
     linux/keyctl.h \
     linux/mempolicy.h \
     linux/module.h \
@@ -71,11 +79,14 @@ AC_CHECK_HEADERS_ONCE([ \
 ])
 AC_CHECK_HEADERS(fts.h, [have_fts=1])
 AC_SUBST(HAVE_FTS_H, $have_fts)
+AC_CHECK_HEADERS(linux/vm_sockets.h, [], [], [#include <sys/socket.h>])
 
 AC_CHECK_FUNCS_ONCE([ \
     clone3 \
+    close_range \
     copy_file_range \
     epoll_pwait \
+    epoll_pwait2 \
     execveat \
     fallocate \
     fchownat \
@@ -92,6 +103,9 @@ AC_CHECK_FUNCS_ONCE([ \
     io_uring_register \
     io_uring_enter \
     kcmp \
+    mallinfo \
+    mallinfo2 \
+    mallopt \
     mkdirat \
     mknodat \
     modify_ldt \
@@ -115,6 +129,7 @@ AC_CHECK_FUNCS_ONCE([ \
     renameat2 \
     sched_getcpu \
     sendmmsg \
+    sethostid \
     setns \
     sigpending \
     splice \
@@ -146,6 +161,12 @@ AC_CHECK_TYPES([struct acct_v3],,,[#include <sys/acct.h>])
 AC_CHECK_TYPES([struct af_alg_iv, struct sockaddr_alg],,,[# include <linux/if_alg.h>])
 AC_CHECK_TYPES([struct fanotify_event_info_fid, struct fanotify_event_info_header],,,[#include <sys/fanotify.h>])
 AC_CHECK_TYPES([struct file_dedupe_range],,,[#include <linux/fs.h>])
+
+AC_CHECK_TYPES([struct file_handle],,,[
+#define _GNU_SOURCE
+#include <fcntl.h>
+])
+
 AC_CHECK_TYPES([struct fs_quota_statv],,,[#include <xfs/xqm.h>])
 AC_CHECK_TYPES([struct if_nextdqblk],,,[#include <linux/quota.h>])
 AC_CHECK_TYPES([struct iovec],,,[#include <sys/uio.h>])
@@ -187,7 +208,7 @@ AC_CHECK_TYPES([struct xt_entry_match, struct xt_entry_target],,,[
 
 # Tools knobs
 
-# Expect
+# Bash
 AC_ARG_WITH([bash],
   [AC_HELP_STRING([--with-bash],
     [have the Bourne Again Shell interpreter])],
@@ -200,6 +221,34 @@ else
     AC_SUBST([WITH_BASH],["no"])
 fi
 
+# metadata
+AC_ARG_ENABLE([metadata],
+  [AC_HELP_STRING([--disable-metadata],
+	[Disable metadata generation (both HTML and PDF, default no)])],
+  [], [enable_metadata=yes]
+)
+AC_ARG_ENABLE([metadata_html],
+  [AC_HELP_STRING([--disable-metadata-html],
+	[Disable metadata HTML generation (default no)])],
+  [], [enable_metadata_html=yes]
+)
+
+AC_ARG_ENABLE([metadata_pdf],
+  [AC_HELP_STRING([--enable-metadata-pdf],
+	[Enable metadata PDF generation (default no)])],
+  [], [enable_metadata_pdf=no]
+)
+
+AC_ARG_WITH([metadata_generator],
+  [AC_HELP_STRING([--with-metadata-generator=asciidoc|asciidoctor],
+	[Specify metadata generator to use (default autodetect)])],
+  [with_metadata_generator=$withval],
+  [with_metadata_generator=detect]
+)
+
+LTP_DOCPARSE
+
+# Expect
 AC_ARG_WITH([expect],
   [AC_HELP_STRING([--with-expect],
     [have the Tcl/expect library])],
@@ -311,7 +360,7 @@ LTP_CHECK_SYSCALL_FCNTL
 
 if test "x$with_numa" = xyes; then
 	LTP_CHECK_SYSCALL_NUMA
-	numa_error_msg="test requires libnuma >= 2 and it's development packages"
+	numa_error_msg="test requires libnuma development packages with LIBNUMA_API_VERSION >= 2"
 else
 	numa_error_msg="NUMA support was disabled during build"
 fi

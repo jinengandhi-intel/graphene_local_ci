@@ -57,11 +57,13 @@
 #				     rope to hang one's self in the event of
 #				     unwanted behavior.
 #
+# $(HOST_MAKE_TARGETS)	: Host tools which use $HOSTCC.
+#
 # $(CLEAN_TARGETS)		: What targets should be cleaned (must be
-#				  real files). This will automatically append
-#				  adds the .o suffix to all files referenced
-#				  by $(MAKE_TARGETS)) to CLEAN_TARGETS, if
-#				  MAKE_TARGETS wasn't defined (see
+#				  real files or directories). This will automatically append
+#				  adds the .o suffix to all files referenced by
+#				  $(MAKE_TARGETS)) to CLEAN_TARGETS, if MAKE_TARGETS wasn't
+#				  defined (see
 #				  $(MAKE_TARGETS)).
 # $(INSTALL_MODE)		: What mode should we using when calling
 # 				  install(1)?
@@ -90,17 +92,24 @@
 # INSTALL_DIR			:= $(libdir)
 #
 
-.PHONY: all clean install
+.PHONY: all clean install check
+
+ifneq ($(strip $(MAKE_TARGETS)),)
+$(MAKE_TARGETS) += $(HOST_MAKE_TARGETS)
+endif
 
 $(MAKE_TARGETS): | $(MAKE_DEPS)
 
 all: $(MAKE_TARGETS)
 
 clean:: $(CLEAN_DEPS)
-	-$(RM) -f $(CLEAN_TARGETS)
+	-$(RM) -f -r $(CLEAN_TARGETS)
 
 $(INSTALL_FILES): | $(INSTALL_DEPS)
 
 install: $(INSTALL_FILES)
+
+$(CHECK_TARGETS): | $(CHECK_DEPS)
+check: $(CHECK_TARGETS) $(SHELL_CHECK_TARGETS)
 
 # vim: syntax=make

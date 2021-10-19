@@ -21,7 +21,6 @@ mtest06_3 mmap3 -x 0.002 -p
 #mtest-6_4 shmat1 -x 0.00005
 
 mem02 mem02
-mem03 mem03
 
 page01 page01
 page02 page02
@@ -70,7 +69,7 @@ ksm04_1 ksm04 -u 128
 ksm05 ksm05 -I 10
 ksm06 ksm06
 ksm06_1 ksm06 -n 10
-ksm06_2 ksm06 -n 10000
+ksm06_2 ksm06 -n 8000
 
 cpuset01 cpuset01
 

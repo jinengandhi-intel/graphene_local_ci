@@ -5,13 +5,17 @@
  *
  * Started by Jan Kara <jack@suse.cz>
  * Forked from fanotify06.c by Amir Goldstein <amir73il@gmail.com>
- *
- * DESCRIPTION
- *     Check that fanotify properly merges ignore mask of a mount mark
- *     with a mask of an inode mark on the same group.  Unlike the
- *     prototype test fanotify06, do not use FAN_MODIFY event for the
- *     test mask, because it hides the bug.
- *
+ */
+
+/*\
+ * [Description]
+ * Check that fanotify properly merges ignore mask of a mount mark
+ * with a mask of an inode mark on the same group.  Unlike the
+ * prototype test fanotify06, do not use FAN_MODIFY event for the
+ * test mask, because it hides the bug.
+ */
+
+/*
  * This is a regression test for commit:
  *
  *     9bdda4e9cf2d fsnotify: fix ignore mask logic in fsnotify()
@@ -25,6 +29,7 @@
  *
  *     497b0c5a7c06 fsnotify: send event to parent and child with single...
  */
+
 #define _GNU_SOURCE
 #include "config.h"
 
@@ -32,17 +37,15 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <fcntl.h>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
 #include <sys/mount.h>
 #include <sys/syscall.h>
 #include "tst_test.h"
-#include "fanotify.h"
 
-#if defined(HAVE_SYS_FANOTIFY_H)
-#include <sys/fanotify.h>
+#ifdef HAVE_SYS_FANOTIFY_H
+#include "fanotify.h"
 
 #define EVENT_MAX 1024
 /* size of the event structure, not counting name */
@@ -58,12 +61,16 @@ static unsigned int fanotify_class[] = {
 	FAN_REPORT_DFID_NAME_FID,
 };
 #define NUM_CLASSES ARRAY_SIZE(fanotify_class)
+#define NUM_PRIORITIES 3
 
 #define GROUPS_PER_PRIO 3
 
 static int fd_notify[NUM_CLASSES][GROUPS_PER_PRIO];
 
 static char event_buf[EVENT_BUF_LEN];
+static int exec_events_unsupported;
+static int fan_report_dfid_unsupported;
+static int filesystem_mark_unsupported;
 
 #define MOUNT_PATH "fs_mnt"
 #define MNT2_PATH "mntpoint"
@@ -287,28 +294,14 @@ static int create_fanotify_groups(unsigned int n)
 	struct fanotify_mark_type *mark, *ignore_mark;
 	unsigned int mark_ignored, mask;
 	unsigned int p, i;
-	int ret;
 
 	mark = &fanotify_mark_types[tc->mark_type];
 	ignore_mark = &fanotify_mark_types[tc->ignore_mark_type];
 
 	for (p = 0; p < num_classes; p++) {
 		for (i = 0; i < GROUPS_PER_PRIO; i++) {
-			fd_notify[p][i] = fanotify_init(fanotify_class[p] |
-							FAN_NONBLOCK, O_RDONLY);
-			if (fd_notify[p][i] == -1) {
-				if (errno == EINVAL &&
-				    fanotify_class[p] & FAN_REPORT_NAME) {
-					tst_res(TCONF,
-						"FAN_REPORT_NAME not supported by kernel?");
-					/* Do not try creating this group again */
-					num_classes--;
-					return -1;
-				}
-
-				tst_brk(TBROK | TERRNO,
-					"fanotify_init(%x, 0) failed", fanotify_class[p]);
-			}
+			fd_notify[p][i] = SAFE_FANOTIFY_INIT(fanotify_class[p] |
+							     FAN_NONBLOCK, O_RDONLY);
 
 			/*
 			 * Add mark for each group.
@@ -316,32 +309,12 @@ static int create_fanotify_groups(unsigned int n)
 			 * FAN_EVENT_ON_CHILD has no effect on filesystem/mount
 			 * or inode mark on non-directory.
 			 */
-			ret = fanotify_mark(fd_notify[p][i],
+			SAFE_FANOTIFY_MARK(fd_notify[p][i],
 					    FAN_MARK_ADD | mark->flag,
 					    tc->expected_mask_without_ignore |
 					    FAN_EVENT_ON_CHILD,
 					    AT_FDCWD, tc->mark_path);
-			if (ret < 0) {
-				if (errno == EINVAL &&
-				    tc->expected_mask_without_ignore &
-				    FAN_OPEN_EXEC) {
-					tst_res(TCONF,
-						"FAN_OPEN_EXEC not supported "
-						"by kernel?");
-					return -1;
-				} else if (errno == EINVAL &&
-					tc->mark_type == FANOTIFY_FILESYSTEM) {
-					tst_res(TCONF,
-						"FAN_MARK_FILESYSTEM not "
-						"supported in kernel?");
-					return -1;
-				}
-				tst_brk(TBROK | TERRNO,
-					"fanotify_mark(%d, FAN_MARK_ADD | %s,"
-					"FAN_OPEN, AT_FDCWD, %s) failed",
-					fd_notify[p][i], mark->name,
-					tc->mark_path);
-			}
+
 			/* Add ignore mark for groups with higher priority */
 			if (p == 0)
 				continue;
@@ -350,18 +323,9 @@ static int create_fanotify_groups(unsigned int n)
 			mark_ignored = FAN_MARK_IGNORED_MASK |
 					FAN_MARK_IGNORED_SURV_MODIFY;
 add_mark:
-			ret = fanotify_mark(fd_notify[p][i],
+			SAFE_FANOTIFY_MARK(fd_notify[p][i],
 					    FAN_MARK_ADD | ignore_mark->flag | mark_ignored,
 					    mask, AT_FDCWD, tc->ignore_path);
-			if (ret < 0) {
-				tst_brk(TBROK | TERRNO,
-					"fanotify_mark(%d, FAN_MARK_ADD | %s | %s, "
-					"%x, AT_FDCWD, %s) failed",
-					fd_notify[p][i], ignore_mark->name,
-					mark_ignored ? "FAN_MARK_IGNORED_MASK | "
-					"FAN_MARK_IGNORED_SURV_MODIFY" : "",
-					mask, tc->ignore_path);
-			}
 
 			/*
 			 * If ignored mask is on a parent watching children,
@@ -451,6 +415,16 @@ static void test_fanotify(unsigned int n)
 
 	tst_res(TINFO, "Test #%d: %s", n, tc->tname);
 
+	if (exec_events_unsupported && tc->expected_mask_with_ignore & FAN_OPEN_EXEC) {
+		tst_res(TCONF, "FAN_OPEN_EXEC not supported in kernel?");
+		return;
+	}
+
+	if (filesystem_mark_unsupported && tc->mark_type == FANOTIFY_FILESYSTEM) {
+		tst_res(TCONF, "FAN_MARK_FILESYSTEM not supported in kernel?");
+		return;
+	}
+
 	if (tc->ignored_onchild && tst_kvercmp(5, 9, 0) < 0) {
 		tst_res(TCONF, "ignored mask in combination with flag FAN_EVENT_ON_CHILD"
 				" has undefined behavior on kernel < 5.9");
@@ -535,6 +509,16 @@ cleanup:
 
 static void setup(void)
 {
+	exec_events_unsupported = fanotify_events_supported_by_kernel(FAN_OPEN_EXEC);
+	filesystem_mark_unsupported = fanotify_mark_supported_by_kernel(FAN_MARK_FILESYSTEM);
+	fan_report_dfid_unsupported = fanotify_init_flags_supported_on_fs(FAN_REPORT_DFID_NAME,
+									  MOUNT_PATH);
+	if (fan_report_dfid_unsupported) {
+		FANOTIFY_INIT_FLAGS_ERR_MSG(FAN_REPORT_DFID_NAME, fan_report_dfid_unsupported);
+		/* Limit tests to legacy priority classes */
+		num_classes = NUM_PRIORITIES;
+	}
+
 	/* Create another bind mount at another path for generating events */
 	SAFE_MKDIR(MNT2_PATH, 0755);
 	SAFE_MOUNT(MOUNT_PATH, MNT2_PATH, "none", MS_BIND, NULL);

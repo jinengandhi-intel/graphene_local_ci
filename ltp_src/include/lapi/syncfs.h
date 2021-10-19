@@ -4,18 +4,18 @@
  * Author: Sumit Garg <sumit.garg@linaro.org>
  */
 
-#ifndef SYNCFS_H
-#define SYNCFS_H
+#ifndef LAPI_SYNCFS_H__
+#define LAPI_SYNCFS_H__
 
 #include "config.h"
 #include <sys/types.h>
 #include "lapi/syscalls.h"
 
 #if !defined(HAVE_SYNCFS)
-int syncfs(int fd)
+static inline int syncfs(int fd)
 {
 	return tst_syscall(__NR_syncfs, fd);
 }
 #endif
 
-#endif /* SYNCFS_H */
+#endif /* LAPI_SYNCFS_H__ */

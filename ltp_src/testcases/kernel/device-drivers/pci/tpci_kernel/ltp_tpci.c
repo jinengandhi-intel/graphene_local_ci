@@ -321,6 +321,9 @@ static int test_slot_scan(void)
 
 	prk_info("scan pci slot");
 
+	if ((num % 8) != 0)
+		return TPASS;
+
 	ret = pci_scan_slot(bus, num);
 	if (ret >= 0) {
 		prk_info("found '%d' devices from scan slot", ret);
@@ -439,6 +442,7 @@ static int test_assign_resources(void)
 
 		if (r->flags & IORESOURCE_MEM &&
 			r->flags & IORESOURCE_PREFETCH) {
+			pci_release_resource(dev, i);
 			ret = pci_assign_resource(dev, i);
 			prk_info("assign resource to '%d', ret '%d'", i, ret);
 			rc |= (ret < 0 && ret != -EBUSY) ? TFAIL : TPASS;
@@ -552,6 +556,11 @@ static int test_read_pci_exp_config(void)
 static int test_case(unsigned int cmd)
 {
 	int rc = TSKIP;
+
+	if (!ltp_pci.dev || !ltp_pci.bus) {
+		prk_err("device or bus not selected for test");
+		return TFAIL;
+	}
 
 	switch (cmd) {
 	case PCI_ENABLE:

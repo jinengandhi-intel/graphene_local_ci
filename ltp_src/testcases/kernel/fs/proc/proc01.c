@@ -63,7 +63,7 @@ static char *opt_maxmbytesstr;
 static char *procpath = "/proc";
 static const char selfpath[] = "/proc/self";
 size_t buffsize = 1024;
-static long long maxbytes;
+static unsigned long long maxbytes;
 
 unsigned long long total_read;
 unsigned int total_obj;
@@ -97,7 +97,13 @@ static const struct mapping known_issues[] = {
 	{"read", "/proc/self/mem", EIO},
 	{"read", "/proc/self/task/[0-9]*/mem", EIO},
 	{"read", "/proc/self/attr/*", EINVAL},
+	{"read", "/proc/self/attr/selinux/*", EINVAL},
+	{"read", "/proc/self/attr/smack/*", EINVAL},
+	{"read", "/proc/self/attr/apparmor/*", EINVAL},
 	{"read", "/proc/self/task/[0-9]*/attr/*", EINVAL},
+	{"read", "/proc/self/task/[0-9]*/attr/smack/*", EINVAL},
+	{"read", "/proc/self/task/[0-9]*/attr/selinux/*", EINVAL},
+	{"read", "/proc/self/task/[0-9]*/attr/apparmor/*", EINVAL},
 	{"read", "/proc/self/ns/*", EINVAL},
 	{"read", "/proc/self/task/[0-9]*/ns/*", EINVAL},
 	{"read", "/proc/ppc64/rtas/error_log", EINVAL},
@@ -129,13 +135,9 @@ static const struct mapping known_issues[] = {
 #ifdef HAVE_LIBSELINUX_DEVEL
 static const char lsm_should_work[][PATH_MAX] = {
 	"/proc/self/attr/*",
+	"/proc/self/attr/selinux/*",
 	"/proc/self/task/[0-9]*/attr/*",
-	""
-};
-
-/* Place holder for none of LSM is detected. */
-#else
-static const char lsm_should_work[][PATH_MAX] = {
+	"/proc/self/task/[0-9]*/attr/selinux/*",
 	""
 };
 #endif
@@ -364,6 +366,7 @@ static long readproc(const char *obj)
 		if ((statbuf.st_mode & S_IRUSR) == 0 &&
 		    (statbuf.st_mode & S_IWUSR) != 0) {
 			tst_resm(TINFO, "%s: is write-only.", obj);
+			(void)close(fd);
 			return 0;
 		}
 
@@ -372,6 +375,7 @@ static long readproc(const char *obj)
 			if (!strcmp(obj, error_nonblock[i])) {
 				tst_resm(TINFO, "%s: does not honor "
 					 "O_NONBLOCK", obj);
+				(void)close(fd);
 				return 0;
 			}
 		}

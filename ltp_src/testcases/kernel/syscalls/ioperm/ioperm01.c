@@ -42,10 +42,6 @@ static void verify_ioperm(void)
 
 static void setup(void)
 {
-	/* ioperm() is restricted under kernel lockdown. */
-	if (tst_lockdown_enabled())
-		tst_brk(TCONF, "Kernel is locked down, skip this test");
-
 	/*
 	 * The value of IO_BITMAP_BITS (include/asm-i386/processor.h) changed
 	 * from kernel 2.6.8 to permit 16-bits ioperm
@@ -64,12 +60,14 @@ static void cleanup(void)
 	 * Reset I/O privileges for the specified port.
 	 */
 	if ((ioperm(io_addr, NUM_BYTES, 0)) == -1)
-		tst_brk(TBROK | TTERRNO, "ioperm() cleanup failed");
+		tst_brk(TBROK | TERRNO, "ioperm() cleanup failed");
 }
 
 static struct tst_test test = {
 	.test_all = verify_ioperm,
 	.needs_root = 1,
+	/* ioperm() is restricted under kernel lockdown. */
+	.skip_in_lockdown = 1,
 	.setup = setup,
 	.cleanup = cleanup,
 };

@@ -3,13 +3,16 @@
  * Copyright (c) International Business Machines  Corp., 2001
  * Copyright (C) 2020 Cyril Hrubis <chrubis@suse.cz>
  */
-/*
+
+/*\
+ * [Description]
+ *
  * Verify that shmctl() IPC_STAT and SHM_STAT reports correct data.
  *
  * The shm_nattach is excercised by:
  *
- * 1. forking() children that attach and detach SHM
- * 2. attaching the SHM before fork and letting the children detach it
+ * - forking() children that attach and detach SHM
+ * - attaching the SHM before fork and letting the children detach it
  *
  * We check that the number shm_nattach is correct after each step we do.
  */
@@ -18,6 +21,7 @@
 #include <stdlib.h>
 #include "tst_test.h"
 #include "tst_safe_sysv_ipc.h"
+#include "tst_clocks.h"
 #include "libnewipc.h"
 
 #define NCHILD 20
@@ -240,9 +244,9 @@ static int get_shm_idx_from_id(int shm_id)
 
 static void setup(void)
 {
-	ctime_min = time(NULL);
+	ctime_min = tst_get_fs_timestamp();
 	shm_id = SAFE_SHMGET(IPC_PRIVATE, SHM_SIZE, IPC_CREAT | SHM_RW);
-	ctime_max = time(NULL);
+	ctime_max = tst_get_fs_timestamp();
 
 	shm_idx = get_shm_idx_from_id(shm_id);
 

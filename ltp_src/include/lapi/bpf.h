@@ -8,8 +8,8 @@
  * some eBPF testing without any external dependencies.
  */
 
-#ifndef BPF_H
-# define BPF_H
+#ifndef LAPI_BPF_H__
+#define LAPI_BPF_H__
 
 #include <stdint.h>
 
@@ -27,6 +27,7 @@
 #define BPF_JNE		0x50	/* jump != */
 
 #define BPF_SIZE(code)  ((code) & 0x18)
+#define		BPF_B		0x10 /*  8-bit */
 #define		BPF_W		0x00    /* 32-bit */
 #define         BPF_DW		0x18	/* double word (64-bit) */
 
@@ -37,8 +38,10 @@
 #define BPF_OP(code)    ((code) & 0xf0)
 #define		BPF_ADD		0x00
 #define		BPF_SUB		0x10
+#define		BPF_DIV		0x30
 #define		BPF_LSH		0x60
 #define		BPF_RSH		0x70
+#define		BPF_MOD		0x90
 
 #define		BPF_JEQ		0x10
 
@@ -588,4 +591,4 @@ static inline int bpf(enum bpf_cmd cmd, union bpf_attr *attr, unsigned int size)
 }
 /* End copy from tools/lib/bpf */
 
-#endif	/* BPF_H */
+#endif	/* LAPI_BPF_H__ */

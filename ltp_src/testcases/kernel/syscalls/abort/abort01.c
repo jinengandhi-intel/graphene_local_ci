@@ -5,12 +5,17 @@
  *   01/02/2003	Port to LTP	avenkat@us.ibm.com
  *   11/11/2002: Ported to LTP Suite by Ananda
  *   06/30/2001	Port to Linux	nsharoff@us.ibm.com
+ */
+
+/*\
+ * [Description]
  *
- * ALGORITHM
- *	Fork child.  Have child abort, check return status.
+ * Checks that process which called abort() gets killed by SIGIOT and dumps core.
  *
- * RESTRICTIONS
- *      The ulimit for core file size must be greater than 0.
+ * [Algorithm]
+ *  - Fork child.
+ *  - Child calls abort.
+ *  - Parent checks return status.
  */
 
 #include <sys/types.h>

@@ -47,12 +47,11 @@ LDFLAGS				+= -L$(top_builddir)/lib/android_libpthread
 LDFLAGS				+= -L$(top_builddir)/lib/android_librt
 endif
 
-MAKE_TARGETS			?= $(notdir $(patsubst %.c,%,$(wildcard $(abs_srcdir)/*.c)))
-
+MAKE_TARGETS			?= $(notdir $(patsubst %.c,%,$(sort $(wildcard $(abs_srcdir)/*.c))))
 MAKE_TARGETS			:= $(filter-out $(FILTER_OUT_MAKE_TARGETS),$(MAKE_TARGETS))
 
 # with only *.dwo, .[0-9]+.dwo can not be cleaned
-CLEAN_TARGETS			+= $(MAKE_TARGETS) *.o *.pyc .cache.mk *.dwo .*.dwo
+CLEAN_TARGETS			+= $(MAKE_TARGETS) $(HOST_MAKE_TARGETS) *.o *.pyc .cache.mk *.dwo .*.dwo
 
 # Majority of the files end up in testcases/bin...
 INSTALL_DIR			?= testcases/bin
@@ -88,6 +87,17 @@ $(foreach make_target,$(MAKE_TARGETS),$(eval $(call generate_install_rule,$(make
 else  # else ! $(filter-out install,$(MAKECMDGOALS)),$(MAKECMDGOALS)
 $(error You must define $$(prefix) before executing install)
 endif # END $(filter-out install,$(MAKECMDGOALS)),$(MAKECMDGOALS)
+endif
+
+CHECK_TARGETS			?= $(addprefix check-,$(notdir $(patsubst %.c,%,$(sort $(wildcard $(abs_srcdir)/*.c)))))
+CHECK_TARGETS			:= $(filter-out $(addprefix check-, $(FILTER_OUT_MAKE_TARGETS)), $(CHECK_TARGETS))
+CHECK				?= $(abs_top_srcdir)/tools/sparse/sparse-ltp
+CHECK_NOFLAGS			?= $(abs_top_srcdir)/scripts/checkpatch.pl -f --no-tree --terse --no-summary --ignore CONST_STRUCT,VOLATILE,SPLIT_STRING
+SHELL_CHECK			?= $(abs_top_srcdir)/scripts/checkbashisms.pl --force --extra
+SHELL_CHECK_TARGETS		?= $(addprefix check-,$(notdir $(sort $(wildcard $(abs_srcdir)/*.sh))))
+
+ifeq ($(CHECK),$(abs_top_srcdir)/tools/sparse/sparse-ltp)
+CHECK_DEPS			+= $(CHECK)
 endif
 
 include $(top_srcdir)/include/mk/rules.mk

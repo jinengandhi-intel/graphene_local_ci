@@ -30,8 +30,8 @@
 static volatile int child_continued;
 static volatile int waiting = 1;
 
-void handler(int signo LTP_ATTRIBUTE_UNUSED, siginfo_t *info,
-	void *context LTP_ATTRIBUTE_UNUSED)
+static void handler(int signo PTS_ATTRIBUTE_UNUSED, siginfo_t *info,
+	void *context PTS_ATTRIBUTE_UNUSED)
 {
 	if (info && info->si_code == CLD_CONTINUED) {
 		printf("Child has been stopped\n");
@@ -51,7 +51,10 @@ int main(void)
 	sigemptyset(&act.sa_mask);
 	sigaction(SIGCHLD, &act, 0);
 
-	if ((pid = fork()) == 0) {
+	if ((pid = fork()) < 0) {
+		printf("fork() did not return success\n");
+		return PTS_UNRESOLVED;
+	} else if (pid == 0) {
 		/* child */
 		while (1) {
 			/* wait forever, or until we are

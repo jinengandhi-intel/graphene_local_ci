@@ -2,6 +2,8 @@
 /tst_checkpoint
 /tst_device
 /tst_getconf
+/tst_get_free_pids
+/tst_get_median
 /tst_get_unused_port
 /tst_kvcmp
 /tst_net_iface_prefix
@@ -11,3 +13,5 @@
 /tst_rod
 /tst_sleep
 /tst_supported_fs
+/tst_hexdump
+/tst_timeout_kill

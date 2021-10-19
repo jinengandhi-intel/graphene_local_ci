@@ -29,6 +29,9 @@
  *  Date:   Mon Mar 26 15:39:07 2018 -1000
  *
  *  perf/hwbp: Simplify the perf-hwbp code, fix documentation
+ *
+ * On Centos7, this is also a regression test for
+ * commit 27747f8bc355 ("perf/x86/hw_breakpoints: Fix check for kernel-space breakpoints").
  */
 
 #include <stdlib.h>
@@ -56,6 +59,11 @@ static pid_t child_pid;
 
 static int deffered_check;
 
+static struct tst_kern_exv kvers[] = {
+	{"RHEL8", "4.18.0-49"},
+	{NULL, NULL},
+};
+
 static void setup(void)
 {
 	/*
@@ -70,9 +78,10 @@ static void setup(void)
 	 * The original fix for the kernel haven't rejected the kernel address
 	 * right away when breakpoint was modified from userspace it was
 	 * disabled instead and the EINVAL was returned when dr7 was written to
-	 * enable it again.
+	 * enable it again. On RHEL8, it has introduced the right fix since
+	 * 4.18.0-49.
 	 */
-	if (tst_kvercmp(4, 19, 0) < 0)
+	if (tst_kvercmp2(4, 19, 0, kvers) < 0)
 		deffered_check = 1;
 }
 
@@ -158,6 +167,7 @@ static struct tst_test test = {
 	.tags = (const struct tst_tag[]) {
 		{"linux-git", "f67b15037a7a"},
 		{"CVE", "2018-1000199"},
+		{"linux-git", "27747f8bc355"},
 		{}
 	}
 };

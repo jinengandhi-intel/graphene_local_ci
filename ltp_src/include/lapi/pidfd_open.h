@@ -4,8 +4,8 @@
  * Author: Viresh Kumar <viresh.kumar@linaro.org>
  */
 
-#ifndef PIDFD_OPEN_H
-#define PIDFD_OPEN_H
+#ifndef LAPI_PIDFD_OPEN_H__
+#define LAPI_PIDFD_OPEN_H__
 
 #include <sys/syscall.h>
 #include <sys/types.h>
@@ -15,10 +15,10 @@
 #include "config.h"
 
 #ifndef HAVE_PIDFD_OPEN
-int pidfd_open(pid_t pid, unsigned int flags)
+static inline int pidfd_open(pid_t pid, unsigned int flags)
 {
 	return tst_syscall(__NR_pidfd_open, pid, flags);
 }
 #endif
 
-#endif /* PIDFD_OPEN_H */
+#endif /* LAPI_PIDFD_OPEN_H__ */
