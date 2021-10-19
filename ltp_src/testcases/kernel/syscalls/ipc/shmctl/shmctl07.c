@@ -2,7 +2,10 @@
 /*
  * Copyright (C) 2020 Cyril Hrubis <chrubis@suse.cz>
  */
-/*
+
+/*\
+ * [Description]
+ *
  * Test for a SHM_LOCK and SHM_UNLOCK.
  */
 

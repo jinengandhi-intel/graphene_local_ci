@@ -16,8 +16,6 @@
 
 #include "tst_test.h"
 
-#define IPC_ENV_VAR "LTP_IPC_PATH"
-
 static void verify_execle(void)
 {
 	pid_t pid;
@@ -33,7 +31,7 @@ static void verify_execle(void)
 	pid = SAFE_FORK();
 	if (pid == 0) {
 		TEST(execle(path, "execle01_child", "canary", NULL, envp));
-		tst_brk(TFAIL | TERRNO,
+		tst_brk(TFAIL | TTERRNO,
 			"Failed to execute execl01_child");
 	}
 }

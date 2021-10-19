@@ -55,8 +55,11 @@ static void setup(void)
 	sprintf(workdir, "%s/%s", cwd, MNTPOINT);
 	free(cwd);
 	SAFE_CHDIR(workdir);
+
+	mode_t sys_umask = umask(0);
 	SAFE_MKDIR(DIR_NAME, 0755);
 	SAFE_MKDIR(BLOCKED_NAME, 0644);
+	umask(sys_umask);
 
 	/* FAT and NTFS override file and directory permissions */
 	SAFE_STAT(BLOCKED_NAME, &statbuf);
@@ -66,7 +69,7 @@ static void setup(void)
 
 	if (!TST_RET)
 		SAFE_SYMLINK(LINK_NAME2, LINK_NAME1);
-	else if (TST_RET == -1 && TST_ERR == EPERM)
+	else if (TST_RET == -1 && (TST_ERR == EPERM || TST_ERR == ENOSYS))
 		skip_symlinks = 1;
 	else
 		tst_brk(TBROK | TTERRNO, "Cannot create symlinks");

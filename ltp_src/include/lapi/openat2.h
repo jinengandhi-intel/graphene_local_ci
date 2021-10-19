@@ -4,8 +4,8 @@
  * Author: Viresh Kumar <viresh.kumar@linaro.org>
  */
 
-#ifndef OPENAT2_H
-#define OPENAT2_H
+#ifndef LAPI_OPENAT2_H__
+#define LAPI_OPENAT2_H__
 
 #include <sys/syscall.h>
 #include <linux/types.h>
@@ -47,7 +47,8 @@ struct open_how {
 					be scoped inside the dirfd
 					(similar to chroot(2)). */
 
-int openat2(int dfd, const char *pathname, struct open_how *how, size_t size)
+static inline int openat2(int dfd, const char *pathname,
+                          struct open_how *how, size_t size)
 {
 	return tst_syscall(__NR_openat2, dfd, pathname, how, size);
 }
@@ -59,14 +60,16 @@ struct open_how_pad {
 	uint64_t pad;
 };
 
-void openat2_supported_by_kernel(void)
+static inline void openat2_supported_by_kernel(void)
 {
+	long ret;
+
 	if ((tst_kvercmp(5, 6, 0)) < 0) {
 		/* Check if the syscall is backported on an older kernel */
-		TEST(syscall(__NR_openat2, -1, NULL, NULL, 0));
-		if (TST_RET == -1 && TST_ERR == ENOSYS)
+		ret = syscall(__NR_openat2, -1, NULL, NULL, 0);
+		if (ret == -1 && errno == ENOSYS)
 			tst_brk(TCONF, "Test not supported on kernel version < v5.6");
 	}
 }
 
-#endif /* OPENAT2_H */
+#endif /* LAPI_OPENAT2_H__ */

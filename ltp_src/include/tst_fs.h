@@ -167,18 +167,48 @@ int tst_fill_file(const char *path, char pattern, size_t bs, size_t bcount);
  */
 int tst_prealloc_file(const char *path, size_t bs, size_t bcount);
 
-#define TST_FS_SKIP_FUSE 0x01
+enum tst_fs_impl {
+	TST_FS_UNSUPPORTED = 0,
+	TST_FS_KERNEL = 1,
+	TST_FS_FUSE = 2,
+};
 
 /*
- * Return 1 if a specified fiilsystem is supported
- * Return 0 if a specified fiilsystem isn't supported
+ * Returns if filesystem is suppored and if driver is in kernel or FUSE.
+ *
+ * @fs_type A filesystem name to check the support for.
  */
-int tst_fs_is_supported(const char *fs_type, int flags);
+enum tst_fs_impl tst_fs_is_supported(const char *fs_type);
 
 /*
  * Returns NULL-terminated array of kernel-supported filesystems.
+ *
+ * @skiplist A NULL terminated array of filesystems to skip.
+*/
+const char **tst_get_supported_fs_types(const char *const *skiplist);
+
+/*
+ * Returns 1 if filesystem is in skiplist 0 otherwise.
+ *
+ * @fs_type A filesystem type to lookup.
+ * @skiplist A NULL terminated array of fileystemsytems to skip.
  */
-const char **tst_get_supported_fs_types(int flags);
+int tst_fs_in_skiplist(const char *fs_type, const char *const *skiplist);
+
+/*
+ * Check whether device supports FS quotas. Negative return value means that
+ * quotas appear to be broken.
+ */
+int tst_check_quota_support(const char *device, int format, char *quotafile);
+
+/*
+ * Check for quota support and terminate the test with appropriate exit status
+ * if quotas are not supported or broken.
+ */
+#define tst_require_quota_support(dev, fmt, qfile) \
+	tst_require_quota_support_(__FILE__, __LINE__, (dev), (fmt), (qfile))
+void tst_require_quota_support_(const char *file, const int lineno,
+	const char *device, int format, char *quotafile);
 
 /*
  * Creates and writes to files on given path until write fails with ENOSPC

@@ -18,6 +18,7 @@
 
 #include "tst_common.h"
 #include "tst_res_flags.h"
+#include "tst_test_macros.h"
 #include "tst_checkpoint.h"
 #include "tst_device.h"
 #include "tst_mkfs.h"
@@ -28,7 +29,6 @@
 #include "tst_process_state.h"
 #include "tst_atomic.h"
 #include "tst_kvercmp.h"
-#include "tst_clone.h"
 #include "tst_kernel.h"
 #include "tst_minmax.h"
 #include "tst_get_bad_addr.h"
@@ -39,9 +39,10 @@
 #include "tst_capability.h"
 #include "tst_hugepage.h"
 #include "tst_assert.h"
-#include "tst_cgroup.h"
 #include "tst_lockdown.h"
+#include "tst_fips.h"
 #include "tst_taint.h"
+#include "tst_memutils.h"
 
 /*
  * Reports testcase result.
@@ -79,6 +80,9 @@ void tst_brk_(const char *file, const int lineno, int ttype,
 		tst_brk_(__FILE__, __LINE__, (ttype), (arg_fmt), ##__VA_ARGS__);\
 	})
 
+void tst_printf(const char *const fmt, ...)
+		__attribute__((nonnull(1), format (printf, 1, 2)));
+
 /* flush stderr and stdout */
 void tst_flush(void);
 
@@ -93,6 +97,7 @@ pid_t safe_fork(const char *filename, unsigned int lineno);
 #include "tst_safe_macros.h"
 #include "tst_safe_file_ops.h"
 #include "tst_safe_net.h"
+#include "tst_clone.h"
 
 /*
  * Wait for all children and exit with TBROK if
@@ -123,6 +128,8 @@ struct tst_tag {
 };
 
 extern unsigned int tst_variant;
+
+#define TST_NO_HUGEPAGES ((unsigned long)-1)
 
 struct tst_test {
 	/* number of tests available in test() function */
@@ -156,6 +163,17 @@ struct tst_test {
 	 * to the test function.
 	 */
 	int all_filesystems:1;
+	int skip_in_lockdown:1;
+
+	/*
+	 * The skip_filesystem is a NULL terminated list of filesystems the
+	 * test does not support. It can also be used to disable whole class of
+	 * filesystems with a special keyworks such as "fuse".
+	 */
+	const char *const *skip_filesystems;
+
+	/* Minimum number of online CPU required by the test */
+	unsigned long min_cpus;
 
 	/*
 	 * If set non-zero number of request_hugepages, test will try to reserve the
@@ -163,7 +181,8 @@ struct tst_test {
 	 * have enough hpage for using, it will try the best to reserve 80% available
 	 * number of hpages. With success test stores the reserved hugepage number in
 	 * 'tst_hugepages. For the system without hugetlb supporting, variable
-	 * 'tst_hugepages' will be set to 0.
+	 * 'tst_hugepages' will be set to 0. If the hugepage number needs to be set to
+	 * 0 on supported hugetlb system, please use '.request_hugepages = TST_NO_HUGEPAGES'.
 	 *
 	 * Also, we do cleanup and restore work for the hpages resetting automatically.
 	 */
@@ -192,8 +211,6 @@ struct tst_test {
 
 	/* Device filesystem type override NULL == default */
 	const char *dev_fs_type;
-	/* Flags to be passed to tst_get_supported_fs_types() */
-	int dev_fs_flags;
 
 	/* Options passed to SAFE_MKFS() when format_device is set */
 	const char *const *dev_fs_opts;
@@ -262,39 +279,14 @@ struct tst_test {
 void tst_run_tcases(int argc, char *argv[], struct tst_test *self)
                     __attribute__ ((noreturn));
 
+#define IPC_ENV_VAR "LTP_IPC_PATH"
+
 /*
  * Does library initialization for child processes started by exec()
  *
  * The LTP_IPC_PATH variable must be passed to the program environment.
  */
 void tst_reinit(void);
-
-//TODO Clean?
-#define TEST(SCALL) \
-	do { \
-		errno = 0; \
-		TST_RET = SCALL; \
-		TST_ERR = errno; \
-	} while (0)
-
-#define TEST_VOID(SCALL) \
-	do { \
-		errno = 0; \
-		SCALL; \
-		TST_ERR = errno; \
-	} while (0)
-
-extern long TST_RET;
-extern int TST_ERR;
-
-extern void *TST_RET_PTR;
-
-#define TESTPTR(SCALL) \
-	do { \
-		errno = 0; \
-		TST_RET_PTR = (void*)SCALL; \
-		TST_ERR = errno; \
-	} while (0)
 
 /*
  * Functions to convert ERRNO to its name and SIGNAL to its name.

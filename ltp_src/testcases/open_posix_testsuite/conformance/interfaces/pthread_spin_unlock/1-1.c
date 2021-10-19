@@ -46,7 +46,7 @@ static void *fn_chld(void *arg)
 	printf("thread: attempt trylock\n");
 	rc = pthread_spin_trylock(&spinlock);
 	if (rc != 0) {
-		printf("Test FAILED: thread failed to get spin lock,"
+		printf("Test FAILED: thread failed to get spin lock, "
 		       "Error code:%d\n", rc);
 		exit(PTS_FAIL);
 	}
@@ -118,7 +118,7 @@ int main(void)
 	}
 
 	if (pthread_spin_destroy(&spinlock) != 0) {
-		printf("Error at pthread_spin_destroy()");
+		printf("Error at pthread_spin_destroy()\n");
 		return PTS_UNRESOLVED;
 	}
 

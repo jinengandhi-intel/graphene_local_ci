@@ -69,7 +69,7 @@ int dio_read(char *filename)
 {
 	int fd;
 	int r;
-	void *bufptr;
+	void *bufptr = NULL;
 
 	TEST(posix_memalign(&bufptr, 4096, 64 * 1024));
 	if (TEST_RETURN) {
@@ -105,7 +105,7 @@ int dio_read(char *filename)
 void dio_append(char *filename, int fill)
 {
 	int fd;
-	void *bufptr;
+	void *bufptr = NULL;
 	int i;
 	int w;
 
@@ -133,7 +133,7 @@ void dio_append(char *filename, int fill)
 	close(fd);
 }
 
-int main(int argc, char **argv)
+int main(void)
 {
 	char filename[PATH_MAX];
 	int pid[NUM_CHILDREN];

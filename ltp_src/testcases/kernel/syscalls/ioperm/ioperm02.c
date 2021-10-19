@@ -88,6 +88,8 @@ static struct tst_test test = {
 	.tcnt = ARRAY_SIZE(tcases),
 	.test = verify_ioperm,
 	.needs_root = 1,
+	/* ioperm() is restricted under kernel lockdown. */
+	.skip_in_lockdown = 1,
 	.setup = setup,
 	.cleanup = cleanup,
 };

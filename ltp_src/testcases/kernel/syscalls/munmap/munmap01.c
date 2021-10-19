@@ -201,7 +201,7 @@ void setup(void)
 		    MAP_FILE | MAP_PRIVATE, fildes, 0);
 #else
 	addr = mmap(0, map_len, PROT_READ | PROT_WRITE,
-		    MAP_FILE | MAP_PRIVATE, fildes, 0);
+		    MAP_FILE | MAP_SHARED, fildes, 0);
 #endif
 
 	/* check for the return value of mmap system call */

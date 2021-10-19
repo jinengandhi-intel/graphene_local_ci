@@ -63,6 +63,7 @@
 #include <netinet/sctp.h>
 #include <sys/uio.h>
 #include <sctputil.h>
+#include "tst_kernel.h"
 
 char *TCID = __FILE__;
 int TST_TOTAL = 10;
@@ -71,7 +72,7 @@ int TST_CNT = 0;
 #define SK_MAX  10
 
 int
-main(int argc, char *argv[])
+main(void)
 {
         socklen_t len;
 	int i;
@@ -82,6 +83,9 @@ main(int argc, char *argv[])
 	char filename[21];
 
         struct sockaddr_in conn_addr,lstn_addr,acpt_addr;
+
+	if (tst_check_driver("sctp"))
+		tst_brkm(TCONF, tst_exit, "sctp driver not available");
 
 	/* Rather than fflush() throughout the code, set stdout to
          * be unbuffered.
@@ -130,7 +134,7 @@ main(int argc, char *argv[])
 	/* accept() TEST1: Bad socket descriptor EBADF, Expected error */
         error = accept(-1, (struct sockaddr *) &acpt_addr, &len);
         if (error != -1 || errno != EBADF)
-		tst_brkm(TBROK, tst_exit, "accept with a bad socket descriptor"
+		tst_brkm(TBROK, tst_exit, "accept with a bad socket descriptor "
                          "error:%d, errno:%d", error, errno);
 
 	tst_resm(TPASS, "accept() with a bad socket descriptor - EBADF");
@@ -155,7 +159,7 @@ main(int argc, char *argv[])
         /*accept() TEST3: Invalid address EFAULT, Expected error*/
         error = accept(lstn_sk, (struct sockaddr *) -1, &len);
         if (error != -1 || errno != EFAULT)
-		tst_brkm(TBROK, tst_exit, "accept with invalid address"
+		tst_brkm(TBROK, tst_exit, "accept with invalid address "
                          "error:%d, errno:%d", error, errno);
 
 	tst_resm(TPASS, "accept() with invalid address - EFAULT");

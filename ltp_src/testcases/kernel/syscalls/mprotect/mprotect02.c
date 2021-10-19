@@ -86,7 +86,7 @@ int main(int ac, char **av)
 
 		/* mmap the PAGESIZE bytes as read only. */
 		addr = SAFE_MMAP(cleanup, 0, sizeof(buf), PROT_READ,
-				 MAP_PRIVATE, fd, 0);
+				 MAP_SHARED, fd, 0);
 
 		if ((pid = FORK_OR_VFORK()) == -1)
 			tst_brkm(TBROK | TERRNO, cleanup, "fork #1 failed");
