@@ -65,6 +65,7 @@ stage('build') {
                 try {
                     sh '''
                     cd "$WORKSPACE"
+                    sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
                     meson setup build \
                         --prefix="$PREFIX" \
                         --buildtype="$BUILDTYPE" \
