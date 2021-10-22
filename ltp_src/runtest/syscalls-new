@@ -1119,7 +1119,7 @@ sched_get_priority_min01 sched_get_priority_min01
 sched_get_priority_min02 sched_get_priority_min02
 
 sched_getparam01 sched_getparam01
-#sched_getparam02 sched_getparam02
+sched_getparam02 sched_getparam02
 sched_getparam03 sched_getparam03
 
 sched_rr_get_interval01 sched_rr_get_interval01
@@ -1471,7 +1471,7 @@ symlinkat01 symlinkat01
 
 sync01 sync01
 #sync02 sync02
-#sync03 sync03
+sync03 sync03
 
 syncfs01 syncfs01
 
@@ -1492,7 +1492,7 @@ sysfs02 sysfs02
 sysfs03 sysfs03
 sysfs04 sysfs04
 sysfs05 sysfs05
-#sysfs06 sysfs06
+sysfs06 sysfs06
 
 sysinfo01 sysinfo01
 sysinfo02 sysinfo02
