@@ -31,10 +31,14 @@ stage('test-sgx') {
 
 
     try{
-        timeout(time: 5, unit: 'MINUTES') {
+        timeout(time: 10, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
+                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                then
+                    sed -i '$ a loader.pal_internal_mem_size = "128M"' manifest.template 
+                fi                    
                 make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                 make ${MAKEOPTS} SGX=1 regression
             '''
