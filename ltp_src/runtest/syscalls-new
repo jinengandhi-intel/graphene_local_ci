@@ -43,6 +43,7 @@ bpf_prog03 bpf_prog03
 bpf_prog04 bpf_prog04
 
 brk01 brk01
+brk02 brk02
 
 capget01 capget01
 capget02 capget02
@@ -149,18 +150,26 @@ dup202 dup202
 dup203 dup203
 dup204 dup204
 dup205 dup205
+dup207 dup207
 
 dup3_01 dup3_01
 dup3_02 dup3_02
 
+epoll_create01 epoll_create01
+epoll_create02 epoll_create02
 epoll_create1_01 epoll_create1_01
+epoll_create1_02 epoll_create1_02
 epoll01 epoll-ltp
 epoll_ctl01 epoll_ctl01
 epoll_ctl02 epoll_ctl02
+epoll_ctl03 epoll_ctl03
 epoll_wait01 epoll_wait01
 epoll_wait02 epoll_wait02
 epoll_wait03 epoll_wait03
+epoll_wait04 epoll_wait04
 epoll_pwait01 epoll_pwait01
+epoll_pwait02 epoll_pwait02
+epoll_pwait03 epoll_pwait03
 
 eventfd01 eventfd01
 
@@ -677,6 +686,8 @@ lstat01_run_64 lstat01_run_64
 lstat02 lstat02
 lstat02_64 lstat02_64
 
+mallinfo02 mallinfo02
+
 mallopt01 mallopt01
 
 mbind01 mbind01
@@ -749,6 +760,7 @@ mmap15 mmap15
 mmap16 mmap16
 mmap17 mmap17
 mmap18 mmap18
+mmap19 mmap19
 
 modify_ldt01 modify_ldt01
 modify_ldt02 modify_ldt02
@@ -897,6 +909,8 @@ newuname01 newuname01
 pathconf01 pathconf01
 
 pause01 pause01
+pause02 pause02
+pause03 pause03
 
 personality01 personality01
 personality02 personality02
@@ -1198,6 +1212,7 @@ sendmsg02 sendmsg02
 sendmsg03 sendmsg03
 
 sendmmsg01 sendmmsg01
+sendmmsg02 sendmmsg02
 
 sendto01 sendto01
 sendto02 sendto02
