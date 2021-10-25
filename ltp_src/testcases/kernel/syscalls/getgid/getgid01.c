@@ -20,7 +20,7 @@ static struct passwd *ltpuser;
 static void run(void)
 {
 	TEST(GETGID());
-	if (TST_RET != ltpuser->pw_gid)
+	if (TST_RET == -1)
 		tst_res(TFAIL, "getgid failed, returned %ld", TST_RET);
 	else
 		tst_res(TPASS, "getgid returned as expectedly");
