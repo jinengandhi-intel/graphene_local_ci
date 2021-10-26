@@ -2,17 +2,17 @@ stage('Build') {
     sh '''
         openssl genrsa -3 -out enclave-key.pem 3072
         cp -f config.yaml.template config.yaml
-        docker build --tag ubuntu18.04-bash --file test/ubuntu18.04-bash.dockerfile .
-        ./gsc build --insecure-args ubuntu18.04-bash test/ubuntu18.04-bash.manifest
-        ./gsc sign-image ubuntu18.04-bash enclave-key.pem
-        ./gsc info-image gsc-ubuntu18.04-bash
+        docker build --tag $OSVER-bash --file test/$OSVER-bash.dockerfile .
+        ./gsc build --insecure-args $OSVER-bash test/$OSVER-bash.manifest
+        ./gsc sign-image $OSVER-bash enclave-key.pem
+        ./gsc info-image gsc-$OSVER-bash
     '''
 } 
 stage('Test') {
     sh '''
         docker run --device=/dev/sgx_enclave \
             -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-            gsc-ubuntu18.04-bash -c ls
+            gsc-$OSVER-bash -c ls
     '''
 }
 stage('Docker images cleanup') {
