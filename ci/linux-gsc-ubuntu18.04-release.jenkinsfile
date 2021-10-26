@@ -13,7 +13,8 @@ node(node_label) {
         }
     
         dir ("gsc_dev_repo") {
-            sh 'cp -rf $WORKSPACE/gsc/* templates'
+            sh 'cp -rf $WORKSPACE/gsc/templates/* templates'
+            sh 'cp -rf $WORKSPACE/gsc/test/* test'
             env.WORKSPACE = env.WORKSPACE + "/gsc_dev_repo"
 
             load '../ci/gsc.jenkinsfile'
