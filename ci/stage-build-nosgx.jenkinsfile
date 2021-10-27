@@ -9,6 +9,7 @@ stage('build') {
                         --buildtype="$BUILDTYPE" \
                         -Dskeleton=enabled \
                         -Ddirect=enabled \
+                        -Dtests=enabled \
                         -Dsgx=disabled > meson_cmd_output.txt
                     ninja -vC build > ninja_build_log.txt
                     ninja -vC build install > ninja_install_log.txt

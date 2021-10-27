@@ -25,6 +25,7 @@ stage('build') {
                         --buildtype="$BUILDTYPE" \
                         -Ddirect=disabled \
                         -Dsgx=enabled \
+                        -Dtests=enabled \
                         -Dsgx_driver=oot > meson_cmd_output.txt
                     ninja -vC build > ninja_build_log.txt
                     ninja -vC build install > ninja_install_log.txt
@@ -51,6 +52,7 @@ stage('build') {
                         --buildtype="$BUILDTYPE" \
                         -Ddirect=disabled \
                         -Dsgx=enabled \
+                        -Dtests=enabled \
                         -Dsgx_driver=dcap1.6 > meson_cmd_output.txt
                     ninja -vC build > ninja_build_log.txt
                     ninja -vC build install > ninja_install_log.txt
@@ -70,6 +72,7 @@ stage('build') {
                         --prefix="$PREFIX" \
                         --buildtype="$BUILDTYPE" \
                         -Ddirect=disabled \
+                        -Dtests=enabled \
                         -Dsgx=enabled > meson_cmd_output.txt
                     ninja -vC build > ninja_build_log.txt
                     ninja -vC build install > ninja_install_log.txt
