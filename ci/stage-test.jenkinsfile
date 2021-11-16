@@ -3,20 +3,14 @@ stage('test') {
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
+                    cd Pal/regression                    
                     if test -n "$SGX"
                     then
-                        gramine=sgx
+                        gramine-test --sgx build -v
                     else
-                        gramine=direct
+                        gramine-test build -v
                     fi
-
-                    cd Pal/regression
-                    make ${MAKEOPTS} all pal_lib="$GRAMINE_PKGLIBDIR"/"$gramine"/libpal.so
-                    if test -n "$SGX"
-                    then
-                        make ${MAKEOPTS} sgx-tokens pal_lib="$GRAMINE_PKGLIBDIR"/"$gramine"/libpal.so
-                    fi
-                    python3 -m pytest -v --junit-xml pal-regression.xml test_pal.py
+                    python3 -m pytest -v --junit-xml pal-regression.xml
                 '''
             }
         } catch (Exception e){
@@ -31,21 +25,22 @@ stage('test') {
 
                 sh '''
                     cd LibOS/shim/test/regression
-                    make ${MAKEOPTS} RA_CLIENT_SPID=${ra_client_spid} all
                     if test -n "$SGX"
-                    then
-                        make ${MAKEOPTS} RA_CLIENT_SPID=${ra_client_spid} sgx-tokens
+                    then                    
+                        RA_CLIENT_SPID=${ra_client_spid} gramine-test --sgx build -v
+                    else
+                        RA_CLIENT_SPID=${ra_client_spid} gramine-test build -v
                     fi
                 '''
                 if (env.node_label == "graphene_dcap") {
                     sh '''
                         cd LibOS/shim/test/regression
-                        python3 -m pytest -v -k "not large_mmap" --junit-xml libos-regression.xml test_libos.py
+                        python3 -m pytest -v -k "not large_mmap" --junit-xml libos-regression.xml 
                     '''
                 } else {
                      sh '''
                         cd LibOS/shim/test/regression
-                        python3 -m pytest -v -k "not attestation" --junit-xml libos-regression.xml test_libos.py
+                        python3 -m pytest -v -k "not attestation" --junit-xml libos-regression.xml 
                     '''
                 }
             }
@@ -60,12 +55,13 @@ stage('test') {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
                     cd LibOS/shim/test/fs
-                    make ${MAKEOPTS} all
                     if test -n "$SGX"
-                    then
-                        make ${MAKEOPTS} sgx-tokens
+                    then                     
+                        gramine-test --sgx build -v
+                    else
+                        gramine-test build -v
                     fi
-                    python3 -m pytest -v --junit-xml fs.xml test_fs.py test_tmpfs.py test_pf.py
+                    python3 -m pytest -v --junit-xml fs.xml
                 '''
             }
         } catch (Exception e){
