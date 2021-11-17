@@ -220,6 +220,21 @@ stage('test-sgx') {
         '''
     }*/
 
+    if(env.no_cpu.toInteger() > 16) 
+    { 
+        try{
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/go_helloworld
+                    make SGX=1 check
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "go_helloworld Example Test Failed"'
+        }
+    }    
+
     try{
         timeout(time: 90, unit: 'MINUTES') {
             sh '''

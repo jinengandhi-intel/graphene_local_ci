@@ -15,6 +15,7 @@ node(node_label) {
             sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
             sh 'cp -rf $WORKSPACE/stress-ng CI-Examples/'
+            sh 'cp -rf $WORKSPACE/go_helloworld CI-Examples/'
             sh 'cp -rf ~/jenkins/sandstone-50-bin CI-Examples/'
             sh 'cp -f $WORKSPACE/test_workloads.py . '
             env.WORKSPACE = env.WORKSPACE + "/gramine"

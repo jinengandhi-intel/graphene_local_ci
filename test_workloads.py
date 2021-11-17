@@ -61,6 +61,13 @@ class Test_Workload_Results():
                 and ("row 3" in sqlite_contents) \
                 and ("row 2" in sqlite_contents) \
                 and ("row 1" in sqlite_contents))
+
+    @pytest.mark.skipif((int(no_cores) < 16),
+                    reason="Go_helloworld is enabled only on servers")
+    def test_go_helloworld_workload(self):
+        go_helloworld_result_file = open("CI-Examples/go_helloworld/OUTPUT", "r")
+        go_helloworld_contents = go_helloworld_result_file.read()
+        assert("Hello, world" in go_helloworld_contents)                
     
     @pytest.mark.skipif((int(no_cores) < 16 or sgx_mode != '1'),
                     reason="Sandstone is enabled on servers with SGX")

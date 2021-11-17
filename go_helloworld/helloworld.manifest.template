@@ -1,0 +1,25 @@
+# Hello World manifest file example
+
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "helloworld"
+loader.log_level = "{{ log_level }}"
+loader.argv0_override = "helloworld"
+loader.env.GOPATH = "/usr/lib/go-1.10:/usr/lib/go"
+loader.env.PATH = "/usr/lib/go-1.10/bin:/usr/lib/go/bin"
+
+loader.env.LD_LIBRARY_PATH = "/lib"
+
+fs.mount.lib.type = "chroot"
+fs.mount.lib.path = "/lib"
+fs.mount.lib.uri = "file:{{ gramine.runtimedir() }}"
+
+sgx.debug = true
+sgx.nonpie_binary = true
+sgx.enclave_size = "32G"
+sgx.thread_num = 256
+
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:helloworld",
+  "file:{{ gramine.runtimedir() }}/",
+]
