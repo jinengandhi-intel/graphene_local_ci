@@ -251,7 +251,6 @@ class TestRunner:
         # pylint: disable=subprocess-popen-preexec-fn
         proc = await asyncio.create_subprocess_exec(
             *cmd,
-            cwd=fspath(self.suite.bindir),
             stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             preexec_fn=os.setsid,
             close_fds=True)
@@ -296,7 +295,12 @@ class TestRunner:
         return proc
 
     async def run_test_setup(self):
-        exec_name = os.path.join(self.suite.bindir.resolve(), 
+        sgx_mode = os.environ.get('SGX')
+        if sgx_mode == '1':
+            binary_dir_ltp = "install-sgx/testcases/bin"
+        else:
+            binary_dir_ltp = "install/testcases/bin"
+        exec_name = os.path.join(binary_dir_ltp, 
         self.get_executable_name()).replace("run", "setup")
         cmd = [exec_name]
 
@@ -521,9 +525,6 @@ class TestSuite:
         self.sgx = self.config.getboolean(config.default_section, 'sgx')
 
         self.loader = 'gramine-sgx' if self.sgx else 'gramine-direct'
-
-        self.bindir = (
-            config.getpath(config.default_section, 'ltproot') / 'testcases/bin')
 
         # Running parallel tests under SGX is risky, see README.
         # However, if user wanted to do that, we shouldn't stand in the way,

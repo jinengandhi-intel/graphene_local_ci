@@ -1,30 +1,26 @@
-include makevars.mk
+ROOTDIR := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 
-target = $(INSTALLDIR)/INSTALL_SUCCESS build-manifest
-exec_target =
-
-clean-extra += clean-build
+BUILDDIR = $(ROOTDIR)/build
+INSTALLDIR = $(ROOTDIR)/install
+TESTCASEDIR = $(INSTALLDIR)/testcases/bin
+LTP_SCENARIO = "install/runtest/syscalls-new"
 SRCDIR = $(ROOTDIR)/ltp_src
+clean-extra += clean-build
+CFG = ltp_tests.cfg
+XML_FILE = ltp.xml	
 ifeq ($(SGX),1)
 	BUILDDIR:=$(BUILDDIR)-sgx
 	INSTALLDIR:=$(INSTALLDIR)-sgx
-	LTPROOT = install-sgx
-else
-	LTPROOT = install
+	LTP_SCENARIO = "install-sgx/runtest/syscalls-new"
+	CFG = ltp_tests.cfg ltp-sgx_tests.cfg ltp-bug-1075_tests.cfg
+	XML_FILE = ltp-sgx.xml	
 endif
 
 VERSION = $(shell uname -r)
 export VERSION
 
-include ../../../../Scripts/Makefile.rules
-include ../../../../Scripts/Makefile.configs
-# Make ARCH_LIBDIR visible in Makefile.Test
-export ARCH_LIBDIR
-include Makefile.Test
-
-ifeq ($(BUILD_VERBOSE),1)
-	RUNLTPOPTS += -v
-endif
+.PHONY: all
+all: $(INSTALLDIR)/INSTALL_SUCCESS manifests etc/nsswitch.conf etc/passwd
 
 $(SRCDIR)/Makefile:
 	$(error "$(SRCDIR) is empty. Please run `git submodule update --init $(SRCDIR)` or download the LTP source code (https://github.com/linux-test-project/ltp) into $(SRCDIR).")
@@ -53,33 +49,30 @@ $(INSTALLDIR)/INSTALL_SUCCESS: $(BUILDDIR)/BUILD_SUCCESS
 	ln -sf $(abspath Makefile_testcases.LTP) $(TESTCASEDIR)/Makefile
 	touch $@
 
-.PHONY: build-manifest
-build-manifest: $(TESTCASEDIR)/manifest.template $(INSTALLDIR)/INSTALL_SUCCESS
-	$(MAKE) -C $(TESTCASEDIR)
+.PHONY: manifests
+manifests: $(INSTALLDIR)/INSTALL_SUCCESS
+	gramine-test build
 
-$(TESTCASEDIR)/manifest.template: manifest.LTP $(INSTALLDIR)/INSTALL_SUCCESS
-	sed -e 's|$$(ARCH_LIBDIR)|'"$(ARCH_LIBDIR)"'|g; s|TESTCASEDIR|$(TESTCASEDIR)|g' \
-		$< > $@
+etc/nsswitch.conf:
+	mkdir -p etc
+	printf "passwd: compat\ngroup: compat\nshadow: compat\nhosts: files\n" > $@
 
-.PHONY: sgx-tokens
-sgx-tokens: build-manifest
-	$(MAKE) -C $(TESTCASEDIR) $@
+etc/passwd:
+	mkdir -p etc
+	printf "root:x:0:0:root:/root:/bin/bash\nnobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin\n" > $@
 
 .PHONY: regression
-regression:
-ifeq ($(SGX),1)
-	$(RM) ltp-sgx.xml
-	$(MAKE) ltp-sgx.xml
-else
-	$(RM) ltp.xml
-	$(MAKE) ltp.xml
-endif
+regression: manifests
+	LTP_CONFIG="$(CFG)" LTP_SCENARIO=$(LTP_SCENARIO) python3 -m pytest -v --junit-xml="$(XML_FILE)"
 
-%.xml: $(LTPCFG) $(target) $(INSTALLDIR)/INSTALL_SUCCESS
-	./contrib/conf_lint.py $(LTPCFG) --scenario $(LTPTESTFILE)
-	./runltp_tests.py $(RUNLTPOPTS) $(foreach cfg,$(LTPCFG),-c $(cfg)) $(LTPTESTFILE) -o ltproot=$(LTPROOT) -O $@
-
-.PHONY: clean-build
-clean-build:
+.PHONY: clean
+clean:
+	if test -f $(INSTALLDIR)/INSTALL_SUCCESS; then gramine-test clean; fi
 	$(MAKE) -C $(SRCDIR) clean
-	$(RM) -r build* install* ltp*.xml
+	$(RM) -r \
+		$(BUILDDIR) \
+		$(INSTALLDIR) \
+		ltp*.xml \
+		etc/ \
+		.pytest_cache \
+		__pycache__

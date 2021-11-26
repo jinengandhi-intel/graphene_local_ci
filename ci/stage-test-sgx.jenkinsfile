@@ -5,10 +5,9 @@ stage('test-sgx') {
             timeout(time: 60, unit: 'MINUTES') {
                 sh '''
                     cd LibOS/shim/test/ltp
-                    make ${MAKEOPTS} -f Makefile.LTP SGX=1 all LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
-                    bash update_manifest.sh
-                    make ${MAKEOPTS} -f Makefile.LTP SGX=1 sgx-tokens LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
-                    make -f Makefile.LTP ltp-sgx_results_1.xml SGX=1 LTPCFG="$CFG" LTPTESTFILE=$PWD$LTPSCENARIO
+                    cp -f toml_files/tests_sgx.toml tests.toml
+                    make ${MAKEOPTS} -f Makefile.LTP SGX=1 all 
+                    make ${MAKEOPTS} -f Makefile.LTP SGX=1 regression
                 '''
                 /*
                 sh '''
@@ -23,8 +22,8 @@ stage('test-sgx') {
             env.build_ok = false
             sh 'echo "LTP Test Failed"'
         } finally {
-            archiveArtifacts 'LibOS/shim/test/ltp/ltp-sgx_results_*.xml'
-            junit 'LibOS/shim/test/ltp/ltp-sgx_results_*.xml'
+            archiveArtifacts 'LibOS/shim/test/ltp/ltp-sgx.xml'
+            junit 'LibOS/shim/test/ltp/ltp-sgx.xml'
         }
     }
 
