@@ -4,8 +4,9 @@ stage('test-direct') {
         timeout(time: 30, unit: 'MINUTES') {
             sh '''
                 cd LibOS/shim/test/ltp
-                make ${MAKEOPTS} -f Makefile.LTP all LTPCFG=$CFG LTPTESTFILE=$PWD$LTPSCENARIO
-                make -f Makefile.LTP ltp_results_1.xml LTPCFG=$CFG LTPTESTFILE=$PWD$LTPSCENARIO
+                cp -f toml_files/tests_direct.toml tests.toml
+                make ${MAKEOPTS} -f Makefile.LTP all 
+                make ${MAKEOPTS} -f Makefile.LTP regression
             '''
             /*
             sh '''
@@ -20,8 +21,8 @@ stage('test-direct') {
         env.build_ok = false
         sh 'echo "LTP Test Failed"'
     } finally {
-        archiveArtifacts 'LibOS/shim/test/ltp/ltp_results_*.xml'
-        junit 'LibOS/shim/test/ltp/ltp_results_*.xml'
+        archiveArtifacts 'LibOS/shim/test/ltp/ltp.xml'
+        junit 'LibOS/shim/test/ltp/ltp.xml'
     }
 
     try{
