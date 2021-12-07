@@ -1,5 +1,7 @@
 stage('build') {
-
+    if (env.CC == 'clang') {
+        env.MESON_OPTIONS += ' -Dmusl=disabled'
+    }
     script {
         if (env.build_type == "manual") {
             try {
@@ -10,7 +12,8 @@ stage('build') {
                         -Dskeleton=enabled \
                         -Ddirect=enabled \
                         -Dtests=enabled \
-                        -Dsgx=disabled > meson_cmd_output.txt
+                        -Dsgx=disabled \
+                        $MESON_OPTIONS > meson_cmd_output.txt
                     ninja -vC build > ninja_build_log.txt
                     ninja -vC build install > ninja_install_log.txt
                 '''
