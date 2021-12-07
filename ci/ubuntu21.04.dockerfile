@@ -41,6 +41,8 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libjudy-dev \
     libpixman-1-dev \
     libipsec-mb-dev \
+    musl \
+    musl-tools \    
     net-tools \
     netcat-openbsd \
     ninja-build \

@@ -51,6 +51,27 @@ stage('test') {
             junit 'LibOS/shim/test/regression/libos-regression.xml'
         }
 
+        if (env.CC != "clang") {
+            timeout(time: 15, unit: 'MINUTES') {
+                try {
+                    sh '''
+                        export GRAMINE_MUSL=1
+                        cd LibOS/shim/test/regression
+                        # For some unknown reason it fails without this clean on sgx-18.04 pipeline
+                        gramine-test clean
+                        RA_CLIENT_SPID=${ra_client_spid} gramine-test -n tests_musl.toml build -v
+                        python3 -m pytest -v --junit-xml libos-regression-musl.xml
+                    '''
+                } catch (Exception e){
+                    env.build_ok = false
+                    sh 'echo "LibOS Test with musl Failed"'
+                }
+                finally {
+                    junit 'LibOS/shim/test/regression/libos-regression-musl.xml'
+                }
+            }
+        }
+
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''

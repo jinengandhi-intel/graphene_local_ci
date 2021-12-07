@@ -41,6 +41,8 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libpixman-1-dev \
     libipsec-mb-dev \
     linux-headers-4.15.0-20-generic \
+    musl \
+    musl-tools \
     net-tools \
     netcat-openbsd \
     ninja-build \
