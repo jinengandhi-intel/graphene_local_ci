@@ -115,6 +115,24 @@ def list_tests(ltp_config=LTP_CONFIG, ltp_scenario=LTP_SCENARIO):
         section = config.get(tag)
         yield tag, cmd, section
 
+def woken_up_valid_check(woken_string_result):
+    if (woken_string_result):
+        flag_woken_issue = False
+        for entry in woken_string_result:
+            find_num = re.findall(r'\d+', entry)
+            if (find_num):
+                num_list = list(map(int, find_num))
+                num_list_1 = num_list[0]
+                num_list_2 = num_list[1]
+                if ( num_list_1 > 50000 and num_list_2 > 50000 ):
+                    return False                        
+                else:
+                    flag_woken_issue = True
+                    continue
+        if (flag_woken_issue == True):
+            return True
+    else:
+        return True
 
 def parse_test_output(stdout, _stderr):
     """Parse LTP stdout to determine passed/failed subtests.
@@ -126,6 +144,9 @@ def parse_test_output(stdout, _stderr):
     failed = set()
     conf = set()
     subtest = 0
+    woken_string = re.compile(r'woken up early | \[\d+\,\d+\]')
+    woken_string_result  = woken_string.findall(stdout)
+    woken_up_valid = woken_up_valid_check(woken_string_result)
     system_error_output_value = check_system_error_output(_stderr)
     for line in stdout.splitlines():
         if line == 'Summary':
@@ -147,12 +168,13 @@ def parse_test_output(stdout, _stderr):
         else:
             subtest += 1
 
-        if 'TPASS' in line or 'PASS:' in line and (system_error_output_value == True):
+        if 'TPASS' in line or 'PASS:' in line and (system_error_output_value == True) and (woken_up_valid == True):
             passed.add(subtest)
-        elif (any(t in line for t in ['TFAIL', 'FAIL:', 'TBROK', 'BROK:']) and (system_error_output_value == True)):
+        elif (any(t in line for t in ['TFAIL', 'FAIL:', 'TBROK', 'BROK:']) and (system_error_output_value == True) and (woken_up_valid == True)):
             failed.add(subtest)
-        elif ('TCONF' in line or 'CONF' in line and (system_error_output_value == True)):
+        elif ('TCONF' in line or 'CONF' in line and (system_error_output_value == True) and (woken_up_valid == True)):
             conf.add(subtest)
+        
     return passed, failed, conf
 
 

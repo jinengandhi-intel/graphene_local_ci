@@ -4,7 +4,7 @@ node(node_label) {
     try {
         stage('checkout'){
             dir ('./') {
-                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'               
+                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
             }
 
             dir ("gramine") {
