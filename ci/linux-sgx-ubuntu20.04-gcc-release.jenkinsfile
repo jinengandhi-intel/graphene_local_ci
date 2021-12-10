@@ -4,8 +4,7 @@ node(node_label) {
     try {
         stage('checkout'){
             dir ('./') {
-                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git',
-                branch: 'aniket/meson_LTP'
+                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
             }
 
             dir ("gramine") {
@@ -45,9 +44,9 @@ node(node_label) {
                 load '.ci/lib/config-release.jenkinsfile'
 
                 load '../ci/stage-build-sgx.jenkinsfile'
-                // load '../ci/stage-test.jenkinsfile'
+                load '../ci/stage-test.jenkinsfile'
                 load '../ci/stage-test-sgx.jenkinsfile'
-                // load '../ci/stage-test-stress-ng.jenkinsfile'
+                load '../ci/stage-test-stress-ng.jenkinsfile'
             }
         }
     } finally {
