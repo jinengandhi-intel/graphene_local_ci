@@ -60,7 +60,7 @@ int main(void)
 	setup();
 
 	for (lc = 0; TEST_LOOPING(lc); lc++) {
-		buf = mmap(NULL, file_len, PROT_WRITE, MAP_SHARED, fd, 0);
+		buf = mmap(NULL, file_len, PROT_WRITE, MAP_PRIVATE, fd, 0);
 
 		if (buf == MAP_FAILED)
 			tst_brkm(TBROK | TERRNO, cleanup, "mmap");
