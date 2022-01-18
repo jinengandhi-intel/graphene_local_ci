@@ -415,7 +415,7 @@ getcwd03_run getcwd03_run
 getcwd04 getcwd04
 
 #getdents01_run getdents01_run
-#getdents02 getdents02
+getdents02 getdents02
 
 #getdents01_run_64 getdents01_run -l
 #getdents02_64 getdents02 -l
