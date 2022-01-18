@@ -182,12 +182,6 @@ def check_must_pass(passed, failed, must_pass, conf):
     """Verify the test results based on `must-pass` specified in configuration file."""
 
     # No `must-pass` means all tests must pass
-    if not must_pass:
-        if failed:
-            pytest.fail('Failed subtests: {}'.format(failed))
-        elif conf and not passed:
-            pytest.fail('Only TCONF found: {}'.format(failed))            
-        return
 
     must_pass_passed = set()
     must_pass_failed = set()
@@ -261,8 +255,15 @@ def test_ltp(cmd, section):
     logging.info('returncode: %s', returncode)
     logging.info('passed: %s', list(passed))
     logging.info('failed: %s', list(failed))
-
-    if must_pass:
+    logging.info('Conf: %s', list(conf))
+    
+    if not must_pass:
+        if failed:
+            pytest.fail('Failed subtests: {}'.format(failed))
+        elif conf and not passed:
+            pytest.fail('Only TCONF found: {}'.format(failed))            
+        return
+    else:
         check_must_pass(passed, failed, must_pass, conf)
 
 
