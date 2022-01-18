@@ -35,7 +35,8 @@ node (node_label) {
                 $WORKSPACE/LibOS/shim/test/ltp/manifest.LTP'
                 
             sh 'sed -i \'s/bash -c "ls"/bash -c "free"/g\' CI-Examples/bash/Makefile'
-            sh 'sed -i \'s/readlink/total/g\' test_workloads.py'                
+            sh 'sed -i \'s/readlink/total/g\' test_workloads.py'
+            sh 'sed -i \'/sgx.trusted_files/ a "file:{{ arch_libdir }}/libtinfo.so.6",\' LibOS/shim/test/ltp/manifest.template'
 
             load '../ci/config-docker.jenkinsfile'
             docker.build(
