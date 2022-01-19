@@ -146,8 +146,7 @@ def parse_test_output(stdout, _stderr):
     subtest = 0
     woken_string = re.compile(r'woken up early | \[\d+\,\d+\]')
     woken_string_result  = woken_string.findall(stdout)
-    woken_up_valid = woken_up_valid_check(woken_string_result)
-    system_error_output_value = check_system_error_output(_stderr)
+
     for line in stdout.splitlines():
         if line == 'Summary':
             break
@@ -168,17 +167,25 @@ def parse_test_output(stdout, _stderr):
         else:
             subtest += 1
 
-        if 'TPASS' in line or 'PASS:' in line and (system_error_output_value == True) and (woken_up_valid == True):
+        if 'TPASS' in line or 'PASS:' in line:
             passed.add(subtest)
-        elif (any(t in line for t in ['TFAIL', 'FAIL:', 'TBROK', 'BROK:']) and (system_error_output_value == True) and (woken_up_valid == True)):
+        elif (any(t in line for t in ['TFAIL', 'FAIL:', 'TBROK', 'BROK:']) and not woken_string_result):
             failed.add(subtest)
-        elif ('TCONF' in line or 'CONF' in line and (system_error_output_value == True) and (woken_up_valid == True)):
+        elif (woken_string_result):
+            woken_up_valid = woken_up_valid_check(woken_string_result)
+            if (woken_up_valid == True):
+                passed.add(subtest)
+            else:
+                failed.add(subtest)
+        elif ('TCONF' in line or 'CONF' in line):
             conf.add(subtest)
         
-    return passed, failed, conf
+    system_error_output_valid = check_system_error_output_valid(_stderr)
+
+    return passed, failed, conf, system_error_output_valid
 
 
-def check_must_pass(passed, failed, must_pass, conf):
+def check_must_pass(passed, failed, must_pass, conf, system_error_output_valid):
     """Verify the test results based on `must-pass` specified in configuration file."""
 
     # No `must-pass` means all tests must pass
@@ -204,7 +211,10 @@ def check_must_pass(passed, failed, must_pass, conf):
     if not passed and not conf:
         pytest.fail('All subtests skipped, replace must-pass with skip')
 
-def check_system_error_output(_stderr):
+    if (system_error_output_valid == False) :
+        pytest.fail("Error due to invalid system error output")        
+
+def check_system_error_output_valid(_stderr):
     error_list = []
     error_list = _stderr.split("\n")
     for error in error_list:
@@ -250,7 +260,7 @@ def test_ltp(cmd, section):
     # Parse output regardless of whether `must_pass` is specified: unfortunately some tests
     # do not exit with non-zero code when failing, because they rely on `MAP_SHARED` (which
     # we do not support correctly) for collecting test results.
-    passed, failed, conf = parse_test_output(stdout, _stderr)
+    passed, failed, conf, system_error_output_valid = parse_test_output(stdout, _stderr)
 
     logging.info('returncode: %s', returncode)
     logging.info('passed: %s', list(passed))
@@ -261,10 +271,12 @@ def test_ltp(cmd, section):
         if failed:
             pytest.fail('Failed subtests: {}'.format(failed))
         elif conf and not passed:
-            pytest.fail('Only TCONF found: {}'.format(failed))            
+            pytest.fail('Only TCONF found: {}'.format(failed))
+        elif (system_error_output_valid == False):
+            pytest.fail("Error due to invalid system error output")                             
         return
     else:
-        check_must_pass(passed, failed, must_pass, conf)
+        check_must_pass(passed, failed, must_pass, conf, system_error_output_valid)
 
 
 def test_lint():
