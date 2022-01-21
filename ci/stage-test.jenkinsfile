@@ -17,6 +17,7 @@ stage('test') {
             env.build_ok = false
             sh 'echo "PAL Test Failed"'
         } finally {
+            archiveArtifacts 'Pal/regression/pal-regression.xml'
             junit 'Pal/regression/pal-regression.xml'
         }
 
@@ -48,6 +49,7 @@ stage('test') {
             env.build_ok = false
             sh 'echo "LibOS Test Failed"'
         } finally {
+            archiveArtifacts 'LibOS/shim/test/regression/libos-regression.xml'
             junit 'LibOS/shim/test/regression/libos-regression.xml'
         }
 
@@ -83,6 +85,7 @@ stage('test') {
                     sh 'echo "LibOS Test with musl Failed"'
                 }
                 finally {
+                    archiveArtifacts 'LibOS/shim/test/regression/libos-regression-musl.xml'
                     junit 'LibOS/shim/test/regression/libos-regression-musl.xml'
                 }
             }
@@ -105,6 +108,7 @@ stage('test') {
             env.build_ok = false
             sh 'echo "LibOS Test Failed"'
         } finally {
+            archiveArtifacts 'LibOS/shim/test/fs/fs.xml'
             junit 'LibOS/shim/test/fs/*.xml'
         }
     }
