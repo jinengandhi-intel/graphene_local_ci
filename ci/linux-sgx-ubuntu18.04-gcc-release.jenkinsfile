@@ -8,7 +8,9 @@ node (node_label) {
             }
 
             dir ("gramine") {
-                git url: 'https://github.com/gramineproject/gramine.git'            }
+                git url: 'https://github.com/gramineproject/gramine.git',
+                branch: 'vijaydhanraj:vdhanraj/refactor_sysfs_part2'
+            }
         }
 
         dir ("gramine") {
