@@ -75,3 +75,10 @@ class Test_Workload_Results():
         sandstone_result_file = open("CI-Examples/sandstone-50-bin/OUTPUT.txt", "r")
         sandstone_contents = sandstone_result_file.read()
         assert(("Loop iteration 1 finished" in sandstone_contents) and ("exit: pass" in sandstone_contents))
+
+    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+                    reason="Rust enabled only for Ubuntu configurations.")
+    def test_rust_workload(self):
+        rust_result_file = open("CI-Examples/rust_helloworld/OUTPUT.txt", "r")
+        rust_contents = rust_result_file.read()
+        assert("Hello World!" in rust_contents)        
