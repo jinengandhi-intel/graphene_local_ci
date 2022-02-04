@@ -1,0 +1,29 @@
+loader.preload = "file:{{ gramine.libos }}"
+libos.entrypoint = "{{ self_exe }}"
+loader.argv0_override = "{{ self_exe }}"
+#loader.log_level = "trace"
+
+# Currently required for Tokio (eventfd is done by the host not the enclave, so less secure)
+sys.insecure__allow_eventfd = true
+
+loader.env.LD_LIBRARY_PATH = "{{ libdir }}"
+loader.env.RUST_BACKTRACE = "1"
+loader.env.RUST_LIB_BACKTRACE = "1"
+
+fs.mount.lib2.type = "chroot"
+fs.mount.lib2.path = "{{ libdir }}"
+fs.mount.lib2.uri = "file:{{ libdir }}"
+
+
+sgx.trusted_files = [
+  "file:{{ self_exe }}",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+  "file:{{ libdir }}/libgcc_s.so.1",
+  "file:{{ libdir }}/libpthread.so.0",
+  "file:{{ libdir }}/libdl.so.2",
+  "file:{{ libdir }}/libc.so.6",
+  "file:/lib/x86_64-linux-gnu/librt.so.1",
+]
+
+

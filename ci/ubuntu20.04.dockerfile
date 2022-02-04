@@ -97,12 +97,15 @@ RUN adduser intel sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 RUN echo 'Acquire::http::proxy "http://proxy-dmz.intel.com:911/"; Acquire::https::proxy "http://proxy-dmz.intel.com:912/"; Acquire::ftp::proxy "ftp://proxy-dmz.intel.com:911/";' >> /etc/apt/apt.conf.d/proxy.conf
 
-
 # Blow away any random state
 RUN rm -f /intel/.rnd
 
 # Make a directory for the intel driver
 RUN mkdir -p /opt/intel && chown 1000 /opt/intel
+RUN mkdir -p /home/intel/rust_binaries && chown 1000 /home/intel/rust_binaries
+ENV CARGO_HOME="/home/intel/rust_binaries"
+ENV RUSTUP_HOME="/home/intel/rust_binaries"
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
 
 # Make a directory for the Gramine installation
 RUN mkdir -p /home/intel/gramine_install && chown 1000 /home/intel/gramine_install
@@ -112,7 +115,6 @@ WORKDIR /intel
 
 # Specify the user to execute all commands below
 USER intel
-
 # Set environment variables.
 ENV HOME /intel
 
