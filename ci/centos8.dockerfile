@@ -4,6 +4,9 @@ From centos:8
 ENV http_proxy "http://proxy-dmz.intel.com:911"
 ENV https_proxy "http://proxy-dmz.intel.com:912"
 
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&\
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* 
+
 RUN sed 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo  | tee /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
 RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
 
