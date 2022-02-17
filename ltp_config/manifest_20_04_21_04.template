@@ -1,0 +1,94 @@
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "{{ entrypoint }}"
+
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/lib:/usr/lib64"
+loader.env.PATH = "/bin:/usr/bin:."
+loader.env.LD_PRELOAD = "{{ coreutils_libdir }}/libstdbuf.so"
+loader.env._STDBUF_O = "L"
+loader.insecure__use_cmdline_argv = true
+
+fs.root.type = "chroot"
+fs.root.uri = "file:{{ binary_dir }}"
+
+fs.mount.etc.type = "chroot"
+fs.mount.etc.path = "etc"
+fs.mount.etc.uri = "file:etc"
+
+fs.mount.bin.type = "chroot"
+fs.mount.bin.path = "/bin"
+fs.mount.bin.uri = "file:/bin"
+
+fs.mount.boot.type = "chroot"
+fs.mount.boot.path = "/boot"
+fs.mount.boot.uri = "file:/boot"
+
+fs.mount.proc.type = "chroot"
+fs.mount.proc.path = "/proc"
+fs.mount.proc.uri = "file:/proc"
+
+fs.mount.shm.type = "chroot"
+fs.mount.shm.path = "/dev/shm"
+fs.mount.shm.uri = "file:/tmp"
+
+fs.mount.lib.type = "chroot"
+fs.mount.lib.path = "/lib"
+fs.mount.lib.uri = "file:{{ gramine.runtimedir() }}"
+
+fs.mount.lib64.type = "chroot"
+fs.mount.lib64.path = "{{ arch_libdir }}"
+fs.mount.lib64.uri = "file:{{ arch_libdir }}"
+
+fs.mount.usr.type = "chroot"
+fs.mount.usr.path = "/usr"
+fs.mount.usr.uri = "file:/usr"
+
+fs.mount.tmp.type = "chroot"
+fs.mount.tmp.path = "/tmp"
+fs.mount.tmp.uri = "file:/tmp"
+
+fs.mount.dmalatency.type = "chroot"
+fs.mount.dmalatency.path="/dev/cpu_dma_latency"
+fs.mount.dmalatency.uri="file:/dev/cpu_dma_latency"
+
+fs.experimental__enable_sysfs_topology = true
+sys.brk.max_size = "32M"
+sys.stack.size = "4M"
+sgx.nonpie_binary = true
+sgx.debug = true
+sgx.thread_num = 13
+
+sgx.allowed_files = [
+    "file:/tmp",
+    "file:etc",
+    "file:{{ gramine.runtimedir() }}",
+    "file:/bin",
+    "file:/proc",
+    "file:{{ gramine.runtimedir() }}/libnss_compat.so.2",
+    "file:{{ arch_libdir }}/libnss_compat.so.2",
+    "file:{{ arch_libdir }}/libnss_systemd.so.2",
+    "file:install-sgx/testcases/bin/pipe2_02_child",
+    "file:install-sgx/testcases/bin/execvp01_child",
+    "file:install-sgx/testcases/bin/execv01_child",
+    "file:install-sgx/testcases/bin/execlp01_child",
+    "file:install-sgx/testcases/bin/execl01_child",
+    "file:/dev/cpu_dma_latency",
+]
+
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ binary_dir }}/{{ entrypoint }}",
+  "file:{{ gramine.runtimedir() }}/ld-linux-x86-64.so.2",
+  "file:{{ gramine.runtimedir() }}/libc.so.6",
+  "file:{{ gramine.runtimedir() }}/libdl.so.2",
+  "file:{{ gramine.runtimedir() }}/libm.so.6",
+  "file:{{ gramine.runtimedir() }}/libpthread.so.0",
+  "file:{{ gramine.runtimedir() }}/librt.so.1",
+  "file:{{ coreutils_libdir }}/libstdbuf.so",
+  "file:{{ gramine.runtimedir() }}/libnss_files.so.2",
+  "file:{{ arch_libdir }}/libnss_files.so.2",
+  "file:{{ arch_libdir }}/libselinux.so.1",
+  "file:{{ arch_libdir }}/libacl.so.1",
+  "file:{{ arch_libdir }}/libattr.so.1",
+  "file:{{ arch_libdir }}/libpcre2-8.so.0",
+  "file:{{ arch_libdir }}/libtinfo.so.6",
+]
