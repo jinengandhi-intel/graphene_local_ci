@@ -27,13 +27,6 @@ node(node_label) {
             sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
                 $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
 
-            sh 'sed -i \'48 a fs.mount.dmalatency.type = "chroot"\\n \
-                fs.mount.dmalatency.path="/dev/cpu_dma_latency"\\n \
-                fs.mount.dmalatency.uri="file:/dev/cpu_dma_latency" \' \
-                $WORKSPACE/LibOS/shim/test/ltp/manifest.template'
-
-            sh 'sed -i \'/sgx.allowed_files/ a "file:/dev/cpu_dma_latency",\' LibOS/shim/test/ltp/manifest.template'
-
             sh 'sed -i \'s/bash -c "ls"/bash -c "free"/g\' CI-Examples/bash/Makefile'
             sh 'sed -i \'s/readlink/total/g\' test_workloads.py'
             
