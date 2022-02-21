@@ -220,28 +220,29 @@ def check_must_pass(passed, failed, must_pass, conf, system_error_output_valid):
 
 def check_system_error_output_valid(_stderr):
     error_list = []
-    error_list = _stderr.split("\n")
+    error_list = _stderr.split("error:")
     for error in error_list:
         if error == "":
-            return True
-        elif "Using insecure argv source" in error or \
-            "error: Mounting file:/proc may expose unsanitized" in error or \
-            "error: Failed to read ELF header" in error or \
+            ret_code = True
+            continue
+        elif "Mounting file:/proc may expose unsanitized" in error or \
+            "[P1:T1:]" in error or \
+            "Failed to read ELF header" in error or \
             "Disallowing access to file '/usr/bin/systemd-detect-virt'" in error or \
             "Disallowing access to file '/lib64/libnss_nis.so.2'" in error or \
             "Disallowing access to file '/usr/lib64/libnss_nis.so.2'" in error or \
             "Disallowing access to file '/lib64/libtinfo.so.6'" in error or \
             "Disallowing access to file '/usr/lib64/libtinfo.so.6'" in error or \
-            "Detected deprecated syntax. Consider switching to new syntax: 'sgx.allowed_files" in error or \
-            "-" in error or \
-            "Gramine detected the following insecure configurations:" in error or \
-            "Gramine will continue application execution, but this configuration must not be used in production!" in error or \
-            'WARNING! "allowed_files" is an insecure feature designed for debugging and prototyping, it must never be used in production!' in error or \
-            "error: Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error or \
-            "Disallowing access to file '/lib/x86_64-linux-gnu/libnss_nis.so.2" in error :
-            return True
+            "Detected deprecated syntax" in error or \
+            "Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error or \
+            "Sending IPC process-exit notification failed: -13" in error or \
+            "Disallowing access to file '/lib/x86_64-linux-gnu/libnss_nis.so.2" in error :        
+            ret_code = True
+            continue
         else:
+            ret_code = False
             return False
+    return ret_code
 
 def test_ltp(cmd, section):
     must_pass = section.getintset('must-pass')
