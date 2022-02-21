@@ -7,48 +7,19 @@ loader.env.LD_PRELOAD = "{{ coreutils_libdir }}/libstdbuf.so"
 loader.env._STDBUF_O = "L"
 loader.insecure__use_cmdline_argv = true
 
-fs.root.type = "chroot"
 fs.root.uri = "file:{{ binary_dir }}"
 
-fs.mount.etc.type = "chroot"
-fs.mount.etc.path = "etc"
-fs.mount.etc.uri = "file:etc"
-
-fs.mount.bin.type = "chroot"
-fs.mount.bin.path = "/bin"
-fs.mount.bin.uri = "file:/bin"
-
-fs.mount.boot.type = "chroot"
-fs.mount.boot.path = "/boot"
-fs.mount.boot.uri = "file:/boot"
-
-fs.mount.proc.type = "chroot"
-fs.mount.proc.path = "/proc"
-fs.mount.proc.uri = "file:/proc"
-
-fs.mount.shm.type = "chroot"
-fs.mount.shm.path = "/dev/shm"
-fs.mount.shm.uri = "file:/tmp"
-
-fs.mount.lib.type = "chroot"
-fs.mount.lib.path = "/lib"
-fs.mount.lib.uri = "file:{{ gramine.runtimedir() }}"
-
-fs.mount.lib64.type = "chroot"
-fs.mount.lib64.path = "{{ arch_libdir }}"
-fs.mount.lib64.uri = "file:{{ arch_libdir }}"
-
-fs.mount.usr.type = "chroot"
-fs.mount.usr.path = "/usr"
-fs.mount.usr.uri = "file:/usr"
-
-fs.mount.tmp.type = "chroot"
-fs.mount.tmp.path = "/tmp"
-fs.mount.tmp.uri = "file:/tmp"
-
-fs.mount.dmalatency.type = "chroot"
-fs.mount.dmalatency.path="/dev/cpu_dma_latency"
-fs.mount.dmalatency.uri="file:/dev/cpu_dma_latency"
+fs.mount = [  
+  { path = "etc", uri = "file:etc" },
+  { path = "/bin", uri = "file:/bin" },
+  { path = "/boot", uri = "file:/boot" },
+  { path = "/proc", uri = "file:/proc" },
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+  { path = "/usr", uri = "file:/usr" },
+  { path = "/tmp", uri = "file:/tmp" },
+  { path = "/dev/cpu_dma_latency", uri = "file:/dev/cpu_dma_latency" },
+]
 
 fs.experimental__enable_sysfs_topology = true
 sys.brk.max_size = "32M"
