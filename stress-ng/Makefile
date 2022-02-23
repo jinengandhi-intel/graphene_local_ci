@@ -2,7 +2,6 @@
 THIS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
 #GRAMINEDIR = ../..
 GRAMINEDIR ?= $(THIS_DIR)../..
-SGX_SIGNER_KEY ?= $(GRAMINEDIR)/Pal/src/host/Linux-SGX/signer/enclave-key.pem
 
 ifeq ($(DEBUG),1)
 GRAMINE_LOG_LEVEL = debug
@@ -26,7 +25,6 @@ stress-ng.manifest: stress-ng.manifest.template
 
 stress-ng.manifest.sgx: stress-ng.manifest
 			gramine-sgx-sign \
-			--key $(SGX_SIGNER_KEY) \
 			--manifest $< --output $@
 
 stress-ng.sig: stress-ng.manifest.sgx
