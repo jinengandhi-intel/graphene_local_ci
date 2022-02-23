@@ -5,7 +5,6 @@ all: all clean build-release rust-release sign-release get-token-release
 endif
 
 PROJNAME=hello
-SGX_SIGNER_KEY ?= ../../Pal/src/host/Linux-SGX/signer/enclave-key.pem
 
 rust-release:
 	cargo build --release
@@ -21,8 +20,7 @@ build-release: target/release/${PROJNAME}.manifest
 
 
 target/release/${PROJNAME}.manifest.sgx: target/release/${PROJNAME}.manifest
-	gramine-sgx-sign --key ${SGX_SIGNER_KEY} \
-					--manifest $(@D)/$(<F) \
+	gramine-sgx-sign --manifest $(@D)/$(<F) \
 					--output $(@D)/$(<F).sgx \
 
 target/release/${PROJNAME}.sig: target/release/${PROJNAME}.manifest.sgx
