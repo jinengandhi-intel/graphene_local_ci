@@ -67,6 +67,7 @@ RUN yum update -y \
         protobuf-c-compiler \
         python3 \
         python3-click \
+        python3-cryptography \
         python3-jinja2 \
         python3-lxml \
         python3-numpy \ 

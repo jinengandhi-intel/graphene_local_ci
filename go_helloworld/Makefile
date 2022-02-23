@@ -1,5 +1,3 @@
-SGX_SIGNER_KEY ?= ../../Pal/src/host/Linux-SGX/signer/enclave-key.pem
-
 ifeq ($(DEBUG),1)
 GRAMINE_LOG_LEVEL = trace
 else
@@ -21,10 +19,7 @@ helloworld.manifest: helloworld.manifest.template
 		$< $@
 
 helloworld.manifest.sgx: helloworld.manifest helloworld
-	@test -s $(SGX_SIGNER_KEY) || \
-	    { echo "SGX signer private key was not found, please specify SGX_SIGNER_KEY!"; exit 1; }
 	gramine-sgx-sign \
-		--key $(SGX_SIGNER_KEY) \
 		--manifest $< \
 		--output $@
 

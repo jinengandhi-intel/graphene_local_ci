@@ -10,10 +10,9 @@ loader.env.LD_LIBRARY_PATH = "{{ libdir }}"
 loader.env.RUST_BACKTRACE = "1"
 loader.env.RUST_LIB_BACKTRACE = "1"
 
-fs.mount.lib2.type = "chroot"
-fs.mount.lib2.path = "{{ libdir }}"
-fs.mount.lib2.uri = "file:{{ libdir }}"
-
+fs.mounts = [
+  { path = "{{ libdir }}", uri = "file:{{ libdir }}" },
+]
 
 sgx.trusted_files = [
   "file:{{ self_exe }}",

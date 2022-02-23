@@ -9,7 +9,7 @@ loader.insecure__use_cmdline_argv = true
 
 fs.root.uri = "file:{{ binary_dir }}"
 
-fs.mount = [  
+fs.mounts = [  
   { path = "etc", uri = "file:etc" },
   { path = "/bin", uri = "file:/bin" },
   { path = "/boot", uri = "file:/boot" },
