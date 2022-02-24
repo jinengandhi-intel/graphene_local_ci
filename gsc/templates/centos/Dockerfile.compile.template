@@ -36,6 +36,7 @@ RUN dnf update -y \
         pkg-config \
         python3-pip \
         python3-protobuf \
+        python3-cryptography \
         rpm-build \
         wget \
     && python3 -B -m pip install --proxy=http://proxy-dmz.intel.com:911 'toml>=0.10' 'meson>=0.55'
