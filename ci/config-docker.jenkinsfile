@@ -1,5 +1,7 @@
 env.PREFIX = '/home/intel/gramine_install/usr'
 
+env.PATH = env.PREFIX + '/bin:' + env.PATH
+
 // don't mess with PATH before reading this: https://issues.jenkins.io/browse/JENKINS-49076
 env.DOCKER_ARGS_COMMON = """
     --device=/dev/kmsg:/dev/kmsg

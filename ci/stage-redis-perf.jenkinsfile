@@ -1,0 +1,36 @@
+stage('redis-perf') {
+    env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
+    try {
+        timeout(time: 30, unit: 'MINUTES') {
+            sh '''
+                export SSHPASS=intel@123
+                cd CI-Examples/redis/redis_server_scripts
+                config_array=($config_list)
+
+                for config in `echo ${config_array[*]}`
+                    do
+                        echo ${config}
+                        python3 ./redis_launch.py -f run_redis -c ${config}
+                        sshpass -e ssh intel@10.66.234.110 "cd /home/intel/jenkins/redis_client_scripts && ./start_benchamark.sh ${config} $BUILD_ID $data_size $read_write_ratio"
+                        python3 ./redis_launch.py -f kill_redis -c ${config}
+                        sleep 5
+                    done
+
+                # python3 ./redis_launch.py -f run_redis -c graphene_sgx_single_thread
+                # sshpass -e ssh intel@10.66.234.110 "cd /home/intel/jenkins/redis_client_scripts && ./start_benchamark.sh graphene_sgx_single_thread $BUILD_ID $data_size $read_write_ratio"
+                # python3 ./redis_launch.py -f kill_redis -c graphene_sgx_single_thread
+                # sleep 5
+
+                # python3 ./redis_launch.py -f run_redis -c graphene
+                # sshpass -e ssh intel@10.66.234.110 "cd /home/intel/jenkins/redis_client_scripts && ./start_benchamark.sh graphene $BUILD_ID $data_size $read_write_ratio"
+                # python3 ./redis_launch.py -f kill_redis -c graphene
+
+                sshpass -e scp -r intel@10.66.234.110:/home/intel/redis-6.0.6/log/set/$BUILD_ID/*.csv .
+                ls
+            '''
+        }
+    } finally {
+        archiveArtifacts 'CI-Examples/redis/redis_server_scripts/*.csv'
+    }
+} 
+    
