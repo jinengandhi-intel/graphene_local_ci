@@ -6,14 +6,13 @@ stage('build') {
         if (env.build_type == "manual") {
             try {
                 sh '''
-                    meson build \
-                        --werror \
+                    meson setup build/ \
                         --prefix="$PREFIX" \
                         --buildtype="$BUILDTYPE" \
                         -Dskeleton=enabled \
                         -Ddirect=enabled \
-                        -Dtests=enabled \
                         -Dsgx=disabled \
+                        -Dtests=enabled \
                         $MESON_OPTIONS > meson_cmd_output.txt
                     ninja -vC build > ninja_build_log.txt
                     ninja -vC build install > ninja_install_log.txt

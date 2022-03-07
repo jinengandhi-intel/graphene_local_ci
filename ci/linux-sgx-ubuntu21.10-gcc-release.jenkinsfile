@@ -1,0 +1,58 @@
+node(node_label) {
+    env.ORIG_WKSP = env.WORKSPACE
+    env.build_ok = true
+    try {
+        stage('checkout'){
+            dir ('./') {
+                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
+            }
+
+            dir ("gramine") {
+                git url: 'https://github.com/gramineproject/gramine.git'
+            }
+        }
+
+        dir ("gramine") {
+            sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
+            sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
+            sh 'cp -rf $WORKSPACE/ltp_scripts/* Scripts/'
+            sh 'cp -rf $WORKSPACE/stress-ng CI-Examples/'
+            sh 'cp -rf ~/jenkins/sandstone-50-bin CI-Examples/'
+            sh 'cp -rf $WORKSPACE/rust_helloworld CI-Examples/'
+            sh 'cp -f $WORKSPACE/test_workloads.py . '
+            sh 'cp -f $WORKSPACE/Patch/rename_protected_files.patch .'
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
+            env.SGX = '1'
+
+            sh 'sed -i -e \'s/dent != g_dentry_root && dent->state & DENTRY_VALID/0/\' \
+                $WORKSPACE/LibOS/shim/src/fs/shim_fs.c'
+            sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
+                $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
+
+            load '../ci/config-docker.jenkinsfile'
+            docker.build(
+                "local:${env.BUILD_TAG}",
+                '-f ../ci/ubuntu21.10.dockerfile .'
+            ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
+                load '.ci/lib/config.jenkinsfile'
+                load '.ci/lib/config-ubuntu20.04.jenkinsfile'
+                load '.ci/lib/config-release.jenkinsfile'
+
+                load '../ci/stage-build-sgx.jenkinsfile'
+                load '../ci/stage-test.jenkinsfile'
+                load '../ci/stage-test-sgx.jenkinsfile'
+                load '../ci/stage-test-stress-ng.jenkinsfile'
+            }
+        }
+    } finally {
+        stage('cleanup'){
+            sh 'rm -rf $ORIG_WKSP/*'
+        }
+    }
+
+    if(env.build_ok) {
+        currentBuild.result = "SUCCESS"
+    } else {
+        currentBuild.result = "FAILURE"
+    }
+}
