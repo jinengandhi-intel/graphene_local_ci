@@ -64,7 +64,7 @@ static struct tcase {
 	{&fd_file, efault_iovec, 3, EFAULT},
 	{&fd_file, large_iovec, -1, EINVAL},
 	{&fd_dir, valid_iovec, 1, EISDIR},
-	{&badfd, valid_iovec, 3, EBADF},
+	{&badfd, valid_iovec, 1, EBADF},
 };
 
 static void verify_readv(unsigned int n)
