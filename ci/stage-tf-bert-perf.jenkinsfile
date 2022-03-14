@@ -1,0 +1,31 @@
+stage('test-tf') {
+    env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
+    try {
+        timeout(time: 30, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/BERT
+                echo intel@123 | sudo -S make PYTHONDISTPATH=/home/intel/.local/lib/python3.8/site-packages
+                OMP_NUM_THREADS=36 KMP_AFFINITY=granularity=fine,verbose,compact,1,0 taskset -c 0-35 gramine-direct \
+                ./python models/models/language_modeling/tensorflow/bert_large/inference/run_squad.py \
+                --init_checkpoint=data/bert_large_checkpoints/model.ckpt-3649 \
+                --vocab_file=data/wwm_uncased_L-24_H-1024_A-16/vocab.txt \
+                --bert_config_file=data/wwm_uncased_L-24_H-1024_A-16/bert_config.json \
+                --predict_file=data/wwm_uncased_L-24_H-1024_A-16/dev-v1.1.json \
+                --precision=int8 \
+                --output_dir=output/bert-squad-output \
+                --predict_batch_size=32 \
+                --experimental_gelu=True \
+                --optimized_softmax=True \
+                --input_graph=data/fp32_bert_squad.pb \
+                --do_predict=True --mode=benchmark \
+                --inter_op_parallelism_threads=1 \
+                --intra_op_parallelism_threads=36 2>&1 | tee OUTPUT.txt
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "BERT Test Failed"'
+    } finally {
+        archiveArtifacts 'CI-Examples/BERT/OUTPUT.txt'
+    }    
+}

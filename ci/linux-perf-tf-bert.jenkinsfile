@@ -7,28 +7,28 @@ node(node_label) {
                 git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git',
                 branch: 'perf_redis'
             }
-
+            dir ('examples') {
+                git url: 'https://github.com/Satya1493/examples.git',
+                branch: 'Satya1493/tensorflow'
+            }  
             dir ("gramine") {
                 git url: 'https://github.com/gramineproject/gramine.git'
             }
         }
-    
+
         dir ("gramine") {
-            sh 'cp -rf $WORKSPACE/perf_benchmarking/redis/redis_client_scripts CI-Examples/redis/'
-            sh 'cp -rf $WORKSPACE/perf_benchmarking/redis/redis_server_scripts CI-Examples/redis/'
-            env.WORKSPACE = env.WORKSPACE + "/gramine"           
-
+            sh 'cp -rf $WORKSPACE/examples/tensorflow/BERT CI-Examples/'
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
             load '../ci/config-docker.jenkinsfile'
-
             load '.ci/lib/config.jenkinsfile'
-            load '.ci/lib/config-ubuntu18.04.jenkinsfile'
+            load '.ci/lib/config-ubuntu20.04.jenkinsfile'
             load '.ci/lib/config-release.jenkinsfile'
             load '../ci/stage-build-perf.jenkinsfile'
-            load '../ci/stage-redis-perf.jenkinsfile'
+            load '../ci/stage-tf-bert-perf.jenkinsfile'            
         }
     } finally {
         stage('cleanup'){
-            sh 'rm -rf $ORIG_WKSP/*'
+            sh 'echo intel@123 | sudo -S rm -rf $ORIG_WKSP/*'
         }
     }
 

@@ -2,10 +2,6 @@ stage('build') {
     if (env.CC == 'clang') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
-    sh '''
-        cd "$WORKSPACE"        
-        git apply rename_protected_files.patch
-    '''
     script {
         try {
             sh '''
