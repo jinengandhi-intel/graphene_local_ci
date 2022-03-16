@@ -1,24 +1,35 @@
 stage('test-tf') {
     env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
+    env.resnet_dir = sh(script:'echo $PWD/CI-Examples/ResNet50', returnStdout: true).trim()
     try {
         timeout(time: 30, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/ResNet50
-                make PYTHONDISTPATH=/home/intel/.local/lib/python3.8/site-packages
-                OMP_NUM_THREADS=36 KMP_AFFINITY=granularity=fine,verbose,compact,1,0 taskset -c 0-35 gramine-direct \
-                ./python models/models/image_recognition/tensorflow/resnet50v1_5/inference/eval_image_classifier_inference.py \
-                --input-graph=resnet50v1_5_int8_pretrained_model.pb \
-                --num-inter-threads=1 \
-                --num-intra-threads=36 \
-                --batch-size=32 \
-                --warmup-steps=50 \
-                --steps=500 2>&1 | tee OUTPUT.txt
+                make PYTHONDISTPATH=/home/intel/.local/lib/python3.8/site-packages SGX=1
+                for config in ${config_list}
+                    do
+                        echo ${config}
+                        chmod +x start_benchmark.sh                   
+                        ./start_benchmark.sh ${config} 
+                    done
             '''
         }
     } catch (Exception e){
         env.build_ok = false
         sh 'echo "ResNet Test Failed"'
     } finally {
-        archiveArtifacts 'CI-Examples/ResNet50/OUTPUT.txt'
-    }    
+        archiveArtifacts 'CI-Examples/ResNet50/*.txt'
+    }
+
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 -m pytest -v --junit-xml tf_workload.xml  tf_parser.py'
+            archiveArtifacts 'tf_workload.xml'
+        }
+    } catch (Exception e){
+        env.build_ok = true
+        sh 'echo "TF parser failed"'
+    } finally {
+        junit 'tf_workload.xml'
+    }
 }
