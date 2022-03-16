@@ -17,7 +17,7 @@ stage('build') {
                 $MESON_OPTIONS > meson_cmd_output.txt
             ninja -vC build > ninja_build_log.txt
             ninja -vC build install > ninja_install_log.txt
-            gramine-sgx-gen-private-key
+            gramine-sgx-gen-private-key -f
         '''
         } finally {
             archiveArtifacts 'build/meson-logs/**/*'

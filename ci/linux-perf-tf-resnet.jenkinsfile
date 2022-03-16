@@ -18,6 +18,8 @@ node(node_label) {
 
         dir ("gramine") {
             sh 'cp -rf $WORKSPACE/examples/tensorflow/ResNet50 CI-Examples/'
+            sh 'cp -f $WORKSPACE/tf_parser.py . '
+            sh 'cp -rf $WORKSPACE/perf_benchmarking/resnet/* CI-Examples/ResNet50/'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             load '../ci/config-docker.jenkinsfile'
             load '.ci/lib/config.jenkinsfile'
