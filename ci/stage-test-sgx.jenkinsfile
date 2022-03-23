@@ -1,52 +1,49 @@
 stage('test-sgx') {
     env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
-    if (env.node_label != "graphene_oot") {
-        try {
-            timeout(time: 60, unit: 'MINUTES') {
-                sh '''
-                    cd LibOS/shim/test/ltp
-                    cp -f toml_files/tests_sgx.toml tests.toml
-                    os_release_id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
-                    os_version=$(grep -oP 'VERSION_ID="\\K[\\d.]+' /etc/os-release)
-                    if [ "${os_release_id}" = "rhel" ] || [ "${os_release_id}" = "centos" ]
-                    then
-                        cp -f manifest_CentOS_RHEL.template manifest.template
-                    fi
-                    if [ "${os_version}" = "18.04" ]
-                    then
-                        cp -f manifest_18_04.template manifest.template
-                    fi
-                    if [ "${os_version}" = "20.04" ] || [ "${os_version}" = "21.10" ]
-                    then
-                        cp -f manifest_20_04_21_10.template manifest.template
-                    fi
-                    make ${MAKEOPTS} -f Makefile.LTP SGX=1 all 
-                '''
-                // Run tests in a separate block, so that Jenkins measures build time and run time
-                // separately
-                sh '''
-                    cd LibOS/shim/test/ltp
-                    python3 -m pytest -v  --junit-xml=ltp-sgx.xml
-                '''                
-                /*
-                sh '''
-                    cd LibOS/shim/test/ltp
-                    export CFG=ltp-sudo-syscalls.cfg
-                    export LTPSCENARIO=$PWD/install-sgx/runtest/syscalls-sudo
-                    make -f Makefile.LTP ltp-sgx_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
-                '''
-                */
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "LTP Test Failed"'
-        } finally {
-            archiveArtifacts 'LibOS/shim/test/ltp/ltp-sgx.xml'
-            junit 'LibOS/shim/test/ltp/ltp-sgx.xml'
+    
+    try {
+        timeout(time: 60, unit: 'MINUTES') {
+            sh '''
+                cd LibOS/shim/test/ltp
+                cp -f toml_files/tests_sgx.toml tests.toml
+                os_release_id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+                os_version=$(grep -oP 'VERSION_ID="\\K[\\d.]+' /etc/os-release)
+                if [ "${os_release_id}" = "rhel" ] || [ "${os_release_id}" = "centos" ]
+                then
+                    cp -f manifest_CentOS_RHEL.template manifest.template
+                fi
+                if [ "${os_version}" = "18.04" ]
+                then
+                    cp -f manifest_18_04.template manifest.template
+                fi
+                if [ "${os_version}" = "20.04" ] || [ "${os_version}" = "21.10" ]
+                then
+                    cp -f manifest_20_04_21_10.template manifest.template
+                fi
+                make ${MAKEOPTS} -f Makefile.LTP SGX=1 all 
+            '''
+            // Run tests in a separate block, so that Jenkins measures build time and run time
+            // separately
+            sh '''
+                cd LibOS/shim/test/ltp
+                python3 -m pytest -v  --junit-xml=ltp-sgx.xml
+            '''                
+            /*
+            sh '''
+                cd LibOS/shim/test/ltp
+                export CFG=ltp-sudo-syscalls.cfg
+                export LTPSCENARIO=$PWD/install-sgx/runtest/syscalls-sudo
+                make -f Makefile.LTP ltp-sgx_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
+            '''
+            */
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "LTP Test Failed"'
+    } finally {
+        archiveArtifacts 'LibOS/shim/test/ltp/ltp-sgx.xml'
+        junit 'LibOS/shim/test/ltp/ltp-sgx.xml'
     }
-
-
 
     try{
         timeout(time: 10, unit: 'MINUTES') {
