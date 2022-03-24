@@ -21,10 +21,10 @@ export PATH=$PREFIX:$PATH
 which gramine-sgx
 echo "LD_PRELOAD : "
 echo $LD_PRELOAD
-for ((i=1;i<=5;i++));
+for ((i=1;i<=3;i++));
 do
     sleep 5
-    OMP_NUM_THREADS=36 KMP_AFFINITY=granularity=fine,verbose,compact,1,0 taskset -c 0-35 ${cmd} \
+    OMP_NUM_THREADS=$cores_per_socket KMP_AFFINITY=granularity=fine,verbose,compact,1,0 taskset -c ${numa_nodes} ${cmd} \
     models/models/language_modeling/tensorflow/bert_large/inference/run_squad.py \
     --init_checkpoint=data/bert_large_checkpoints/model.ckpt-3649 \
     --vocab_file=data/wwm_uncased_L-24_H-1024_A-16/vocab.txt \
@@ -38,7 +38,7 @@ do
     --input_graph=data/fp32_bert_squad.pb \
     --do_predict=True --mode=benchmark \
     --inter_op_parallelism_threads=1 \
-    --intra_op_parallelism_threads=36 2>&1 | tee output_${config}_${i}.txt
+    --intra_op_parallelism_threads=$cores_per_socket > output_${config}_${i}.txt
 done
 
 sleep 5

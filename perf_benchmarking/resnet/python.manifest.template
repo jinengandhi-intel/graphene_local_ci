@@ -35,6 +35,10 @@ fs.mount.pydisthome.type = "chroot"
 fs.mount.pydisthome.path = "{{ python.distlib }}"
 fs.mount.pydisthome.uri = "file:{{ python.distlib }}"
 
+fs.mount.pydisthome_1.type = "chroot"
+fs.mount.pydisthome_1.path = "/usr/local/lib/python3.6/dist-packages"
+fs.mount.pydisthome_1.uri = "file:/usr/local/lib/python3.6/dist-packages"
+
 fs.mount.pydistpath.type = "chroot"
 fs.mount.pydistpath.path = "{{ pythondistpath }}"
 fs.mount.pydistpath.uri = "file:{{ pythondistpath }}"
@@ -62,6 +66,7 @@ sgx.trusted_files = [
   "file:{{ python.stdlib }}/",
   "file:{{ python.distlib }}/",
   "file:{{ pythondistpath }}/",
+  "file:/usr/local/lib/python3.6/dist-packages/",
   "file:/usr/lib/x86_64-linux-gnu/libtcmalloc.so.4",
   "file:/usr/lib/x86_64-linux-gnu/libunwind.so.8",
 ]
