@@ -25,14 +25,14 @@ for ((i=1;i<=3;i++));
 do
     sleep 5
 
-    OMP_NUM_THREADS=36 KMP_AFFINITY=granularity=fine,verbose,compact,1,0 taskset -c 0-35 ${cmd} \
+    OMP_NUM_THREADS=$cores_per_socket KMP_AFFINITY=granularity=fine,verbose,compact,1,0 taskset -c ${numa_nodes} ${cmd} \
     models/models/image_recognition/tensorflow/resnet50v1_5/inference/eval_image_classifier_inference.py \
     --input-graph=resnet50v1_5_int8_pretrained_model.pb \
     --num-inter-threads=1 \
-    --num-intra-threads=36 \
+    --num-intra-threads=$cores_per_socket \
     --batch-size=$predict_batch_size \
     --warmup-steps=50 \
-    --steps=500 2>&1 | tee output_${config}_${i}.txt
+    --steps=500 > output_${config}_${i}.txt
 done
 
 sleep 5

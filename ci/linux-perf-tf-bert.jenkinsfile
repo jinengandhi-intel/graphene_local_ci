@@ -9,7 +9,7 @@ node(node_label) {
             }
             dir ('examples') {
                 git url: 'https://github.com/Satya1493/examples.git',
-                branch: 'Satya1493/tensorflow'
+                branch: 'tensorflow'
             }  
             dir ("gramine") {
                 git url: 'https://github.com/gramineproject/gramine.git'
