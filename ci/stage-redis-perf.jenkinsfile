@@ -11,8 +11,12 @@ stage('redis-perf') {
                         echo ${config}
                         python3 ./redis_launch.py -f run_redis -c ${config}
                         sshpass -e ssh intel@10.66.247.185 "cd /home/intel/perf_benchmarking/redis_client_scripts && ./start_benchamark.sh ${config} $BUILD_ID $data_size $read_write_ratio"
-                        python3 ./redis_launch.py -f kill_redis -c ${config}
-                        sleep 5
+                        PID=`lsof -t -i:9001`
+                        if [ "" !=  "$PID" ]; then
+                            echo "killing $PID"
+                            kill -9 $PID
+                        fi
+                        sleep 10
                     done
 
                 sshpass -e scp -r intel@10.66.247.185:/home/intel/perf_benchmarking/redis-6.0.6/log/set/$BUILD_ID/*.csv .
