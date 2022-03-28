@@ -46,11 +46,13 @@ class Test_TF_Results():
         if len(sgx_result) > 0:    
             print("Throughput values in Gramine SGX run : ", sgx_result) 
             print("Average Throughput Gramine SGX: ",sum(sgx_result)/len(sgx_result))
-        if len(sgx_result) > 0 and len(native_result) > 0:
+        if len(sgx_result) > 0 and len(native_result) > 0 and len(direct_result) > 0:
             avg_sgx_throughput = sum(sgx_result)/len(sgx_result)
             avg_native_throughput = sum(native_result)/len(native_result)
-            perf_degrad = 100 - (avg_sgx_throughput/avg_native_throughput) * 100
-            print("Degradation SGX/Native in percentage : ", perf_degrad )            
+            avg_direct_throughput = sum(direct_result)/len(direct_result)
+            print("Degradation Native/SGX : ", (avg_native_throughput/avg_sgx_throughput))
+            print("Degradation Native/Direct : ", (avg_native_throughput/avg_direct_throughput))
+            print("Degradation Direct/SGX : ", (avg_direct_throughput/avg_sgx_throughput))        
         assert(len(native_result) is not None or len(sgx_result) is not None)
 
     @pytest.mark.skipif(path_resnet is None,
@@ -67,10 +69,12 @@ class Test_TF_Results():
         if len(sgx_result) > 0:    
             print("Throughput values in Gramine SGX run : ", sgx_result) 
             print("Average Throughput Gramine SGX: ",sum(sgx_result)/len(sgx_result))
-        if len(sgx_result) > 0 and len(native_result) > 0:
+        if len(sgx_result) > 0 and len(native_result) > 0 and len(direct_result) > 0:
             avg_sgx_throughput = sum(sgx_result)/len(sgx_result)
             avg_native_throughput = sum(native_result)/len(native_result)
-            perf_degrad = 100 - (avg_sgx_throughput/avg_native_throughput) * 100
-            print("Degradation SGX/Native in percentage : ", perf_degrad )
+            avg_direct_throughput = sum(direct_result)/len(direct_result)
+            print("Degradation Native/SGX : ", (avg_native_throughput/avg_sgx_throughput))
+            print("Degradation Native/Direct : ", (avg_native_throughput/avg_direct_throughput))
+            print("Degradation Direct/SGX : ", (avg_direct_throughput/avg_sgx_throughput))
         assert(len(native_result) is not None or len(sgx_result) is not None)
     
