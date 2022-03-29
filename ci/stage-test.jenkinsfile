@@ -112,4 +112,15 @@ stage('test') {
             junit 'LibOS/shim/test/fs/*.xml'
         }
     }
+    
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 -m pytest -v --junit-xml workload-regression.xml test_workloads.py'
+        }
+    } catch (Exception e){
+        env.build_ok = true
+        sh 'echo "Workload parser failed"'
+    } finally {
+        junit 'workload-regression.xml'
+    }
 }

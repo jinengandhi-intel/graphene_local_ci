@@ -40,8 +40,8 @@ node (node_label) {
             load '.ci/lib/config-release.jenkinsfile'
 
             load '../ci/stage-build-sgx.jenkinsfile'
-            load '../ci/stage-test.jenkinsfile'
             load '../ci/stage-test-sgx.jenkinsfile'
+            load '../ci/stage-test.jenkinsfile'
             load '../ci/stage-test-stress-ng.jenkinsfile'
         }
     } finally {

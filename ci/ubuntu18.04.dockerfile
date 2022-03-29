@@ -23,8 +23,10 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libevent-dev \
     libexpat1 \
     libexpat1-dev \
+    libjpeg-dev \
     libmemcached-tools \
     libnss-mdns \
+    libnss-myhostname \
     libnuma1 \
     libomp-dev \
     libpcre2-dev \
@@ -41,11 +43,14 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libpixman-1-dev \
     libipsec-mb-dev \
     linux-headers-4.15.0-20-generic \
+    lsb-release \
     musl \
     musl-tools \
     net-tools \
     netcat-openbsd \
     ninja-build \
+    nodejs \
+    openjdk-11-jdk \
     pkg-config \
     protobuf-c-compiler \
     pylint3 \
@@ -64,6 +69,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-pytest \
     python3-pytest-xdist \
     python3-scipy \
+    r-base \
     sqlite3 \
     shellcheck \
     sudo \
@@ -83,7 +89,13 @@ RUN python3 -m pip install -U \
     'Sphinx==1.8' \
     sphinx_rtd_theme \
     'toml>=0.10' \
-    'meson>=0.55,<0.56'
+    'meson>=0.55,<0.56' \ 
+    torchvision \
+    pillow
+
+ADD CI-Examples/common_tools common_tools
+ADD CI-Examples/tensorflow-lite tensorflow
+RUN make -f tensorflow/Makefile install-dependencies-ubuntu
 
 # # Add the user UID:1000, GID:1000, home at /intel
 # RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -m -d /intel -c "intel Jenkins" intel && \

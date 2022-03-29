@@ -10,6 +10,11 @@ node(node_label) {
             dir ("gramine") {
                 git url: 'https://github.com/gramineproject/gramine.git'
             }
+
+            dir ('examples') {
+                git url: 'https://github.com/anjalirai-intel/examples',
+                branch: 'examples_update'
+            }
         }
 
         dir ("gramine") {
@@ -19,6 +24,7 @@ node(node_label) {
             sh 'cp -rf $WORKSPACE/stress-ng CI-Examples/'
             sh 'cp -rf ~/jenkins/sandstone-50-bin CI-Examples/'
             sh 'cp -rf $WORKSPACE/rust_helloworld CI-Examples/'
+            sh 'cp -rf $WORKSPACE/examples/* CI-Examples/'
             sh 'cp -f $WORKSPACE/test_workloads.py . '
             sh 'cp -f $WORKSPACE/Patch/rename_protected_files.patch .'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
@@ -39,8 +45,9 @@ node(node_label) {
                 load '.ci/lib/config-release.jenkinsfile'
 
                 load '../ci/stage-build-sgx.jenkinsfile'
-                load '../ci/stage-test.jenkinsfile'
                 load '../ci/stage-test-sgx.jenkinsfile'
+                load '../ci/stage-test-examples.jenkinsfile'
+                load '../ci/stage-test.jenkinsfile'
                 load '../ci/stage-test-stress-ng.jenkinsfile'
             }
         }

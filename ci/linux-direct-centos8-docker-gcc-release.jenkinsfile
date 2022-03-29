@@ -44,9 +44,9 @@ node(node_label) {
                 load '.ci/lib/config-release.jenkinsfile'
 
                 load '../ci/stage-build-nosgx.jenkinsfile'
-                load '../ci/stage-test.jenkinsfile'
                 load '../ci/stage-test-direct.jenkinsfile'
                 load '../ci/stage-test-sandstone.jenkinsfile'
+                load '../ci/stage-test.jenkinsfile'
                 load '../ci/stage-test-stress-ng.jenkinsfile'
             }
         }
