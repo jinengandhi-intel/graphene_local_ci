@@ -1,0 +1,117 @@
+stage('test-examples') {              
+    if (env.SGX == "1") {
+        env.MODE = "sgx"
+    }
+    else {
+        env.MODE = "direct"
+    }
+
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/rust_helloworld
+                export PATH=/home/intel/rust_binaries/bin:$PATH
+                make run-release-${MODE} 2>&1 | tee OUTPUT.txt
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Rust example Test Failed"'
+    }
+
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/openjdk
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                gramine-${MODE} java MultiThreadMain > OUTPUT
+            '''
+        }
+    } catch (Exception e) {
+        env.build_ok = false
+        sh 'echo "Openjdk Example Test Failed"'
+    }
+
+    /*
+    try {
+        timeout(time: 15, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/tensorflow-lite
+                sudo make install-dependencies-ubuntu
+                sudo make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                sudo make $(MAKEOPTS} run-gramine > OUTPUT
+                sudo make distclean
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "TensorFlow Example Test Failed"'
+    }*/
+
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/curl
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} check > RESULT
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Curl Example Test Failed"'
+    }
+
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/nodejs
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} check > RESULT
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Nodejs Example Test Failed"'
+    }
+
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/pytorch
+                python3 download-pretrained-model.py
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                gramine-${MODE} ./pytorch ./pytorchexample.py
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Pytorch Example Test Failed"'
+    }
+
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/r
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r > RESULT_1
+                gramine-${MODE} ./R --slave --vanilla -f scripts/R-benchmark-25.R > RESULT_2
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "R Example Test Failed"'
+    }
+
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/gcc
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} check > OUTPUT
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "GCC Example Test Failed"'
+    }
+}

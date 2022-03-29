@@ -23,8 +23,10 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libevent-dev \
     libexpat1 \
     libexpat1-dev \
+    libjpeg-dev \
     libmemcached-tools \
     libnss-mdns \
+    libnss-myhostname \
     libnuma1 \
     libomp-dev \
     libpcre2-dev \
@@ -41,11 +43,14 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libjudy-dev \
     libpixman-1-dev \
     libipsec-mb-dev \
+    lsb-release \
     musl \
     musl-tools \    
     net-tools \
     netcat-openbsd \
     ninja-build \
+    nodejs \
+    openjdk-11-jdk \
     pkg-config \
     protobuf-c-compiler \
     pylint3 \
@@ -67,6 +72,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-scipy \
     python3-sphinx-rtd-theme \
     python3-toml \
+    r-base \
     sqlite3 \
     shellcheck \
     sphinx-doc \
@@ -83,7 +89,9 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
 # specification)
 RUN python3 -m pip install -U \
     asv \
-    'meson>=0.55,<0.56'
+    'meson>=0.55,<0.56'  \
+    torchvision \
+    pillow
 
 # # Add the user UID:1000, GID:1000, home at /intel
 # RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -m -d /intel -c "intel Jenkins" intel && \
