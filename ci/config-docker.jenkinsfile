@@ -39,3 +39,16 @@ if(env.gcc_dump_machine == "x86_64-redhat-linux")
 {
     env.ARCH_LIB_OPT = "ARCH_LIBDIR=/lib64"
 }
+
+env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
+
+if (fileExists('/etc/os-release')) {
+    sh '''
+        . /etc/os-release
+        echo $NAME > os_release_id
+        echo $VERSION_ID > os_version
+    '''
+
+    env.os_release_id=sh(script: 'cat os_release_id', returnStdout: true).trim()
+    env.os_version=sh(script: 'cat os_version', returnStdout: true).trim()
+}

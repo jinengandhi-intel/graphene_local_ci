@@ -23,8 +23,10 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libevent-dev \
     libexpat1 \
     libexpat1-dev \
+    libjpeg-dev \
     libmemcached-tools \
     libnss-mdns \
+    libnss-myhostname \
     libnuma1 \
     libomp-dev \
     libpcre2-dev \
@@ -41,11 +43,14 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libjudy-dev \
     libpixman-1-dev \
     libipsec-mb-dev \
+    lsb-release \
     musl \
     musl-tools \    
     net-tools \
     netcat-openbsd \
     ninja-build \
+    nodejs \
+    openjdk-11-jdk \
     pkg-config \
     protobuf-c-compiler \
     pylint3 \
@@ -67,6 +72,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-scipy \
     python3-sphinx-rtd-theme \
     python3-toml \
+    r-base \
     sqlite3 \
     shellcheck \
     sphinx-doc \
@@ -83,20 +89,19 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
 # specification)
 RUN python3 -m pip install -U \
     asv \
-    'meson>=0.55,<0.56'
+    'meson>=0.55,<0.56'  \
+    torchvision \
+    pillow
 
-# # Add the user UID:1000, GID:1000, home at /intel
-# RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -m -d /intel -c "intel Jenkins" intel && \
-#     chmod 755 /intel
+# Add the user UID:1000, GID:1000, home at /intel
+RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G sudo -m -d /intel -c "intel Jenkins" intel && \
+    chmod 777 /intel
 
-# # Make sure /intel can be written by intel
-# RUN chown 1000 /intel
+# Make sure /intel can be written by intel
+RUN chown 1000 /intel 
 
-RUN adduser --disabled-password --gecos '' intel
-RUN adduser intel sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-RUN echo 'Acquire::http::proxy "http://proxy-dmz.intel.com:911/"; Acquire::https::proxy "http://proxy-dmz.intel.com:912/"; Acquire::ftp::proxy "ftp://proxy-dmz.intel.com:911/";' >> /etc/apt/apt.conf.d/proxy.conf
-
+RUN echo 'http_proxy="http://proxy-dmz.intel.com:911/"\nhttps_proxy="http://proxy-dmz.intel.com:912/"' >> /etc/environment
 
 # Blow away any random state
 RUN rm -f /intel/.rnd
