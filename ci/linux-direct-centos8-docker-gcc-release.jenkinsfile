@@ -47,6 +47,7 @@ node(node_label) {
                 load '../ci/stage-test.jenkinsfile'
                 load '../ci/stage-test-direct.jenkinsfile'
                 load '../ci/stage-test-sandstone.jenkinsfile'
+                load '../ci/stage-verification-examples.jenkinsfile'
                 load '../ci/stage-test-stress-ng.jenkinsfile'
             }
         }

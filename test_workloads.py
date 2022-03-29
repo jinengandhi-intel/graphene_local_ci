@@ -5,6 +5,7 @@ import glob
 from os import path
 import os
 import pytest
+import re
 
 gcc_dumpmachine = os.environ.get('gcc_dump_machine')
 sgx_mode = os.environ.get('SGX')
@@ -82,3 +83,73 @@ class Test_Workload_Results():
         rust_result_file = open("CI-Examples/rust_helloworld/OUTPUT.txt", "r")
         rust_contents = rust_result_file.read()
         assert("Hello World!" in rust_contents)        
+
+    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+                    reason="OpenJDK enabled only for Ubuntu configurations.")
+    def test_openjdk_workload(self):
+        jdk_result_file = open("CI-Examples/openjdk/OUTPUT", "r")
+        jdk_contents = jdk_result_file.read()
+        assert("Final Count is:" in jdk_contents)
+
+    @pytest.mark.skip(reason="Currently tensorflow build is failing")
+    def test_tensorflow_workload(self):
+        tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
+        tensorflow_contents = tensorflow_result_file.read()
+        assert((re.search("average time: \d+", tensorflow_contents)) \
+            and (re.search("\d+: 653 military uniform", tensorflow_contents)) \
+            and (re.search("\d+: 668 mortarboard", tensorflow_contents)) \
+            and (re.search("\d+: 401 academic gown", tensorflow_contents)) \
+            and (re.search("\d+: 835 suit", tensorflow_contents)) \
+            and (re.search("\d+: 458 bow tie", tensorflow_contents)))
+
+    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+                    reason="Curl enabled only for Ubuntu configurations.")
+    def test_curl_workload(self):
+        curl_result_file = open("CI-Examples/curl/RESULT", "r")
+        curl_contents = curl_result_file.read()
+        assert("Success 1/1" in curl_contents)
+
+    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+                    reason="Nodejs enabled only for Ubuntu configurations.")
+    def test_nodejs_workload(self):
+        nodejs_result_file = open("CI-Examples/nodejs/RESULT", "r")
+        nodejs_contents = nodejs_result_file.read()
+        assert("Success 1/1" in nodejs_contents)
+
+    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+                    reason="Pytorch enabled only for Ubuntu configurations.")
+    def test_pytorch_workload(self):
+        pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
+        pytorch_contents = pytorch_result_file.read()
+        assert(("Labrador retriever" in pytorch_contents) \
+            and ("golden retriever" in pytorch_contents) \
+            and ("Saluki, gazelle hound" in pytorch_contents) \
+            and ("whippet" in pytorch_contents) \
+            and ("Ibizan hound, Ibizan Podenco" in pytorch_contents))
+
+    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+                    reason="R enabled only for Ubuntu configurations.")
+    def test_r_workload(self):
+        r1_result_file = open("CI-Examples/r/RESULT_1", "r")
+        r1_contents = r1_result_file.read()
+        assert("success" in r1_contents)
+
+        r2_result_file = open("CI-Examples/r/RESULT_2", "r")
+        r2_contents = r2_result_file.read()
+        assert(("R Benchmark 2.5" in r2_contents) \
+            and ("Matrix calculation" in r2_contents) \
+            and ("Matrix functions" in r2_contents) \
+            and ("Programmation" in r2_contents) \
+            and (re.search("Total time for all \d+ tests", r2_contents)) \
+            and ("Overall mean (sum of " in r2_contents) \
+            and ("--- End of test ---" in r2_contents))
+
+    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+                    reason="GCC enabled only for Ubuntu configurations.")
+    def test_gcc_workload(self):
+        gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")
+        gcc_contents = gcc_result_file.read()
+        assert(("Hello world (./test_files/hello)!" in gcc_contents) \
+            and ("diff -q test_files/bzip2 test_files/bzip2.copy" in gcc_contents) \
+            and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
+

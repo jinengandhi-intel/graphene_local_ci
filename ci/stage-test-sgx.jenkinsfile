@@ -250,22 +250,6 @@ stage('test-sgx') {
         }
     }    
 
-    if(env.gcc_dump_machine != "x86_64-redhat-linux")
-    {
-        try{
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/rust_helloworld
-                    export PATH=/home/intel/rust_binaries/bin:$PATH
-                    make run-release-sgx 2>&1 | tee OUTPUT.txt
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "Rust example Test Failed"'
-        }
-    }
-
     try{
         timeout(time: 120, unit: 'MINUTES') {
             sh '''
@@ -280,16 +264,5 @@ stage('test-sgx') {
     } catch (Exception e) {
         env.build_ok = false
         sh 'echo "Sandstone workload Failed"'
-    }
-
-    try {
-        timeout(time: 2, unit: 'MINUTES') {
-            sh 'python3 -m pytest -v --junit-xml workload-regression.xml test_workloads.py'
-        }
-    } catch (Exception e){
-        env.build_ok = true
-        sh 'echo "Workload parser failed"'
-    } finally {
-        junit 'workload-regression.xml'
     }
 }
