@@ -1,7 +1,7 @@
 stage('redis-perf') {
     env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
     try {
-        timeout(time: 30, unit: 'MINUTES') {
+        timeout(time: 60, unit: 'MINUTES') {
             sh '''
                 export SSHPASS=intel@123
                 cd CI-Examples/redis/redis_server_scripts
