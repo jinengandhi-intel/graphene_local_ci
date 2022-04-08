@@ -84,14 +84,13 @@ class Test_Workload_Results():
         rust_contents = rust_result_file.read()
         assert("Hello World!" in rust_contents)        
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+    @pytest.mark.skipif(((gcc_dumpmachine == 'x86_64-redhat-linux') or (int(no_cores) < 16)),
                     reason="OpenJDK enabled only for Ubuntu configurations.")
     def test_openjdk_workload(self):
         jdk_result_file = open("CI-Examples/openjdk/OUTPUT", "r")
         jdk_contents = jdk_result_file.read()
         assert("Final Count is:" in jdk_contents)
 
-    @pytest.mark.skip(reason="Currently tensorflow build is failing")
     def test_tensorflow_workload(self):
         tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
         tensorflow_contents = tensorflow_result_file.read()
@@ -116,7 +115,7 @@ class Test_Workload_Results():
         nodejs_contents = nodejs_result_file.read()
         assert("Success 1/1" in nodejs_contents)
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+    @pytest.mark.skipif(((gcc_dumpmachine == 'x86_64-redhat-linux') or (int(no_cores) < 16)),
                     reason="Pytorch enabled only for Ubuntu configurations.")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")

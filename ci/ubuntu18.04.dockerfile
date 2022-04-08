@@ -9,6 +9,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     build-essential \
     curl \
     flex \
+    g++ \
     gawk \
     gdb \
     gettext \
@@ -55,6 +56,8 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     protobuf-c-compiler \
     pylint3 \
     python \
+    python-dev \
+    python-pip \
     python3-apport \
     python3-apt \
     python3-breathe \
@@ -74,9 +77,11 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     shellcheck \
     sudo \
     texinfo \
+    unzip \
     uthash-dev \
     vim \
     wget \
+    zip \
     zlib1g \
     zlib1g-dev
 
@@ -93,17 +98,15 @@ RUN python3 -m pip install -U \
     torchvision \
     pillow
 
-# # Add the user UID:1000, GID:1000, home at /intel
-# RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -m -d /intel -c "intel Jenkins" intel && \
-#     chmod 777 /intel
+# Add the user UID:1000, GID:1000, home at /intel
+RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G sudo -m -d /intel -c "intel Jenkins" intel && \
+    chmod 777 /intel
 
-# # Make sure /intel can be written by intel
-# RUN chown 1000 /intel
+# Make sure /intel can be written by intel
+RUN chown 1000 /intel 
 
-RUN adduser --disabled-password --gecos '' intel
-RUN adduser intel sudo
 RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-RUN echo 'Acquire::http::proxy "http://proxy-dmz.intel.com:911/"; Acquire::https::proxy "http://proxy-dmz.intel.com:912/"; Acquire::ftp::proxy "ftp://proxy-dmz.intel.com:911/";' >> /etc/apt/apt.conf.d/proxy.conf
+RUN echo 'http_proxy="http://proxy-dmz.intel.com:911/"\nhttps_proxy="http://proxy-dmz.intel.com:912/"' >> /etc/environment
 
 # Blow away any random state
 RUN rm -f /intel/.rnd

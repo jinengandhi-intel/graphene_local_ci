@@ -19,34 +19,39 @@ stage('test-examples') {
         sh 'echo "Rust example Test Failed"'
     }
 
-    try {
-        timeout(time: 10, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/openjdk
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                gramine-${MODE} java MultiThreadMain > OUTPUT
-            '''
+    if ((env.no_cpu.toInteger() > 16) and (env.SGX == '1'))
+    {
+        try {
+            timeout(time: 10, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/openjdk
+                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    gramine-${MODE} java MultiThreadMain > OUTPUT
+                '''
+            }
+        } catch (Exception e) {
+            env.build_ok = false
+            sh 'echo "Openjdk Example Test Failed"'
         }
-    } catch (Exception e) {
-        env.build_ok = false
-        sh 'echo "Openjdk Example Test Failed"'
     }
 
-    /*
     try {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/tensorflow-lite
-                sudo make install-dependencies-ubuntu
-                sudo make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                sudo make $(MAKEOPTS} run-gramine > OUTPUT
-                sudo make distclean
+                ../common_tools/download --output bazel-0.16.1-installer-linux-x86_64.sh \
+                --sha256 17ab70344645359fd4178002f367885e9019ae7507c9c1ade8220f3628383444 \
+                --url https://github.com/bazelbuild/bazel/releases/download/0.16.1/bazel-0.16.1-installer-linux-x86_64.sh
+                chmod +x ./bazel-0.16.1-installer-linux-x86_64.sh
+                ./bazel-0.16.1-installer-linux-x86_64.sh --user
+                make ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} run-gramine > OUTPUT
             '''
         }
     } catch (Exception e){
         env.build_ok = false
         sh 'echo "TensorFlow Example Test Failed"'
-    }*/
+    }
 
     try {
         timeout(time: 10, unit: 'MINUTES') {
@@ -74,18 +79,21 @@ stage('test-examples') {
         sh 'echo "Nodejs Example Test Failed"'
     }
 
-    try {
-        timeout(time: 5, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/pytorch
-                python3 download-pretrained-model.py
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
-                gramine-${MODE} ./pytorch ./pytorchexample.py
-            '''
+    if ((env.no_cpu.toInteger() > 16) and (env.SGX == '1'))
+    {
+        try {
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/pytorch
+                    python3 download-pretrained-model.py
+                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    gramine-${MODE} ./pytorch ./pytorchexample.py
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "Pytorch Example Test Failed"'
         }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Pytorch Example Test Failed"'
     }
 
     try {

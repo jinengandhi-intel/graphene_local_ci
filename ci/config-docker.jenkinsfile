@@ -5,6 +5,9 @@ env.DOCKER_ARGS_COMMON = """
     --device=/dev/kmsg:/dev/kmsg
     --device=/dev/cpu_dma_latency:/dev/cpu_dma_latency
     --env=PATH=${env.PREFIX}/bin:${env.PATH}
+    --env=PYTHONPATH=${env.PYTHONPATH}
+    --env=LC_ALL=${env.LC_ALL}
+    --env=LANG=${env.LANG}
     --env=XDG_CACHE_HOME=/tmp/.cache
     --security-opt seccomp=${env.WORKSPACE}/Scripts/docker_seccomp.json
     --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
