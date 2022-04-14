@@ -7,6 +7,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     bison \
     build-essential \
     clang \
+    cmake \
     curl \
     flex \
     gawk \
@@ -73,6 +74,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-scipy \
     python3-sphinx-rtd-theme \
     python3-toml \
+    python3-venv \
     r-base \
     sqlite3 \
     shellcheck \

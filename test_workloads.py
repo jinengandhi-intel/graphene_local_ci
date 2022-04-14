@@ -158,3 +158,14 @@ class Test_Workload_Results():
             and ("diff -q test_files/bzip2 test_files/bzip2.copy" in gcc_contents) \
             and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
 
+    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux') or
+                    (float(os_version) >= 21) or ((int(no_cores) < 16) and sgx_mode == '1'),
+                    reason="Openvino enabled only for Ubuntu 18 & 20 Server Configurations")
+    def test_openvino_workload(self):
+        openvino_result_file = open("CI-Examples/openvino/OUTPUT", "r")
+        openvino_contents = openvino_result_file.read()
+        assert((re.search("Dumping statistics report", openvino_contents)) \
+            and (re.search("Count:", openvino_contents)) \
+            and (re.search("Duration:", openvino_contents)) \
+            and (re.search("Latency:", openvino_contents)) \
+            and (re.search("Throughput:", openvino_contents)))
