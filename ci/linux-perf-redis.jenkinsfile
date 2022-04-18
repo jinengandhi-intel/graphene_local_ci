@@ -9,8 +9,7 @@ node(node_label) {
             }
 
             dir ("gramine") {
-                git url: 'https://github.com/jinengandhi-intel/gramine-1',
-                branch: 'tag_v11'
+                git url: 'https://github.com/jinengandhi-intel/gramine-1'
             }
         }
     

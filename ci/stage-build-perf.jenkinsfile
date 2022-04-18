@@ -3,10 +3,6 @@ stage('build') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
 
-    sh '''
-        cd "$WORKSPACE"
-        openssl genrsa -3 -out Pal/src/host/Linux-SGX/signer/enclave-key.pem 3072
-    '''
     
     script {
         try {
@@ -23,7 +19,8 @@ stage('build') {
                 $MESON_OPTIONS > meson_cmd_output.txt
             ninja -vC build > ninja_build_log.txt
             ninja -vC build install > ninja_install_log.txt 
-        '''
+            gramine-sgx-gen-private-key -f
+	'''
         } finally {
             archiveArtifacts 'build/meson-logs/**/*'
             archiveArtifacts 'ninja_build_log.txt'
