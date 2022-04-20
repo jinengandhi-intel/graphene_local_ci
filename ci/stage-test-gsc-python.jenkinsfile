@@ -1,0 +1,33 @@
+stage('Build') {
+    sh '''
+        openssl genrsa -3 -out enclave-key.pem 3072
+        cp -f config.yaml.template config.yaml
+        sed -i -E 's/Distro: "(.+)"/Distro: "'"$distro_ver"'"/g' config.yaml
+        os_release_id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
+        if [ "${os_release_id}" = "centos" ]
+        then
+            docker build --tag python --file test/python.dockerfile .
+        fi
+        if [ "${os_release_id}" = "ubuntu" ]
+        then
+            docker pull python
+        fi               
+        ./gsc build --insecure-args python test/generic.manifest
+        ./gsc sign-image python enclave-key.pem
+        ./gsc info-image gsc-python
+    '''
+} 
+stage('Test') {
+    sh '''
+        docker run --device=/dev/sgx_enclave \
+            -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+            gsc-python -c 'print("HelloWorld!")'
+    '''
+}
+stage('Docker images cleanup') {
+    sh '''
+        docker stop $(docker ps -aq)
+        docker rm $(docker ps -aq)
+        docker image prune -af
+    '''
+}

@@ -19,7 +19,7 @@ node(node_label) {
             env.WORKSPACE = env.WORKSPACE + "/gsc_dev_repo"
 
             load '../ci/stage-test-gsc.jenkinsfile'
-            
+            load '../ci/stage-test-gsc-python.jenkinsfile'
         }
     } finally {
         stage('Workspace cleanup'){
