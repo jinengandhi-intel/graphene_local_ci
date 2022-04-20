@@ -9,20 +9,18 @@ node (node_label) {
         dir ("gramine") {
             env.SGX = '1'
             sh '../ci/resources/setup_workspace.sh'
+            sh 'bash ./enable_edmm.sh $WORKSPACE/gramine'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             load '../ci/config/config-docker.jenkinsfile'
             load '.ci/lib/config.jenkinsfile'
             load '.ci/lib/config-ubuntu18.04.jenkinsfile'
             load '.ci/lib/config-release.jenkinsfile'
 
-            load '../ci/config/config-centos8.jenkinsfile'
             load '../ci/lib/stage-build-sgx.jenkinsfile'
             load '../ci/lib/stage-test.jenkinsfile'
             load '../ci/lib/stage-test-sgx.jenkinsfile'
             load '../ci/lib/stage-test-examples.jenkinsfile'
             load '../ci/lib/stage-verification-examples.jenkinsfile'
-            load '../ci/lib/stage-test-sandstone.jenkinsfile'
-            load '../ci/lib/stage-test-stress-ng.jenkinsfile'
         }
     } finally {
         stage('cleanup'){
