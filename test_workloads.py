@@ -85,16 +85,14 @@ class Test_Workload_Results():
         rust_contents = rust_result_file.read()
         assert("Hello World!" in rust_contents)        
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux') or
-                    ((int(no_cores) < 16) and sgx_mode == '1'),
+    @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="OpenJDK enabled only for Ubuntu Server Configurations.")
     def test_openjdk_workload(self):
         jdk_result_file = open("CI-Examples/openjdk/OUTPUT", "r")
         jdk_contents = jdk_result_file.read()
         assert("Final Count is:" in jdk_contents)
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux') or
-                    (float(os_version) >= 21),
+    @pytest.mark.skipif(float(os_version) >= 21,
                     reason="Bazel Build fails for Ubuntu 21")
     def test_tensorflow_workload(self):
         tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
@@ -106,22 +104,17 @@ class Test_Workload_Results():
             and (re.search("\d+: 835 suit", tensorflow_contents)) \
             and (re.search("\d+: 458 bow tie", tensorflow_contents)))
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
-                    reason="Curl enabled only for Ubuntu configurations.")
     def test_curl_workload(self):
         curl_result_file = open("CI-Examples/curl/RESULT", "r")
         curl_contents = curl_result_file.read()
         assert("Success 1/1" in curl_contents)
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
-                    reason="Nodejs enabled only for Ubuntu configurations.")
     def test_nodejs_workload(self):
         nodejs_result_file = open("CI-Examples/nodejs/RESULT", "r")
         nodejs_contents = nodejs_result_file.read()
         assert("Success 1/1" in nodejs_contents)
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux') or
-                    ((int(no_cores) < 16) and sgx_mode == '1'),
+    @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="OpenJDK enabled only for Ubuntu Server Configurations.")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
@@ -132,8 +125,6 @@ class Test_Workload_Results():
             and ("whippet" in pytorch_contents) \
             and ("Ibizan hound, Ibizan Podenco" in pytorch_contents))
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
-                    reason="R enabled only for Ubuntu configurations.")
     def test_r_workload(self):
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()
