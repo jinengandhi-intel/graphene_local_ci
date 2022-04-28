@@ -45,7 +45,8 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libipsec-mb-dev \
     lsb-release \
     musl \
-    musl-tools \    
+    musl-tools \
+    nasm \ 
     net-tools \
     netcat-openbsd \
     ninja-build \

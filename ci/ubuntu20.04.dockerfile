@@ -48,6 +48,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     lsb-release \
     musl \
     musl-tools \
+    nasm \
     net-tools \
     netcat-openbsd \
     ninja-build \

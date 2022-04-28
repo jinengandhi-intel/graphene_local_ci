@@ -24,6 +24,7 @@ RUN dnf update -y \
         libcurl-devel \
         libevent-devel \
         make \
+        nasm \
         ncurses-devel \
         ninja-build \
         openssl-devel \
