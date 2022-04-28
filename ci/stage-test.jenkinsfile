@@ -94,6 +94,27 @@ stage('test') {
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
+                    cd LibOS/shim/test/abi/x86_64
+                    if test -n "$SGX"
+                    then                     
+                        gramine-test --sgx build -v
+                    else
+                        gramine-test build -v
+                    fi
+                    python3 -m pytest -v --junit-xml abi.xml
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "LibOS Test Failed"'
+        } finally {
+            archiveArtifacts 'LibOS/shim/test/abi/x86_64/abi.xml'
+            junit 'LibOS/shim/test/abi/x86_64/abi.xml'
+        }
+
+        try {
+            timeout(time: 15, unit: 'MINUTES') {
+                sh '''
                     cd LibOS/shim/test/fs
                     if test -n "$SGX"
                     then                     

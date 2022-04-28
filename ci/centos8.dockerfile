@@ -61,6 +61,7 @@ RUN yum update -y \
 #        linux-headers-generic \
         musl-devel \
         musl-gcc \
+        nasm \
         ninja-build \
         nss_nis \
         pkg-config \
