@@ -4,7 +4,7 @@ stage('test-direct') {
             sh '''
                 cd LibOS/shim/test/ltp
                 cp -f toml_files/tests_direct.toml tests.toml
-                if [ "${os_release_id}" != "Ubuntu" ]
+                if [ "${os_release_id}" != "ubuntu" ]
                 then
                     cp -f manifest_CentOS_RHEL.template manifest.template
                 fi

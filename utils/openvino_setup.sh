@@ -1,12 +1,20 @@
-#!/bin/bash
-wget https://apt.repos.intel.com/openvino/2021/GPG-PUB-KEY-INTEL-OPENVINO-2021
-sudo apt-key add GPG-PUB-KEY-INTEL-OPENVINO-2021
-echo "deb https://apt.repos.intel.com/openvino/2021 all main" | sudo tee /etc/apt/sources.list.d/intel-openvino-2021.list
-sudo apt update
-if [ "${os_version}" = "18.04" ]
+if [ "${os_release_id}" = "ubuntu" ]
 then
-    sudo apt-get install -y intel-openvino-dev-ubuntu18-2021.4.752
-elif [ "${os_version}" = "20.04" ]
+    if [ "${os_version}" = "18.04" ]
+    then
+        wget https://storage.openvinotoolkit.org/repositories/openvino/packages/2021.4.2/l_openvino_toolkit_dev_ubuntu18_p_2021.4.752.tgz
+        tar xzf l_openvino_toolkit_dev_ubuntu18_p_2021.4.752.tgz
+        mv ./l_openvino_toolkit_dev_ubuntu18_p_2021.4.752 openvino_2021
+    elif [ "${os_version}" = "20.04" ]
+    then
+        wget https://storage.openvinotoolkit.org/repositories/openvino/packages/2021.4.2/l_openvino_toolkit_dev_ubuntu20_p_2021.4.752.tgz
+        tar xzf l_openvino_toolkit_dev_ubuntu20_p_2021.4.752.tgz
+        mv ./l_openvino_toolkit_dev_ubuntu20_p_2021.4.752 openvino_2021
+    fi
+
+elif [ "${os_release_id}" = "rhel" ]
 then
-    sudo apt-get install -y intel-openvino-dev-ubuntu20-2021.4.752
+    wget https://storage.openvinotoolkit.org/repositories/openvino/packages/2021.4.2/l_openvino_toolkit_dev_rhel8_p_2021.4.752.tgz
+    tar xzf l_openvino_toolkit_dev_rhel8_p_2021.4.752.tgz
+    mv ./l_openvino_toolkit_dev_rhel8_p_2021.4.752 openvino_2021
 fi
