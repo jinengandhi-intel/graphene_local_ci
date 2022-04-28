@@ -45,7 +45,7 @@ env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
 if (fileExists('/etc/os-release')) {
     sh '''
         . /etc/os-release
-        echo $NAME > os_release_id
+        echo $ID > os_release_id
         echo $VERSION_ID > os_version
     '''
 

@@ -27,6 +27,7 @@ node (node_label) {
             sh 'cp -f $WORKSPACE/test_workloads.py . '
             sh 'cp -f $WORKSPACE/Patch/rename_protected_files.patch .'
             sh 'cp -rf $WORKSPACE/examples/* CI-Examples/'
+            sh 'cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 

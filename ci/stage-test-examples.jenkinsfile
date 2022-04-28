@@ -136,18 +136,20 @@ stage('test-examples') {
         sh 'echo "R Example Test Failed"'
     }
 
-    if(env.gcc_dump_machine != "x86_64-redhat-linux")
-    {
-        if ((Float.parseFloat(env.os_version) < 21) || (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1')))) {
+    if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
+        if ((Float.parseFloat(env.os_version) < 21) && (env.os_release_id != "centos")) {
             try {
-                timeout(time: 20, unit: 'MINUTES') {
+                timeout(time: 30, unit: 'MINUTES') {
                     sh '''#!/bin/bash
                         cd CI-Examples/openvino
                         chmod +x ./openvino_setup.sh
                         ./openvino_setup.sh
-                        source /opt/intel/openvino_2021/bin/setupvars.sh
+                        source openvino_2021/bin/setupvars.sh
+                        sed -i '$ a loader.pal_internal_mem_size = "64M"' benchmark_app.manifest.template
+                        sed -i '$ a sgx.nonpie_binary = true' benchmark_app.manifest.template
+                        sed -i 's/intel_models public_models/intel_models/' Makefile
+                        make ${MAKEOPTS} ${ARCH_LIB_OPT} intel_models
                         model_name="bert-large-uncased-whole-word-masking-squad-0001"
-                        make ${MAKEOPTS} ${ARCH_LIB_OPT} intel_models public_models
                         make ${MAKEOPTS} ${ARCH_LIB_OPT} all
                         gramine-${MODE} benchmark_app -m model/intel/${model_name}/FP32/${model_name}.xml > OUTPUT
                     '''
@@ -157,7 +159,9 @@ stage('test-examples') {
                 sh 'echo "OpenVino Example Test Failed"'
             }
         }
+    }
 
+    if (env.gcc_dump_machine != "x86_64-redhat-linux") {
         try {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
