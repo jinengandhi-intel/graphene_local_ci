@@ -144,6 +144,12 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/nginx
+                export PID=$(lsof -t -i:8002)
+                if [ "$PID" != "" ]
+                then
+                    echo "Killing $PID"
+                    kill -9 $PID
+                fi                  
                 if [ "${os_release_id}" != 'ubuntu' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "64M"' nginx.manifest.template 
@@ -245,21 +251,5 @@ stage('test-sgx') {
             env.build_ok = false
             sh 'echo "go_helloworld Example Test Failed"'
         }
-    }    
-
-    try{
-        timeout(time: 120, unit: 'MINUTES') {
-            sh '''
-                if [ "${no_cpu}" -gt 16 ]
-                then
-                    cd CI-Examples/sandstone-50-bin
-                    make SGX=1 
-                    SGX=1 make start-sandstone 2>&1 | tee OUTPUT.txt
-                fi
-            '''
-        }
-    } catch (Exception e) {
-        env.build_ok = false
-        sh 'echo "Sandstone workload Failed"'
     }
 }

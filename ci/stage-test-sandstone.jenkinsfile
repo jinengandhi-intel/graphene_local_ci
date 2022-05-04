@@ -1,17 +1,30 @@
 stage('test') {
-    env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
-    timeout(time: 120, unit: 'MINUTES') {
-        sh '''
-            if [ "${no_cpu}" -gt 16 ]
-            then
-                cd CI-Examples/sandstone-50-bin
-                if test -n "$SGX"
-                then
-                    make SGX=1 
-                    SGX=1 make start-sandstone 2>&1 | tee OUTPUT.txt
-                fi
-            fi
-        '''
+    if (env.no_cpu.toInteger() > 16)
+    {
+        try{
+            timeout(time: 120, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/sandstone-50-bin
+                    make 
+                    make start-sandstone 2>&1 | tee OUTPUT.txt
+                '''
+            }
+        } catch (Exception e) {
+            env.build_ok = false
+            sh 'echo "Sandstone workload Failed"'
+        }
+    }   
+}
+
+stage('verification') {            
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 -m pytest -v -m sandstone --junit-xml sandstone.xml test_workloads.py'
+        }
+    } catch (Exception e){
+        env.build_ok = true
+        sh 'echo "Sandstone parser failed"'
+    } finally {
+        junit 'sandstone.xml'
     }
 }
-            

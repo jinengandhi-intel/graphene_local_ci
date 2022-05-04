@@ -14,11 +14,13 @@ os_release_id = os.environ.get('os_release_id')
 node_label = os.environ.get('node_label')
 
 class Test_Workload_Results():
+    @pytest.mark.examples
     def test_bash_workload(self):
         bash_result_file = open("CI-Examples/bash/OUTPUT", "r")
         bash_contents = bash_result_file.read()
         assert("readlink" in bash_contents)
 
+    @pytest.mark.examples
     @pytest.mark.skipif((os_release_id != "ubuntu" and sgx_mode == '1'),
                     reason="Python Cent/RHEL issue")
     def test_python_workload(self):
@@ -29,6 +31,7 @@ class Test_Workload_Results():
         assert("Success 3/4" in python_contents)
         assert("Success 4/4" in python_contents)
 
+    @pytest.mark.examples
     @pytest.mark.skipif(os_release_id != "ubuntu",
                     reason="Memcached libraries not available for CENT/RHEL")
     def test_memcached_workload(self):
@@ -36,27 +39,32 @@ class Test_Workload_Results():
         memcached_contents = memcached_result_file.read()
         assert("2" in memcached_contents)
         
+    @pytest.mark.examples
     def test_lightppd_workload(self):
         for filename in glob.glob("CI-Examples/lighttpd/result-*"):
             lightppd_result_file = open(filename,"r")
         lightppd_contents = lightppd_result_file.read()
         assert("0,0" in lightppd_contents)
 
+    @pytest.mark.examples
     def test_nginx_workload(self):
         for filename in glob.glob("CI-Examples/nginx/result-*"):
             nginx_result_file = open(filename,"r")
         nginx_contents = nginx_result_file.read()
         assert("0,0" in nginx_contents)
 
+    @pytest.mark.examples
     def test_blender(self):
         blender_result_file = "CI-Examples/blender/data/images/simple_scene.blend0001.png"
         assert(path.exists(blender_result_file))
 
+    @pytest.mark.examples
     def test_redis(self):
         redis_result_file = open("CI-Examples/redis/OUTPUT", "r")
         redis_contents = redis_result_file.read()
         assert(("PING_INLINE" in redis_contents) and ("MSET" in redis_contents))
 
+    @pytest.mark.examples
     def test_sqlite_workload(self):
         sqlite_result_file = open("CI-Examples/sqlite/OUTPUT", "r")
         sqlite_contents = sqlite_result_file.read()
@@ -65,6 +73,7 @@ class Test_Workload_Results():
                 and ("row 2" in sqlite_contents) \
                 and ("row 1" in sqlite_contents))
 
+    @pytest.mark.examples
     @pytest.mark.skipif((int(no_cores) < 16),
                     reason="Go_helloworld is enabled only on servers")
     def test_go_helloworld_workload(self):
@@ -72,6 +81,7 @@ class Test_Workload_Results():
         go_helloworld_contents = go_helloworld_result_file.read()
         assert("Hello, world" in go_helloworld_contents)                
     
+    @pytest.mark.sandstone
     @pytest.mark.skipif((int(no_cores) < 16 or sgx_mode != '1'),
                     reason="Sandstone is enabled on servers with SGX")
     def test_sandstone_workload(self):
@@ -79,6 +89,7 @@ class Test_Workload_Results():
         sandstone_contents = sandstone_result_file.read()
         assert(("Loop iteration 1 finished" in sandstone_contents) and ("exit: pass" in sandstone_contents))
 
+    @pytest.mark.examples
     @pytest.mark.skipif((os_release_id != "ubuntu"),
                     reason="Rust enabled only for Ubuntu configurations.")
     def test_rust_workload(self):
@@ -86,6 +97,7 @@ class Test_Workload_Results():
         rust_contents = rust_result_file.read()
         assert("Hello World!" in rust_contents)        
 
+    @pytest.mark.examples
     @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="OpenJDK enabled only for Ubuntu Server Configurations.")
     def test_openjdk_workload(self):
@@ -93,6 +105,7 @@ class Test_Workload_Results():
         jdk_contents = jdk_result_file.read()
         assert("Final Count is:" in jdk_contents)
 
+    @pytest.mark.examples
     @pytest.mark.skipif(float(os_version) >= 21 or
                 ((node_label == 'graphene_dcap') and sgx_mode == '1'),
                     reason="Bazel Build fails for Ubuntu 21 and Graphene DCAP")
@@ -106,16 +119,19 @@ class Test_Workload_Results():
             and (re.search("\d+: 835 suit", tensorflow_contents)) \
             and (re.search("\d+: 458 bow tie", tensorflow_contents)))
 
+    @pytest.mark.examples
     def test_curl_workload(self):
         curl_result_file = open("CI-Examples/curl/RESULT", "r")
         curl_contents = curl_result_file.read()
         assert("Success 1/1" in curl_contents)
 
+    @pytest.mark.examples
     def test_nodejs_workload(self):
         nodejs_result_file = open("CI-Examples/nodejs/RESULT", "r")
         nodejs_contents = nodejs_result_file.read()
         assert("Success 1/1" in nodejs_contents)
 
+    @pytest.mark.examples
     @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="OpenJDK enabled only for Ubuntu Server Configurations.")
     def test_pytorch_workload(self):
@@ -127,6 +143,7 @@ class Test_Workload_Results():
             and ("whippet" in pytorch_contents) \
             and ("Ibizan hound, Ibizan Podenco" in pytorch_contents))
 
+    @pytest.mark.examples
     def test_r_workload(self):
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()
@@ -142,6 +159,7 @@ class Test_Workload_Results():
             and ("Overall mean (sum of " in r2_contents) \
             and ("--- End of test ---" in r2_contents))
 
+    @pytest.mark.examples
     @pytest.mark.skipif((os_release_id != "ubuntu"),
                     reason="GCC enabled only for Ubuntu configurations.")
     def test_gcc_workload(self):
@@ -151,6 +169,7 @@ class Test_Workload_Results():
             and ("diff -q test_files/bzip2 test_files/bzip2.copy" in gcc_contents) \
             and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
 
+    @pytest.mark.examples
     @pytest.mark.skipif((os_release_id == 'centos') or
                     (float(os_version) >= 21) or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Openvino enabled only for Ubuntu 18 & 20 Server Configurations")

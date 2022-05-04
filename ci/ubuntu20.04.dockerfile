@@ -46,6 +46,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libpixman-1-dev \
     libipsec-mb-dev \
     lsb-release \
+    lsof \
     musl \
     musl-tools \
     nasm \

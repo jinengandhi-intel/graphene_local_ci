@@ -48,6 +48,7 @@ RUN yum update -y && env yum install -y \
     libXtst \
     libXfixes \
     libXrender \
+    lsof \
     musl-devel \
     musl-gcc \
     nasm \
