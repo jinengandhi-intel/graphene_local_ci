@@ -46,6 +46,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libipsec-mb-dev \
     linux-headers-4.15.0-20-generic \
     lsb-release \
+    lsof \
     musl \
     musl-tools \
     nasm \
