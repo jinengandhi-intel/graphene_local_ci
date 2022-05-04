@@ -7,11 +7,11 @@ import os
 import pytest
 import re
 
-gcc_dumpmachine = os.environ.get('gcc_dump_machine')
 sgx_mode = os.environ.get('SGX')
 no_cores = os.environ.get('no_cpu')
 os_version = os.environ.get('os_version')
 os_release_id = os.environ.get('os_release_id')
+node_label = os.environ.get('node_label')
 
 class Test_Workload_Results():
     def test_bash_workload(self):
@@ -19,7 +19,7 @@ class Test_Workload_Results():
         bash_contents = bash_result_file.read()
         assert("readlink" in bash_contents)
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux' and sgx_mode == '1'),
+    @pytest.mark.skipif((os_release_id != "ubuntu" and sgx_mode == '1'),
                     reason="Python Cent/RHEL issue")
     def test_python_workload(self):
         python_result_file = open("CI-Examples/python/TEST_STDOUT", "r")
@@ -29,7 +29,7 @@ class Test_Workload_Results():
         assert("Success 3/4" in python_contents)
         assert("Success 4/4" in python_contents)
 
-    @pytest.mark.skipif(gcc_dumpmachine == 'x86_64-redhat-linux',
+    @pytest.mark.skipif(os_release_id != "ubuntu",
                     reason="Memcached libraries not available for CENT/RHEL")
     def test_memcached_workload(self):
         memcached_result_file = open("CI-Examples/memcached/OUTPUT.txt", "r")
@@ -79,7 +79,7 @@ class Test_Workload_Results():
         sandstone_contents = sandstone_result_file.read()
         assert(("Loop iteration 1 finished" in sandstone_contents) and ("exit: pass" in sandstone_contents))
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+    @pytest.mark.skipif((os_release_id != "ubuntu"),
                     reason="Rust enabled only for Ubuntu configurations.")
     def test_rust_workload(self):
         rust_result_file = open("CI-Examples/rust_helloworld/OUTPUT.txt", "r")
@@ -93,8 +93,9 @@ class Test_Workload_Results():
         jdk_contents = jdk_result_file.read()
         assert("Final Count is:" in jdk_contents)
 
-    @pytest.mark.skipif(float(os_version) >= 21,
-                    reason="Bazel Build fails for Ubuntu 21")
+    @pytest.mark.skipif(float(os_version) >= 21 or
+                ((node_label == 'graphene_dcap') and sgx_mode == '1'),
+                    reason="Bazel Build fails for Ubuntu 21 and Graphene DCAP")
     def test_tensorflow_workload(self):
         tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
         tensorflow_contents = tensorflow_result_file.read()
@@ -141,7 +142,7 @@ class Test_Workload_Results():
             and ("Overall mean (sum of " in r2_contents) \
             and ("--- End of test ---" in r2_contents))
 
-    @pytest.mark.skipif((gcc_dumpmachine == 'x86_64-redhat-linux'),
+    @pytest.mark.skipif((os_release_id != "ubuntu"),
                     reason="GCC enabled only for Ubuntu configurations.")
     def test_gcc_workload(self):
         gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")

@@ -36,7 +36,7 @@ node(node_label) {
 
             load '../ci/config-docker.jenkinsfile'
 
-            if (env.gcc_dump_machine == "x86_64-redhat-linux") {  
+            if (env.os_release_id != "ubuntu") {
                 sh 'sed -i -e \'/dist\\|apport/c\\\' $WORKSPACE/CI-Examples/python/python.manifest.template'
             }
 
@@ -44,6 +44,7 @@ node(node_label) {
             load '.ci/lib/config-ubuntu18.04.jenkinsfile'
             load '.ci/lib/config-release.jenkinsfile'
 
+            load '../ci/config-centos8.jenkinsfile'
             load '../ci/stage-build-nosgx.jenkinsfile'
             load '../ci/stage-test.jenkinsfile'
             load '../ci/stage-test-direct.jenkinsfile'

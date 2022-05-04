@@ -9,18 +9,16 @@ stage('test-examples') {
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1')))
     {
         try {
-            env.JAVAHOME = sh(script: "java -XshowSettings:properties -version 2>&1 > /dev/null \
-	            | grep 'java.home' | cut -d'=' -f2", returnStdout: true).trim()
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/openjdk
-                    if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                    if [ "${os_release_id}" != 'ubuntu' ]
                     then
                         sed -i '$ a loader.pal_internal_mem_size = "64M"' java.manifest.template
                         sed -i -e "/file:\\/usr\\/lib\\/jvm\\/java-11-openjdk-amd64/,+d" java.manifest.template
                         sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$JAVAHOME\\/lib\\/\\"," java.manifest.template
                     fi
-                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make ${MAKEOPTS} all
                     gramine-${MODE} java MultiThreadMain > OUTPUT
                 '''
             }
@@ -30,10 +28,9 @@ stage('test-examples') {
         }
     }
 
-    if (Float.parseFloat(env.os_version) < 21) {
+    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_dcap") && (env.SGX == '1'))) {
         try {
             timeout(time: 15, unit: 'MINUTES') {
-                env.PYTHON_BIN_PATH= sh(script: 'which python3', returnStdout: true).trim()
                 sh '''
                     cd CI-Examples/tensorflow-lite
                     ../common_tools/download --output bazel-0.16.1-installer-linux-x86_64.sh \
@@ -41,14 +38,14 @@ stage('test-examples') {
                     --url https://github.com/bazelbuild/bazel/releases/download/0.16.1/bazel-0.16.1-installer-linux-x86_64.sh
                     chmod +x ./bazel-0.16.1-installer-linux-x86_64.sh
                     ./bazel-0.16.1-installer-linux-x86_64.sh --user
-                    if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                    if [ "${os_release_id}" != 'ubuntu' ]
                     then
                         make ${MAKEOPTS} tensorflow/configure
                         sed -i '$ a loader.pal_internal_mem_size = "64M"' label_image.manifest.template
                         sed -i "s/\\/usr\\/bin\\/env python/\\/usr\\/bin\\/env python3/" tensorflow/tensorflow/tools/git/gen_git_source.py
-                        make ${ARCH_LIB_OPT} PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
+                        make PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
                     fi
-                    make ${ARCH_LIB_OPT} all
+                    make all
                     make ${MAKEOPTS} run-gramine > OUTPUT
                 '''
             }
@@ -62,11 +59,11 @@ stage('test-examples') {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/curl
-                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                if [ "${os_release_id}" != 'ubuntu' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "64M"' curl.manifest.template
                 fi
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} check > RESULT
             '''
         }
@@ -79,12 +76,12 @@ stage('test-examples') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/nodejs
-                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                if [ "${os_release_id}" != 'ubuntu' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "64M"' nodejs.manifest.template
                     sed -i "s/{{ nodejs_dir }}\\/nodejs/{{ nodejs_dir }}\\/node/g" nodejs.manifest.template
                 fi
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} check > RESULT
             '''
         }
@@ -96,15 +93,23 @@ stage('test-examples') {
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1')))
     {
         try {
-            timeout(time: 5, unit: 'MINUTES') {
+            timeout(time: 15, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/pytorch
-                    if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                    if [ "${os_release_id}" != 'ubuntu' ]
                     then
-                        sed -i \'s/"file:{{ python.distlib }}/"file:\\/usr\\/local\\/lib\\/python3.6\\/site-packages/\' pytorch.manifest.template
+                        if [ "${os_release_id}" == 'centos' ]
+                        then
+                            sed -i '$ a loader.argv0_override="{{ entrypoint }}"' pytorch.manifest.template
+                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$SETUPTOOLS_PATH\\/\\"," pytorch.manifest.template
+                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$DATACLASSES_PATH\\/\\"," pytorch.manifest.template
+                            sed -i -e "/file:{{ python.distlib }}/,+d" pytorch.manifest.template
+                        else
+                            sed -i \'s/"file:{{ python.distlib }}/"file:\\/usr\\/local\\/lib\\/python3.6\\/site-packages/\' pytorch.manifest.template
+                        fi
                     fi
                     python3 download-pretrained-model.py
-                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make ${MAKEOPTS} all
                     gramine-${MODE} ./pytorch ./pytorchexample.py
                 '''
             }
@@ -116,17 +121,19 @@ stage('test-examples') {
 
     try {
         timeout(time: 10, unit: 'MINUTES') {
-            env.R_HOME = sh(script: 'R RHOME', returnStdout: true).trim()
             sh '''
                 cd CI-Examples/r
-                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                if [ "${os_release_id}" != 'ubuntu' ]
                 then
+                    export R_HOME=/usr/lib64/R
                     sed -i '$ a loader.pal_internal_mem_size = "128M"' R.manifest.template
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/uname",\' R.manifest.template
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/sh",\' R.manifest.template
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/rm",\' R.manifest.template
                     sed -i 's/sgx.enclave_size = "1G"/sgx.enclave_size = "2G"/' R.manifest.template
                 fi
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r > RESULT_1
                 gramine-${MODE} ./R --slave --vanilla -f scripts/R-benchmark-25.R > RESULT_2
             '''
@@ -148,9 +155,9 @@ stage('test-examples') {
                         sed -i '$ a loader.pal_internal_mem_size = "64M"' benchmark_app.manifest.template
                         sed -i '$ a sgx.nonpie_binary = true' benchmark_app.manifest.template
                         sed -i 's/intel_models public_models/intel_models/' Makefile
-                        make ${MAKEOPTS} ${ARCH_LIB_OPT} intel_models
+                        make ${MAKEOPTS} intel_models
                         model_name="bert-large-uncased-whole-word-masking-squad-0001"
-                        make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                        make ${MAKEOPTS} all
                         gramine-${MODE} benchmark_app -m model/intel/${model_name}/FP32/${model_name}.xml > OUTPUT
                     '''
                 }
@@ -161,7 +168,7 @@ stage('test-examples') {
         }
     }
 
-    if (env.gcc_dump_machine != "x86_64-redhat-linux") {
+    if (env.os_release_id == "ubuntu") {
         try {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
@@ -179,7 +186,7 @@ stage('test-examples') {
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/gcc
-                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make ${MAKEOPTS} all
                     make ${MAKEOPTS} check > OUTPUT
                 '''
             }

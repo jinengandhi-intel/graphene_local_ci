@@ -45,7 +45,7 @@ stage('test-direct') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/python
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} DEBUG=1 all
+                make ${MAKEOPTS} DEBUG=1 all
                 make check
             '''
         }
@@ -61,7 +61,7 @@ stage('test-direct') {
             sh '''
                 cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} regression
             '''
         }
@@ -70,13 +70,12 @@ stage('test-direct') {
         sh 'echo "Bash Example Test Failed"'
     }
 
-    if(env.gcc_dump_machine != "x86_64-redhat-linux") 
-    {
+    if (env.os_release_id == "ubuntu") {
         try {
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/memcached
-                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make ${MAKEOPTS} all
                     make start-gramine-server &
                     ../../Scripts/wait_for_server 5 127.0.0.1 11211
                     # memcslap populates server but doesn't report errors, use
@@ -100,7 +99,7 @@ stage('test-direct') {
                     USE_SELECT=1
                     export USE_SELECT
                 fi
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make start-gramine-server &
                 ../../Scripts/wait_for_server 5 127.0.0.1 6379
                 ./src/src/redis-benchmark 2>&1 | tee OUTPUT
@@ -115,7 +114,7 @@ stage('test-direct') {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/lighttpd
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} start-gramine-server &
                 ../../Scripts/wait_for_server 5 127.0.0.1 8003
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8003
@@ -130,7 +129,7 @@ stage('test-direct') {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/nginx
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} start-gramine-server &
                 ../../Scripts/wait_for_server 5 127.0.0.1 8002
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8002
@@ -145,7 +144,7 @@ stage('test-direct') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/blender
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make check
             '''
         }
@@ -158,7 +157,7 @@ stage('test-direct') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/sqlite
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} regression
             '''
         }

@@ -46,11 +46,11 @@ stage('test-sgx') {
             sh '''
                 cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
-                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                if [ "${os_release_id}" != 'ubuntu' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "128M"' manifest.template 
                 fi                    
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 regression
             '''
         }
@@ -59,13 +59,12 @@ stage('test-sgx') {
         sh 'echo "Bash Example Test Failed"'
     }
  
-    if(env.gcc_dump_machine != "x86_64-redhat-linux") 
-    {  
+    if (env.os_release_id == "ubuntu") {  
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/memcached
-                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make ${MAKEOPTS} all
                     make SGX=1 start-gramine-server &
                     ../../Scripts/wait_for_server 60 127.0.0.1 11211
                     # memcslap populates server but doesn't report errors, use
@@ -83,7 +82,7 @@ stage('test-sgx') {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/python
-                    make ${MAKEOPTS} ${ARCH_LIB_OPT} DEBUG=1 all
+                    make ${MAKEOPTS} DEBUG=1 all
                     make ${MAKEOPTS} SGX=1 check
                 '''
             }
@@ -107,11 +106,11 @@ stage('test-sgx') {
                 fi
 
                 cd CI-Examples/redis
-                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                if [ "${os_release_id}" != 'ubuntu' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "64M"' redis-server.manifest.template 
                 fi                
-                make ${MAKEOPTS} ${ARCH_LIB_OPT}
+                make ${MAKEOPTS}
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 6379
                 ./src/src/redis-benchmark 2>&1 | tee OUTPUT
@@ -126,11 +125,11 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/lighttpd
-                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                if [ "${os_release_id}" != 'ubuntu' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "64M"' lighttpd.manifest.template 
                 fi                
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 8003
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8003
@@ -145,11 +144,11 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/nginx
-                if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+                if [ "${os_release_id}" != 'ubuntu' ]
                 then
                     sed -i '$ a loader.pal_internal_mem_size = "64M"' nginx.manifest.template 
                 fi                
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../Scripts/wait_for_server 60 127.0.0.1 8002
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8002
@@ -169,11 +168,11 @@ stage('test-sgx') {
                 sed -i 's/sgx.enclave_size = "2048M"/sgx.enclave_size = "4G"/g' blender.manifest.template
                 sed -i 's/sgx.thread_num = 64/sgx.thread_num = 256/g' blender.manifest.template
             fi
-            if [ "${gcc_dump_machine}" == 'x86_64-redhat-linux' ]
+            if [ "${os_release_id}" != 'ubuntu' ]
             then
                 sed -i '$ a loader.pal_internal_mem_size = "64M"' blender.manifest.template 
             fi
-            make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+            make ${MAKEOPTS} all
             make ${MAKEOPTS} SGX=1 check	
             '''
         }
@@ -186,7 +185,7 @@ stage('test-sgx') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/sqlite
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 regression
             '''
         }
