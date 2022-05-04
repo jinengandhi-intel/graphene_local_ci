@@ -1,0 +1,13 @@
+// Environment for CentOS/RHEL setup
+env.ARCH_LIBDIR="/lib64"
+
+// Environment for openjdk workload
+env.JAVAHOME = sh(script: "java -XshowSettings:properties -version 2>&1 > /dev/null \
+	            | grep 'java.home' | cut -d'=' -f2", returnStdout: true).trim()
+
+// Environment for bazel workload
+env.PYTHON_BIN_PATH = sh(script: 'which python3', returnStdout: true).trim()
+
+// Environment for pytorch workload
+env.SETUPTOOLS_PATH = sh(script: 'pip3 show setuptools | grep Location: | cut -d" " -f2', returnStdout: true).trim()
+env.DATACLASSES_PATH = sh(script: 'pip3 show dataclasses | grep Location: | cut -d" " -f2', returnStdout: true).trim()
