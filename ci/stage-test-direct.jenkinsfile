@@ -45,13 +45,15 @@ stage('test-direct') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/python
-                make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                make ${MAKEOPTS} ${ARCH_LIB_OPT} DEBUG=1 all
                 make check
             '''
         }
     } catch (Exception e){
         env.build_ok = false
         sh 'echo "Python Example Test Failed"'
+    } finally {
+            archiveArtifacts 'CI-Examples/python/TEST_*'
     }
 
     try{

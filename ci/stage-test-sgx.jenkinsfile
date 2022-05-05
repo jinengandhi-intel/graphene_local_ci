@@ -83,13 +83,15 @@ stage('test-sgx') {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/python
-                    make ${MAKEOPTS} ${ARCH_LIB_OPT} all
+                    make ${MAKEOPTS} ${ARCH_LIB_OPT} DEBUG=1 all
                     make ${MAKEOPTS} SGX=1 check
                 '''
             }
         } catch (Exception e){
             env.build_ok = false
             sh 'echo "Python Example Test Failed"'
+        } finally {
+            archiveArtifacts 'CI-Examples/python/TEST_*'
         }
     }
 
