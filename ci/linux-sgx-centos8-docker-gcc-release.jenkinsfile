@@ -28,6 +28,7 @@ node (node_label) {
             sh 'cp -rf $WORKSPACE/examples/* CI-Examples/'
             sh 'cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/'
             sh 'cp -f $WORKSPACE/Patch/rename_protected_file.patch .'
+            sh 'cp -rf $WORKSPACE/utils/rust_centos_setup/* CI-Examples/rust/'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 

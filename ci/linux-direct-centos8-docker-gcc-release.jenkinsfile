@@ -26,6 +26,7 @@ node(node_label) {
             sh 'cp -f $WORKSPACE/test_workloads.py . '
             sh 'cp -rf $WORKSPACE/examples/* CI-Examples/'
             sh 'cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/'
+            sh 'cp -rf $WORKSPACE/utils/rust_centos_setup/* CI-Examples/rust/'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
 
             sh 'sed -i -e \'s/dent != g_dentry_root && dent->state & DENTRY_VALID/0/\' \

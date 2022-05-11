@@ -168,20 +168,26 @@ stage('test-examples') {
         }
     }
 
-    if (env.os_release_id == "ubuntu") {
-        try {
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/rust_helloworld
-                    export PATH=/home/intel/rust_binaries/bin:$PATH
-                    make run-release-${MODE} 2>&1 | tee OUTPUT.txt
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "Rust example Test Failed"'
+    try {
+        timeout(time: 30, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/rust
+                if [ "${os_release_id}" == 'centos' ]
+                then
+                    sudo yum install -y *.rpm
+                fi
+                make ${MAKEOPTS}
+                make ${MAKEOPTS} start-gramine-server &
+                ../../Scripts/wait_for_server 60 127.0.0.1 3000
+                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:3000 > RESULT
+            '''
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Rust example Test Failed"'
+    }
 
+    if (env.os_release_id == "ubuntu") {
         try {
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''
