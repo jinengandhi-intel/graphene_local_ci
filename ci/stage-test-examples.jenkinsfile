@@ -168,20 +168,31 @@ stage('test-examples') {
         }
     }
 
-    if (env.os_release_id == "ubuntu") {
-        try {
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/rust_helloworld
-                    export PATH=/home/intel/rust_binaries/bin:$PATH
-                    make run-release-${MODE} 2>&1 | tee OUTPUT.txt
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "Rust example Test Failed"'
+    try {
+        timeout(time: 15, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/rust
+                if [ "${os_release_id}" == 'centos' ]
+                then
+                    wget http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/Packages/rust-1.58.1-1.module_el8.6.0+1082+15e7b372.x86_64.rpm --tries=2
+                    wget http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/Packages/llvm-libs-13.0.0-3.module_el8.6.0+1029+6594c364.x86_64.rpm --tries=2
+                    wget http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/Packages/rust-std-static-1.58.1-1.module_el8.6.0+1082+15e7b372.x86_64.rpm --tries=2
+                    wget http://mirror.centos.org/centos/8-stream/AppStream/x86_64/os/Packages/cargo-1.58.1-1.module_el8.6.0+1082+15e7b372.x86_64.rpm --tries=2
+                    sudo yum install -y ./rust-std-static-1.58.1-1.module_el8.6.0+1082+15e7b372.x86_64.rpm ./llvm-libs-13.0.0-3.module_el8.6.0+1029+6594c364.x86_64.rpm ./rust-1.58.1-1.module_el8.6.0+1082+15e7b372.x86_64.rpm
+                    sudo yum install -y ./cargo-1.58.1-1.module_el8.6.0+1082+15e7b372.x86_64.rpm
+                fi
+                make ${MAKEOPTS}
+                make ${MAKEOPTS} start-gramine-server &
+                ../../Scripts/wait_for_server 5 127.0.0.1 3000
+                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:3000 > RESULT
+            '''
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Rust example Test Failed"'
+    }
 
+    if (env.os_release_id == "ubuntu") {
         try {
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''

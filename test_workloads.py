@@ -90,12 +90,12 @@ class Test_Workload_Results():
         assert(("Loop iteration 1 finished" in sandstone_contents) and ("exit: pass" in sandstone_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != "ubuntu"),
-                    reason="Rust enabled only for Ubuntu configurations.")
     def test_rust_workload(self):
-        rust_result_file = open("CI-Examples/rust_helloworld/OUTPUT.txt", "r")
+        data = open("CI-Examples/rust/RESULT", "r")
+        result_file = data.read().split("Result file: ")[1].strip()
+        rust_result_file = open("CI-Examples/rust/{}".format(result_file), "r")
         rust_contents = rust_result_file.read()
-        assert("Hello World!" in rust_contents)        
+        assert("0,0\n0,0\n" in rust_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),

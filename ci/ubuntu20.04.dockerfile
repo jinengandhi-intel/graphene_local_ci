@@ -6,6 +6,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     autoconf \
     bison \
     build-essential \
+    cargo \
     clang \
     cmake \
     curl \
@@ -114,10 +115,6 @@ RUN rm -f /intel/.rnd
 
 # Make a directory for the intel driver
 RUN mkdir -p /opt/intel && chown 1000 /opt/intel
-RUN mkdir -p /home/intel/rust_binaries && chown 1000 /home/intel/rust_binaries
-ENV CARGO_HOME="/home/intel/rust_binaries"
-ENV RUSTUP_HOME="/home/intel/rust_binaries"
-RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --default-toolchain stable
 
 # Make a directory for the Gramine installation
 RUN mkdir -p /home/intel/gramine_install && chown 1000 /home/intel/gramine_install
