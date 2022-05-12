@@ -28,6 +28,7 @@ node(node_label) {
             sh 'cp -rf ~/jenkins/sandstone-50-bin CI-Examples/'
             sh 'cp -f $WORKSPACE/test_workloads.py . '
             sh 'cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/'
+            sh 'cp -f $WORKSPACE/Patch/rename_protected_file.patch .'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 
