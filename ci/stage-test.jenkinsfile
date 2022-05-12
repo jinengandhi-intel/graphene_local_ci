@@ -117,7 +117,7 @@ stage('test') {
                 sh '''
                     cd LibOS/shim/test/fs
                     if test -n "$SGX"
-                    then                     
+                    then
                         gramine-test --sgx build -v
                     else
                         gramine-test build -v

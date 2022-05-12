@@ -2,7 +2,15 @@ stage('build') {
     if (env.CC == 'clang') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
-
+    try {
+        sh '''
+            cd "$WORKSPACE"        
+            git apply rename_protected_file.patch
+        '''        
+    } catch (Exception e){
+        env.build_ok = true
+        sh 'echo "Failed to apply Git patch for FS testcase"'
+    }
     script {
         if (env.build_type == "manual") {
 
