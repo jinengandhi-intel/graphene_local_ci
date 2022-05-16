@@ -1,0 +1,45 @@
+node (node_label) {
+    env.ORIG_WKSP = env.WORKSPACE
+    env.build_ok = true
+    try {
+        stage('checkout'){
+            dir ('./') {
+                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
+            }
+
+            dir ("gramine") {
+                git url: 'https://github.com/gramineproject/gramine.git'
+            }
+
+        }
+
+        dir ("gramine") {
+            sh "cp -rf $WORKSPACE/debian ."
+            sh "cp -f $WORKSPACE/ci/pkey.txt ."
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
+            env.SGX = '1'
+
+            load '../ci/config-docker.jenkinsfile'
+
+            docker.build(
+                "local:${env.BUILD_TAG}",
+                '-f ../ci/debian11.dockerfile .'
+            ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
+
+                load '../ci/pkg_deb.jenkinsfile'
+            }
+        }
+
+    } finally {
+        stage('cleanup'){
+            sh 'sudo rm -rf $ORIG_WKSP/*'
+        }
+    }
+
+    if(env.build_ok) {
+        currentBuild.result = "SUCCESS"
+    } else {
+        currentBuild.result = "FAILURE"
+    }
+}
+

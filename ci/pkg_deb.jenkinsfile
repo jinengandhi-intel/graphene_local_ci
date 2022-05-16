@@ -1,0 +1,27 @@
+stage('pkg_deb') {
+    try {
+        sh '''
+            sudo debuild --set-envvar=http_proxy=http://proxy-chain.intel.com:911/ --set-envvar=https_proxy=http://proxy-chain.intel.com:912/
+            mkdir package
+            sudo cp -rf ../*.deb ./package
+            cd package
+            sudo apt install -y ./*.deb
+            gramine-sgx-gen-private-key
+        '''
+        } catch (Exception e) {}
+    finally {
+        archiveArtifacts 'package/*.deb'
+    }
+}
+
+stage('test') {
+    timeout(time: 5, unit: 'MINUTES') {
+        try {
+            sh '''
+                cd CI-Examples/helloworld
+                make ${MAKEOPTS} all
+                make check
+            '''
+        } catch (Exception e) {}
+    }
+}
