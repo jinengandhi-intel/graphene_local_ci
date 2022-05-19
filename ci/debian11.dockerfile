@@ -16,23 +16,41 @@ RUN apt-get update
 
 # keep this list synced with Build-Depends: in debian/control
 RUN apt-get install -y build-essential \
+    apache2-utils \
     autoconf \
     bison \
     devscripts \
     gawk \
+    libaio1 \
     libcurl4-openssl-dev \
     libprotobuf-c-dev \
     libsgx-dcap-quote-verify-dev \
+    libnss-mdns \
+    libssl-dev \
+    libxi6 \
+    libxxf86vm1 \
+    libxfixes3 \
+    libxrender1 \
+    lsof \
     meson \
     nasm \
+    net-tools \
+    netcat-openbsd \
     ninja-build \
     pkg-config \
     protobuf-c-compiler \
     python3-breathe \
     python3-cryptography \
+    python3-numpy \
+    python3-pytest \
+    python3-scipy \
     python3-sphinx \
     python3-sphinx-rtd-theme \
-    sudo
+    sudo \
+    sqlite3 \
+    wget \
+    zlib1g \
+    zlib1g-dev
 
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G sudo -m -d /intel -c "intel Jenkins" intel && \

@@ -15,6 +15,7 @@ node_label = os.environ.get('node_label')
 
 class Test_Workload_Results():
     @pytest.mark.examples
+    @pytest.mark.debian_verification
     def test_bash_workload(self):
         bash_result_file = open("CI-Examples/bash/OUTPUT", "r")
         bash_contents = bash_result_file.read()
@@ -40,6 +41,7 @@ class Test_Workload_Results():
         assert("2" in memcached_contents)
         
     @pytest.mark.examples
+    @pytest.mark.debian_verification
     def test_lightppd_workload(self):
         for filename in glob.glob("CI-Examples/lighttpd/result-*"):
             lightppd_result_file = open(filename,"r")
@@ -47,6 +49,7 @@ class Test_Workload_Results():
         assert("0,0" in lightppd_contents)
 
     @pytest.mark.examples
+    @pytest.mark.debian_verification
     def test_nginx_workload(self):
         for filename in glob.glob("CI-Examples/nginx/result-*"):
             nginx_result_file = open(filename,"r")
@@ -54,17 +57,20 @@ class Test_Workload_Results():
         assert("0,0" in nginx_contents)
 
     @pytest.mark.examples
+    @pytest.mark.debian_verification
     def test_blender(self):
         blender_result_file = "CI-Examples/blender/data/images/simple_scene.blend0001.png"
         assert(path.exists(blender_result_file))
 
     @pytest.mark.examples
+    @pytest.mark.debian_verification
     def test_redis(self):
         redis_result_file = open("CI-Examples/redis/OUTPUT", "r")
         redis_contents = redis_result_file.read()
         assert(("PING_INLINE" in redis_contents) and ("MSET" in redis_contents))
 
     @pytest.mark.examples
+    @pytest.mark.debian_verification
     def test_sqlite_workload(self):
         sqlite_result_file = open("CI-Examples/sqlite/OUTPUT", "r")
         sqlite_contents = sqlite_result_file.read()
