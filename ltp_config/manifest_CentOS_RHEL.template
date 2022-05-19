@@ -61,5 +61,8 @@ sgx.trusted_files = [
   "file:{{ arch_libdir }}/libattr.so.1",
   "file:{{ arch_libdir }}/libpcre2-8.so.0",
   "file:{{ arch_libdir }}/libtinfo.so.6",
+  "file:/usr/bin/coreutils",
+  "file:/usr/lib64/libcap.so.2",
+
 ]
 

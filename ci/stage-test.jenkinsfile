@@ -20,7 +20,14 @@ stage('test') {
             archiveArtifacts 'Pal/regression/pal-regression.xml'
             junit 'Pal/regression/pal-regression.xml'
         }
-
+        if (env.os_release_id != "ubuntu")
+        {  
+            sh'''
+            cd LibOS/shim/test/regression
+            sed -i \'/^sgx.trusted_files = \\[.*/a "file:{{ arch_libdir }}/libtinfo.so.6",\' manifest.template
+            '''
+        }
+            
         try {
             timeout(time: 15, unit: 'MINUTES') {
 
