@@ -131,6 +131,8 @@ stage('test-examples') {
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/uname",\' R.manifest.template
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/sh",\' R.manifest.template
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/rm",\' R.manifest.template
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/coreutils",\' R.manifest.template
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/lib64/libcap.so.2",\' R.manifest.template
                     sed -i 's/sgx.enclave_size = "1G"/sgx.enclave_size = "2G"/' R.manifest.template
                 fi
                 make ${MAKEOPTS} all
