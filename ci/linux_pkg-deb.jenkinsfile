@@ -16,6 +16,7 @@ node (node_label) {
         dir ("gramine") {
             sh "cp -rf $WORKSPACE/debian ."
             sh "cp -f $WORKSPACE/ci/pkey.txt ."
+            sh 'cp -f $WORKSPACE/test_workloads.py . '
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 
@@ -31,9 +32,7 @@ node (node_label) {
         }
 
     } finally {
-        stage('cleanup'){
-            sh 'sudo rm -rf $ORIG_WKSP/*'
-        }
+        sh 'sudo rm -rf $ORIG_WKSP/*'
     }
 
     if(env.build_ok) {
