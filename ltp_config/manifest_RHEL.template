@@ -1,0 +1,65 @@
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "{{ entrypoint }}"
+
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/lib:/usr/lib64"
+loader.env.PATH = "/bin:/usr/bin:."
+loader.env.LD_PRELOAD = "{{ coreutils_libdir }}/libstdbuf.so"
+loader.env._STDBUF_O = "L"
+loader.insecure__use_cmdline_argv = true
+
+fs.root.uri = "file:{{ binary_dir }}"
+
+fs.mounts = [  
+  { path = "etc", uri = "file:etc" },
+  { path = "/bin", uri = "file:/bin" },
+  { path = "/boot", uri = "file:/boot" },
+  { path = "/proc", uri = "file:/proc" },
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+  { path = "/usr", uri = "file:/usr" },
+  { path = "/tmp", uri = "file:/tmp" },
+  { path = "/dev/cpu_dma_latency", uri = "file:/dev/cpu_dma_latency" },
+]
+
+sys.brk.max_size = "32M"
+sys.stack.size = "4M"
+sgx.nonpie_binary = true
+sgx.debug = true
+sgx.thread_num = 13
+
+sgx.allowed_files = [
+    "file:/tmp",
+    "file:etc",
+    "file:{{ gramine.runtimedir() }}",
+    "file:/bin",
+    "file:/proc",
+    "file:{{ gramine.runtimedir() }}/libnss_compat.so.2",
+    "file:{{ arch_libdir }}/libnss_compat.so.2",
+    "file:{{ arch_libdir }}/libnss_systemd.so.2",
+    "file:install-sgx/testcases/bin/pipe2_02_child",
+    "file:install-sgx/testcases/bin/execvp01_child",
+    "file:install-sgx/testcases/bin/execv01_child",
+    "file:install-sgx/testcases/bin/execlp01_child",
+    "file:install-sgx/testcases/bin/execl01_child",
+    "file:/dev/cpu_dma_latency",
+]
+
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ binary_dir }}/{{ entrypoint }}",
+  "file:{{ gramine.runtimedir() }}/ld-linux-x86-64.so.2",
+  "file:{{ gramine.runtimedir() }}/libc.so.6",
+  "file:{{ gramine.runtimedir() }}/libdl.so.2",
+  "file:{{ gramine.runtimedir() }}/libm.so.6",
+  "file:{{ gramine.runtimedir() }}/libpthread.so.0",
+  "file:{{ gramine.runtimedir() }}/librt.so.1",
+  "file:{{ coreutils_libdir }}/libstdbuf.so",
+  "file:{{ gramine.runtimedir() }}/libnss_files.so.2",
+  "file:{{ arch_libdir }}/libnss_files.so.2",
+  "file:{{ arch_libdir }}/libselinux.so.1",
+  "file:{{ arch_libdir }}/libacl.so.1",
+  "file:{{ arch_libdir }}/libattr.so.1",
+  "file:{{ arch_libdir }}/libpcre2-8.so.0",
+  "file:{{ arch_libdir }}/libtinfo.so.6",
+]
+
