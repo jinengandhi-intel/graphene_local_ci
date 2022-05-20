@@ -4,9 +4,13 @@ stage('test-sgx') {
             sh '''
                 cd LibOS/shim/test/ltp
                 cp -f toml_files/tests_sgx.toml tests.toml
-                if [ "${os_release_id}" != "ubuntu" ]
+                if [ "${os_release_id}" = "centos" ]
                 then
-                    cp -f manifest_CentOS_RHEL.template manifest.template
+                    cp -f manifest_CentOS.template manifest.template
+                fi
+                if [ "${os_release_id}" = "rhel" ]
+                then
+                    cp -f manifest_RHEL.template manifest.template
                 fi
                 if [ "${os_version}" = "18.04" ]
                 then

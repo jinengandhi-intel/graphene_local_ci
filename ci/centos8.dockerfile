@@ -11,8 +11,7 @@ RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
 
 RUN yum install -y yum-utils epel-release
 RUN dnf copr enable -y ngompa/musl-libc
-
-RUN yum update -y && env yum install -y \
+RUN yum update -y --exclude=texlive-context && env yum install -y \
     libunwind \
     ncurses-devel \
     bison \
