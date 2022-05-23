@@ -1,0 +1,11 @@
+stage('test') {
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/helloworld
+                make ${MAKEOPTS} all
+                make check
+            '''
+        }
+    } catch (Exception e) {}
+}

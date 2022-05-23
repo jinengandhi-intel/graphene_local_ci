@@ -2,17 +2,18 @@ stage('build') {
     if (env.CC == 'clang') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
-    try {
-        sh '''
-            cd "$WORKSPACE"        
-            git apply rename_protected_file.patch
-        '''        
-    } catch (Exception e){
-        env.build_ok = true
-        sh 'echo "Failed to apply Git patch for FS testcase"'
-    }
+
     script {
         if (env.build_type == "manual") {
+            try {
+                sh '''
+                    cd "$WORKSPACE"
+                    git apply rename_protected_file.patch
+                '''
+            } catch (Exception e){
+                env.build_ok = true
+                sh 'echo "Failed to apply Git patch for FS testcase"'
+            }
 
             if (env.node_label == "graphene_oot") {
                 sh '''
@@ -118,30 +119,68 @@ stage('build') {
             sh 'rm -rf build'
             sh 'git clean -Xf subprojects'
         } else {
+            env.LC_ALL = "C.UTF-8"
+            env.LANG = "C.UTF-8"
 
-            sh '''sudo apt-key adv --keyserver-options http-proxy=http://proxy-chain.intel.com:911 \
-             --fetch-keys https://packages.grapheneproject.io/graphene.asc
-             echo "deb [arch=amd64 signed-by=EA3C2D624681AC968521587A5EE1171912234070] \
-             https://packages.grapheneproject.io/ unstable main" | sudo tee /etc/apt/sources.list.d/graphene-unstable.list
-             sudo apt update
-            '''
+            if (env.os_release_id == "centos") {
+                env.ARCH_LIBDIR="/lib64"
+                sh '''
+                    sudo yum-config-manager --add-repo https://packages.gramineproject.io/rpm/gramine.repo
+                    sudo yum update
+                '''
 
-            if (env.build_type == "package_in_kernel") {
-                sh 'sudo apt install graphene-inkernel'
-            } else if (env.build_type == "package_oot") {
-                sh 'sudo apt install graphene-oot'
-            } else if (env.build_type == "package_dcap") {
-                sh 'sudo apt install graphene-dcap'
+                if (env.gramine_version == "v1.3") {
+                    sh 'sudo yum install -y gramine --enablerepo=gramine-unstable'
+                } else {
+                    sh 'sudo yum install -y gramine'
+                }
+
+                if (env.gramine_version == "v1.2_update") {
+                    sh 'sudo yum update && sudo yum upgrade -y --enablerepo=gramine-unstable'
+                }
             } else {
-                currentBuild.result = "ABORTED"
-                error("Aborting the build")
-            }
+                if (env.os_version == "18.04") {
+                    env.ubuntu_repo = "bionic"
+                } else if (env.os_version == "20.04") {
+                    env.ubuntu_repo = "focal"
+                }
 
-            //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
-            //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
-            
-            //env.GRAPHENE_PKGLIBDIR = '/usr/lib/x86_64-linux-gnu/graphene'
-        }
+                if (env.gramine_version == "v1.3") {
+                    env.gramine_branch = "unstable"
+                } else {
+                    env.gramine_branch = "stable"
+                }
+
+                sh '''
+                    curl -fsSL https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
+                    echo "deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu ${ubuntu_repo} main main" | sudo tee /etc/apt/sources.list.d/intel-sgx.list
+
+                    sudo curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
+                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ ${gramine_branch} main" | sudo tee /etc/apt/sources.list.d/gramine.list
+                    sudo apt-get update
+                '''
+
+                if (env.build_type == "package_in_kernel") {
+                    sh 'sudo apt-get install -y gramine'
+                } else if (env.build_type == "package_oot") {
+                    sh 'sudo apt-get install -y gramine-oot'
+                } else if (env.build_type == "package_dcap") {
+                    sh 'sudo apt-get install -y gramine-dcap'
+                } else {
+                    currentBuild.result = "ABORTED"
+                    error("Aborting the build")
+                }
+                sh 'sudo apt-get update'
+
+                if (env.gramine_version == "v1.2_update") {
+                    sh '''
+                        echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ unstable main' | sudo tee /etc/apt/sources.list.d/gramine.list
+                        sudo apt-get update && sudo apt-get --with-new-pkgs -y upgrade
+                    '''
+                }
+                sh 'gramine-sgx-gen-private-key'
+            }
+       }
     }
 }
 

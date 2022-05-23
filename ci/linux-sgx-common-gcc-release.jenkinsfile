@@ -1,0 +1,42 @@
+node (node_label) {
+    env.ORIG_WKSP = env.WORKSPACE
+    env.build_ok = true
+    try {
+        checkout scm
+        load 'ci/lib/stage-clone.jenkinsfile'
+
+        dir ("gramine") {
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
+            env.SGX = '1'
+
+            load '../ci/config/config-docker.jenkinsfile'
+            if (env.os_release_id == "centos") {
+                dockerfile_name = "../ci/dockerfile/common_centos.dockerfile"
+            } else {
+                dockerfile_name = "../ci/dockerfile/common_ubuntu.dockerfile"
+            }
+            sh "sed -i 's/GRAMINE_BUILD_VERSION/$os_version/' $dockerfile_name"
+
+            docker.build(
+                "local:${env.BUILD_TAG}",
+                "-f ${dockerfile_name} ."
+            ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
+                load '.ci/lib/config-ubuntu18.04.jenkinsfile'
+                load '.ci/lib/config-release.jenkinsfile'
+
+                load '../ci/lib/stage-build-sgx.jenkinsfile'
+                load '../ci/lib/stage-test-sanity.jenkinsfile'
+            }
+        }
+    } finally {
+        stage('cleanup'){
+            sh 'rm -rf $ORIG_WKSP/*'
+        }
+    }
+
+    if(env.build_ok) {
+        currentBuild.result = "SUCCESS"
+    } else {
+        currentBuild.result = "FAILURE"
+    }
+}
