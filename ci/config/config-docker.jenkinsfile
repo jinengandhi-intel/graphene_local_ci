@@ -8,7 +8,6 @@ env.DOCKER_ARGS_COMMON = """
     --device=/dev/cpu_dma_latency:/dev/cpu_dma_latency
     --env=PATH=${env.PREFIX}/bin:${env.PATH}
     --env=XDG_CACHE_HOME=/tmp/.cache
-    --security-opt seccomp=${env.WORKSPACE}/scripts/docker_seccomp.json
     --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
 """
 env.DOCKER_ARGS_SGX = '''
@@ -16,6 +15,13 @@ env.DOCKER_ARGS_SGX = '''
     --volume=/usr/src:/usr/src:ro
     --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
 '''
+
+if (env.gramine_version == "v1.2") {
+    env.DOCKER_ARGS_COMMON += """ --security-opt seccomp=${env.WORKSPACE}/Scripts/docker_seccomp.json"""
+}
+else {
+    env.DOCKER_ARGS_COMMON += """ --security-opt seccomp=${env.WORKSPACE}/scripts/docker_seccomp.json"""
+}
 
 if (fileExists('/dev/sgx/enclave')) {
     env.DOCKER_ARGS_SGX += ' --device=/dev/sgx/enclave:/dev/sgx/enclave'

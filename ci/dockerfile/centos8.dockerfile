@@ -107,7 +107,7 @@ RUN python3 -m pip install -U \
     torchvision \
     pillow \
     'toml>=0.10' \
-    'meson>=0.55'
+    'meson>=0.56,<0.57'
 
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G wheel -m -d /intel -c "intel Jenkins" intel && \

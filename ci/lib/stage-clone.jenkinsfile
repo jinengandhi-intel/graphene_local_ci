@@ -1,6 +1,10 @@
 stage('checkout'){
-    dir ("gramine") {
-        git url: 'https://github.com/gramineproject/gramine.git'
+    if (env.gramine_version == "v1.2") {
+        sh 'git clone --depth 1 https://github.com/gramineproject/gramine.git -b v1.2'
+    } else {
+        dir ("gramine") {
+            git url: 'https://github.com/gramineproject/gramine.git'
+        }
     }
 
     dir ('examples') {
