@@ -28,7 +28,8 @@ stage('test-examples') {
         }
     }
 
-    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_dcap") && (env.SGX == '1'))) {
+    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_oot") && (env.SGX == '1')) && !((env.node_label == "graphene_dcap") && (env.SGX == '1')))
+    {
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
@@ -54,41 +55,72 @@ stage('test-examples') {
             sh 'echo "TensorFlow Example Test Failed"'
         }
     }
-
-    try {
-        timeout(time: 10, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/curl
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    sed -i '$ a loader.pal_internal_mem_size = "64M"' curl.manifest.template
-                fi
-                make ${MAKEOPTS} all
-                make ${MAKEOPTS} check > RESULT
-            '''
+    if (!((env.node_label == "graphene_oot") && (env.SGX == '1')))
+    {
+        try {
+            timeout(time: 10, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/curl
+                    if [ "${os_release_id}" != 'ubuntu' ]
+                    then
+                        sed -i '$ a loader.pal_internal_mem_size = "64M"' curl.manifest.template
+                    fi
+                    make ${MAKEOPTS} all
+                    make ${MAKEOPTS} check > RESULT
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "Curl Example Test Failed"'
         }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Curl Example Test Failed"'
-    }
 
-    try {
-        timeout(time: 5, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/nodejs
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    sed -i '$ a loader.pal_internal_mem_size = "64M"' nodejs.manifest.template
-                    sed -i "s/{{ nodejs_dir }}\\/nodejs/{{ nodejs_dir }}\\/node/g" nodejs.manifest.template
-                fi
-                make ${MAKEOPTS} all
-                make ${MAKEOPTS} check > RESULT
-            '''
+        try {
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/nodejs
+                    if [ "${os_release_id}" != 'ubuntu' ]
+                    then
+                        sed -i '$ a loader.pal_internal_mem_size = "64M"' nodejs.manifest.template
+                        sed -i "s/{{ nodejs_dir }}\\/nodejs/{{ nodejs_dir }}\\/node/g" nodejs.manifest.template
+                    fi
+                    make ${MAKEOPTS} all
+                    make ${MAKEOPTS} check > RESULT
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "Nodejs Example Test Failed"'
         }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Nodejs Example Test Failed"'
-    }
+
+        try {
+            timeout(time: 10, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/r
+                    if [ "${os_release_id}" != 'ubuntu' ]
+                    then
+                        export R_HOME=/usr/lib64/R
+                        sed -i '$ a loader.pal_internal_mem_size = "128M"' R.manifest.template
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/uname",\' R.manifest.template
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/sh",\' R.manifest.template
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/rm",\' R.manifest.template
+                        sed -i 's/sgx.enclave_size = "1G"/sgx.enclave_size = "2G"/' R.manifest.template
+                    fi
+                    if [ "${os_release_id}" = 'centos' ]
+                    then
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/coreutils",\' R.manifest.template
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/lib64/libcap.so.2",\' R.manifest.template
+                    fi
+                    make ${MAKEOPTS} all
+                    gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r > RESULT_1
+                    gramine-${MODE} ./R --slave --vanilla -f scripts/R-benchmark-25.R > RESULT_2
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "R Example Test Failed"'
+        }
+    }    
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1')))
     {
@@ -117,35 +149,6 @@ stage('test-examples') {
             env.build_ok = false
             sh 'echo "Pytorch Example Test Failed"'
         }
-    }
-
-    try {
-        timeout(time: 10, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/r
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    export R_HOME=/usr/lib64/R
-                    sed -i '$ a loader.pal_internal_mem_size = "128M"' R.manifest.template
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/uname",\' R.manifest.template
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/sh",\' R.manifest.template
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/rm",\' R.manifest.template
-                    sed -i 's/sgx.enclave_size = "1G"/sgx.enclave_size = "2G"/' R.manifest.template
-                fi
-                if [ "${os_release_id}" = 'centos' ]
-                then
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/coreutils",\' R.manifest.template
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/lib64/libcap.so.2",\' R.manifest.template
-                fi
-                make ${MAKEOPTS} all
-                gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r > RESULT_1
-                gramine-${MODE} ./R --slave --vanilla -f scripts/R-benchmark-25.R > RESULT_2
-            '''
-        }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "R Example Test Failed"'
     }
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
@@ -192,7 +195,8 @@ stage('test-examples') {
         sh 'echo "Rust example Test Failed"'
     }
 
-    if (env.os_release_id == "ubuntu") {
+    if (env.os_release_id == "ubuntu" && (!((env.node_label == "graphene_oot") && (env.SGX == '1'))))
+    {
         try {
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''

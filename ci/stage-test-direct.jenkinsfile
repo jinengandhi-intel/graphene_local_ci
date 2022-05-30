@@ -74,7 +74,8 @@ stage('test-direct') {
         sh 'echo "Bash Example Test Failed"'
     }
 
-    if (env.os_release_id == "ubuntu") {
+    if (env.os_release_id == "ubuntu" && (Float.parseFloat(env.os_version) < 21)) 
+    {
         try {
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''
@@ -174,6 +175,19 @@ stage('test-direct') {
     } catch (Exception e){
         env.build_ok = false
         sh 'echo "SQLite Example Test Failed"'
+    }
+    
+    try{
+        timeout(time: 10, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/busybox
+                make ${MAKEOPTS} all
+                make ${MAKEOPTS} check 2>&1 | tee result.txt
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Busybox Example Test Failed"'
     }
 
     if(env.no_cpu.toInteger() > 16) 

@@ -33,7 +33,8 @@ class Test_Workload_Results():
         assert("Success 4/4" in python_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(os_release_id != "ubuntu",
+    @pytest.mark.skipif((os_release_id != "ubuntu" or
+                    float(os_version) >= 21),
                     reason="Memcached libraries not available for CENT/RHEL")
     def test_memcached_workload(self):
         memcached_result_file = open("CI-Examples/memcached/OUTPUT.txt", "r")
@@ -78,6 +79,12 @@ class Test_Workload_Results():
                 and ("row 3" in sqlite_contents) \
                 and ("row 2" in sqlite_contents) \
                 and ("row 1" in sqlite_contents))
+    
+    @pytest.mark.examples
+    def test_busybox_workload(self):
+        busybox_result_file = open("CI-Examples/busybox/result.txt", "r")
+        busybox_contents = busybox_result_file.read()
+        assert("Success 1/1" in busybox_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif((int(no_cores) < 16),
@@ -113,6 +120,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif(float(os_version) >= 21 or
+                ((node_label == 'graphene_oot') and sgx_mode == '1') or
                 ((node_label == 'graphene_dcap') and sgx_mode == '1'),
                     reason="Bazel Build fails for Ubuntu 21 and Graphene DCAP")
     def test_tensorflow_workload(self):
@@ -126,12 +134,16 @@ class Test_Workload_Results():
             and (re.search("\d+: 458 bow tie", tensorflow_contents)))
 
     @pytest.mark.examples
+    @pytest.mark.skipif(((node_label == 'graphene_oot') and sgx_mode == '1'),
+                    reason="Curl skipped for OOT with SGX.")
     def test_curl_workload(self):
         curl_result_file = open("CI-Examples/curl/RESULT", "r")
         curl_contents = curl_result_file.read()
         assert("Success 1/1" in curl_contents)
 
     @pytest.mark.examples
+    @pytest.mark.skipif(((node_label == 'graphene_oot') and sgx_mode == '1'),
+                    reason="NodeJS skipped for OOT with SGX.")
     def test_nodejs_workload(self):
         nodejs_result_file = open("CI-Examples/nodejs/RESULT", "r")
         nodejs_contents = nodejs_result_file.read()
@@ -150,6 +162,8 @@ class Test_Workload_Results():
             and ("Ibizan hound, Ibizan Podenco" in pytorch_contents))
 
     @pytest.mark.examples
+    @pytest.mark.skipif(((node_label == 'graphene_oot') and sgx_mode == '1'),
+                    reason="R skipped for OOT with SGX.")
     def test_r_workload(self):
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()
@@ -166,7 +180,8 @@ class Test_Workload_Results():
             and ("--- End of test ---" in r2_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != "ubuntu"),
+    @pytest.mark.skipif((os_release_id != "ubuntu") or
+            ((node_label == 'graphene_oot') and sgx_mode == '1'),
                     reason="GCC enabled only for Ubuntu configurations.")
     def test_gcc_workload(self):
         gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")
