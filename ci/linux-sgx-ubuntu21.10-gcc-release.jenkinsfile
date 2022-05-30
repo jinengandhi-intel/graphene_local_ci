@@ -12,8 +12,7 @@ node(node_label) {
             }
 
             dir ('examples') {
-                git url: 'https://github.com/anjalirai-intel/examples',
-                branch: 'examples_update'
+                git url: 'https://github.com/gramineproject/examples.git'
             }
         }
 
