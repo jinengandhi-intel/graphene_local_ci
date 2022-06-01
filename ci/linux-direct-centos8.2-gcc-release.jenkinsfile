@@ -1,54 +1,27 @@
 node(node_label) {
     env.ORIG_WKSP = env.WORKSPACE
     env.build_ok = true
+
     try {
-        stage('checkout'){
-            dir ('./') {
-                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
-            }
-
-            dir ("gramine") {
-                git url: 'https://github.com/gramineproject/gramine.git'
-            }
-
-            dir ('examples') {
-                git url: 'https://github.com/gramineproject/examples.git'
-            }
-        }
+        checkout scm
+        load 'ci/lib/stage-clone.jenkinsfile'
     
         dir ("gramine") {
-            sh 'cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/'
-            sh 'cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/'
-            sh 'cp -rf $WORKSPACE/ltp_scripts/* Scripts/'
-            sh 'cp -rf $WORKSPACE/stress-ng CI-Examples/'
-            sh 'cp -rf $WORKSPACE/go_helloworld CI-Examples/'
-            sh 'cp -f $WORKSPACE/test_workloads.py . '
-            sh 'cp -rf $WORKSPACE/examples/* CI-Examples/'
-            sh 'cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/'
+            sh '../ci/resources/setup_workspace.sh'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
-
-            sh 'sed -i -e \'s/dent != g_dentry_root && dent->state & DENTRY_VALID/0/\' \
-                $WORKSPACE/LibOS/shim/src/fs/shim_fs.c'
-            sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
-                $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
-
-            load '../ci/config-docker.jenkinsfile'
-
-            if (env.os_release_id != "ubuntu") {
-                sh 'sed -i -e \'/dist\\|apport/c\\\' $WORKSPACE/CI-Examples/python/python.manifest.template'
-            }
+            load '../ci/config/config-docker.jenkinsfile'
 
             load '.ci/lib/config.jenkinsfile'
             load '.ci/lib/config-ubuntu18.04.jenkinsfile'
             load '.ci/lib/config-release.jenkinsfile'
 
-            load '../ci/config-centos8.jenkinsfile'
-            load '../ci/stage-build-nosgx.jenkinsfile'
-            load '../ci/stage-test.jenkinsfile'
-            load '../ci/stage-test-direct.jenkinsfile'
-            load '../ci/stage-test-examples.jenkinsfile'
-            load '../ci/stage-verification-examples.jenkinsfile'
-            load '../ci/stage-test-stress-ng.jenkinsfile'
+            load '../ci/config/config-centos8.jenkinsfile'
+            load '../ci/lib/stage-build-nosgx.jenkinsfile'
+            load '../ci/lib/stage-test.jenkinsfile'
+            load '../ci/lib/stage-test-direct.jenkinsfile'
+            load '../ci/lib/stage-test-examples.jenkinsfile'
+            load '../ci/lib/stage-verification-examples.jenkinsfile'
+            load '../ci/lib/stage-test-stress-ng.jenkinsfile'
         }
     } finally {
         stage('cleanup'){

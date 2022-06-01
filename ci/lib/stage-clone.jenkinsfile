@@ -1,0 +1,9 @@
+stage('checkout'){
+    dir ("gramine") {
+        git url: 'https://github.com/gramineproject/gramine.git'
+    }
+
+    dir ('examples') {
+        git url: 'https://github.com/gramineproject/examples.git'
+    }
+}

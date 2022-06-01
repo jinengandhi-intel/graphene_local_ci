@@ -1,6 +1,8 @@
 node (node_label) {
     env.ORIG_WKSP = env.WORKSPACE
     env.build_ok = true
+    env.base_os = 'debian11'
+
     try {
         stage('checkout'){
             dir ('./') {
@@ -15,16 +17,16 @@ node (node_label) {
 
         dir ("gramine") {
             sh "cp -rf $WORKSPACE/debian ."
-            sh "cp -f $WORKSPACE/ci/pkey.txt ."
+            sh "cp -f $WORKSPACE/ci/resources/pkey.txt ."
             sh 'cp -f $WORKSPACE/test_workloads.py . '
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 
-            load '../ci/config-docker.jenkinsfile'
+            load '../ci/config/config-docker.jenkinsfile'
 
             docker.build(
                 "local:${env.BUILD_TAG}",
-                '-f ../ci/debian11.dockerfile .'
+                "-f ../ci/dockerfile/${base_os}.dockerfile ../ci"
             ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
 
                 load '../ci/pkg_deb.jenkinsfile'
@@ -32,7 +34,7 @@ node (node_label) {
         }
 
     } finally {
-        sh 'sudo rm -rf $ORIG_WKSP/*'
+        sh 'rm -rf $ORIG_WKSP/*'
     }
 
     if(env.build_ok) {

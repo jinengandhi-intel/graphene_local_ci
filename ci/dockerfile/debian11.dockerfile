@@ -7,7 +7,7 @@ ENV https_proxy "http://proxy-dmz.intel.com:912"
 RUN apt-get update && apt-get install -y gnupg ca-certificates
 
 # Intel's RSA-1024 key signing intel-sgx/sgx_repo below. Expires 2023-05-24.
-COPY pkey.txt /
+COPY resources/pkey.txt /
 
 RUN cat /pkey.txt | apt-key add -
 
