@@ -18,8 +18,8 @@ node(node_label) {
             sh 'cp -rf $WORKSPACE/gsc/test/* test'
             env.WORKSPACE = env.WORKSPACE + "/gsc_dev_repo"
 
-            load '../ci/stage-test-gsc.jenkinsfile'
-            load '../ci/stage-test-gsc-python.jenkinsfile'
+            load '../ci/lib/stage-test-gsc.jenkinsfile'
+            load '../ci/lib/stage-test-gsc-python.jenkinsfile'
         }
     } finally {
         stage('Workspace cleanup'){

@@ -1,3 +1,0 @@
-#!/bin/sh
-sed -i 's/pytest/pytest -k \"not attestation\"/g' $WORKSPACE/Scripts/run-pytest
-echo "Disabled attestation tests"

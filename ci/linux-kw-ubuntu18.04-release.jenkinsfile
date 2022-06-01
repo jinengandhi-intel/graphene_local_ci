@@ -20,7 +20,7 @@ node(node_label) {
             load '.ci/lib/config-ubuntu18.04.jenkinsfile'
             load '.ci/lib/config-release.jenkinsfile'
 
-            load '../ci/stage-build-kw.jenkinsfile'
+            load '../ci/lib/stage-build-kw.jenkinsfile'
             
         }
     } finally {

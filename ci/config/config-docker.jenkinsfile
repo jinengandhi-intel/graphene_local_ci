@@ -33,13 +33,22 @@ if (fileExists('/var/run/aesmd/aesm.socket')) {
 
 env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
 
-if (fileExists('/etc/os-release')) {
-    sh '''
-        . /etc/os-release
-        echo $ID > os_release_id
-        echo $VERSION_ID > os_version
-    '''
-
-    env.os_release_id=sh(script: 'cat os_release_id', returnStdout: true).trim()
-    env.os_version=sh(script: 'cat os_version', returnStdout: true).trim()
+// Extract OS and version details from jenkins parameter 'base_os'
+if (env.base_os) {
+    echo 'base OS : ' + base_os
+    env.os_release_id=base_os.split(/\d/)[0].trim()
+    env.os_version=base_os.substring(os_release_id.length()).trim()
+} else {
+    if (fileExists('/etc/os-release')) {
+        sh '''
+            . /etc/os-release
+            echo $ID > os_release_id
+            echo $VERSION_ID > os_version
+        '''
+        env.os_release_id=sh(script: 'cat os_release_id', returnStdout: true).trim()
+        env.os_version=sh(script: 'cat os_version', returnStdout: true).trim()
+    }
 }
+
+echo 'OS name : ' + os_release_id
+echo 'OS version : ' + os_version

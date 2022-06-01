@@ -15,20 +15,20 @@ node (node_label) {
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 
-            load '../ci/config-docker.jenkinsfile'
+            load '../ci/config/config-docker.jenkinsfile'
             sh 'cp -rf ~/jenkins/sandstone-50-bin $WORKSPACE/CI-Examples'
 
             docker.build(
                 "local:${env.BUILD_TAG}",
-                '-f ../ci/ubuntu20.04.dockerfile .'
+                '-f ../ci/dockerfile/ubuntu20.04.dockerfile .'
             ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
                 load '.ci/lib/config.jenkinsfile'
                 load '.ci/lib/config-ubuntu18.04.jenkinsfile'
                 load '.ci/lib/config-release.jenkinsfile'
 
-                load '../ci/stage-build-sgx.jenkinsfile'
-                load '../ci/stage-test-sandstone.jenkinsfile'
-                load '../ci/stage-test-stress-ng.jenkinsfile'
+                load '../ci/lib/stage-build-sgx.jenkinsfile'
+                load '../ci/lib/stage-test-sandstone.jenkinsfile'
+                load '../ci/lib/stage-test-stress-ng.jenkinsfile'
             }
         }
     } finally {

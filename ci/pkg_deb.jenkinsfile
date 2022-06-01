@@ -35,7 +35,7 @@ stage('test') {
                     sed -i '$ a loader.pal_internal_mem_size = "128M"' manifest.template 
                 fi
                 make ${MAKEOPTS} all
-                make ${MAKEOPTS} SGX=1 regression
+                make ${MAKEOPTS} SGX=1 regression 2>&1 | tee result.txt
             '''
         }
     } catch (Exception e){

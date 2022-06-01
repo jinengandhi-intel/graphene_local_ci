@@ -1,0 +1,13 @@
+stage('checkout'){
+    dir ('./') {
+        git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
+    }
+
+    dir ("gramine") {
+        git url: 'https://github.com/gramineproject/gramine.git'
+    }
+
+    dir ('examples') {
+        git url: 'https://github.com/gramineproject/examples.git'
+    }
+}
