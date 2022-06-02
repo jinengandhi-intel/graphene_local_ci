@@ -33,9 +33,6 @@ node(node_label) {
             sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
                 $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
 
-            sh 'sed -i \'s/bash -c "ls"/bash -c "free"/g\' CI-Examples/bash/Makefile'
-            sh 'sed -i \'s/readlink/total/g\' test_workloads.py'
-            
             load '../ci/config-docker.jenkinsfile'
             docker.build(
                 "local:${env.BUILD_TAG}",

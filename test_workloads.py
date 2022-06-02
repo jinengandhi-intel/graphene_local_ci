@@ -17,9 +17,15 @@ class Test_Workload_Results():
     @pytest.mark.examples
     @pytest.mark.debian_verification
     def test_bash_workload(self):
-        bash_result_file = open("CI-Examples/bash/OUTPUT", "r")
+        bash_result_file = open("CI-Examples/bash/result.txt", "r")
         bash_contents = bash_result_file.read()
-        assert("readlink" in bash_contents)
+        assert("Success 1/7" in bash_contents)
+        assert("Success 2/7" in bash_contents)
+        assert("Success 3/7" in bash_contents)
+        assert("Success 4/7" in bash_contents)
+        assert("Success 5/7" in bash_contents)
+        assert("Success 6/7" in bash_contents)
+        assert("Success 7/7" in bash_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id != "ubuntu" and sgx_mode == '1'),
