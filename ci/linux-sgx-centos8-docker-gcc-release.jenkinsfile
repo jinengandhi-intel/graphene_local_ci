@@ -34,10 +34,7 @@ node (node_label) {
             sh 'sed -i -e \'s/dent != g_dentry_root && dent->state & DENTRY_VALID/0/\' \
                 $WORKSPACE/LibOS/shim/src/fs/shim_fs.c'
             sh 'sed -i \'s/.release  = "3.10.0"/.release  = "5.10.0"/\' \
-                $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'
-                
-            sh 'sed -i \'s/bash -c "ls"/bash -c "free"/g\' CI-Examples/bash/Makefile'
-            sh 'sed -i \'s/readlink/total/g\' test_workloads.py'
+                $WORKSPACE/LibOS/shim/src/sys/shim_uname.c'          
 
             load '../ci/config-docker.jenkinsfile'
             docker.build(
