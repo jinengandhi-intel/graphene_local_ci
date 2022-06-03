@@ -7,11 +7,9 @@ node(node_label) {
                 git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git',
                 branch: 'perf_redis'
             }
-
-            dir ("gramine") {
-                git url: 'https://github.com/gramineproject/gramine'
-            }
-        }
+	sh 'git clone --depth 1 https://github.com/gramineproject/gramine.git -b v1.1'
+        
+	}
     
         dir ("gramine") {
             sh 'cp -rf $WORKSPACE/perf_benchmarking/redis/redis_client_scripts CI-Examples/redis/'

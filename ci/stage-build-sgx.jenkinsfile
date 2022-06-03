@@ -2,9 +2,10 @@ stage('build') {
     if (env.CC == 'clang') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
+    
     sh '''
-        cd "$WORKSPACE"        
-        git apply rename_protected_files.patch
+        cd "$WORKSPACE"
+        openssl genrsa -3 -out Pal/src/host/Linux-SGX/signer/enclave-key.pem 3072
     '''
     script {
         if (env.build_type == "manual") {
@@ -32,7 +33,6 @@ stage('build') {
                         $MESON_OPTIONS > meson_cmd_output.txt
                     ninja -vC build > ninja_build_log.txt
                     ninja -vC build install > ninja_install_log.txt
-                    gramine-sgx-gen-private-key
                     '''
                 } finally {
                     archiveArtifacts 'build/meson-logs/**/*'
