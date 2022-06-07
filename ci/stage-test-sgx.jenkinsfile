@@ -53,7 +53,6 @@ stage('test-sgx') {
                 if [ "${os_release_id}" = "centos" ]
                 then
                     sed -i "s/bin\\/readlink/bin\\/coreutils/" Makefile
-                    sed -i 's/sgx.enclave_size = "256M"/sgx.enclave_size = "512M"/g' manifest.template
                 fi
                 if [ "${os_release_id}" != 'ubuntu' ]
                 then
