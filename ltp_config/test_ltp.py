@@ -246,7 +246,7 @@ def check_system_error_output_valid(_stderr):
             return False
     return ret_code
 
-def test_ltp(cmd, section):
+def test_ltp(cmd, section, capsys):
     must_pass = section.getintset('must-pass')
     if sgx_mode == '1':
         binary_dir_ltp = "install-sgx/testcases/bin"
@@ -262,7 +262,12 @@ def test_ltp(cmd, section):
     logging.info('command: %s', full_cmd)
     logging.info('must_pass: %s', list(must_pass) if must_pass else 'all')
 
-    returncode, stdout, _stderr = run_command(full_cmd, timeout=timeout, can_fail=True)
+    live_output = os.getenv('GRAMINE_LTP_LIVE_OUTPUT') or ''
+    if section.name in live_output.split(','):
+        with capsys.disabled():
+            returncode, stdout, _stderr = run_command(full_cmd, timeout=timeout, can_fail=True)
+    else:
+        returncode, stdout, _stderr = run_command(full_cmd, timeout=timeout, can_fail=True)
 
     # Parse output regardless of whether `must_pass` is specified: unfortunately some tests
     # do not exit with non-zero code when failing, because they rely on `MAP_SHARED` (which
