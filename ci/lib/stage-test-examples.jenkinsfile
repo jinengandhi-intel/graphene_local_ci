@@ -93,7 +93,7 @@ stage('test-examples') {
         }
 
         try {
-            timeout(time: 10, unit: 'MINUTES') {
+            timeout(time: 20, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/r
                     if [ "${os_release_id}" != 'ubuntu' ]
