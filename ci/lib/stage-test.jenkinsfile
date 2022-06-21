@@ -23,7 +23,7 @@ stage('test') {
         if (env.os_release_id != "ubuntu")
         {  
             sh'''
-            cd LibOS/shim/test/regression
+            cd LibOS/test/regression
             sed -i \'/^sgx.trusted_files = \\[.*/a "file:{{ arch_libdir }}/libtinfo.so.6",\' manifest.template
             '''
         }
@@ -32,7 +32,7 @@ stage('test') {
             timeout(time: 15, unit: 'MINUTES') {
 
                 sh '''
-                    cd LibOS/shim/test/regression
+                    cd LibOS/test/regression
                     if test -n "$SGX"
                     then                    
                         RA_CLIENT_SPID=${ra_client_spid} gramine-test --sgx build -v
@@ -42,12 +42,12 @@ stage('test') {
                 '''
                 if (env.node_label == "graphene_dcap") {
                     sh '''
-                        cd LibOS/shim/test/regression
+                        cd LibOS/test/regression
                         python3 -m pytest -v -k "not large_mmap" --junit-xml libos-regression.xml 
                     '''
                 } else {
                      sh '''
-                        cd LibOS/shim/test/regression
+                        cd LibOS/test/regression
                         python3 -m pytest -v -k "not attestation" --junit-xml libos-regression.xml 
                     '''
                 }
@@ -56,8 +56,8 @@ stage('test') {
             env.build_ok = false
             sh 'echo "LibOS Test Failed"'
         } finally {
-            archiveArtifacts 'LibOS/shim/test/regression/libos-regression.xml'
-            junit 'LibOS/shim/test/regression/libos-regression.xml'
+            archiveArtifacts 'LibOS/test/regression/libos-regression.xml'
+            junit 'LibOS/test/regression/libos-regression.xml'
         }
 
         if (env.CC != "clang") {
@@ -65,7 +65,7 @@ stage('test') {
                 try {
                     sh '''
                         export GRAMINE_MUSL=1
-                        cd LibOS/shim/test/regression
+                        cd LibOS/test/regression
                         gramine-test clean
                         if test -n "$SGX"
                         then                    
@@ -77,13 +77,13 @@ stage('test') {
                     if (env.node_label == "graphene_dcap") {
                         sh '''
                             export GRAMINE_MUSL=1
-                            cd LibOS/shim/test/regression
+                            cd LibOS/test/regression
                             python3 -m pytest -v -k "not large_mmap" --junit-xml libos-regression-musl.xml
                         '''
                     } else {
                         sh '''
                             export GRAMINE_MUSL=1
-                            cd LibOS/shim/test/regression
+                            cd LibOS/test/regression
                             python3 -m pytest -v -k "not attestation" --junit-xml libos-regression-musl.xml
                         '''
                     }
@@ -92,8 +92,8 @@ stage('test') {
                     sh 'echo "LibOS Test with musl Failed"'
                 }
                 finally {
-                    archiveArtifacts 'LibOS/shim/test/regression/libos-regression-musl.xml'
-                    junit 'LibOS/shim/test/regression/libos-regression-musl.xml'
+                    archiveArtifacts 'LibOS/test/regression/libos-regression-musl.xml'
+                    junit 'LibOS/test/regression/libos-regression-musl.xml'
                 }
             }
         }
@@ -101,7 +101,7 @@ stage('test') {
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
-                    cd LibOS/shim/test/abi/x86_64
+                    cd LibOS/test/abi/x86_64
                     if test -n "$SGX"
                     then                     
                         gramine-test --sgx build -v
@@ -115,14 +115,14 @@ stage('test') {
             env.build_ok = false
             sh 'echo "LibOS Test Failed"'
         } finally {
-            archiveArtifacts 'LibOS/shim/test/abi/x86_64/abi.xml'
-            junit 'LibOS/shim/test/abi/x86_64/abi.xml'
+            archiveArtifacts 'LibOS/test/abi/x86_64/abi.xml'
+            junit 'LibOS/test/abi/x86_64/abi.xml'
         }
 
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
-                    cd LibOS/shim/test/fs
+                    cd LibOS/test/fs
                     if test -n "$SGX"
                     then
                         gramine-test --sgx build -v
@@ -136,8 +136,8 @@ stage('test') {
             env.build_ok = false
             sh 'echo "LibOS Test Failed"'
         } finally {
-            archiveArtifacts 'LibOS/shim/test/fs/fs.xml'
-            junit 'LibOS/shim/test/fs/*.xml'
+            archiveArtifacts 'LibOS/test/fs/fs.xml'
+            junit 'LibOS/test/fs/*.xml'
         }
     }
 }
