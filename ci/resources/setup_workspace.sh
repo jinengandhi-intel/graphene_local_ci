@@ -2,8 +2,8 @@
 set -x
 
 cd $WORKSPACE/gramine
-cp -rf $WORKSPACE/ltp_src LibOS/shim/test/ltp/
-cp -rf $WORKSPACE/ltp_config/* LibOS/shim/test/ltp/
+cp -rf $WORKSPACE/ltp_src LibOS/test/ltp/
+cp -rf $WORKSPACE/ltp_config/* LibOS/test/ltp/
 cp -rf $WORKSPACE/ltp_scripts/* Scripts/
 cp -rf $WORKSPACE/stress-ng CI-Examples/
 cp -rf $WORKSPACE/go_helloworld CI-Examples/
@@ -20,7 +20,7 @@ if [[ "$SGX" == 1 ]]; then
   fi
 fi
 
-sed -i 's/.release  = "3.10.0"/.release  = "5.10.0"/' LibOS/shim/src/sys/shim_uname.c
+sed -i 's/.release  = "3.10.0"/.release  = "5.10.0"/' LibOS/src/sys/shim_uname.c
 
 if [[ "$base_os" == *"centos"* ]]; then
   echo "setting up workspace for centos"
