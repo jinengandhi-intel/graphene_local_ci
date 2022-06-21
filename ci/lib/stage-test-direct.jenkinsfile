@@ -2,7 +2,7 @@ stage('test-direct') {
     try {
         timeout(time: 30, unit: 'MINUTES') {
             sh '''
-                cd LibOS/shim/test/ltp
+                cd LibOS/test/ltp
                 cp -f toml_files/tests_direct.toml tests.toml
                 if [ "${os_release_id}" = "centos" ]
                 then
@@ -25,7 +25,7 @@ stage('test-direct') {
             // Run tests in a separate block, so that Jenkins measures build time and run time
             // separately
             sh '''
-                cd LibOS/shim/test/ltp
+                cd LibOS/test/ltp
                 export GRAMINE_LTP_LIVE_OUTPUT=fcntl14,fdatasync01
                 python3 -m pytest -v  --junit-xml=ltp.xml
             '''            
@@ -42,8 +42,8 @@ stage('test-direct') {
         env.build_ok = false
         sh 'echo "LTP Test Failed"'
     } finally {
-        archiveArtifacts 'LibOS/shim/test/ltp/ltp.xml'
-        junit 'LibOS/shim/test/ltp/ltp.xml'
+        archiveArtifacts 'LibOS/test/ltp/ltp.xml'
+        junit 'LibOS/test/ltp/ltp.xml'
     }
 
     try{

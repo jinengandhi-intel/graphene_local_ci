@@ -156,6 +156,7 @@ stage('test-examples') {
             try {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''#!/bin/bash
+                        set -x
                         cd CI-Examples/openvino
                         chmod +x ./openvino_setup.sh
                         ./openvino_setup.sh
