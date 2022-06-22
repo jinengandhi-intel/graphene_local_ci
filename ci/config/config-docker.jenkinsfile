@@ -6,7 +6,7 @@ env.DOCKER_ARGS_COMMON = """
     --device=/dev/cpu_dma_latency:/dev/cpu_dma_latency
     --env=PATH=${env.PREFIX}/bin:${env.PATH}
     --env=XDG_CACHE_HOME=/tmp/.cache
-    --security-opt seccomp=${env.WORKSPACE}/Scripts/docker_seccomp.json
+    --security-opt seccomp=${env.WORKSPACE}/scripts/docker_seccomp.json
     --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
 """
 env.DOCKER_ARGS_SGX = '''

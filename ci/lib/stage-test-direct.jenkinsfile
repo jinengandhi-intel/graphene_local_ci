@@ -2,7 +2,7 @@ stage('test-direct') {
     try {
         timeout(time: 30, unit: 'MINUTES') {
             sh '''
-                cd LibOS/test/ltp
+                cd libos/test/ltp
                 cp -f toml_files/tests_direct.toml tests.toml
                 if [ "${os_release_id}" = "centos" ]
                 then
@@ -25,7 +25,7 @@ stage('test-direct') {
             // Run tests in a separate block, so that Jenkins measures build time and run time
             // separately
             sh '''
-                cd LibOS/test/ltp
+                cd libos/test/ltp
                 export GRAMINE_LTP_LIVE_OUTPUT=fcntl14,fdatasync01
                 python3 -m pytest -v  --junit-xml=ltp.xml
             '''            
@@ -42,8 +42,8 @@ stage('test-direct') {
         env.build_ok = false
         sh 'echo "LTP Test Failed"'
     } finally {
-        archiveArtifacts 'LibOS/test/ltp/ltp.xml'
-        junit 'LibOS/test/ltp/ltp.xml'
+        archiveArtifacts 'libos/test/ltp/ltp.xml'
+        junit 'libos/test/ltp/ltp.xml'
     }
 
     try{
@@ -87,7 +87,7 @@ stage('test-direct') {
                     cd CI-Examples/memcached
                     make ${MAKEOPTS} all
                     make start-gramine-server &
-                    ../../Scripts/wait_for_server 5 127.0.0.1 11211
+                    ../../scripts/wait_for_server 5 127.0.0.1 11211
                     # memcslap populates server but doesn't report errors, use
                     # memcached-tool for this (must return two lines of stats)
                     memcslap --servers=127.0.0.1 --concurrency=8
@@ -111,7 +111,7 @@ stage('test-direct') {
                 fi
                 make ${MAKEOPTS} all
                 make start-gramine-server &
-                ../../Scripts/wait_for_server 5 127.0.0.1 6379
+                ../../scripts/wait_for_server 5 127.0.0.1 6379
                 ./src/src/redis-benchmark 2>&1 | tee OUTPUT
             '''
         }
@@ -126,7 +126,7 @@ stage('test-direct') {
                 cd CI-Examples/lighttpd
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} start-gramine-server &
-                ../../Scripts/wait_for_server 5 127.0.0.1 8003
+                ../../scripts/wait_for_server 5 127.0.0.1 8003
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8003
             '''
         }
@@ -147,7 +147,7 @@ stage('test-direct') {
                 fi    
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} start-gramine-server &
-                ../../Scripts/wait_for_server 5 127.0.0.1 8002
+                ../../scripts/wait_for_server 5 127.0.0.1 8002
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8002
             '''
         }
