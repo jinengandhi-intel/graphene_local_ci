@@ -142,7 +142,7 @@ stage('test-sgx') {
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../scripts/wait_for_server 60 127.0.0.1 8003
-                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8003
+                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:8003
             '''
         }
     } catch (Exception e){
@@ -167,7 +167,7 @@ stage('test-sgx') {
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../scripts/wait_for_server 60 127.0.0.1 8002
-                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh 127.0.0.1:8002
+                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:8002
             '''
         }
     } catch (Exception e){

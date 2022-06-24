@@ -92,6 +92,15 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     zip \
     zlib-devel
 
+# Install wrk2 benchmark. This benchmark is used in `benchmark-http.sh`.
+RUN git clone https://github.com/giltene/wrk2.git \
+    && cd wrk2 \
+    && git checkout 44a94c17d8e6a0bac8559b53da76848e430cb7a7 \
+    && make \
+    && cp wrk /usr/local/bin \
+    && cd .. \
+    && rm -rf wrk2
+
 RUN python3 -m pip install -U \
     six \
     torchvision \
