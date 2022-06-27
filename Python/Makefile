@@ -26,7 +26,7 @@ python.manifest: python.manifest.template
 		-Dentrypoint=$(realpath $(shell sh -c "command -v python3")) \
 		-Dra_type=$(RA_TYPE) \
 		-Dra_client_spid=$(RA_CLIENT_SPID) \
-		-Dra_client_linkable=$(RA_CLIENT_LINKABLE) \		
+		-Dra_client_linkable=$(RA_CLIENT_LINKABLE) \
 		$< >$@
 
 python.manifest.sgx: python.manifest
