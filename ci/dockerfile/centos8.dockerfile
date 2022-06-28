@@ -14,6 +14,7 @@ RUN dnf copr enable -y ngompa/musl-libc
 RUN yum update -y --exclude=texlive-context && env yum install -y \
     libunwind \
     ncurses-devel \
+    bc \
     bison \
     flex \
     make \
