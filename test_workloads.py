@@ -53,7 +53,8 @@ class Test_Workload_Results():
         for filename in glob.glob("CI-Examples/lighttpd/result-*"):
             lightppd_result_file = open(filename,"r")
         lightppd_contents = lightppd_result_file.read()
-        assert("0,0" in lightppd_contents)
+        assert((re.search("Concurrency =(\s+)1: Per Thread Median Througput (.*)Latency(.*)", lightppd_contents)) \
+            and (re.search("Concurrency =(\s+)32: Per Thread Median Througput (.*)Latency(.*)", lightppd_contents)))
 
     @pytest.mark.examples
     @pytest.mark.debian_verification
@@ -61,7 +62,8 @@ class Test_Workload_Results():
         for filename in glob.glob("CI-Examples/nginx/result-*"):
             nginx_result_file = open(filename,"r")
         nginx_contents = nginx_result_file.read()
-        assert("0,0" in nginx_contents)
+        assert((re.search("Concurrency =(\s+)1: Per Thread Median Througput (.*)Latency(.*)", nginx_contents)) \
+            and (re.search("Concurrency =(\s+)32: Per Thread Median Througput (.*)Latency(.*)", nginx_contents)))
 
     @pytest.mark.examples
     @pytest.mark.debian_verification
@@ -114,7 +116,8 @@ class Test_Workload_Results():
         result_file = data.read().split("Result file: ")[1].strip()
         rust_result_file = open("CI-Examples/rust/{}".format(result_file), "r")
         rust_contents = rust_result_file.read()
-        assert("0,0\n0,0\n" in rust_contents)
+        assert((re.search("Concurrency =(\s+)1: Per Thread Median Througput (.*)Latency(.*)", rust_contents)) \
+            and (re.search("Concurrency =(\s+)32: Per Thread Median Througput (.*)Latency(.*)", rust_contents)))
 
     @pytest.mark.examples
     @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
