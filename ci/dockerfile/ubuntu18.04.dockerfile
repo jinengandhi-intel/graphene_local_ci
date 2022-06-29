@@ -45,6 +45,8 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libjudy-dev \
     libpixman-1-dev \
     libipsec-mb-dev \
+    libprotoc-dev \
+    libprotobuf-dev \
     linux-headers-4.15.0-20-generic \
     lsb-release \
     lsof \
@@ -57,6 +59,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     nodejs \
     openjdk-11-jdk \
     pkg-config \
+    protobuf-compiler \
     protobuf-c-compiler \
     pylint3 \
     python \
@@ -104,11 +107,13 @@ RUN git clone https://github.com/giltene/wrk2.git \
 # specification)
 RUN python3 -m pip install -U \
     asv \
+    'onnx==1.11.0' \
     recommonmark \
     'Sphinx==1.8' \
     sphinx_rtd_theme \
     'toml>=0.10' \
-    'meson>=0.55,<0.56' \ 
+    'meson>=0.55,<0.56' \
+    'protobuf==3.19.4' \
     torchvision \
     pillow
 
