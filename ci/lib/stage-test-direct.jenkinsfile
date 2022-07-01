@@ -59,6 +59,10 @@ stage('test-direct') {
         sh 'echo "Python Example Test Failed"'
     } finally {
             archiveArtifacts 'CI-Examples/python/TEST_*'
+            sh'''
+            cd CI-Examples/python
+            cat TEST_STDOUT
+            '''
     }
 
     try{
