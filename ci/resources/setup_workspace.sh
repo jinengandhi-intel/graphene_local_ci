@@ -20,10 +20,14 @@ if [[ "$SGX" == 1 ]]; then
   fi
 fi
 
-sed -i 's/.release  = "3.10.0"/.release  = "5.10.0"/' libos/src/sys/shim_uname.c
+sed -i 's/.release  = "3.10.0"/.release  = "5.10.0"/' libos/src/sys/libos_uname.c
 
 if [[ "$base_os" == *"centos"* ]]; then
   echo "setting up workspace for centos"
   cp -rf $WORKSPACE/utils/rust_centos_setup/* CI-Examples/rust/
+fi
+
+if [[ "$base_os" != *"ubuntu"* ]]; then
+  echo "Updating Python manifest file for centos/rhel"
   sed -i -e '/dist\|apport/c\' CI-Examples/python/python.manifest.template
 fi
