@@ -53,12 +53,12 @@ index 00000000..95e58076
 +}
 \ No newline at end of file
 diff --git a/libos/test/fs/test_enc.py b/libos/test/fs/test_enc.py
-index 77479c3a..8c73a611 100644
+index ea3bfdde..205f9489 100644
 --- a/libos/test/fs/test_enc.py
 +++ b/libos/test/fs/test_enc.py
-@@ -101,6 +101,12 @@ class TC_50_EncryptedFiles(test_fs.TC_00_FileSystem):
-         stdout, stderr = self.run_binary(['open_flags', file_path])
-         self.verify_open_flags(stdout, stderr)
+@@ -91,6 +91,12 @@ class TC_50_EncryptedFiles(test_fs.TC_00_FileSystem):
+         self.verify_open_close(stdout, stderr, output_path, 'output')
+         self.assertTrue(os.path.isfile(output_path))
  
 +    @unittest.skipIf(os.environ.get('SGX') != '1', 'Checking renaming of protected files for SGX only')
 +    def test_099_rename_pf(self):
