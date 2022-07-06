@@ -87,7 +87,10 @@ stage('test-sgx') {
             env.build_ok = false
             sh 'echo "Memcached Example Test Failed"'
         }
+    }
 
+    if (env.os_release_id == "ubuntu")
+    {
         try{
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
