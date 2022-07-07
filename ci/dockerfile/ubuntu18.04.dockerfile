@@ -58,6 +58,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     openjdk-11-jdk \
     pkg-config \
     protobuf-c-compiler \
+    protobuf-compiler \
     pylint3 \
     python \
     python-dev \
