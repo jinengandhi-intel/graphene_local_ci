@@ -33,6 +33,7 @@ RUN dnf update -y \
         protobuf-c-devel \
         patch \
         protobuf-c-compiler \
+        protobuf-compiler \
         python3 \
         pkg-config \
         python3-pip \
