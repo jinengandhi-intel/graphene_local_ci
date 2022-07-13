@@ -8,6 +8,7 @@ ENV https_proxy "http://proxy-dmz.intel.com:912"
 RUN apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         binutils \
+        libcurl4-openssl-dev \
         libprotobuf-c-dev \
         locales \
         locales-all \
