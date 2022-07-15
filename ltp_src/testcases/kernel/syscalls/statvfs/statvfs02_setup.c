@@ -33,8 +33,8 @@
 #include "test.h"
 #include "safe_macros.h"
 
-#define TEST_SYMLINK	"/tmp/statvfs_symlink"
-#define TEST_FILE	"/tmp/statvfs_file"
+#define TEST_SYMLINK	"/tmp/statvfs02_symlink"
+#define TEST_FILE	"/tmp/statvfs02_file"
 
 char *TCID = "statvfs02";
 
@@ -52,7 +52,7 @@ static struct test_case_t {
 	{TEST_SYMLINK, &buf, ELOOP},
 	{nametoolong, &buf, ENAMETOOLONG},
 	{"filenoexist", &buf, ENOENT},
-	{"statvfs_file/test", &buf, ENOTDIR},
+	{"/tmp/statvfs02_file/test", &buf, ENOTDIR},
 };
 
 int TST_TOTAL = ARRAY_SIZE(test_cases);
@@ -84,8 +84,8 @@ static void setup(void)
 
 	tst_tmpdir();
 
-	SAFE_SYMLINK(cleanup, TEST_SYMLINK, "/tmp/statfs_symlink_2");
-	SAFE_SYMLINK(cleanup, "/tmp/statfs_symlink_2", TEST_SYMLINK);
+	SAFE_SYMLINK(cleanup, TEST_SYMLINK, "/tmp/statfs02_symlink_2");
+	SAFE_SYMLINK(cleanup, "/tmp/statfs02_symlink_2", TEST_SYMLINK);
 
 	memset(nametoolong, 'a', PATH_MAX+1);
 
