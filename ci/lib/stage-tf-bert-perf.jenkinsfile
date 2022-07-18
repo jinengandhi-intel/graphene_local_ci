@@ -1,0 +1,37 @@
+stage('test-tf') {
+    env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
+    env.bert_dir = sh(script:'echo $PWD/CI-Examples/BERT', returnStdout: true).trim()
+    try {
+        timeout(time: 120, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/BERT
+                echo "Batch size :"
+                echo $predict_batch_size                
+                make PYTHONDISTPATH=/home/intel/.local/lib/${python_version}/site-packages SGX=1
+                for config in ${config_list}
+                    do
+                        echo ${config}
+                        chmod +x start_benchmark.sh                                                  
+                        ./start_benchmark.sh ${config} > benchmark_results.txt
+                    done
+            '''
+        }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "BERT Test Failed"'
+    } finally {
+        archiveArtifacts 'CI-Examples/BERT/*.txt'
+    }
+
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 -m pytest -v --junit-xml tf_workload.xml  tf_parser.py'
+            archiveArtifacts 'tf_workload.xml'
+        }
+    } catch (Exception e){
+        env.build_ok = true
+        sh 'echo "TF parser failed"'
+    } finally {
+        junit 'tf_workload.xml'
+    }
+}
