@@ -10,7 +10,13 @@ stage('test') {
                     else
                         gramine-test build -v
                     fi
-                    python3 -m pytest -v --junit-xml pal-regression.xml
+
+                    if [ "${node_label}" != "graphene_oot" ]
+                    then
+                        python3 -m pytest -v --junit-xml pal-regression.xml
+                    else
+                        python3 -m pytest -v -k "not test_120_8gb_enclave" --junit-xml pal-regression.xml
+                    fi
                 '''
             }
         } catch (Exception e){
@@ -40,10 +46,10 @@ stage('test') {
                         RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test build -v
                     fi
                 '''
-                if (env.node_label == "graphene_dcap") {
+                if (env.node_label == "graphene_oot") {
                     sh '''
                         cd libos/test/regression
-                        python3 -m pytest -v -k "not large_mmap" --junit-xml libos-regression.xml 
+                        python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression.xml
                     '''
                 } else {
                      sh '''
@@ -74,11 +80,11 @@ stage('test') {
                             RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test -n tests_musl.toml build -v
                         fi
                     '''
-                    if (env.node_label == "graphene_dcap") {
+                    if (env.node_label == "graphene_oot") {
                         sh '''
                             export GRAMINE_MUSL=1
                             cd libos/test/regression
-                            python3 -m pytest -v -k "not large_mmap" --junit-xml libos-regression-musl.xml
+                            python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression-musl.xml
                         '''
                     } else {
                         sh '''
