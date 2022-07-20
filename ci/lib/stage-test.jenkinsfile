@@ -11,7 +11,7 @@ stage('test') {
                         gramine-test build -v
                     fi
 
-                    if [ "${node_label}" != "graphene_oot" ]
+                    if [[ "graphene_oot" == $node_label ||  "graphene_dcap" == $node_label ]];
                     then
                         python3 -m pytest -v --junit-xml pal-regression.xml
                     else
@@ -45,18 +45,14 @@ stage('test') {
                     else
                         RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test build -v
                     fi
-                '''
-                if (env.node_label == "graphene_oot") {
-                    sh '''
-                        cd libos/test/regression
+
+                    if [[ "graphene_oot" == $node_label ||  "graphene_dcap" == $node_label ]];
+                    then
+                        python3 -m pytest -v -k "not attestation" --junit-xml libos-regression.xml
+                    else
                         python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression.xml
-                    '''
-                } else {
-                     sh '''
-                        cd libos/test/regression
-                        python3 -m pytest -v -k "not attestation" --junit-xml libos-regression.xml 
-                    '''
-                }
+                    fi
+                '''
             }
         } catch (Exception e){
             env.build_ok = false
@@ -79,20 +75,14 @@ stage('test') {
                         else
                             RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test -n tests_musl.toml build -v
                         fi
-                    '''
-                    if (env.node_label == "graphene_oot") {
-                        sh '''
-                            export GRAMINE_MUSL=1
-                            cd libos/test/regression
-                            python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression-musl.xml
-                        '''
-                    } else {
-                        sh '''
-                            export GRAMINE_MUSL=1
-                            cd libos/test/regression
+
+                        if [[ "graphene_oot" == $node_label ||  "graphene_dcap" == $node_label ]];
+                        then
                             python3 -m pytest -v -k "not attestation" --junit-xml libos-regression-musl.xml
-                        '''
-                    }
+                        else
+                            python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression-musl.xml
+                        fi
+                    '''
                 } catch (Exception e){
                     env.build_ok = false
                     sh 'echo "libos Test with musl Failed"'
