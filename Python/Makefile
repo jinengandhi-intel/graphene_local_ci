@@ -1,6 +1,6 @@
 ARCH_LIBDIR ?= /lib/$(shell $(CC) -dumpmachine)
 
-NUMPY_PATH ?= $(shell pip3 show numpy | grep -P 'Location' | sed 's/Location:.\(.*\)\python.*/\1/')
+NUMPY_PATH ?= $(shell pip3 show numpy | grep Location: | cut -d" " -f2)/
 
 ifeq ($(DEBUG),1)
 GRAMINE_LOG_LEVEL = debug

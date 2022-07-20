@@ -17,6 +17,8 @@ if [[ "$SGX" == 1 ]]; then
 
   if [[ "$base_os" == "ubuntu18.04" ]]; then
     cp -rf $WORKSPACE/Python/* CI-Examples/python/
+    sed -i 's/sgx.enclave_size = "512M"/sgx.enclave_size = "2G"/g' CI-Examples/python/python.manifest.template
+    sed -i 's/sgx.thread_num = 32/sgx.thread_num = 64/g' CI-Examples/python/python.manifest.template
   fi
 fi
 
