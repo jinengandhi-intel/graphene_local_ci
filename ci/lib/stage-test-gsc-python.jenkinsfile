@@ -12,7 +12,7 @@ stage('Build') {
         then
             docker pull python
         fi               
-        ./gsc build --insecure-args python test/generic.manifest
+        ./gsc build -nc --insecure-args python test/generic.manifest
         ./gsc sign-image python enclave-key.pem
         ./gsc info-image gsc-python
     '''

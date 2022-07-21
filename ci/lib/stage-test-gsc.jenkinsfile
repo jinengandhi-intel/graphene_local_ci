@@ -4,7 +4,7 @@ stage('Build') {
         cp -f config.yaml.template config.yaml
         sed -i -E 's/Distro: "(.+)"/Distro: "'"$distro_ver"'"/g' config.yaml
         docker build --tag $workload_ver-bash --file test/$workload_ver-bash.dockerfile .
-        ./gsc build --insecure-args $workload_ver-bash test/$workload_ver-bash.manifest
+        ./gsc build -nc --insecure-args $workload_ver-bash test/$workload_ver-bash.manifest
         ./gsc sign-image $workload_ver-bash enclave-key.pem
         ./gsc info-image gsc-$workload_ver-bash
     '''
