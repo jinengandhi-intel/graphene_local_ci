@@ -24,9 +24,9 @@ fs.mounts = [
 
 sgx.debug = true
 sgx.nonpie_binary = true
-sgx.enclave_size = "512M"
+sgx.enclave_size = "2G"
 sys.stack.size = "2M"
-sgx.thread_num = 32
+sgx.thread_num = 64
 
 sgx.remote_attestation = "{{ ra_type }}"
 sgx.ra_client_spid = "{{ ra_client_spid }}"
