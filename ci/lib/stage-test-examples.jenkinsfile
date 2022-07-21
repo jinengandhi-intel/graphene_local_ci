@@ -140,6 +140,11 @@ stage('test-examples') {
                             sed -i \'s/"file:{{ python.distlib }}/"file:\\/usr\\/local\\/lib\\/python3.6\\/site-packages/\' pytorch.manifest.template
                         fi
                     fi
+                    if [ "${no_cpu}" -gt 100 ] && ([ "${base_os}" = 'ubuntu18.04' ] || [ "${os_release_id}" == 'centos' ] || [ "${os_release_id}" == 'rhel' ])
+                    then
+                        sed -i 's/sgx.enclave_size = "2G"/sgx.enclave_size = "4G"/g' pytorch.manifest.template
+                        sed -i 's/sgx.thread_num = 16/sgx.thread_num = 32/g' pytorch.manifest.template
+                    fi
                     python3 download-pretrained-model.py
                     make ${MAKEOPTS} all
                     gramine-${MODE} ./pytorch ./pytorchexample.py
