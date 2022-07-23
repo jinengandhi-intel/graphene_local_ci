@@ -113,7 +113,6 @@ stage('test-examples') {
                     fi
                     make ${MAKEOPTS} all
                     gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r | tee RESULT_1
-                    gramine-${MODE} ./R --slave --vanilla -f scripts/R-benchmark-25.R | tee RESULT_2
                 '''
             }
         } catch (Exception e){

@@ -235,7 +235,7 @@ def check_system_error_output_valid(_stderr):
             "Disallowing access to file '/usr/lib64/libtinfo.so.6'" in error or \
             "Detected deprecated syntax" in error or \
             "Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error or \
-            "Sending IPC process-exit notification failed: -13" in error or \
+            "Sending IPC process-exit notification failed: " in error or \
             "Failed to send IPC msg" in error or \
             "bind: invalid handle returned" in error or \
             "Disallowing access to file '/lib/x86_64-linux-gnu/libnss_nis.so.2" in error :        
