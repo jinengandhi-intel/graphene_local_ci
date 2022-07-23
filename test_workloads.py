@@ -178,16 +178,6 @@ class Test_Workload_Results():
         r1_contents = r1_result_file.read()
         assert("success" in r1_contents)
 
-        r2_result_file = open("CI-Examples/r/RESULT_2", "r")
-        r2_contents = r2_result_file.read()
-        assert(("R Benchmark 2.5" in r2_contents) \
-            and ("Matrix calculation" in r2_contents) \
-            and ("Matrix functions" in r2_contents) \
-            and ("Programmation" in r2_contents) \
-            and (re.search("Total time for all \d+ tests", r2_contents)) \
-            and ("Overall mean (sum of " in r2_contents) \
-            and ("--- End of test ---" in r2_contents))
-
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id != "ubuntu") or
             ((node_label == 'graphene_oot') and sgx_mode == '1'),
