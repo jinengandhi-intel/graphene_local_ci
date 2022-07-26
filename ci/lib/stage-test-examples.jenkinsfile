@@ -28,7 +28,7 @@ stage('test-examples') {
         }
     }
 
-    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_oot") && (env.SGX == '1')) && !((env.node_label == "graphene_dcap") && (env.SGX == '1')))
+    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_oot") && (env.SGX == '1')))
     {
         try {
             timeout(time: 30, unit: 'MINUTES') {
@@ -55,9 +55,8 @@ stage('test-examples') {
             sh 'echo "TensorFlow Example Test Failed"'
         }
     }
-    if (!((env.node_label == "graphene_oot") && (env.SGX == '1')))
-    {
-        try {
+
+try {
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/curl
@@ -119,7 +118,6 @@ stage('test-examples') {
             env.build_ok = false
             sh 'echo "R Example Test Failed"'
         }
-    }    
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1')))
     {
@@ -200,8 +198,6 @@ stage('test-examples') {
         sh 'echo "Rust example Test Failed"'
     }
 
-    if (env.os_release_id == "ubuntu" && (!((env.node_label == "graphene_oot") && (env.SGX == '1'))))
-    {
         try {
             timeout(time: 10, unit: 'MINUTES') {
                 sh '''
@@ -214,5 +210,4 @@ stage('test-examples') {
             env.build_ok = false
             sh 'echo "GCC Example Test Failed"'
         }
-    }
 }
