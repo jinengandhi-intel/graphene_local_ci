@@ -142,17 +142,11 @@ class Test_Workload_Results():
             and (re.search("\d+: 835 suit", tensorflow_contents)) \
             and (re.search("\d+: 458 bow tie", tensorflow_contents)))
 
-    @pytest.mark.examples
-    @pytest.mark.skipif(((node_label == 'graphene_oot') and sgx_mode == '1'),
-                    reason="Curl skipped for OOT with SGX.")
     def test_curl_workload(self):
         curl_result_file = open("CI-Examples/curl/RESULT", "r")
         curl_contents = curl_result_file.read()
         assert("Success 1/1" in curl_contents)
 
-    @pytest.mark.examples
-    @pytest.mark.skipif(((node_label == 'graphene_oot') and sgx_mode == '1'),
-                    reason="NodeJS skipped for OOT with SGX.")
     def test_nodejs_workload(self):
         nodejs_result_file = open("CI-Examples/nodejs/RESULT", "r")
         nodejs_contents = nodejs_result_file.read()
@@ -179,8 +173,7 @@ class Test_Workload_Results():
         assert("success" in r1_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != "ubuntu") or
-            ((node_label == 'graphene_oot') and sgx_mode == '1'),
+    @pytest.mark.skipif((os_release_id != "ubuntu"),
                     reason="GCC enabled only for Ubuntu configurations.")
     def test_gcc_workload(self):
         gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")

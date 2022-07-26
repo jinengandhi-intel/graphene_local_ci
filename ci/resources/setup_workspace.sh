@@ -1,6 +1,12 @@
 #!/bin/bash
 set -x
 
+cd $WORKSPACE/examples
+for i in $(find -name '*.manifest.template');
+do
+  sed -i '$ a sgx.debug = true' $i;
+done;
+
 cd $WORKSPACE/gramine
 cp -rf $WORKSPACE/ltp_src libos/test/ltp/
 cp -rf $WORKSPACE/ltp_config/* libos/test/ltp/
