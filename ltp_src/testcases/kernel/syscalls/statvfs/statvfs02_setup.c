@@ -63,7 +63,9 @@ int main(int argc, char **argv)
 	int i, lc;
 
 	tst_parse_opts(argc, argv, NULL, NULL);
-
+	remove("/tmp/statvfs02_symlink");
+	remove("/tmp/statvfs02_file");
+	remove("/tmp/statfs02_symlink_2");
 	setup();
 
 	// for (lc = 0; TEST_LOOPING(lc); lc++) {
@@ -82,7 +84,7 @@ static void setup(void)
 
 	TEST_PAUSE;
 
-	tst_tmpdir();
+	// tst_tmpdir();
 
 	SAFE_SYMLINK(cleanup, TEST_SYMLINK, "/tmp/statfs02_symlink_2");
 	SAFE_SYMLINK(cleanup, "/tmp/statfs02_symlink_2", TEST_SYMLINK);
