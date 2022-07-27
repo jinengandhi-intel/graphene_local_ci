@@ -11,11 +11,11 @@ stage('test') {
                         gramine-test build -v
                     fi
 
-                    if [[ "graphene_oot" == $node_label ||  "graphene_dcap" == $node_label ]];
+                    if [ "graphene_oot" = $node_label ] || [ "graphene_dcap" = $node_label ];
                     then
-                        python3 -m pytest -v --junit-xml pal-regression.xml
-                    else
                         python3 -m pytest -v -k "not test_120_8gb_enclave" --junit-xml pal-regression.xml
+                    else
+                        python3 -m pytest -v --junit-xml pal-regression.xml
                     fi
                 '''
             }
@@ -46,11 +46,11 @@ stage('test') {
                         RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test build -v
                     fi
 
-                    if [[ "graphene_oot" == $node_label ||  "graphene_dcap" == $node_label ]];
+                    if [ "graphene_oot" = $node_label ] || [ "graphene_dcap" = $node_label ];
                     then
-                        python3 -m pytest -v -k "not attestation" --junit-xml libos-regression.xml
-                    else
                         python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression.xml
+                    else
+                        python3 -m pytest -v -k "not attestation" --junit-xml libos-regression.xml
                     fi
                 '''
             }
@@ -76,11 +76,11 @@ stage('test') {
                             RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test -n tests_musl.toml build -v
                         fi
 
-                        if [[ "graphene_oot" == $node_label ||  "graphene_dcap" == $node_label ]];
+                        if [ "graphene_oot" = $node_label ] || [ "graphene_dcap" = $node_label ];
                         then
-                            python3 -m pytest -v -k "not attestation" --junit-xml libos-regression-musl.xml
-                        else
                             python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression-musl.xml
+                        else
+                            python3 -m pytest -v -k "not attestation" --junit-xml libos-regression-musl.xml
                         fi
                     '''
                 } catch (Exception e){
