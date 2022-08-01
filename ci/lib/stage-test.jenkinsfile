@@ -31,6 +31,7 @@ stage('test') {
             sh'''
             cd libos/test/regression
             sed -i \'/^sgx.trusted_files = \\[.*/a "file:{{ arch_libdir }}/libtinfo.so.6",\' manifest.template
+            sed -i \'/^sgx.trusted_files = \\[.*/a "file:{{ arch_libdir }}/libtinfo.so.6",\' shebang_test_script.manifest.template
             '''
         }
             
