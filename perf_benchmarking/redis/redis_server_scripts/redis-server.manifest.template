@@ -7,7 +7,7 @@
 loader.entrypoint = "file:{{ gramine.libos }}"
 
 # Entrypoint binary which Gramine invokes.
-libos.entrypoint = "redis-server"
+libos.entrypoint = "/redis-server"
 
 # Verbosity of Gramine debug log (none/error/warning/debug/trace/all). Note
 # that GRAMINE_LOG_LEVEL macro is expanded in the Makefile as part of the
@@ -45,27 +45,24 @@ sys.enable_sigterm_injection = true
 # - In-Gramine visible path names may be arbitrary but we reuse host-OS URIs
 #   for simplicity (except for the first 'lib' case).
 
-# Mount host-OS directory to Gramine glibc/runtime libraries (in 'uri') into
-# in-Gramine visible directory /lib (in 'path').
-fs.mount.lib.type = "chroot"
-fs.mount.lib.path = "/lib"
-fs.mount.lib.uri = "file:{{ gramine.runtimedir() }}"
+fs.mounts = [
+  # Mount host-OS directory to Gramine glibc/runtime libraries (in 'uri') into
+  # in-Gramine visible directory /lib (in 'path').
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
 
-# Mount host-OS directory to Name Service Switch (NSS) libraries (in 'uri')
-# into in-Gramine visible directory /lib/x86_64-linux-gnu (in 'path').
-fs.mount.lib2.type = "chroot"
-fs.mount.lib2.path = "{{ arch_libdir }}"
-fs.mount.lib2.uri = "file:{{ arch_libdir }}"
+  # Mount host-OS directory to Name Service Switch (NSS) libraries (in 'uri')
+  # into in-Gramine visible directory /lib/x86_64-linux-gnu (in 'path').
+  { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+  { path = "/usr/{{ arch_libdir }}", uri = "file:/usr/{{ arch_libdir }}" },
 
-fs.mount.lib3.type = "chroot"
-fs.mount.lib3.path = "/usr/{{ arch_libdir }}"
-fs.mount.lib3.uri = "file:/usr/{{ arch_libdir }}"
+  # Mount host-OS directory to NSS files required by Glibc + NSS libs (in 'uri')
+  # into in-Gramine visible directory /etc (in 'path').
+  { path = "/etc", uri = "file:/etc" },
 
-# Mount host-OS directory to NSS files required by Glibc + NSS libs (in 'uri')
-# into in-Gramine visible directory /etc (in 'path').
-fs.mount.etc.type = "chroot"
-fs.mount.etc.path = "/etc"
-fs.mount.etc.uri = "file:/etc"
+  # Mount redis-server executable (located in the current directory) under the
+  # in-Gramine visible root directory.
+  { path = "/redis-server", uri = "file:redis-server" },
+]
 
 ############################### SGX: GENERAL ##################################
 

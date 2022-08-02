@@ -139,7 +139,7 @@ try {
                     fi
                     if [ "${no_cpu}" -gt 100 ] && ([ "${base_os}" = 'ubuntu18.04' ] || [ "${os_release_id}" == 'centos' ] || [ "${os_release_id}" == 'rhel' ])
                     then
-                        sed -i 's/sgx.enclave_size = "2G"/sgx.enclave_size = "4G"/g' pytorch.manifest.template
+                        sed -i 's/sgx.enclave_size = "2G"/sgx.enclave_size = "8G"/g' pytorch.manifest.template
                         sed -i 's/sgx.thread_num = 16/sgx.thread_num = 32/g' pytorch.manifest.template
                     fi
                     python3 download-pretrained-model.py
