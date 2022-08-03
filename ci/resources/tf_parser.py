@@ -32,21 +32,21 @@ def result_aggregation(input_path):
     
     print("\nNumber of iterations : ",len(sgx_result))
     if len(native_result) > 0:
+        avg_native = sum(native_result)/len(native_result)
         print("Throughput values in native run : ", native_result, 
-            " and Average : ",round(sum(native_result)/len(native_result),2))
+            " and Average : ",round(avg_native,2))
     if len(direct_result) > 0: 
+        avg_direct = sum(direct_result)/len(direct_result)
         print("Throughput values in Gramine direct run : ", direct_result,
-            " and Average : ", round(sum(direct_result)/len(direct_result),2))   
-    if len(sgx_result) > 0:    
+            " and Average : ", round(avg_direct,2))
+    if len(sgx_result) > 0:
+        avg_sgx = sum(sgx_result)/len(sgx_result)
         print("Throughput values in Gramine SGX run : ", sgx_result,
-            " and Average : ", round(sum(sgx_result)/len(sgx_result),2)) 
+            " and Average : ", round(avg_sgx,2))
     if len(sgx_result) > 0 and len(native_result) > 0 and len(direct_result) > 0:
-        avg_sgx_throughput = sum(sgx_result)/len(sgx_result)
-        avg_native_throughput = sum(native_result)/len(native_result)
-        avg_direct_throughput = sum(direct_result)/len(direct_result)
-        print("Degradation Native/SGX : ", (avg_native_throughput/avg_sgx_throughput))
-        print("Degradation Native/Direct : ", (avg_native_throughput/avg_direct_throughput))
-        print("Degradation Direct/SGX : ", (avg_direct_throughput/avg_sgx_throughput)) 
+        print("Degradation Native/SGX : ", ((avg_native-avg_sgx)/avg_native))
+        print("Degradation Native/Direct : ", ((avg_native-avg_direct)/avg_native))
+        print("Degradation Direct/SGX : ", ((avg_direct-avg_sgx)/avg_direct))
 
     return native_result, direct_result, sgx_result
 
@@ -62,4 +62,4 @@ class Test_TF_Results():
     def test_resnet_workload(self):
         native_result, direct_result, sgx_result = result_aggregation(path_resnet)
         assert(len(native_result) is not None or len(sgx_result) is not None)
-    
+
