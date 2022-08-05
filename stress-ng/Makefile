@@ -15,7 +15,7 @@ ifeq ($(SGX),1)
 all: stress-ng.manifest.sgx stress-ng.sig stress-ng.token
 endif
 
-include ../../Scripts/Makefile.configs
+include ../../scripts/Makefile.configs
 
 stress-ng.manifest: stress-ng.manifest.template
 			gramine-manifest \
