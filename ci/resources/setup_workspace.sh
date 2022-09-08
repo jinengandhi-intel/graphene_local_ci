@@ -1,6 +1,9 @@
 #!/bin/bash
 set -x
 
+chmod +x $WORKSPACE/ci/resources/setup_ltp.sh
+bash $WORKSPACE/ci/resources/setup_ltp.sh
+
 cd $WORKSPACE/examples
 for i in $(find -name '*.manifest.template');
 do
@@ -8,9 +11,6 @@ do
 done;
 
 cd $WORKSPACE/gramine
-cp -rf $WORKSPACE/ltp_src libos/test/ltp/
-cp -rf $WORKSPACE/ltp_config/* libos/test/ltp/
-cp -rf $WORKSPACE/ltp_scripts/* scripts/
 cp -rf $WORKSPACE/stress-ng CI-Examples/
 cp -rf $WORKSPACE/go_helloworld CI-Examples/
 cp -rf $WORKSPACE/examples/* CI-Examples/

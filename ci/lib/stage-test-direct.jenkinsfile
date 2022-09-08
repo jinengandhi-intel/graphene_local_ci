@@ -3,23 +3,6 @@ stage('test-direct') {
         timeout(time: 30, unit: 'MINUTES') {
             sh '''
                 cd libos/test/ltp
-                cp -f toml_files/tests_direct.toml tests.toml
-                if [ "${os_release_id}" = "centos" ]
-                then
-                    cp -f manifest_CentOS.template manifest.template
-                fi
-                if [ "${os_release_id}" = "rhel" ]
-                then
-                    cp -f manifest_RHEL.template manifest.template
-                fi
-                if [ "${os_version}" = "18.04" ]
-                then
-                    cp -f manifest_18_04.template manifest.template
-                fi
-                if [ "${os_version}" = "20.04" ] || [ "${os_version}" = "21.10" ]
-                then
-                    cp -f manifest_20_04_21_10.template manifest.template
-                fi
                 make ${MAKEOPTS} -f Makefile.LTP all 
             '''
             // Run tests in a separate block, so that Jenkins measures build time and run time
