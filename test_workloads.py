@@ -142,11 +142,13 @@ class Test_Workload_Results():
             and (re.search("\d+: 835 suit", tensorflow_contents)) \
             and (re.search("\d+: 458 bow tie", tensorflow_contents)))
 
+    @pytest.mark.examples
     def test_curl_workload(self):
         curl_result_file = open("CI-Examples/curl/RESULT", "r")
         curl_contents = curl_result_file.read()
         assert("Success 1/1" in curl_contents)
 
+    @pytest.mark.examples
     def test_nodejs_workload(self):
         nodejs_result_file = open("CI-Examples/nodejs/RESULT", "r")
         nodejs_contents = nodejs_result_file.read()
