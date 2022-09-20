@@ -155,8 +155,6 @@ class Test_Workload_Results():
         assert("Success 1/1" in nodejs_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
-                    reason="OpenJDK enabled only for Ubuntu Server Configurations.")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
         pytorch_contents = pytorch_result_file.read()
@@ -167,8 +165,6 @@ class Test_Workload_Results():
             and ("Ibizan hound, Ibizan Podenco" in pytorch_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((node_label == 'graphene_oot') and sgx_mode == '1'),
-                    reason="R skipped for OOT with SGX.")
     def test_r_workload(self):
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()

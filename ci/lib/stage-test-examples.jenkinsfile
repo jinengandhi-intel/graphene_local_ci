@@ -56,99 +56,93 @@ stage('test-examples') {
         }
     }
 
-try {
-            timeout(time: 10, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/curl
-                    if [ "${os_release_id}" != 'ubuntu' ]
-                    then
-                        sed -i '$ a loader.pal_internal_mem_size = "64M"' curl.manifest.template
-                    fi
-                    make ${MAKEOPTS} all
-                    make ${MAKEOPTS} check | tee RESULT
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "Curl Example Test Failed"'
+    try {
+        timeout(time: 10, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/curl
+                if [ "${os_release_id}" != 'ubuntu' ]
+                then
+                    sed -i '$ a loader.pal_internal_mem_size = "64M"' curl.manifest.template
+                fi
+                make ${MAKEOPTS} all
+                make ${MAKEOPTS} check | tee RESULT
+            '''
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Curl Example Test Failed"'
+    }
 
-        try {
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/nodejs
-                    if [ "${os_release_id}" != 'ubuntu' ]
-                    then
-                        sed -i '$ a loader.pal_internal_mem_size = "64M"' nodejs.manifest.template
-                        sed -i "s/{{ nodejs_dir }}\\/nodejs/{{ nodejs_dir }}\\/node/g" nodejs.manifest.template
-                    fi
-                    make ${MAKEOPTS} all
-                    make ${MAKEOPTS} check | tee RESULT
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "Nodejs Example Test Failed"'
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/nodejs
+                if [ "${os_release_id}" != 'ubuntu' ]
+                then
+                    sed -i '$ a loader.pal_internal_mem_size = "64M"' nodejs.manifest.template
+                    sed -i "s/{{ nodejs_dir }}\\/nodejs/{{ nodejs_dir }}\\/node/g" nodejs.manifest.template
+                fi
+                make ${MAKEOPTS} all
+                make ${MAKEOPTS} check | tee RESULT
+            '''
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Nodejs Example Test Failed"'
+    }
 
-        try {
-            timeout(time: 20, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/r
-                    if [ "${os_release_id}" != 'ubuntu' ]
-                    then
-                        export R_HOME=/usr/lib64/R
-                        sed -i '$ a loader.pal_internal_mem_size = "128M"' R.manifest.template
-                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
-                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/uname",\' R.manifest.template
-                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/sh",\' R.manifest.template
-                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/rm",\' R.manifest.template
-                        sed -i 's/sgx.enclave_size = "1G"/sgx.enclave_size = "2G"/' R.manifest.template
-                    fi
-                    if [ "${os_release_id}" = 'centos' ]
-                    then
-                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/coreutils",\' R.manifest.template
-                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/lib64/libcap.so.2",\' R.manifest.template
-                    fi
-                    make ${MAKEOPTS} all
-                    gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r | tee RESULT_1
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "R Example Test Failed"'
+    try {
+        timeout(time: 20, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/r
+                if [ "${os_release_id}" != 'ubuntu' ]
+                then
+                    export R_HOME=/usr/lib64/R
+                    sed -i '$ a loader.pal_internal_mem_size = "128M"' R.manifest.template
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/uname",\' R.manifest.template
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/sh",\' R.manifest.template
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/rm",\' R.manifest.template
+                fi
+                if [ "${os_release_id}" = 'centos' ]
+                then
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/coreutils",\' R.manifest.template
+                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/lib64/libcap.so.2",\' R.manifest.template
+                fi
+                make ${MAKEOPTS} all
+                gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r | tee RESULT_1
+            '''
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "R Example Test Failed"'
+    }
 
-    if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1')))
-    {
-        try {
-            timeout(time: 15, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/pytorch
-                    if [ "${os_release_id}" != 'ubuntu' ]
+    try {
+        timeout(time: 15, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/pytorch
+                if [ "${os_release_id}" != 'ubuntu' ]
+                then
+                    if [ "${os_release_id}" == 'centos' ]
                     then
-                        if [ "${os_release_id}" == 'centos' ]
-                        then
-                            sed -i '$ a loader.argv0_override="{{ entrypoint }}"' pytorch.manifest.template
-                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$SETUPTOOLS_PATH\\/\\"," pytorch.manifest.template
-                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$DATACLASSES_PATH\\/\\"," pytorch.manifest.template
-                            sed -i -e "/file:{{ python.distlib }}/,+d" pytorch.manifest.template
-                        else
-                            sed -i \'s/"file:{{ python.distlib }}/"file:\\/usr\\/local\\/lib\\/python3.6\\/site-packages/\' pytorch.manifest.template
-                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/lib\\/python3.6\\/site-packages\\/\\"," pytorch.manifest.template
-                        fi
+                        sed -i '$ a loader.argv0_override="{{ entrypoint }}"' pytorch.manifest.template
+                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$SETUPTOOLS_PATH\\/\\"," pytorch.manifest.template
+                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$DATACLASSES_PATH\\/\\"," pytorch.manifest.template
+                        sed -i -e "/file:{{ python.distlib }}/,+d" pytorch.manifest.template
+                    else
+                        sed -i \'s/"file:{{ python.distlib }}/"file:\\/usr\\/local\\/lib\\/python3.6\\/site-packages/\' pytorch.manifest.template
+                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/lib\\/python3.6\\/site-packages\\/\\"," pytorch.manifest.template
                     fi
-                        sed -i 's/sgx.enclave_size = "2G"/sgx.enclave_size = "8G"/g' pytorch.manifest.template
-                        sed -i 's/sgx.thread_num = 16/sgx.thread_num = 32/g' pytorch.manifest.template
-                    python3 download-pretrained-model.py
-                    make ${MAKEOPTS} all
-                    gramine-${MODE} ./pytorch ./pytorchexample.py
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "Pytorch Example Test Failed"'
+                fi
+                python3 download-pretrained-model.py
+                make ${MAKEOPTS} all
+                gramine-${MODE} ./pytorch ./pytorchexample.py
+            '''
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Pytorch Example Test Failed"'
     }
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
