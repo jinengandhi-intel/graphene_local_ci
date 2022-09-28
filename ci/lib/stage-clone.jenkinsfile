@@ -1,6 +1,11 @@
 stage('checkout'){
     if (env.gramine_version != null) {
-        sh """git clone --depth 1 https://github.com/gramineproject/gramine.git -b ${env.gramine_version}"""
+        try {
+            sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git -b ${env.gramine_version}"""
+        }  catch (Exception e){
+            sh 'Failed to checkout tag version. Cloning Gramine Latest Master'
+            sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git """
+        }
     } else {
         dir ("gramine") {
             git url: 'https://github.com/gramineproject/gramine.git'

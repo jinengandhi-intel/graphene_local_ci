@@ -6,6 +6,7 @@ node (node_label) {
         load 'ci/lib/stage-clone.jenkinsfile'
 
         dir ("gramine") {
+            sh 'cp -rf $WORKSPACE/test_workloads.py . '
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 
