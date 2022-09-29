@@ -4,8 +4,48 @@ stage('test') {
             sh '''
                 cd CI-Examples/helloworld
                 make ${MAKEOPTS} all
-                make check
+                make check | tee helloworld_result.txt
             '''
         }
     } catch (Exception e) {}
+
+    if (env.node_label == "graphene_dcap") {
+        sh '''
+            sudo apt install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev
+            cp -rf /sgx_default_qcnl.conf /etc/sgx_default_qcnl.conf
+        '''
+        try {
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/ra-tls-mbedtls
+                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
+                    make check_dcap | tee mbedtls_result.txt
+                '''
+            }
+        } catch (Exception e) {}
+
+        try {
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/ra-tls-secret-prov
+                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
+                    make check_dcap | tee secret_prov_result.txt
+                '''
+            }
+        } catch (Exception e) {}
+    }
+}
+
+stage ('verification') {
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 -m pytest -v -m sanity --junit-xml workload-regression.xml test_workloads.py'
+        }
+    } catch (Exception e){
+        env.build_ok = true
+        sh 'echo "Workload parser failed"'
+    }
+    finally {
+        junit 'workload-regression.xml'
+    }
 }

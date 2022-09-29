@@ -129,7 +129,7 @@ stage('build') {
                     sudo yum update
                 '''
 
-                if (env.gramine_version == "v1.3") {
+                if (env.gramine_version == "v1.3.1") {
                     sh 'sudo yum install -y gramine --enablerepo=gramine-unstable'
                 } else {
                     sh 'sudo yum install -y gramine'
@@ -145,8 +145,8 @@ stage('build') {
                     env.ubuntu_repo = "focal"
                 }
 
-                if (env.gramine_version == "v1.3") {
-                    env.gramine_branch = "unstable"
+                if (env.gramine_version == "v1.3.1") {
+                    env.gramine_branch = "unstable-${ubuntu_repo}"
                 } else {
                     env.gramine_branch = "stable"
                 }
@@ -178,8 +178,8 @@ stage('build') {
                         sudo apt-get update && sudo apt-get --with-new-pkgs -y upgrade
                     '''
                 }
-                sh 'gramine-sgx-gen-private-key'
             }
+            sh 'gramine-sgx-gen-private-key'
        }
     }
 }
