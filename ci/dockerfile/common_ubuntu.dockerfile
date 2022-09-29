@@ -8,6 +8,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get inst
     make \
     pkg-config \
     python3-pip \
+    python3-pytest \
     sudo \
     wget
 
