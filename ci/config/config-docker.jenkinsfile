@@ -40,7 +40,7 @@ if (fileExists('/var/run/aesmd/aesm.socket')) {
 }
 
 if (fileExists('/etc/sgx_default_qcnl.conf')) {
-    env.DOCKER_ARGS_SGX += ' --volume=/etc/sgx_default_qcnl.conf:/sgx_default_qcnl.conf'
+    env.DOCKER_ARGS_SGX += ' --volume=/etc/sgx_default_qcnl.conf:/etc/sgx_default_qcnl.conf'
 }
 
 env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
