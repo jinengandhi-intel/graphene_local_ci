@@ -10,6 +10,9 @@ RUN sed 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo 
 RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
 
 RUN yum install -y yum-utils epel-release
+
+RUN yum-config-manager --add-repo https://packages.gramineproject.io/rpm/gramine.repo
+
 # Add steps here to set up dependencies
 RUN yum update -y && yum install -y \
     curl \
