@@ -11,8 +11,8 @@ stage('test') {
 
     if (env.node_label == "graphene_dcap") {
         sh '''
-            sudo apt install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev
-            cp -rf /sgx_default_qcnl.conf /etc/sgx_default_qcnl.conf
+            sudo apt install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev netcat
+            sudo cp -rf /sgx_default_qcnl.conf /etc/sgx_default_qcnl.conf
         '''
         try {
             timeout(time: 5, unit: 'MINUTES') {

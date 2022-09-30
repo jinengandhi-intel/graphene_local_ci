@@ -129,11 +129,7 @@ stage('build') {
                     sudo yum update
                 '''
 
-                if (env.gramine_version == "v1.3.1") {
-                    sh 'sudo yum install -y gramine --enablerepo=gramine-unstable'
-                } else {
-                    sh 'sudo yum install -y gramine'
-                }
+                sh 'sudo yum install -y gramine'
 
                 if (env.gramine_version == "v1.2_update") {
                     sh 'sudo yum update && sudo yum upgrade -y --enablerepo=gramine-unstable'
@@ -146,7 +142,7 @@ stage('build') {
                 }
 
                 if (env.gramine_version == "v1.3.1") {
-                    env.gramine_branch = "unstable-${ubuntu_repo}"
+                    env.gramine_branch = "${ubuntu_repo}"
                 } else {
                     env.gramine_branch = "stable"
                 }

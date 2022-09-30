@@ -3,9 +3,7 @@ stage('checkout'){
         try {
             sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git -b ${env.gramine_version}"""
         }  catch (Exception e){
-            echo 'Failed to checkout tag version. Cloning Gramine Latest Master'
-        } finally {
-            sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git """
+            echo 'Failed to checkout tag version.'
         }
     } else {
         dir ("gramine") {
