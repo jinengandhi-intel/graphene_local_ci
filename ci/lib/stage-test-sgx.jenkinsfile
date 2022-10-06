@@ -205,43 +205,34 @@ stage('test-sgx') {
         sh 'echo "SQLite Example Test Failed"'
     }
 
-    /*timeout(time: 5, unit: 'MINUTES') {
-        sh '''
-            # test SGX remote attestation only on Ubuntu 18.04 to keep internet requests to minimum
-            .ci/isdistro bionic || exit 0
+    if ((env.node_label == "graphene_dcap") && (env.SGX == '1')) {
+        try {
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/ra-tls-mbedtls
+                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
+                    make check_dcap | tee mbedtls_result.txt
+                '''
+            }
+        } catch (Exception e) {
+            env.build_ok = false
+            sh 'echo "ra-tls-mbedtls Example Test Failed"'
+        }
 
-            cd CI-Examples/ra-tls-mbedtls
-            if [ "${ra_client_spid}" != "" ] && [ "${ra_client_key}" != "" ]; \
-            then \
-                make check_epid RA_CLIENT_SPID=${ra_client_spid} \
-                                        RA_TLS_EPID_API_KEY=${ra_client_key} \
-                                        RA_CLIENT_LINKABLE=0; \
-                make check_epid_fail RA_CLIENT_SPID=${ra_client_spid} \
-                                            RA_TLS_EPID_API_KEY=${ra_client_key} \
-                                            RA_CLIENT_LINKABLE=0; \
-            else \
-                echo "Failure: no ra_client_spid and/or ra_client_key!"; \
-                exit 1; \
-            fi
-        '''
+        try {
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/ra-tls-secret-prov
+                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
+                    make check_dcap | tee secret_prov_result.txt
+                '''
+            }
+        } catch (Exception e) {
+            env.build_ok = false
+            sh 'echo "ra-tls-secret-prov Example Test Failed"'
+        }
     }
-    timeout(time: 5, unit: 'MINUTES') {
-        sh '''
-            # test SGX remote attestation only on Ubuntu 18.04 to keep internet requests to minimum
-            .ci/isdistro bionic || exit 0
 
-            cd CI-Examples/ra-tls-secret-prov
-            if [ "${ra_client_spid}" != "" ] && [ "${ra_client_key}" != "" ]; \
-            then \
-                make SGX=1 check_epid RA_CLIENT_SPID=${ra_client_spid} \
-                                        RA_TLS_EPID_API_KEY=${ra_client_key} \
-                                        RA_CLIENT_LINKABLE=0; \
-            else \
-                echo "Failure: no ra_client_spid and/or ra_client_key!"; \
-                exit 1; \
-            fi
-        '''
-    }*/
     try{
         timeout(time: 10, unit: 'MINUTES') {
             sh '''

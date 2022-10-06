@@ -196,6 +196,7 @@ class Test_Workload_Results():
             and (re.search("Latency:", openvino_contents)) \
             and (re.search("Throughput:", openvino_contents)))
 
+    @pytest.mark.examples
     @pytest.mark.sanity
     @pytest.mark.skipif((node_label != 'graphene_dcap'), reason="Enabled only for Gramine Dcap")
     def test_ra_tls_mbedtls_workload(self):
@@ -206,6 +207,7 @@ class Test_Workload_Results():
         assert("Success 3/4" in mbedtls_contents)
         assert("Success 4/4" in mbedtls_contents)
 
+    @pytest.mark.examples
     @pytest.mark.sanity
     @pytest.mark.skipif((node_label != 'graphene_dcap'), reason="Enabled only for Gramine Dcap")
     def test_ra_tls_secret_prov_workload(self):

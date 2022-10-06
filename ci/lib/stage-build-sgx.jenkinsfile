@@ -52,6 +52,10 @@ stage('build') {
                     git clone https://github.com/intel/SGXDataCenterAttestationPrimitives.git
                     cd SGXDataCenterAttestationPrimitives
                     git checkout DCAP_1.6
+                    curl -fsSL https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
+                    echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
+                    sudo apt-get update
+                    echo N | sudo apt-get install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev libsgx-dcap-quote-verify libsgx-dcap-quote-verify-dev
                 '''
 
                 try {
@@ -65,6 +69,7 @@ stage('build') {
                         -Dsgx=enabled \
                         -Dtests=enabled \
                         -Dsgx_driver=dcap1.6 \
+                        -Ddcap=enabled \
                         $MESON_OPTIONS > meson_cmd_output.txt
                     ninja -vC build > ninja_build_log.txt
                     ninja -vC build install > ninja_install_log.txt
