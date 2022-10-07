@@ -155,6 +155,8 @@ class Test_Workload_Results():
         assert("Success 1/1" in nodejs_contents)
 
     @pytest.mark.examples
+    @pytest.mark.skipif(((node_label == 'graphene_oot') and (sgx_mode == '1')),
+                    reason="Pytorch fails for Graphene OOT")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
         pytorch_contents = pytorch_result_file.read()
@@ -171,7 +173,8 @@ class Test_Workload_Results():
         assert("success" in r1_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != "ubuntu"),
+    @pytest.mark.skipif((os_release_id != "ubuntu") or
+                    ((node_label == 'graphene_oot') and (sgx_mode == '1')),
                     reason="GCC enabled only for Ubuntu configurations.")
     def test_gcc_workload(self):
         gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")

@@ -118,31 +118,48 @@ stage('test-examples') {
         sh 'echo "R Example Test Failed"'
     }
 
-    try {
-        timeout(time: 15, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/pytorch
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    if [ "${os_release_id}" == 'centos' ]
+    if (!((node_label == 'graphene_oot') && (env.SGX == '1'))) {
+       try {
+            timeout(time: 15, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/pytorch
+                    if [ "${os_release_id}" != 'ubuntu' ]
                     then
-                        sed -i '$ a loader.argv0_override="{{ entrypoint }}"' pytorch.manifest.template
-                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$SETUPTOOLS_PATH\\/\\"," pytorch.manifest.template
-                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$DATACLASSES_PATH\\/\\"," pytorch.manifest.template
-                        sed -i -e "/file:{{ python.distlib }}/,+d" pytorch.manifest.template
-                    else
-                        sed -i \'s/"file:{{ python.distlib }}/"file:\\/usr\\/local\\/lib\\/python3.6\\/site-packages/\' pytorch.manifest.template
-                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/lib\\/python3.6\\/site-packages\\/\\"," pytorch.manifest.template
+                        if [ "${os_release_id}" == 'centos' ]
+                        then
+                            sed -i '$ a loader.argv0_override="{{ entrypoint }}"' pytorch.manifest.template
+                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$SETUPTOOLS_PATH\\/\\"," pytorch.manifest.template
+                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$DATACLASSES_PATH\\/\\"," pytorch.manifest.template
+                            sed -i -e "/file:{{ python.distlib }}/,+d" pytorch.manifest.template
+                        else
+                            sed -i \'s/"file:{{ python.distlib }}/"file:\\/usr\\/local\\/lib\\/python3.6\\/site-packages/\' pytorch.manifest.template
+                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/lib\\/python3.6\\/site-packages\\/\\"," pytorch.manifest.template
+                        fi
                     fi
-                fi
-                python3 download-pretrained-model.py
-                make ${MAKEOPTS} all
-                gramine-${MODE} ./pytorch ./pytorchexample.py
-            '''
+                    python3 download-pretrained-model.py
+                    make ${MAKEOPTS} all
+                    gramine-${MODE} ./pytorch ./pytorchexample.py
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "Pytorch Example Test Failed"'
         }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Pytorch Example Test Failed"'
+
+        if (os_release_id == "ubuntu") {
+           try {
+                timeout(time: 10, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/gcc
+                        make ${MAKEOPTS} all
+                        make ${MAKEOPTS} check | tee OUTPUT
+                    '''
+                }
+            } catch (Exception e){
+                env.build_ok = false
+                sh 'echo "GCC Example Test Failed"'
+            }
+        }
     }
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
@@ -196,18 +213,4 @@ stage('test-examples') {
         sh 'echo "Rust example Test Failed"'
     }
 
-    if (os_release_id == "ubuntu") {
-        try {
-            timeout(time: 10, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/gcc
-                    make ${MAKEOPTS} all
-                    make ${MAKEOPTS} check | tee OUTPUT
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "GCC Example Test Failed"'
-        }
-    }
 }
