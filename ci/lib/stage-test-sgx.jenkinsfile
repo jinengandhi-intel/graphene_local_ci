@@ -72,30 +72,27 @@ stage('test-sgx') {
         }
     }
 
-    if (env.os_release_id == "ubuntu")
-    {
-        try{
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/python
-                    if [ "${base_os}" = 'ubuntu18.04' ] && [ "${no_cpu}" -gt 100 ]
-                    then
-                        sed -i 's/sgx.enclave_size = "2G"/sgx.enclave_size = "16G"/g' python.manifest.template
-                        sed -i 's/sgx.thread_num = 64/sgx.thread_num = 256/g' python.manifest.template
-                    fi
-                    make ${MAKEOPTS} DEBUG=1
-                    make ${MAKEOPTS} SGX=1 check
-                '''
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "Python Example Test Failed"'
-        } finally {
-            archiveArtifacts 'CI-Examples/python/TEST_*'
+    try{
+        timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cat CI-Examples/python/TEST_STDOUT
-            '''            
+                cd CI-Examples/python
+                if [ "${base_os}" = 'ubuntu18.04' ] && [ "${no_cpu}" -gt 100 ]
+                then
+                    sed -i 's/sgx.enclave_size = "2G"/sgx.enclave_size = "16G"/g' python.manifest.template
+                    sed -i 's/sgx.thread_num = 64/sgx.thread_num = 256/g' python.manifest.template
+                fi
+                make ${MAKEOPTS} DEBUG=1
+                make ${MAKEOPTS} SGX=1 check
+            '''
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "Python Example Test Failed"'
+    } finally {
+        archiveArtifacts 'CI-Examples/python/TEST_*'
+        sh '''
+            cat CI-Examples/python/TEST_STDOUT
+        '''
     }
 
     try {

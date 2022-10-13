@@ -28,8 +28,6 @@ class Test_Workload_Results():
         assert("Success 7/7" in bash_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != "ubuntu" and sgx_mode == '1'),
-                    reason="Python Cent/RHEL issue")
     def test_python_workload(self):
         python_result_file = open("CI-Examples/python/TEST_STDOUT", "r")
         python_contents = python_result_file.read()
