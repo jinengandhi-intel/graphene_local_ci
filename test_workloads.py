@@ -198,7 +198,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif((node_label != 'graphene_dcap'), reason="Enabled only for Gramine Dcap")
+    @pytest.mark.skipif(not(node_label == 'graphene_dcap' and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_mbedtls_workload(self):
         mbedtls_result_file = open("CI-Examples/ra-tls-mbedtls/mbedtls_result.txt", "r")
         mbedtls_contents = mbedtls_result_file.read()
@@ -209,7 +209,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif((node_label != 'graphene_dcap'), reason="Enabled only for Gramine Dcap")
+    @pytest.mark.skipif(not(node_label == 'graphene_dcap' and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_secret_prov_workload(self):
         secret_prov_result_file = open("CI-Examples/ra-tls-secret-prov/secret_prov_result.txt", "r")
         secret_prov_contents = secret_prov_result_file.read()
