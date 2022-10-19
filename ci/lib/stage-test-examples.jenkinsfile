@@ -14,7 +14,6 @@ stage('test-examples') {
                     cd CI-Examples/openjdk
                     if [ "${os_release_id}" != 'ubuntu' ]
                     then
-                        sed -i '$ a loader.pal_internal_mem_size = "64M"' java.manifest.template
                         sed -i -e "/file:\\/usr\\/lib\\/jvm\\/java-11-openjdk-amd64/,+d" java.manifest.template
                         sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$JAVAHOME\\/lib\\/\\"," java.manifest.template
                     fi
@@ -42,7 +41,6 @@ stage('test-examples') {
                     if [ "${os_release_id}" != 'ubuntu' ]
                     then
                         make ${MAKEOPTS} tensorflow/configure
-                        sed -i '$ a loader.pal_internal_mem_size = "64M"' label_image.manifest.template
                         sed -i "s/\\/usr\\/bin\\/env python/\\/usr\\/bin\\/env python3/" tensorflow/tensorflow/tools/git/gen_git_source.py
                         make PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
                     fi
@@ -60,10 +58,6 @@ stage('test-examples') {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/curl
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    sed -i '$ a loader.pal_internal_mem_size = "64M"' curl.manifest.template
-                fi
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} check | tee RESULT
             '''
@@ -79,7 +73,6 @@ stage('test-examples') {
                 cd CI-Examples/nodejs
                 if [ "${os_release_id}" != 'ubuntu' ]
                 then
-                    sed -i '$ a loader.pal_internal_mem_size = "64M"' nodejs.manifest.template
                     sed -i "s/{{ nodejs_dir }}\\/nodejs/{{ nodejs_dir }}\\/node/g" nodejs.manifest.template
                 fi
                 make ${MAKEOPTS} all
@@ -98,7 +91,6 @@ stage('test-examples') {
                 if [ "${os_release_id}" != 'ubuntu' ]
                 then
                     export R_HOME=/usr/lib64/R
-                    sed -i '$ a loader.pal_internal_mem_size = "128M"' R.manifest.template
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/uname",\' R.manifest.template
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/sh",\' R.manifest.template
@@ -172,7 +164,6 @@ stage('test-examples') {
                         chmod +x ./openvino_setup.sh
                         ./openvino_setup.sh
                         source openvino_2021/bin/setupvars.sh
-                        sed -i '$ a loader.pal_internal_mem_size = "64M"' benchmark_app.manifest.template
                         sed -i '$ a sgx.nonpie_binary = true' benchmark_app.manifest.template
                         sed -i 's/intel_models public_models/intel_models/' Makefile
                         make ${MAKEOPTS} intel_models
