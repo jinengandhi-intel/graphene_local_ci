@@ -38,10 +38,6 @@ stage('test-sgx') {
                 then
                     sed -i "s/bin\\/readlink/bin\\/coreutils/" Makefile
                 fi
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    sed -i '$ a loader.pal_internal_mem_size = "128M"' manifest.template 
-                fi
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 regression 2>&1 | tee result.txt
             '''
@@ -107,10 +103,6 @@ stage('test-sgx') {
                 fi
 
                 cd CI-Examples/redis
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    sed -i '$ a loader.pal_internal_mem_size = "64M"' redis-server.manifest.template 
-                fi                
                 make ${MAKEOPTS}
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../scripts/wait_for_server 60 127.0.0.1 6379
@@ -126,10 +118,6 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/lighttpd
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    sed -i '$ a loader.pal_internal_mem_size = "64M"' lighttpd.manifest.template 
-                fi                
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../scripts/wait_for_server 60 127.0.0.1 8003
@@ -150,11 +138,7 @@ stage('test-sgx') {
                 then
                     echo "Killing $PID"
                     kill -9 $PID
-                fi                  
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    sed -i '$ a loader.pal_internal_mem_size = "64M"' nginx.manifest.template 
-                fi                
+                fi
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../scripts/wait_for_server 120 127.0.0.1 8002
@@ -175,10 +159,6 @@ stage('test-sgx') {
             then
                 sed -i 's/sgx.enclave_size = "2048M"/sgx.enclave_size = "4G"/g' blender.manifest.template
                 sed -i 's/sgx.thread_num = 64/sgx.thread_num = 256/g' blender.manifest.template
-            fi
-            if [ "${os_release_id}" != 'ubuntu' ]
-            then
-                sed -i '$ a loader.pal_internal_mem_size = "64M"' blender.manifest.template 
             fi
             make ${MAKEOPTS} all
             make ${MAKEOPTS} SGX=1 check	
@@ -236,7 +216,6 @@ stage('test-sgx') {
                 cd CI-Examples/busybox
                 if [ "${os_release_id}" != 'ubuntu' ]
                 then
-                    sed -i '$ a loader.pal_internal_mem_size = "64M"' busybox.manifest.template
                     sed -i '$ a sgx.nonpie_binary = true' busybox.manifest.template
                 fi                
                 make ${MAKEOPTS} all

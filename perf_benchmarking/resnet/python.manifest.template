@@ -9,8 +9,6 @@ loader.insecure__disable_aslr = true
 
 loader.env.LD_LIBRARY_PATH = "{{ python.stdlib }}/lib:/lib:{{ arch_libdir }}:/usr/lib:/usr/{{ arch_libdir }}"
 
-loader.pal_internal_mem_size = "512M"
-
 fs.mounts = [
   { path = "/lib", uri = "file:{{ gramine.runtimedir() }}"},
   { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}"},

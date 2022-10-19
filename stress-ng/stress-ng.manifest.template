@@ -2,7 +2,6 @@ loader.entrypoint = "file:{{ gramine.libos }}"
 libos.entrypoint = "/usr/bin/stress-ng" 
 
 loader.log_level = "error"
-loader.pal_internal_mem_size = "1024M"
 sys.stack.size = "8M"
 sgx.enclave_size = "4G"
 sgx.thread_num = 512
