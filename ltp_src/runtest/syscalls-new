@@ -76,8 +76,8 @@ chown03 chown03
 chown03_16 chown03_16
 chown04 chown04
 chown04_16 chown04_16
-chown05 chown05
-chown05_16 chown05_16
+chown05_run chown05_run
+chown05_run_16 chown05_run_16
 
 chroot01 chroot01
 chroot02 chroot02
