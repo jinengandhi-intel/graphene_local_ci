@@ -75,7 +75,7 @@ stage('test-sgx') {
                 if [ "${base_os}" = 'ubuntu18.04' ] && [ "${no_cpu}" -gt 100 ]
                 then
                     sed -i 's/sgx.enclave_size = "2G"/sgx.enclave_size = "16G"/g' python.manifest.template
-                    sed -i 's/sgx.thread_num = 64/sgx.thread_num = 256/g' python.manifest.template
+                    sed -i 's/sgx.max_threads = 64/sgx.max_threads = 256/g' python.manifest.template
                 fi
                 make ${MAKEOPTS} DEBUG=1
                 make ${MAKEOPTS} SGX=1 check
@@ -158,7 +158,7 @@ stage('test-sgx') {
             if [ "${no_cpu}" -gt 16 ]
             then
                 sed -i 's/sgx.enclave_size = "2048M"/sgx.enclave_size = "4G"/g' blender.manifest.template
-                sed -i 's/sgx.thread_num = 64/sgx.thread_num = 256/g' blender.manifest.template
+                sed -i 's/sgx.max_threads = 64/sgx.max_threads = 256/g' blender.manifest.template
             fi
             make ${MAKEOPTS} all
             make ${MAKEOPTS} SGX=1 check	

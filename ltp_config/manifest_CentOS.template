@@ -25,7 +25,7 @@ sys.brk.max_size = "32M"
 sys.stack.size = "4M"
 sgx.nonpie_binary = true
 sgx.debug = true
-sgx.thread_num = 13
+sgx.max_threads = 13
 
 sgx.allowed_files = [
     "file:/tmp",
