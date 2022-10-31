@@ -4,7 +4,7 @@ libos.entrypoint = "/usr/bin/stress-ng"
 loader.log_level = "error"
 sys.stack.size = "8M"
 sgx.enclave_size = "4G"
-sgx.thread_num = 512
+sgx.max_threads = 512
 
 sgx.nonpie_binary = true
 loader.insecure__use_cmdline_argv = true
