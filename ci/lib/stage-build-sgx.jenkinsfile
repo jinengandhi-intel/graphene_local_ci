@@ -144,10 +144,16 @@ stage('build') {
                     env.ubuntu_repo = "bionic"
                 } else if (env.os_version == "20.04") {
                     env.ubuntu_repo = "focal"
+                } else if (env.os_version == "22.04") {
+                    env.ubuntu_repo = "stable"
                 }
 
                 if (env.gramine_repo == "unstable") {
-                    env.gramine_branch = "unstable-${ubuntu_repo}"
+                    if (env.os_version == "22.04") {
+                        env.gramine_branch = "unstable"
+                    } else {
+                        env.gramine_branch = "unstable-${ubuntu_repo}"
+                    }
                 } else {
                     env.gramine_branch = "${ubuntu_repo}"
                 }

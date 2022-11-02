@@ -12,7 +12,6 @@ node (node_label) {
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             load '../ci/config/config-docker.jenkinsfile'
             load '.ci/lib/config.jenkinsfile'
-            load '.ci/lib/config-ubuntu18.04.jenkinsfile'
             load '.ci/lib/config-release.jenkinsfile'
 
             load '../ci/config/config-centos8.jenkinsfile'

@@ -23,7 +23,6 @@ node (node_label) {
                 '-f ../ci/dockerfile/ubuntu20.04.dockerfile .'
             ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
                 load '.ci/lib/config.jenkinsfile'
-                load '.ci/lib/config-ubuntu18.04.jenkinsfile'
                 load '.ci/lib/config-release.jenkinsfile'
 
                 load '../ci/lib/stage-build-sgx.jenkinsfile'
