@@ -19,15 +19,8 @@ node (node_label) {
                 load '.ci/lib/config.jenkinsfile'
 
                 switch(params.base_os) {
-                    case 'ubuntu18.04':
-                        load '.ci/lib/config-ubuntu18.04.jenkinsfile'
-                        break
                     case 'centos8':
-                        load '.ci/lib/config-ubuntu18.04.jenkinsfile'
                         load '../ci/config/config-centos8.jenkinsfile'
-                        break
-                    default:
-                        load '.ci/lib/config-ubuntu20.04.jenkinsfile'
                         break
                 }
 

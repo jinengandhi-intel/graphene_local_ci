@@ -13,7 +13,6 @@ node(node_label) {
             load '../ci/config/config-docker.jenkinsfile'
 
             load '.ci/lib/config.jenkinsfile'
-            load '.ci/lib/config-ubuntu18.04.jenkinsfile'
             load '.ci/lib/config-release.jenkinsfile'
             load '../ci/lib/stage-build-perf.jenkinsfile'
             load '../ci/lib/stage-redis-perf.jenkinsfile'

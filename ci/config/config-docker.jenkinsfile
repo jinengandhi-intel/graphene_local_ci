@@ -16,11 +16,11 @@ env.DOCKER_ARGS_SGX = '''
     --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
 '''
 
-if (env.gramine_version == "v1.2") {
-    env.DOCKER_ARGS_COMMON += """ --security-opt seccomp=${env.WORKSPACE}/Scripts/docker_seccomp.json"""
+if (env.gramine_version == "v1.3") {
+    env.DOCKER_ARGS_COMMON += """ --security-opt seccomp=${env.WORKSPACE}/scripts/docker_seccomp.json"""
 }
 else {
-    env.DOCKER_ARGS_COMMON += """ --security-opt seccomp=${env.WORKSPACE}/scripts/docker_seccomp.json"""
+    env.DOCKER_ARGS_COMMON += """ --security-opt seccomp=${env.WORKSPACE}/scripts/docker_seccomp_aug_2022.json"""
 }
 
 if (fileExists('/dev/sgx/enclave')) {
