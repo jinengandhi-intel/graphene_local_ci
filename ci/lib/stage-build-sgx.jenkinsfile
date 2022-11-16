@@ -164,7 +164,7 @@ stage('build') {
                 '''
 
                 if (env.build_type == "package_in_kernel") {
-                    sh 'sudo apt-get install -y gramine'
+                    sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y gramine'
                 } else if (env.build_type == "package_oot") {
                     sh 'sudo apt-get install -y gramine-oot'
                 } else if (env.build_type == "package_dcap") {
