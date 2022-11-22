@@ -47,7 +47,7 @@ stage('test') {
                         RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test build -v
                     fi
 
-                    if [ "graphene_oot" = $node_label ] || [ "graphene_dcap" = $node_label ];
+                    if [ ${no_cpu} -le 8 ];
                     then
                         python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression.xml
                     else
@@ -77,7 +77,7 @@ stage('test') {
                             RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test -n tests_musl.toml build -v
                         fi
 
-                        if [ "graphene_oot" = $node_label ] || [ "graphene_dcap" = $node_label ];
+                        if [ ${no_cpu} -le 8 ];
                         then
                             python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression-musl.xml
                         else
