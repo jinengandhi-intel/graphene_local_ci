@@ -64,14 +64,12 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-cryptography \
     python3-jinja2 \
     python3-lxml \
-    python3-numpy \
     python3-pip \
     python3-protobuf \
     python3-pyelftools \
     python3-pytest \
     python3-pytest-xdist \
     python3-recommonmark \
-    python3-scipy \
     python3-sphinx-rtd-theme \
     python3-toml \
     r-base \
@@ -103,6 +101,10 @@ RUN python3 -m pip install -U \
     'meson>=0.56,<0.57'  \
     ninja \
     torchvision \
+    scikit-learn-intelex \
+    pandas \
+    scipy \
+    numpy \
     pillow
 
 # Add the user UID:1000, GID:1000, home at /intel

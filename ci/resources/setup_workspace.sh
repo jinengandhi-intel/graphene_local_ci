@@ -13,6 +13,7 @@ done;
 cd $WORKSPACE/gramine
 cp -rf $WORKSPACE/stress-ng CI-Examples/
 cp -rf $WORKSPACE/go_helloworld CI-Examples/
+cp -rf $WORKSPACE/scikit-learn-intelex CI-Examples/
 cp -rf $WORKSPACE/examples/* CI-Examples/
 cp -rf $WORKSPACE/test_workloads.py . 
 cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/

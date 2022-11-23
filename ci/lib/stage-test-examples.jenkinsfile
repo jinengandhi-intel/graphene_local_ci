@@ -204,4 +204,16 @@ stage('test-examples') {
         sh 'echo "Rust example Test Failed"'
     }
 
+    if ((os_release_id == "ubuntu") && !((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
+        try {
+            sh '''
+                cd CI-Examples/scikit-learn-intelex
+                python3 scripts/download_dataset.py
+                make
+                gramine-${MODE} ./sklearnex scripts/kmeans_example.py | tee RESULT_1
+                gramine-${MODE} ./sklearnex scripts/kmeans_perf_eval.py | tee RESULT_2
+            '''
+        } catch (Exception e) {}
+    }
+
 }

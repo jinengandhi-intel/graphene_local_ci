@@ -221,3 +221,14 @@ class Test_Workload_Results():
         helloworld_result_file = open("CI-Examples/helloworld/helloworld_result.txt", "r")
         helloworld_contents = helloworld_result_file.read()
         assert("Hello, world" in helloworld_contents)
+
+    @pytest.mark.examples
+    @pytest.mark.skipif((os_release_id != 'ubuntu') or ((int(no_cores) < 16) and sgx_mode == '1'),
+                    reason="SciKit enabled only for Ubuntu Server Configurations")
+    def test_sklearn_workload(self):
+        sklearn_result_1 = open("CI-Examples/scikit-learn-intelex/RESULT_1", "r")
+        kmeans_example = sklearn_result_1.read()
+        sklearn_result_2 = open("CI-Examples/scikit-learn-intelex/RESULT_2", "r")
+        kmeans_perf = sklearn_result_2.read()
+        assert((re.search("Kmeans example finished:", kmeans_example)) \
+            and (re.search("Kmeans perf evaluation finished", kmeans_perf)))
