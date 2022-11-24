@@ -35,6 +35,9 @@ class Test_Workload_Results():
         assert("Success 2/4" in python_contents)
         assert("Success 3/4" in python_contents)
         assert("Success 4/4" in python_contents)
+        if os.environ.get("RA_TYPE") == "dcap":
+            assert("Success SGX report" in python_contents)
+            assert("Success SGX quote" in python_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id != "ubuntu" or
