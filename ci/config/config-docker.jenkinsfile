@@ -63,3 +63,7 @@ if (env.base_os) {
 
 echo 'OS name : ' + os_release_id
 echo 'OS version : ' + os_version
+
+if (env.node_label.contains("dcap") && (env.SGX == "1")) {
+    env.RA_TYPE = "dcap"
+}
