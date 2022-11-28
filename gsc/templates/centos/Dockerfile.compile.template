@@ -41,5 +41,5 @@ RUN dnf update -y \
         python3-cryptography \
         rpm-build \
         wget \
-    && /usr/bin/python3 -B -m pip install --proxy=http://proxy-dmz.intel.com:911 'toml>=0.10' 'meson>=0.55'
+    && /usr/bin/python3 -B -m pip install --proxy=http://proxy-dmz.intel.com:911 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.55'
 {% endblock %}

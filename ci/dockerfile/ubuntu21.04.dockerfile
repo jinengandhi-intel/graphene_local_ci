@@ -74,7 +74,6 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-recommonmark \
     python3-scipy \
     python3-sphinx-rtd-theme \
-    python3-toml \
     r-base \
     sqlite3 \
     shellcheck \
@@ -103,6 +102,8 @@ RUN python3 -m pip install -U \
     asv \
     'meson>=0.56,<0.57'  \
     torchvision \
+    'tomli>=1.1.0' \
+    'tomli-w>=0.4.0' \
     pillow
 
 # Add the user UID:1000, GID:1000, home at /intel
