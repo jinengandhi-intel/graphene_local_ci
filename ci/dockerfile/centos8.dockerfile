@@ -106,7 +106,8 @@ RUN python3 -m pip install -U \
     six \
     torchvision \
     pillow \
-    'toml>=0.10' \
+    'tomli>=1.1.0' \
+    'tomli-w>=0.4.0' \
     'meson>=0.56,<0.57'
 
 # Add the user UID:1000, GID:1000, home at /intel

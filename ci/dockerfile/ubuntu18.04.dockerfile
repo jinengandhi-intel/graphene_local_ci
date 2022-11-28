@@ -107,7 +107,8 @@ RUN python3 -m pip install -U \
     recommonmark \
     'Sphinx==1.8' \
     sphinx_rtd_theme \
-    'toml>=0.10' \
+    'tomli>=1.1.0' \
+    'tomli-w>=0.4.0' \
     'meson>=0.56,<0.57' \
     torchvision \
     pillow

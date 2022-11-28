@@ -76,7 +76,6 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-recommonmark \
     python3-scipy \
     python3-sphinx-rtd-theme \
-    python3-toml \
     python3-venv \
     r-base \
     sqlite3 \
@@ -105,6 +104,8 @@ RUN git clone https://github.com/giltene/wrk2.git \
 RUN python3 -m pip install -U \
     asv \
     'meson>=0.56,<0.57' \
+    'tomli>=1.1.0'\
+    'tomli-w>=0.4.0' \
     torchvision \
     pillow
 
