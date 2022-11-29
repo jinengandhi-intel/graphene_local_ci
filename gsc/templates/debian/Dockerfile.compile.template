@@ -26,7 +26,10 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         python3-pip \
         python3-protobuf \
         wget \
-    && /usr/bin/python3 -B -m pip install --proxy=http://proxy-dmz.intel.com:911 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.55'
+    && /usr/bin/python3 -B -m pip install --proxy=http://proxy-dmz.intel.com:911 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56'
+
+# For compatibility with Gramine v1.3 or lower
+RUN /usr/bin/python3 -B -m pip install 'toml>=0.10'
 
 COPY intel-sgx-deb.key /
 
