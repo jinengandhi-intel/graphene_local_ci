@@ -1,0 +1,47 @@
+pipeline{
+    // this pipeline will clone gsc, gramine and contrib repo and generates Bandit scan on these repos
+    // ensure agent is installed with Bandit package
+    // sudo apt install bandit
+    agent {
+        label 'graphene_20.04_6.0_WilsonCity'
+    }
+    options {
+        skipDefaultCheckout()
+    }
+    stages {
+        stage('clone') {
+            steps{
+                cleanWs()
+                dir('gramine') {
+                    git branch: 'master', url: 'https://github.com/gramineproject/gramine.git'
+                }
+                dir('gsc') {
+                    git branch: 'master', url: 'https://github.com/gramineproject/gsc.git'
+                }
+                dir('contrib') {
+                    git branch: 'master', url: 'https://github.com/gramineproject/contrib.git'
+                }
+            }
+        }
+        stage('Bandit scan'){
+            steps{
+                script {
+                    output = sh returnStdout: true, script: 'ls -d */'
+                    dirs = output.tokenize('/\n').collect() { it }
+                    for( dir in dirs){
+                        print 'Bandit scan on ' + dir
+                        rc = sh returnStatus: true, script:'bandit -r ' + dir + ' -f txt -o ' + dir + '.txt'
+                        print 'NOTE : Expected Bandit scan return code is 1'
+                        print 'Bandit scan Return code on ' + dir + ' : ' + rc
+                    }
+                }
+            }
+            post{
+                success{
+                    archiveArtifacts artifacts: '*.txt', followSymlinks: false
+                    cleanWs()
+                }
+            }
+        }
+    }
+}
