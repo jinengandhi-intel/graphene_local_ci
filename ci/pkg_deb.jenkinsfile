@@ -1,18 +1,32 @@
 stage('pkg_deb') {
     try {
         sh '''
-            sudo debuild --set-envvar=http_proxy=http://proxy-chain.intel.com:911/ --set-envvar=https_proxy=http://proxy-chain.intel.com:912/
-            mkdir package
-            sudo cp -rf ../*.deb ./package
-            cd package
-            sudo apt install -y ./*.deb
-            gramine-sgx-gen-private-key
+            ./scripts/makedist.sh
+            tar -xzf gramine_*.orig.tar.gz
+            sed -i '28 aSGX_HEADER_DIR := /usr/src/linux-headers-$(shell uname -r | cut -d \"-\" -f 1,2)/arch/x86/include/uapi' debian/rules
+            sed -i 's/$(SGX_DRIVER_INCLUDE_PATH_UPSTREAM)/$(SGX_HEADER_DIR)/g' debian/rules
+            cd gramine-*
+            debuild
         '''
         } catch (Exception e) {}
     finally {
-        archiveArtifacts 'package/*.deb'
+        sh '''
+            sudo apt install -y ./gramine_1.3.1~post_amd64.deb
+            gramine-sgx-gen-private-key
+        '''
+        archiveArtifacts '''
+                gramine*.deb,
+                gramine*.tar.xz,
+                gramine_*.orig.tar.gz,
+                gramine_*.build,
+                gramine_*.buildinfo,
+                gramine_*.changes,
+                gramine_*.dsc,
+        '''
     }
 }
+
+
 
 stage('test') {
     try {
