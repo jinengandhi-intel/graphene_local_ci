@@ -27,7 +27,7 @@ stage('test-examples') {
         }
     }
 
-    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_oot") && (env.SGX == '1')))
+    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_22.04_5.18") && (env.SGX == '1')))
     {
         try {
             timeout(time: 30, unit: 'MINUTES') {
@@ -84,33 +84,35 @@ stage('test-examples') {
         sh 'echo "Nodejs Example Test Failed"'
     }
 
-    try {
-        timeout(time: 20, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/r
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    export R_HOME=/usr/lib64/R
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/uname",\' R.manifest.template
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/sh",\' R.manifest.template
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/rm",\' R.manifest.template
-                fi
-                if [ "${os_release_id}" = 'centos' ]
-                then
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/coreutils",\' R.manifest.template
-                    sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/lib64/libcap.so.2",\' R.manifest.template
-                fi
-                make ${MAKEOPTS} all
-                gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r | tee RESULT_1
-            '''
+    if (!((node_label == 'graphene_22.04_5.18') && (env.SGX == '1'))) {
+        try {
+            timeout(time: 20, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/r
+                    if [ "${os_release_id}" != 'ubuntu' ]
+                    then
+                        export R_HOME=/usr/lib64/R
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/uname",\' R.manifest.template
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/sh",\' R.manifest.template
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/rm",\' R.manifest.template
+                    fi
+                    if [ "${os_release_id}" = 'centos' ]
+                    then
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/coreutils",\' R.manifest.template
+                        sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/lib64/libcap.so.2",\' R.manifest.template
+                    fi
+                    make ${MAKEOPTS} all
+                    gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r | tee RESULT_1
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "R Example Test Failed"'
         }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "R Example Test Failed"'
     }
 
-    if (!((node_label == 'graphene_oot') && (env.SGX == '1'))) {
+    if (!((node_label == 'graphene_22.04_5.18') && (env.SGX == '1'))) {
        try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
