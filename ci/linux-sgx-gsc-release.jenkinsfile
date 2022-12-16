@@ -3,9 +3,7 @@ node(node_label) {
     env.build_ok = true
     try {
         stage('checkout'){
-            dir ('./') {
-                git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git'
-            }
+            checkout scm
 
             dir('gsc_dev_repo') {
                 git url: 'https://github.com/gramineproject/gsc.git'
@@ -21,6 +19,7 @@ node(node_label) {
 
             load '../ci/lib/stage-test-gsc.jenkinsfile'
             load '../ci/lib/stage-test-gsc-python.jenkinsfile'
+            load '../ci/lib/stage-test-gsc-helloworld.jenkinsfile'
         }
     } finally {
         stage('Workspace cleanup'){

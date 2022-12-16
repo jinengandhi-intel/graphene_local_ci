@@ -1,0 +1,28 @@
+stage('Build') {
+    sh '''
+        openssl genrsa -3 -out enclave-key.pem 3072
+        cp -f config.yaml.template config.yaml
+        sed -i -E 's/Distro: "(.+)"/Distro: "'"$distro_ver"'"/g' config.yaml
+        cp -f test/$workload_ver-bash.dockerfile test/helloworld.dockerfile
+        cp -f test/$workload_ver-bash.manifest test/helloworld.manifest
+        sed -i -E \'s/CMD \\["bash"\\]/CMD ["echo", \\"\\\\"Hello World!\\\\""]/\' test/helloworld.dockerfile
+        docker build --tag $workload_ver-helloworld --file test/helloworld.dockerfile .
+        ./gsc build -nc --insecure-args $workload_ver-helloworld test/helloworld.manifest
+        ./gsc sign-image $workload_ver-helloworld enclave-key.pem
+        ./gsc info-image gsc-$workload_ver-helloworld
+    '''
+} 
+stage('Test') {
+    sh '''
+        docker run --device=/dev/sgx_enclave \
+            -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+            gsc-$workload_ver-helloworld
+    '''
+}
+stage('Docker images cleanup') {
+    sh '''
+        docker stop $(docker ps -aq)
+        docker rm $(docker ps -aq)
+        docker image prune -af
+    '''
+}
