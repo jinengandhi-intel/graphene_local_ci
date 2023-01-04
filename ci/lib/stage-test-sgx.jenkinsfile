@@ -1,4 +1,12 @@
 stage('test-sgx') {
+
+    sh '''
+        .ci/check-no-syscall.sh "$GRAMINE_PKGLIBDIR"/runtime/glibc/libc.so.6
+        if test -f "$GRAMINE_PKGLIBDIR"/runtime/musl/libc.so
+        then
+            .ci/check-no-syscall.sh "$GRAMINE_PKGLIBDIR"/runtime/musl/libc.so
+        fi
+    '''
     try {
         timeout(time: 60, unit: 'MINUTES') {
             sh '''
