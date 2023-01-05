@@ -11,6 +11,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get inst
     python3-pip \
     python3-pytest \
     sudo \
+    sshpass \
     wget
 
 RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
