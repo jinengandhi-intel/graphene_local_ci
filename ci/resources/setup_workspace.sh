@@ -29,7 +29,9 @@ if [[ "$base_os" == *"centos"* ]]; then
   cp -rf $WORKSPACE/utils/rust_centos_setup/* CI-Examples/rust/
 fi
 
-for i in $(find -name '*manifest.template');
-do
-  sed -i 's/sgx.preheat_enclave = true//' $i;
-done;
+if [[ "$EDMM" == 1 ]]; then
+  for i in $(find -name '*manifest.template');
+  do
+    sed -i 's/sgx.preheat_enclave = true//' $i;
+  done;
+fi

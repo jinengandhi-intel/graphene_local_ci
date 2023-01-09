@@ -30,7 +30,7 @@ stage('test-sgx') {
     }
 
     try{
-        timeout(time: 10, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 40 : 10), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
@@ -69,7 +69,7 @@ stage('test-sgx') {
     }
 
     try{
-        timeout(time: 5, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 30 : 5), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/python
                 if [ "${base_os}" != *"centos"* ]
@@ -129,7 +129,7 @@ stage('test-sgx') {
     }
 
     try {
-        timeout(time: 15, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 60 : 15), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/nginx
                 export PID=$(lsof -t -i:8002)
@@ -151,7 +151,7 @@ stage('test-sgx') {
     }
 
     try {    
-        timeout(time: 5, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 30 : 5), unit: 'MINUTES') {
             sh '''
             cd CI-Examples/blender
             if [ "${no_cpu}" -gt 16 ]
@@ -169,7 +169,7 @@ stage('test-sgx') {
     }
 
     try{
-        timeout(time: 5, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 30 : 5), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/sqlite
                 make ${MAKEOPTS} all
