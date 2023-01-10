@@ -28,3 +28,10 @@ if [[ "$base_os" == *"centos"* ]]; then
   echo "setting up workspace for centos"
   cp -rf $WORKSPACE/utils/rust_centos_setup/* CI-Examples/rust/
 fi
+
+if [[ "$EDMM" == 1 ]]; then
+  for i in $(find -name '*manifest.template');
+  do
+    sed -i 's/sgx.preheat_enclave = true//' $i;
+  done;
+fi
