@@ -8,6 +8,9 @@ cd $WORKSPACE/examples
 for i in $(find -name '*.manifest.template');
 do
   sed -i '$ a sgx.debug = true' $i;
+  if [[ "$EDMM" == 1 ]]; then
+    sed -i '$ a sgx.edmm_enable = true' $i;
+  fi
 done;
 
 cd $WORKSPACE/gramine
