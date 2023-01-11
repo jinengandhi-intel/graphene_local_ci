@@ -8,15 +8,21 @@ stage('Build Workloads') {
 
     // Build Bash Workload
     sh '''
-        docker build --tag $workload_ver-bash --file test/$workload_ver-bash.dockerfile .
-        ./gsc build -nc --insecure-args $workload_ver-bash test/$workload_ver-bash.manifest
-        ./gsc sign-image $workload_ver-bash enclave-key.pem
-        ./gsc info-image gsc-$workload_ver-bash
+        if [ "${os_release_id}" = "centos" ]
+        then
+            cp -rf test/centos8-bash.dockerfile test/bash.dockerfile
+        else
+            cp -rf test/ubuntu18.04-bash.dockerfile test/bash.dockerfile
+            sed -i -e "s/From ubuntu:18.04/From $distro_ver/g" test/bash.dockerfile
+        fi
+        docker build --tag bash-test --file test/bash.dockerfile .
+        ./gsc build -nc --insecure-args bash-test test/ubuntu18.04-bash.manifest
+        ./gsc sign-image bash-test enclave-key.pem
+        ./gsc info-image gsc-bash-test
     '''
 
     // Build Python Workload
     sh '''
-        os_release_id=$(grep -oP '(?<=^ID=).+' /etc/os-release | tr -d '"')
         if [ "${os_release_id}" = "centos" ]
         then
             docker build --tag python --file test/python.dockerfile .
@@ -32,12 +38,17 @@ stage('Build Workloads') {
 
     // Build Bash HelloWorld Workload
     sh '''
-        cp -f test/$workload_ver-bash.dockerfile test/helloworld.dockerfile
-        cp -f test/$workload_ver-bash.manifest test/helloworld.manifest
-        sed -i -E \'s/CMD \\["bash"\\]/CMD ["echo", \\"\\\\"Hello World!\\\\""]/\' test/helloworld.dockerfile
-        docker build --tag $workload_ver-helloworld --file test/helloworld.dockerfile .
-        ./gsc build -nc --insecure-args $workload_ver-helloworld test/helloworld.manifest
-        ./gsc sign-image $workload_ver-helloworld enclave-key.pem
-        ./gsc info-image gsc-$workload_ver-helloworld
+        if [ "${os_release_id}" = "centos" ]
+        then
+            cp -rf test/centos8-helloworld.dockerfile test/helloworld.dockerfile
+        else
+            cp -rf test/ubuntu18.04-hello-world.dockerfile test/helloworld.dockerfile
+            sed -i -e "s/From ubuntu:18.04/From $distro_ver/g" test/helloworld.dockerfile
+        fi
+
+        docker build --tag helloworld-test --file test/helloworld.dockerfile .
+        ./gsc build -nc --insecure-args helloworld-test test/ubuntu18.04-hello-world.manifest
+        ./gsc sign-image helloworld-test enclave-key.pem
+        ./gsc info-image gsc-helloworld-test
     '''
 }
