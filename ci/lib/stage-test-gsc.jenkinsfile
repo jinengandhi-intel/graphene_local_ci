@@ -2,7 +2,7 @@ stage('Test Bash') {
     sh '''
         docker run --device=/dev/sgx_enclave \
             -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-            gsc-$workload_ver-bash -c free
+            gsc-bash-test -c free
     '''
 }
 
@@ -18,7 +18,7 @@ stage('Test Helloworld') {
     sh '''
         docker run --device=/dev/sgx_enclave \
             -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-            gsc-$workload_ver-helloworld
+            gsc-helloworld-test
     '''
 }
 
