@@ -22,6 +22,10 @@ cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/
 
 if [[ "$SGX" == 1 ]]; then
   cp -rf ~/jenkins/sandstone-50-bin CI-Examples/
+  if [[ "$EDMM" == 1 ]]; then
+    sed -i '$ a sgx.edmm_enable = true' CI-Examples/sandstone-50-bin/sandstone.manifest.template;
+  fi
+
   cp -f $WORKSPACE/Patch/rename_protected_file.patch .
 fi
 
