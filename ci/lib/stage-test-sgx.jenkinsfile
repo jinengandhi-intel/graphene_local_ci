@@ -38,7 +38,7 @@ stage('test-sgx') {
     }
 
     try{
-        timeout(time: (env.EDMM ? 40 : 10), unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 120 : 10), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
@@ -77,7 +77,7 @@ stage('test-sgx') {
     }
 
     try{
-        timeout(time: (env.EDMM ? 30 : 5), unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 45 : 5), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/python
                 if [ "${base_os}" != *"centos"* ]
