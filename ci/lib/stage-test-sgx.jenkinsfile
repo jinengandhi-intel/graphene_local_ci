@@ -159,7 +159,7 @@ stage('test-sgx') {
     }
 
     try {    
-        timeout(time: (env.EDMM ? 30 : 5), unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 30 : 10), unit: 'MINUTES') {
             sh '''
             cd CI-Examples/blender
             if [ "${no_cpu}" -gt 16 ]
