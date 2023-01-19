@@ -179,6 +179,44 @@ stage('test-examples') {
                 sh 'echo "OpenVino Example Test Failed"'
             }
         }
+
+        if ((Float.parseFloat(env.os_version) >= 20) && (env.os_release_id == "ubuntu")) {
+            try {
+                timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/scikit-learn-intelex
+                        sed -i "s/\\/home\\/user\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
+                        sed -i "s/{{ env.HOME }}\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
+                        python3 scripts/download_dataset.py
+                        make ${MAKEOPTS} all
+                        ./run_tests.sh | tee RESULT
+                    '''
+                }
+            } catch (Exception e) {
+                env.build_ok = false
+                sh 'echo "Scikit-learn Example Test Failed"'
+            }
+
+            try {
+                timeout(time: (env.EDMM ? 60 : 20), unit: 'MINUTES') {
+                    sh '''
+                        export PID=$(lsof -t -i:8501)
+                        if [ "$PID" != "" ]
+                        then
+                            echo "Killing $PID"
+                            kill -9 $PID
+                        fi
+                        cd CI-Examples/tfserving
+                        sudo make install-dependencies
+                        make all
+                        make ${MAKEOPTS} check 2>&1 | tee RESULT
+                    '''
+                }
+            } catch (Exception e) {
+                env.build_ok = false
+                sh 'echo "Tensorflow Serving Example Test Failed"'
+            }
+        }
     }
 
     try {
@@ -205,5 +243,4 @@ stage('test-examples') {
         env.build_ok = false
         sh 'echo "Rust example Test Failed"'
     }
-
 }

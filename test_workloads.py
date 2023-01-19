@@ -226,3 +226,21 @@ class Test_Workload_Results():
         helloworld_result_file = open("CI-Examples/helloworld/helloworld_result.txt", "r")
         helloworld_contents = helloworld_result_file.read()
         assert("Hello, world" in helloworld_contents)
+
+    @pytest.mark.examples
+    @pytest.mark.skipif((os_release_id != 'ubuntu') or (float(os_version) <= 20) or ((int(no_cores) < 16) and sgx_mode == '1'),
+                    reason="Scikit-learn enabled for Ubuntu Server Configurations.")
+    def test_scikit_workload(self):
+        sklearn_result_file = open("CI-Examples/scikit-learn-intelex/RESULT", "r")
+        sklearn_contents = sklearn_result_file.read()
+        assert(("Success 1/2" in sklearn_contents) \
+            and ("Success 2/2" in sklearn_contents))
+
+    @pytest.mark.examples
+    @pytest.mark.skipif((os_release_id != 'ubuntu') or (float(os_version) <= 20) or
+                    ((int(no_cores) < 16) and sgx_mode == '1'),
+                    reason="TFServing enabled only for above Ubuntu 18.04 Configurations.")
+    def test_tfserving_workload(self):
+        tfserving_result = open("CI-Examples/tfserving/RESULT", "r")
+        tfserving_contents = tfserving_result.read()
+        assert("Success" in tfserving_contents)
