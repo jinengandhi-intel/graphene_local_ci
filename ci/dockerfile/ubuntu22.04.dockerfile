@@ -65,6 +65,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-jinja2 \
     python3-lxml \
     python3-numpy \
+    python3-pandas \
     python3-pip \
     python3-protobuf \
     python3-pyelftools \
@@ -97,14 +98,17 @@ RUN git clone https://github.com/giltene/wrk2.git \
 # NOTE about meson version: we support "0.56 or newer", so in CI we pin to latest patch version of
 # the earliest supported minor version (pip implicitly installs latest version satisfying the
 # specification)
+RUN python3 -m pip install --upgrade pip --user
+
 RUN python3 -m pip install -U \
     asv \
     'meson>=0.56,<0.57'  \
+    ninja \
+    pillow \
+    scikit-learn-intelex \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \
-    ninja \
-    torchvision \
-    pillow
+    torchvision --timeout 120
 
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G sudo -m -d /intel -c "intel Jenkins" intel && \

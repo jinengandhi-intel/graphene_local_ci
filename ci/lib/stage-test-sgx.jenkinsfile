@@ -11,7 +11,7 @@ stage('test-sgx') {
         timeout(time: 60, unit: 'MINUTES') {
             sh '''
                 cd libos/test/ltp
-                make ${MAKEOPTS} -f Makefile.LTP SGX=1 all 
+                make ${MAKEOPTS} -f Makefile.LTP SGX=1 all
             '''
             // Run tests in a separate block, so that Jenkins measures build time and run time
             // separately
@@ -19,7 +19,7 @@ stage('test-sgx') {
                 cd libos/test/ltp
                 export GRAMINE_LTP_LIVE_OUTPUT=fcntl14,fdatasync01
                 python3 -m pytest -v  --junit-xml=ltp-sgx.xml
-            '''                
+            '''
             /*
             sh '''
                 cd LibOS/shim/test/ltp
