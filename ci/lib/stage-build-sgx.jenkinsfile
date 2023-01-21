@@ -45,7 +45,7 @@ stage('build') {
                     archiveArtifacts 'ninja_build_log.txt'
                     archiveArtifacts 'ninja_install_log.txt'                    
                 }
-            } else if (env.node_label == "graphene_dcap") {
+            } else if (env.node_label.contains("dcap")) {
                 sh '''
                     curl -fsSL https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
                     echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list

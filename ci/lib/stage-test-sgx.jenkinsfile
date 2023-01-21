@@ -189,7 +189,7 @@ stage('test-sgx') {
         sh 'echo "SQLite Example Test Failed"'
     }
 
-    if ((env.node_label == "graphene_dcap") && (env.SGX == '1')) {
+    if ((env.node_label.contains("dcap")) && (env.SGX == '1')) {
         try {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''

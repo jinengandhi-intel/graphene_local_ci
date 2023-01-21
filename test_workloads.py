@@ -131,7 +131,7 @@ class Test_Workload_Results():
     @pytest.mark.examples
     @pytest.mark.skipif(float(os_version) >= 21 or
                 ((node_label == 'graphene_22.04_5.18') and sgx_mode == '1') or
-                ((node_label == 'graphene_dcap') and sgx_mode == '1'),
+                (("dcap" in node_label) and sgx_mode == '1'),
                     reason="Bazel Build fails for Ubuntu 21 and Graphene DCAP")
     def test_tensorflow_workload(self):
         tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
@@ -201,7 +201,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not(node_label == 'graphene_icl_dcap' and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif(not(("dcap" in node_label) and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_mbedtls_workload(self):
         mbedtls_result_file = open("CI-Examples/ra-tls-mbedtls/mbedtls_result.txt", "r")
         mbedtls_contents = mbedtls_result_file.read()
@@ -212,7 +212,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not(node_label == 'graphene_icl_dcap' and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif(not(("dcap" in node_label) and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_secret_prov_workload(self):
         secret_prov_result_file = open("CI-Examples/ra-tls-secret-prov/secret_prov_result.txt", "r")
         secret_prov_contents = secret_prov_result_file.read()
