@@ -197,7 +197,7 @@ stage('test-examples') {
                 fi
                 make ${MAKEOPTS}
                 make ${MAKEOPTS} start-gramine-server &
-                ../../scripts/wait_for_server 60 127.0.0.1 3000
+                ../../scripts/wait_for_server 300 127.0.0.1 3000
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:3000 | tee RESULT
             '''
         }
