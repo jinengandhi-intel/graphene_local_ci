@@ -34,10 +34,21 @@ pipeline{
                         print 'NOTE : Expected Bandit scan return code is 1'
                         print 'Bandit scan Return code on ' + dir + ' : ' + rc
                     }
+                    // compare current build gramine repo scan report with baseline metrics values
+                    dir('graphene_local_ci') {
+                        checkout scm
+                    }
+                    result = sh returnStatus: true, script: 'python3 graphene_local_ci/ci/resources/bandit_parser.py'
+                    if(result != 0){
+                        print('bandit scan report is not matching with baseline metrics values')
+                        currentBuild.result = 'FAILURE'
+                    }else{
+                        print('No new issues found on comparison of current build bandit scan with baseline matrics values')
+                    }
                 }
             }
             post{
-                success{
+                always{
                     archiveArtifacts artifacts: '*.txt', followSymlinks: false
                     cleanWs()
                 }
