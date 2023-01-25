@@ -14,6 +14,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     gdb \
     gettext \
     git \
+    golang \
     jq \
     libaio1 \
     libapr1-dev \
