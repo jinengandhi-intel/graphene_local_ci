@@ -45,7 +45,7 @@ stage('build') {
                     archiveArtifacts 'ninja_build_log.txt'
                     archiveArtifacts 'ninja_install_log.txt'                    
                 }
-            } else if (env.node_label == "graphene_dcap") {
+            } else if (env.node_label.contains("dcap")) {
                 sh '''
                     curl -fsSL https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
                     echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
@@ -122,15 +122,22 @@ stage('build') {
             env.LC_ALL = "C.UTF-8"
             env.LANG = "C.UTF-8"
 
+            if (env.package_type == "local") {
+                sh 'sshpass -p intel@123 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r intel@${local_machine}:${package_path} packages'
+            }
+
             if (env.os_release_id == "centos") {
                 env.ARCH_LIBDIR="/lib64"
 
-                if (env.gramine_repo == "unstable") {
-                    sh 'sudo yum install -y gramine --enablerepo=gramine-unstable'
+                if (env.package_type == "remote") {
+                    if (env.gramine_repo == "unstable") {
+                        sh 'sudo yum install -y gramine --enablerepo=gramine-unstable'
+                    } else {
+                        sh 'sudo yum install -y gramine'
+                    }
                 } else {
-                    sh 'sudo yum install -y gramine'
+                    sh "sudo dnf install ./packages/${env.package_version} -y" 
                 }
-
                 if (env.gramine_version.contains("update")) {
                     sh 'sudo yum update && sudo yum upgrade -y --enablerepo=gramine-unstable'
                 }
@@ -159,15 +166,27 @@ stage('build') {
                 '''
 
                 if (env.build_type == "package_in_kernel") {
-                    sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y gramine'
+                    if (env.package_type == "remote") {
+                        sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y gramine'
+                    } else {
+                        env.package_name = "gramine_${env.package_version}_amd64.deb"
+                        sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y ./packages/${package_name}'
+                    }  
                 } else if (env.build_type == "package_oot") {
                     sh 'sudo apt-get install -y gramine-oot'
                 } else if (env.build_type == "package_dcap") {
-                    sh 'sudo apt-get install -y gramine-dcap'
+                    if (env.package_type == "remote") {
+                        sh 'sudo apt-get install -y gramine-dcap'
+                    } else {
+                        env.gramine_package_name = "gramine_${env.package_version}_amd64.deb"
+                        env.gramine_ratls_package_name = "gramine-ratls-dcap_${env.package_version}_amd64.deb"
+                        sh 'sudo apt-get install -y ./packages/${gramine_package_name} ./packages/${gramine_ratls_package_name}'
+                    }
                 } else {
                     currentBuild.result = "ABORTED"
                     error("Aborting the build")
                 }
+                
 
                 sh 'sudo apt-get update'
                 if (env.gramine_version.contains("update")) {

@@ -1,0 +1,54 @@
+stage('Build Workloads') {
+
+    sh '''
+        openssl genrsa -3 -out enclave-key.pem 3072
+        cp -f config.yaml.template config.yaml
+        sed -i -E 's/Distro: "(.+)"/Distro: "'"$distro_ver"'"/g' config.yaml
+    '''
+
+    // Build Bash Workload
+    sh '''
+        if [ "${os_release_id}" = "centos" ]
+        then
+            cp -rf test/centos8-bash.dockerfile test/bash.dockerfile
+        else
+            cp -rf test/ubuntu18.04-bash.dockerfile test/bash.dockerfile
+            sed -i -e "s/From ubuntu:18.04/From $distro_ver/g" test/bash.dockerfile
+        fi
+        docker build --tag bash-test --file test/bash.dockerfile .
+        ./gsc build -nc --insecure-args bash-test test/ubuntu18.04-bash.manifest
+        ./gsc sign-image bash-test enclave-key.pem
+        ./gsc info-image gsc-bash-test
+    '''
+
+    // Build Python Workload
+    sh '''
+        if [ "${os_release_id}" = "centos" ]
+        then
+            docker build --tag python --file test/python.dockerfile .
+        fi
+        if [ "${os_release_id}" = "ubuntu" ]
+        then
+            docker pull python
+        fi
+        ./gsc build -nc --insecure-args python test/generic.manifest
+        ./gsc sign-image python enclave-key.pem
+        ./gsc info-image gsc-python
+    '''
+
+    // Build Bash HelloWorld Workload
+    sh '''
+        if [ "${os_release_id}" = "centos" ]
+        then
+            cp -rf test/centos8-helloworld.dockerfile test/helloworld.dockerfile
+        else
+            cp -rf test/ubuntu18.04-hello-world.dockerfile test/helloworld.dockerfile
+            sed -i -e "s/From ubuntu:18.04/From $distro_ver/g" test/helloworld.dockerfile
+        fi
+
+        docker build --tag helloworld-test --file test/helloworld.dockerfile .
+        ./gsc build -nc --insecure-args helloworld-test test/ubuntu18.04-hello-world.manifest
+        ./gsc sign-image helloworld-test enclave-key.pem
+        ./gsc info-image gsc-helloworld-test
+    '''
+}

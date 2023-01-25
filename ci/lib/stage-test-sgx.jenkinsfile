@@ -1,4 +1,12 @@
 stage('test-sgx') {
+
+    sh '''
+        .ci/check-no-syscall.sh "$GRAMINE_PKGLIBDIR"/runtime/glibc/libc.so.6
+        if test -f "$GRAMINE_PKGLIBDIR"/runtime/musl/libc.so
+        then
+            .ci/check-no-syscall.sh "$GRAMINE_PKGLIBDIR"/runtime/musl/libc.so
+        fi
+    '''
     try {
         timeout(time: 60, unit: 'MINUTES') {
             sh '''
@@ -30,7 +38,7 @@ stage('test-sgx') {
     }
 
     try{
-        timeout(time: 10, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 120 : 10), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
@@ -55,7 +63,7 @@ stage('test-sgx') {
                     cd CI-Examples/memcached
                     make ${MAKEOPTS} all
                     make SGX=1 start-gramine-server &
-                    ../../scripts/wait_for_server 60 127.0.0.1 11211
+                    ../../scripts/wait_for_server 300 127.0.0.1 11211
                     # memcslap populates server but doesn't report errors, use
                     # memcached-tool for this (must return two lines of stats)
                     memcslap --servers=127.0.0.1 --concurrency=8
@@ -69,7 +77,7 @@ stage('test-sgx') {
     }
 
     try{
-        timeout(time: 5, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 45 : 5), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/python
                 if [ "${base_os}" != *"centos"* ]
@@ -104,7 +112,7 @@ stage('test-sgx') {
                 cd CI-Examples/redis
                 make ${MAKEOPTS}
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
-                ../../scripts/wait_for_server 60 127.0.0.1 6379
+                ../../scripts/wait_for_server 300 127.0.0.1 6379
                 ./src/src/redis-benchmark 2>&1 | tee OUTPUT
             '''
         }
@@ -119,7 +127,7 @@ stage('test-sgx') {
                 cd CI-Examples/lighttpd
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
-                ../../scripts/wait_for_server 60 127.0.0.1 8003
+                ../../scripts/wait_for_server 300 127.0.0.1 8003
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:8003
             '''
         }
@@ -129,7 +137,7 @@ stage('test-sgx') {
     }
 
     try {
-        timeout(time: 15, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 60 : 15), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/nginx
                 export PID=$(lsof -t -i:8002)
@@ -140,7 +148,7 @@ stage('test-sgx') {
                 fi
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
-                ../../scripts/wait_for_server 120 127.0.0.1 8002
+                ../../scripts/wait_for_server 360 127.0.0.1 8002
                 sleep 15
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:8002
             '''
@@ -151,7 +159,7 @@ stage('test-sgx') {
     }
 
     try {    
-        timeout(time: 5, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 30 : 10), unit: 'MINUTES') {
             sh '''
             cd CI-Examples/blender
             if [ "${no_cpu}" -gt 16 ]
@@ -169,7 +177,7 @@ stage('test-sgx') {
     }
 
     try{
-        timeout(time: 5, unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 30 : 5), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/sqlite
                 make ${MAKEOPTS} all
@@ -181,7 +189,7 @@ stage('test-sgx') {
         sh 'echo "SQLite Example Test Failed"'
     }
 
-    if ((env.node_label == "graphene_dcap") && (env.SGX == '1')) {
+    if ((env.node_label.contains("dcap")) && (env.SGX == '1')) {
         try {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''

@@ -24,6 +24,10 @@ RUN yum update -y && yum install -y \
     sudo \
     wget
 
+RUN wget https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/sshpass-1.09-4.el8.x86_64.rpm
+
+RUN sudo dnf install ./sshpass-1.09-4.el8.x86_64.rpm -y
+
 RUN python3 -m pip install -U 'meson>=0.56,<0.57'
 
 # Add the user UID:1000, GID:1000, home at /intel

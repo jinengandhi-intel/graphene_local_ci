@@ -9,7 +9,7 @@ stage('test') {
         }
     } catch (Exception e) {}
 
-    if (env.node_label == "graphene_dcap") {
+    if (env.node_label.contains("dcap")) {
         try {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''

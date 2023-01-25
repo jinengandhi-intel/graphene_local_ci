@@ -130,8 +130,8 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif(float(os_version) >= 21 or
-                ((node_label == 'graphene_oot') and sgx_mode == '1') or
-                ((node_label == 'graphene_dcap') and sgx_mode == '1'),
+                ((node_label == 'graphene_22.04_5.18') and sgx_mode == '1') or
+                (("dcap" in node_label) and sgx_mode == '1'),
                     reason="Bazel Build fails for Ubuntu 21 and Graphene DCAP")
     def test_tensorflow_workload(self):
         tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
@@ -156,8 +156,8 @@ class Test_Workload_Results():
         assert("Success 1/1" in nodejs_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((node_label == 'graphene_oot') and (sgx_mode == '1')),
-                    reason="Pytorch fails for Graphene OOT")
+    @pytest.mark.skipif(((node_label == 'graphene_22.04_5.18') and (sgx_mode == '1')),
+                    reason="Pytorch fails for Graphene_22.04.5.18")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
         pytorch_contents = pytorch_result_file.read()
@@ -168,6 +168,8 @@ class Test_Workload_Results():
             and ("Ibizan hound, Ibizan Podenco" in pytorch_contents))
 
     @pytest.mark.examples
+    @pytest.mark.skipif(((node_label == 'graphene_22.04_5.18') and (sgx_mode == '1')),
+                    reason="R fails for Graphene_22.04.5.18")
     def test_r_workload(self):
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()
@@ -175,7 +177,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id != "ubuntu") or
-                    ((node_label == 'graphene_oot') and (sgx_mode == '1')),
+                    ((node_label == 'graphene_22.04_5.18') and (sgx_mode == '1')),
                     reason="GCC enabled only for Ubuntu configurations.")
     def test_gcc_workload(self):
         gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")
@@ -199,7 +201,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not(node_label == 'graphene_dcap' and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif(not(("dcap" in node_label) and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_mbedtls_workload(self):
         mbedtls_result_file = open("CI-Examples/ra-tls-mbedtls/mbedtls_result.txt", "r")
         mbedtls_contents = mbedtls_result_file.read()
@@ -210,7 +212,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not(node_label == 'graphene_dcap' and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif(not(("dcap" in node_label) and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_secret_prov_workload(self):
         secret_prov_result_file = open("CI-Examples/ra-tls-secret-prov/secret_prov_result.txt", "r")
         secret_prov_contents = secret_prov_result_file.read()

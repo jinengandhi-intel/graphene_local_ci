@@ -1,21 +1,27 @@
-stage('Build') {
-    sh '''
-        openssl genrsa -3 -out enclave-key.pem 3072
-        cp -f config.yaml.template config.yaml
-        sed -i -E 's/Distro: "(.+)"/Distro: "'"$distro_ver"'"/g' config.yaml
-        docker build --tag $workload_ver-bash --file test/$workload_ver-bash.dockerfile .
-        ./gsc build -nc --insecure-args $workload_ver-bash test/$workload_ver-bash.manifest
-        ./gsc sign-image $workload_ver-bash enclave-key.pem
-        ./gsc info-image gsc-$workload_ver-bash
-    '''
-} 
-stage('Test') {
+stage('Test Bash') {
     sh '''
         docker run --device=/dev/sgx_enclave \
             -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-            gsc-$workload_ver-bash -c free
+            gsc-bash-test -c free
     '''
 }
+
+stage('Test Python') {
+    sh '''
+        docker run --device=/dev/sgx_enclave \
+            -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+            gsc-python -c 'print("HelloWorld!")'
+    '''
+}
+
+stage('Test Helloworld') {
+    sh '''
+        docker run --device=/dev/sgx_enclave \
+            -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+            gsc-helloworld-test
+    '''
+}
+
 stage('Docker images cleanup') {
     sh '''
         docker stop $(docker ps -aq)

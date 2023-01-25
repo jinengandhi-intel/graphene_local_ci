@@ -5,7 +5,7 @@ chmod +x $WORKSPACE/ci/resources/setup_ltp.sh
 bash $WORKSPACE/ci/resources/setup_ltp.sh
 
 cd $WORKSPACE/examples
-for i in $(find -name '*.manifest.template');
+for i in $(find -name '*manifest.template');
 do
   sed -i '$ a sgx.debug = true' $i;
 done;
