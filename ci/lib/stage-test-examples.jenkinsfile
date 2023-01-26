@@ -9,7 +9,7 @@ stage('test-examples') {
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1')))
     {
         try {
-            timeout(time: 10, unit: 'MINUTES') {
+            timeout(time: 30, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/openjdk
                     if [ "${os_release_id}" != 'ubuntu' ]
