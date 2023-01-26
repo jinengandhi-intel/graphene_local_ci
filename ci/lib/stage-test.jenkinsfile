@@ -11,7 +11,7 @@ stage('test') {
                         gramine-test build -v
                     fi
 
-                    if [ "graphene_22.04_5.18" = $node_label ] || [ $node_label = *dcap* ];
+                    if [ "graphene_22.04_5.18" = $node_label ] || [ "graphene_icl_dcap" = $node_label ] || [ "graphene_dcap" = $node_label ];
                     then
                         python3 -m pytest -v -k "not test_120_8gb_enclave" --junit-xml pal-regression.xml
                     else
