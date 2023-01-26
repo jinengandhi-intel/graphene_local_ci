@@ -142,7 +142,7 @@ stage('test-examples') {
 
         if (os_release_id == "ubuntu") {
            try {
-                timeout(time: 10, unit: 'MINUTES') {
+                timeout(time: (env.EDMM ? 60 : 10), unit: 'MINUTES') {
                     sh '''
                         cd CI-Examples/gcc
                         make ${MAKEOPTS} all
