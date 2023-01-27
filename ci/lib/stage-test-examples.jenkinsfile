@@ -27,7 +27,7 @@ stage('test-examples') {
         }
     }
 
-    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_22.04_5.18") && (env.SGX == '1')))
+    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_18.04_5.19") && (env.SGX == '1')))
     {
         try {
             timeout(time: 30, unit: 'MINUTES') {
