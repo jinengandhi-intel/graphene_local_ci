@@ -149,7 +149,7 @@ stage('test-sgx') {
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../scripts/wait_for_server 360 127.0.0.1 8002
-                if [ "${os_release_id}" == "rhel" ]
+                if [ "${os_release_id}" != "ubuntu" ]
                 then
                     sleep 450
                 fi
@@ -163,7 +163,7 @@ stage('test-sgx') {
     }
 
     try {    
-        timeout(time: (env.EDMM ? 30 : 10), unit: 'MINUTES') {
+        timeout(time: (env.EDMM ? 45 : 10), unit: 'MINUTES') {
             sh '''
             cd CI-Examples/blender
             if [ "${no_cpu}" -gt 16 ]
