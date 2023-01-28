@@ -130,7 +130,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif(float(os_version) >= 21 or
-                ((node_label == 'graphene_22.04_5.18') and sgx_mode == '1') or
+                ((node_label == 'graphene_18.04_5.19') and sgx_mode == '1') or
                 (("dcap" in node_label) and sgx_mode == '1'),
                     reason="Bazel Build fails for Ubuntu 21 and Graphene DCAP")
     def test_tensorflow_workload(self):
