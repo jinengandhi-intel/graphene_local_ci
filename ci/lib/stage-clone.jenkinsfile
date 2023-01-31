@@ -1,11 +1,8 @@
 stage('checkout'){
     if (env.gramine_version != null) {
-        if (env.gramine_repo == "unstable") {
+        if ((env.gramine_repo == "unstable") || (env.gramine_version.contains("update"))) {
             sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git """
         } else {
-            if (env.gramine_version.contains("update")) {
-                env.gramine_version = sh(script: "echo $gramine_version | cut -c -6", returnStdout: true).trim()
-            }
             sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git -b ${env.gramine_version}"""
         }
     } else {
