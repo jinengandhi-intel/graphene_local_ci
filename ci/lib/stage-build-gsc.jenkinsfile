@@ -16,8 +16,8 @@ stage('Build Workloads') {
             sed -i -e "s/From ubuntu:18.04/From $distro_ver/g" test/bash.dockerfile
         fi
         docker build --tag bash-test --file test/bash.dockerfile .
-        ./gsc build -nc --insecure-args bash-test test/ubuntu18.04-bash.manifest
-        ./gsc sign-image bash-test enclave-key.pem
+        ./gsc build -nc --insecure-args --manifest test/ubuntu18.04-bash.manifest bash-test
+        ./gsc sign-image --key enclave-key.pem bash-test
         ./gsc info-image gsc-bash-test
     '''
 
@@ -31,8 +31,8 @@ stage('Build Workloads') {
         then
             docker pull python
         fi
-        ./gsc build -nc --insecure-args python test/generic.manifest
-        ./gsc sign-image python enclave-key.pem
+        ./gsc build -nc --insecure-args --manifest test/generic.manifest python
+        ./gsc sign-image --key enclave-key.pem python
         ./gsc info-image gsc-python
     '''
 
@@ -47,8 +47,8 @@ stage('Build Workloads') {
         fi
 
         docker build --tag helloworld-test --file test/helloworld.dockerfile .
-        ./gsc build -nc --insecure-args helloworld-test test/ubuntu18.04-hello-world.manifest
-        ./gsc sign-image helloworld-test enclave-key.pem
+        ./gsc build -nc --insecure-args --manifest test/ubuntu18.04-hello-world.manifest helloworld-test
+        ./gsc sign-image --key enclave-key.pem helloworld-test
         ./gsc info-image gsc-helloworld-test
     '''
 }

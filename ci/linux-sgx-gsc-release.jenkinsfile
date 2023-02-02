@@ -6,7 +6,8 @@ node(node_label) {
             checkout scm
 
             dir('gsc_dev_repo') {
-                git url: 'https://github.com/gramineproject/gsc.git'
+                git url: 'https://github.com/svenkata9/gsc.git',
+                branch: 'svenkat9/arg_update'
             }
         }
     
