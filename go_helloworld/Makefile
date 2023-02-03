@@ -7,7 +7,7 @@ endif
 .PHONY: all
 all: helloworld helloworld.manifest
 ifeq ($(SGX),1)
-all: helloworld.manifest.sgx helloworld.sig helloworld.token
+all: helloworld.manifest.sgx helloworld.sig
 endif
 
 helloworld: 
@@ -24,10 +24,6 @@ helloworld.manifest.sgx: helloworld.manifest helloworld
 		--output $@
 
 helloworld.sig: helloworld.manifest.sgx
-
-helloworld.token: helloworld.sig
-	gramine-sgx-get-token \
-		--output $@ --sig $<
 
 ifeq ($(SGX),)
 GRAMINE = gramine-direct

@@ -21,5 +21,3 @@ etc/passwd:
 	mkdir -p etc
 	printf "root:x:0:0:root:/root:/bin/bash\nnobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin\n" > $@
 
-.PHONY: sgx-tokens
-sgx-tokens: $(call expand_target_to_token,$(testcases))

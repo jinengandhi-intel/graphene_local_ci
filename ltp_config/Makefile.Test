@@ -15,7 +15,6 @@ LDFLAGS =
 .PHONY: default
 default: all
 
-expand_target_to_token = $(foreach t,$(filter-out manifest,$(1)),$(patsubst %.manifest,%,$(t)).token)
 ifeq ($(SGX),1)
 expand_target = $(1) $(foreach t,$(filter-out manifest,$(1)), \
                 $(patsubst %.manifest,%,$(t)).manifest.sgx)
@@ -25,9 +24,6 @@ endif
 
 .PHONY: all
 all: $(target) | $(call expand_target,$(exec_target))
-
-.PHONY: sgx-tokens
-sgx-tokens: $(call expand_target_to_token,$(exec_target))
 
 ifeq ($(DEBUG),1)
 CC += -g
@@ -74,17 +70,11 @@ SGX_DIR = $(PALDIR)/host/Linux-SGX
 
 SGX_SIGNER_KEY ?= $(SGX_DIR)/signer/enclave-key.pem
 SGX_SIGN = gramine-sgx-sign --key $(SGX_SIGNER_KEY)
-SGX_GET_TOKEN = gramine-sgx-get-token
 
 # sgx manifest.sgx/sig/token
 drop_manifest_suffix = $(filter-out manifest,$(sort $(patsubst %.manifest,%,$(1))))
-expand_target_to_token = $(addsuffix .token,$(call drop_manifest_suffix, $(1)))
 expand_target_to_sig = $(addsuffix .sig,$(call drop_manifest_suffix,$(1)))
 expand_target_to_sgx = $(addsuffix .manifest.sgx,$(call drop_manifest_suffix,$(1)))
-
-%.token: %.sig
-	@echo [ $@ ]
-	@$(SGX_GET_TOKEN) --output $@ --sig $^ > .output.sgx_get_token.$(basename $*)
 
 %.sig %.manifest.sgx: %.manifest $(SGX_SIGNER_KEY) %.manifest.sgx.d
 	@echo [ $@ ]
