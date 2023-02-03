@@ -12,7 +12,7 @@ endif
 .PHONY: all
 all: stress-ng.manifest
 ifeq ($(SGX),1)
-all: stress-ng.manifest.sgx stress-ng.sig stress-ng.token
+all: stress-ng.manifest.sgx stress-ng.sig
 endif
 
 include ../../scripts/Makefile.configs
@@ -28,9 +28,6 @@ stress-ng.manifest.sgx: stress-ng.manifest
 			--manifest $< --output $@
 
 stress-ng.sig: stress-ng.manifest.sgx
-
-stress-ng.token: stress-ng.sig
-		gramine-sgx-get-token --output stress-ng.token --sig stress-ng.sig
 
 .PHONY: clean
 clean:
