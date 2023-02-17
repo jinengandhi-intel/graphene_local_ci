@@ -84,7 +84,8 @@ stage('test-sgx') {
                 then
                     sed -i 's/sgx.enclave_size = "1G"/sgx.enclave_size = "2G"/g' python.manifest.template
                 fi
-                make ${MAKEOPTS} DEBUG=1
+                sed -i "s/wait_for_server 300 127.0.0.1 8005/wait_for_server 1000 127.0.0.1 8005/" run-tests.sh
+                make ${MAKEOPTS}
                 make ${MAKEOPTS} SGX=1 check
             '''
         }
@@ -92,7 +93,6 @@ stage('test-sgx') {
         env.build_ok = false
         sh 'echo "Python Example Test Failed"'
     } finally {
-        archiveArtifacts 'CI-Examples/python/TEST_*'
         sh '''
             cat CI-Examples/python/TEST_STDOUT
         '''
