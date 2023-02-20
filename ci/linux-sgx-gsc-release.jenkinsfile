@@ -6,11 +6,13 @@ node(node_label) {
             checkout scm
 
             dir('gsc_dev_repo') {
-                git url: 'https://github.com/gramineproject/gsc.git'
+                git url: 'https://github.com/gramineproject/gsc.git',
+                branch: 'dimakuv/bump-gsc-gramine-version'
             }
         }
     
         dir ("gsc_dev_repo") {
+            sh 'git reset --hard a60a4991d7351c1b7489444c694638ca9cc68e39'
             sh 'cp -rf $WORKSPACE/gsc/templates/ubuntu/* templates/ubuntu/'
             sh 'cp -rf $WORKSPACE/gsc/templates/centos/* templates/centos/'
             sh 'cp -rf $WORKSPACE/gsc/templates/debian/* templates/debian/'
