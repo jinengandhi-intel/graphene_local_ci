@@ -78,20 +78,19 @@ stage('build') {
 
             } else {
                 try {
-                    if (env.prefix == "true") {
+                    if (env.build_prefix == "0") {
                         sh '''
                         cd "$WORKSPACE"
                         sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
                         meson setup build \
                             --werror \
-                            --prefix="$PREFIX" \
                             --buildtype="$BUILDTYPE" \
                             -Ddirect=disabled \
                             -Dtests=enabled \
                             -Dsgx=enabled \
                             $MESON_OPTIONS > meson_cmd_output.txt
                         ninja -vC build > ninja_build_log.txt
-                        ninja -vC build install > ninja_install_log.txt
+                        sudo ninja -vC build install > ninja_install_log.txt
                         gramine-sgx-gen-private-key
                         '''
                     } else {
@@ -100,6 +99,7 @@ stage('build') {
                         sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
                         meson setup build \
                             --werror \
+                            --prefix="$PREFIX" \
                             --buildtype="$BUILDTYPE" \
                             -Ddirect=disabled \
                             -Dtests=enabled \
@@ -117,7 +117,7 @@ stage('build') {
                 }
             }
 
-            if (env.prefix == "true") {
+            if (env.build_prefix != "0") {
                 // Absolute path to libdir, as configured by Meson.
                 // For our current builds this should be "$WORKSPACE/usr/lib/x86_64-linux-gnu":
                 // --prefix is set from $PREFIX above (see config-docker.jenkinsfile) and should be "$WORKSPACE/usr";
