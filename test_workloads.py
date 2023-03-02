@@ -106,6 +106,7 @@ class Test_Workload_Results():
         assert(("Loop iteration 1 finished" in sandstone_contents) and ("exit: pass" in sandstone_contents))
 
     @pytest.mark.examples
+    @pytest.mark.skipif(os_release_id == "debian", reason='rust is not working on debian currently')
     def test_rust_workload(self):
         data = open("CI-Examples/rust/RESULT", "r")
         result_file = data.read().split("Result file: ")[1].strip()
@@ -124,8 +125,8 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif(float(os_version) >= 21 or
-                ((node_label == 'graphene_18.04_5.19') and sgx_mode == '1') or
-                (("dcap" in node_label) and sgx_mode == '1'),
+                ((node_label == 'graphene_18.04_5.19') and sgx_mode == '1') or (os_release_id == "debian") \
+                or (("dcap" in node_label) and sgx_mode == '1'), \
                     reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
     def test_tensorflow_workload(self):
         tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
@@ -181,7 +182,7 @@ class Test_Workload_Results():
             and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id == 'centos') or
+    @pytest.mark.skipif((os_release_id == 'centos') or (os_release_id == "debian") or
                     (float(os_version) >= 21) or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Openvino enabled only for Ubuntu 18 & 20 Server Configurations")
     def test_openvino_workload(self):

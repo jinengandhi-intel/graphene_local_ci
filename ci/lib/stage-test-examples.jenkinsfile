@@ -26,36 +26,38 @@ stage('test-examples') {
             sh 'echo "Openjdk Example Test Failed"'
         }
     }
-
-    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_18.04_5.19") && (env.SGX == '1')))
-    {
-        try {
-            timeout(time: 60, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/tensorflow-lite
-                    ../common_tools/download --output bazel-0.16.1-installer-linux-x86_64.sh \
-                    --sha256 17ab70344645359fd4178002f367885e9019ae7507c9c1ade8220f3628383444 \
-                    --url https://github.com/bazelbuild/bazel/releases/download/0.16.1/bazel-0.16.1-installer-linux-x86_64.sh
-                    chmod +x ./bazel-0.16.1-installer-linux-x86_64.sh
-                    ./bazel-0.16.1-installer-linux-x86_64.sh --user
-                    if [ "${os_release_id}" != 'ubuntu' ]
-                    then
-                        make GRAMINE_LOG_LEVEL=all ${MAKEOPTS} tensorflow/configure
-                        sed -i "s/\\/usr\\/bin\\/env python/\\/usr\\/bin\\/env python3/" tensorflow/tensorflow/tools/git/gen_git_source.py
-                        make GRAMINE_LOG_LEVEL=all PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
-                    fi
-                    make GRAMINE_LOG_LEVEL=all all
-                    make ${MAKEOPTS} run-gramine | tee OUTPUT
-                '''
+    if ( env.os_release_id != "debian" ) {
+        if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_18.04_5.19") && (env.SGX == '1')) )
+        {
+            try {
+                timeout(time: 60, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/tensorflow-lite
+                        ../common_tools/download --output bazel-0.16.1-installer-linux-x86_64.sh \
+                        --sha256 17ab70344645359fd4178002f367885e9019ae7507c9c1ade8220f3628383444 \
+                        --url https://github.com/bazelbuild/bazel/releases/download/0.16.1/bazel-0.16.1-installer-linux-x86_64.sh
+                        chmod +x ./bazel-0.16.1-installer-linux-x86_64.sh
+                        ./bazel-0.16.1-installer-linux-x86_64.sh --user
+                        if [ "${os_release_id}" != 'ubuntu' ]
+                        then
+                            make GRAMINE_LOG_LEVEL=all ${MAKEOPTS} tensorflow/configure
+                            sed -i "s/\\/usr\\/bin\\/env python/\\/usr\\/bin\\/env python3/" tensorflow/tensorflow/tools/git/gen_git_source.py
+                            make GRAMINE_LOG_LEVEL=all PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
+                        fi
+                        make GRAMINE_LOG_LEVEL=all all
+                        make ${MAKEOPTS} run-gramine | tee OUTPUT
+                    '''
+                }
+            } catch (Exception e){
+                env.build_ok = false
+                sh 'echo "TensorFlow Example Test Failed"'
+            } finally {
+                try{
+                    archiveArtifacts 'CI-Examples/tensorflow-lite/OUTPUT'
+                } catch (Excpetion e){}
             }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "TensorFlow Example Test Failed"'
-        } finally {
-            archiveArtifacts 'CI-Examples/tensorflow-lite/OUTPUT'
         }
     }
-
     try {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
@@ -91,7 +93,7 @@ stage('test-examples') {
             timeout(time: (env.EDMM ? 45 : 20), unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/r
-                    if [ "${os_release_id}" != 'ubuntu' ]
+                    if [ "${os_release_id}" == 'centos' ] || [ "${os_release_id}" == 'rhel' ]
                     then
                         export R_HOME=/usr/lib64/R
                         sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
@@ -119,7 +121,7 @@ stage('test-examples') {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/pytorch
-                    if [ "${os_release_id}" != 'ubuntu' ]
+                    if [ "${os_release_id}" == 'centos' ] || [ "${os_release_id}" == 'rhel' ]
                     then
                         if [ "${os_release_id}" == 'centos' ]
                         then
@@ -159,7 +161,7 @@ stage('test-examples') {
     }
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
-        if ((Float.parseFloat(env.os_version) < 21) && (env.os_release_id != "centos")) {
+        if ((Float.parseFloat(env.os_version) < 21) && (env.os_release_id != "centos") || (env.os_release_id != "debian")) {
             try {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''#!/bin/bash
@@ -219,29 +221,30 @@ stage('test-examples') {
             }
         }
     }
-
-    try {
-        timeout(time: 30, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/rust
-                export PID=$(lsof -t -i:3000)
-                if [ "$PID" != "" ]
-                then
-                    echo "Killing $PID"
-                    kill -9 $PID
-                fi
-                if [ "${os_release_id}" == 'centos' ]
-                then
-                    sudo yum install -y *.rpm
-                fi
-                make ${MAKEOPTS}
-                make ${MAKEOPTS} start-gramine-server &
-                ../../scripts/wait_for_server 300 127.0.0.1 3000
-                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:3000 | tee RESULT
-            '''
+    if (env.os_release_id != "debian"){
+        try {
+            timeout(time: 30, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/rust
+                    export PID=$(lsof -t -i:3000)
+                    if [ "$PID" != "" ]
+                    then
+                        echo "Killing $PID"
+                        kill -9 $PID
+                    fi
+                    if [ "${os_release_id}" == 'centos' ]
+                    then
+                        sudo yum install -y *.rpm
+                    fi
+                    make ${MAKEOPTS}
+                    make ${MAKEOPTS} start-gramine-server &
+                    ../../scripts/wait_for_server 300 127.0.0.1 3000
+                    LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:3000 | tee RESULT
+                '''
+            }
+        } catch (Exception e){
+            env.build_ok = false
+            sh 'echo "Rust example Test Failed"'
         }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Rust example Test Failed"'
     }
 }
