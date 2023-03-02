@@ -78,21 +78,38 @@ stage('build') {
 
             } else {
                 try {
-                    sh '''
-                    cd "$WORKSPACE"
-                    sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
-                    meson setup build \
-                        --werror \
-                        --prefix="$PREFIX" \
-                        --buildtype="$BUILDTYPE" \
-                        -Ddirect=disabled \
-                        -Dtests=enabled \
-                        -Dsgx=enabled \
-                        $MESON_OPTIONS > meson_cmd_output.txt
-                    ninja -vC build > ninja_build_log.txt
-                    ninja -vC build install > ninja_install_log.txt
-                    gramine-sgx-gen-private-key
-                '''
+                    if (env.build_prefix == "0") {
+                        sh '''
+                        cd "$WORKSPACE"
+                        sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
+                        meson setup build \
+                            --werror \
+                            --buildtype="$BUILDTYPE" \
+                            -Ddirect=disabled \
+                            -Dtests=enabled \
+                            -Dsgx=enabled \
+                            $MESON_OPTIONS > meson_cmd_output.txt
+                        ninja -vC build > ninja_build_log.txt
+                        sudo ninja -vC build install > ninja_install_log.txt
+                        gramine-sgx-gen-private-key
+                        '''
+                    } else {
+                        sh '''
+                        cd "$WORKSPACE"
+                        sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
+                        meson setup build \
+                            --werror \
+                            --prefix="$PREFIX" \
+                            --buildtype="$BUILDTYPE" \
+                            -Ddirect=disabled \
+                            -Dtests=enabled \
+                            -Dsgx=enabled \
+                            $MESON_OPTIONS > meson_cmd_output.txt
+                        ninja -vC build > ninja_build_log.txt
+                        ninja -vC build install > ninja_install_log.txt
+                        gramine-sgx-gen-private-key
+                        '''
+                    }
                 } finally {
                     archiveArtifacts 'build/meson-logs/**/*'
                     archiveArtifacts 'ninja_build_log.txt'
@@ -100,21 +117,22 @@ stage('build') {
                 }
             }
 
-            // Absolute path to libdir, as configured by Meson.
-            // For our current builds this should be "$WORKSPACE/usr/lib/x86_64-linux-gnu":
-            // --prefix is set from $PREFIX above (see config-docker.jenkinsfile) and should be "$WORKSPACE/usr";
-            // --libdir is distro-dependent, but on Debian and derivatives it's "lib/x86_64-linux-gnu"
-            libdir = sh(returnStdout: true, script: '''
-                meson introspect build/ --buildoptions \
-                | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
-            ''').trim()
+            if (env.build_prefix != "0") {
+                // Absolute path to libdir, as configured by Meson.
+                // For our current builds this should be "$WORKSPACE/usr/lib/x86_64-linux-gnu":
+                // --prefix is set from $PREFIX above (see config-docker.jenkinsfile) and should be "$WORKSPACE/usr";
+                // --libdir is distro-dependent, but on Debian and derivatives it's "lib/x86_64-linux-gnu"
+                libdir = sh(returnStdout: true, script: '''
+                    meson introspect build/ --buildoptions \
+                    | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
+                ''').trim()
 
-            env.GRAMINE_PKGLIBDIR = libdir + '/gramine'
+                env.GRAMINE_PKGLIBDIR = libdir + '/gramine'
 
-            // In CI we install to non-standard --prefix (see above). This makes sure the libraries are
-            // available anyway
-            env.PKG_CONFIG_PATH = libdir + '/pkgconfig'
-
+                // In CI we install to non-standard --prefix (see above). This makes sure the libraries are
+                // available anyway
+                env.PKG_CONFIG_PATH = libdir + '/pkgconfig'
+            }
             // prevent cheating and testing from repo
             sh 'rm -rf build'
             sh 'git clean -Xf subprojects'
