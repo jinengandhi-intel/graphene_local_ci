@@ -94,9 +94,18 @@ stage('build') {
                         gramine-sgx-gen-private-key
                         '''
                     } else {
+                        if (env.os_release_id == "debian") {
+                            sh '''
+                            cd "$WORKSPACE"
+                            sed -i "/uname/ a '/usr/src/linux-headers-@0@common/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('amd64')[0].strip())," meson.build
+                            '''
+                        } else {
+                            sh '''
+                            cd "$WORKSPACE"
+                            sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
+                            '''
+                        }
                         sh '''
-                        cd "$WORKSPACE"
-                        sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
                         meson setup build \
                             --werror \
                             --prefix="$PREFIX" \
