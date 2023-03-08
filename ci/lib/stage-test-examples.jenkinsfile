@@ -30,7 +30,7 @@ stage('test-examples') {
     if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_18.04_5.19") && (env.SGX == '1')))
     {
         try {
-            timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
+            timeout(time: 60, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/tensorflow-lite
                     ../common_tools/download --output bazel-0.16.1-installer-linux-x86_64.sh \
