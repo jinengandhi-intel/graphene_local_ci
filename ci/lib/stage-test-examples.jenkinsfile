@@ -9,7 +9,7 @@ stage('test-examples') {
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1')))
     {
         try {
-            timeout(time: 10, unit: 'MINUTES') {
+            timeout(time: 30, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/openjdk
                     if [ "${os_release_id}" != 'ubuntu' ]
@@ -27,10 +27,10 @@ stage('test-examples') {
         }
     }
 
-    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_22.04_5.18") && (env.SGX == '1')))
+    if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_18.04_5.19") && (env.SGX == '1')))
     {
         try {
-            timeout(time: 30, unit: 'MINUTES') {
+            timeout(time: 60, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/tensorflow-lite
                     ../common_tools/download --output bazel-0.16.1-installer-linux-x86_64.sh \
@@ -84,9 +84,9 @@ stage('test-examples') {
         sh 'echo "Nodejs Example Test Failed"'
     }
 
-    if (!((node_label == 'graphene_22.04_5.18') && (env.SGX == '1'))) {
+    if (!((node_label == 'graphene_18.04_5.19') && (env.SGX == '1'))) {
         try {
-            timeout(time: 20, unit: 'MINUTES') {
+            timeout(time: (env.EDMM ? 45 : 20), unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/r
                     if [ "${os_release_id}" != 'ubuntu' ]
@@ -112,7 +112,7 @@ stage('test-examples') {
         }
     }
 
-    if (!((node_label == 'graphene_22.04_5.18') && (env.SGX == '1'))) {
+    if (!((node_label == 'graphene_18.04_5.19') && (env.SGX == '1'))) {
        try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
@@ -142,7 +142,7 @@ stage('test-examples') {
 
         if (os_release_id == "ubuntu") {
            try {
-                timeout(time: 10, unit: 'MINUTES') {
+                timeout(time: (env.EDMM ? 60 : 10), unit: 'MINUTES') {
                     sh '''
                         cd CI-Examples/gcc
                         make ${MAKEOPTS} all
@@ -179,6 +179,44 @@ stage('test-examples') {
                 sh 'echo "OpenVino Example Test Failed"'
             }
         }
+
+        if ((Float.parseFloat(env.os_version) >= 20) && (env.os_release_id == "ubuntu")) {
+            try {
+                timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/scikit-learn-intelex
+                        sed -i "s/\\/home\\/user\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
+                        sed -i "s/{{ env.HOME }}\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
+                        python3 scripts/download_dataset.py
+                        make ${MAKEOPTS} all
+                        ./run_tests.sh | tee RESULT
+                    '''
+                }
+            } catch (Exception e) {
+                env.build_ok = false
+                sh 'echo "Scikit-learn Example Test Failed"'
+            }
+
+            try {
+                timeout(time: (env.EDMM ? 60 : 20), unit: 'MINUTES') {
+                    sh '''
+                        export PID=$(lsof -t -i:8501)
+                        if [ "$PID" != "" ]
+                        then
+                            echo "Killing $PID"
+                            kill -9 $PID
+                        fi
+                        cd CI-Examples/tfserving
+                        sudo make install-dependencies
+                        make all
+                        make ${MAKEOPTS} check 2>&1 | tee RESULT
+                    '''
+                }
+            } catch (Exception e) {
+                env.build_ok = false
+                sh 'echo "Tensorflow Serving Example Test Failed"'
+            }
+        }
     }
 
     try {
@@ -205,5 +243,4 @@ stage('test-examples') {
         env.build_ok = false
         sh 'echo "Rust example Test Failed"'
     }
-
 }

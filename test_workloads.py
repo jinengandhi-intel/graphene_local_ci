@@ -130,7 +130,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif(float(os_version) >= 21 or
-                ((node_label == 'graphene_22.04_5.18') and sgx_mode == '1') or
+                ((node_label == 'graphene_18.04_5.19') and sgx_mode == '1') or
                 (("dcap" in node_label) and sgx_mode == '1'),
                     reason="Bazel Build fails for Ubuntu 21 and Graphene DCAP")
     def test_tensorflow_workload(self):
@@ -156,8 +156,8 @@ class Test_Workload_Results():
         assert("Success 1/1" in nodejs_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((node_label == 'graphene_22.04_5.18') and (sgx_mode == '1')),
-                    reason="Pytorch fails for Graphene_22.04.5.18")
+    @pytest.mark.skipif(((node_label == 'graphene_18.04_5.19') and (sgx_mode == '1')),
+                    reason="Pytorch fails for graphene_18.04_5.19")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
         pytorch_contents = pytorch_result_file.read()
@@ -168,8 +168,8 @@ class Test_Workload_Results():
             and ("Ibizan hound, Ibizan Podenco" in pytorch_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((node_label == 'graphene_22.04_5.18') and (sgx_mode == '1')),
-                    reason="R fails for Graphene_22.04.5.18")
+    @pytest.mark.skipif(((node_label == 'graphene_18.04_5.19') and (sgx_mode == '1')),
+                    reason="R fails for graphene_18.04_5.19")
     def test_r_workload(self):
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()
@@ -177,7 +177,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id != "ubuntu") or
-                    ((node_label == 'graphene_22.04_5.18') and (sgx_mode == '1')),
+                    ((node_label == 'graphene_18.04_5.19') and (sgx_mode == '1')),
                     reason="GCC enabled only for Ubuntu configurations.")
     def test_gcc_workload(self):
         gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")
@@ -226,3 +226,21 @@ class Test_Workload_Results():
         helloworld_result_file = open("CI-Examples/helloworld/helloworld_result.txt", "r")
         helloworld_contents = helloworld_result_file.read()
         assert("Hello, world" in helloworld_contents)
+
+    @pytest.mark.examples
+    @pytest.mark.skipif((os_release_id != 'ubuntu') or (float(os_version) <= 20) or ((int(no_cores) < 16) and sgx_mode == '1'),
+                    reason="Scikit-learn enabled for Ubuntu Server Configurations.")
+    def test_scikit_workload(self):
+        sklearn_result_file = open("CI-Examples/scikit-learn-intelex/RESULT", "r")
+        sklearn_contents = sklearn_result_file.read()
+        assert(("Success 1/2" in sklearn_contents) \
+            and ("Success 2/2" in sklearn_contents))
+
+    @pytest.mark.examples
+    @pytest.mark.skipif((os_release_id != 'ubuntu') or (float(os_version) <= 20) or
+                    ((int(no_cores) < 16) and sgx_mode == '1'),
+                    reason="TFServing enabled only for above Ubuntu 18.04 Configurations.")
+    def test_tfserving_workload(self):
+        tfserving_result = open("CI-Examples/tfserving/RESULT", "r")
+        tfserving_contents = tfserving_result.read()
+        assert("Success" in tfserving_contents)

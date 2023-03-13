@@ -5,6 +5,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get inst
     curl \
     gcc\
     git \
+    lsb-release \
     make \
     netcat \
     pkg-config \
