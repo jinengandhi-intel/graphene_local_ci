@@ -1,0 +1,32 @@
+pipeline{
+    agent{
+        label 'graphene'
+    }
+    parameters {
+        string(defaultValue: 'master', name: 'release_tag', description: 'this parameter accepts either tag or branch name of the contrib repo', trim: true)
+        extendedChoice(defaultValue: 'all', multiSelectDelimiter: ' -', name: 'workload', 
+        quoteValue: false, saveJSONParameterToFile: false, type: 'PT_CHECKBOX', 
+        value: 'redis,pytorch,tfserving,sklearn,all', visibleItemCount: 8)
+    }
+    
+    stages{
+        stage('scm checkout'){
+            steps{
+                cleanWs()
+                checkout scm
+            }
+            
+        }
+        stage('create github release assets'){
+            steps{
+                sh "./ci/resources/generate_curated_app_github_assets.sh -${workload} -tag ${release_tag}"
+            }
+            post{
+                success{
+                    archiveArtifacts artifacts: '*.tar.gz', followSymlinks: false
+                    cleanWs()
+                }
+            }
+        }
+    }
+}
