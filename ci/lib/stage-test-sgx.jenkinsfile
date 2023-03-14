@@ -237,10 +237,6 @@ stage('test-sgx') {
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/busybox
-                if [ "${os_release_id}" != 'ubuntu' ]
-                then
-                    sed -i '$ a sgx.nonpie_binary = true' busybox.manifest.template
-                fi                
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} SGX=1 check 2>&1 | tee result.txt
             '''
