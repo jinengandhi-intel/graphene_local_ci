@@ -14,7 +14,6 @@ fs.mounts = [
 ]
 
 sgx.debug = true
-sgx.nonpie_binary = true
 sgx.enclave_size = "32G"
 sgx.max_threads = 256
 

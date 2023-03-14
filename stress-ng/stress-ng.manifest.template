@@ -6,7 +6,6 @@ sys.stack.size = "8M"
 sgx.enclave_size = "4G"
 sgx.max_threads = 512
 
-sgx.nonpie_binary = true
 loader.insecure__use_cmdline_argv = true
 loader.insecure__use_host_env = true
 loader.insecure__disable_aslr = true
