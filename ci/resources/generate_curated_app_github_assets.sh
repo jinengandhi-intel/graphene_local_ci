@@ -14,8 +14,12 @@ workload_list=''
 function usage()
 {
  echo -e "Usage:
-        eg : $0 -tag 1.4 -redis -pytorch [clones contrib repo from 1.4 tag and creates assets for redis pytorch]
-        eg : $0 -tag 1.3 -all [clones contrib repo from 1.3 tag and creates assets for all the workload supported]
+        eg : $0 -tag 1.4 -redis -pytorch 
+        [clones contrib repo from 1.4 tag and creates assets for redis pytorch]
+
+        eg : $0 -tag 1.3 -all 
+        [clones contrib repo from 1.3 tag and creates assets for all the workload supported]
+
         $0 <OPTION>\n
         OPTION:
            [-tag 1.4: clones contrib repo from the mentioned tag][MUST]

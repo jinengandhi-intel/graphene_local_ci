@@ -40,17 +40,19 @@ stage('test-examples') {
                     ./bazel-0.16.1-installer-linux-x86_64.sh --user
                     if [ "${os_release_id}" != 'ubuntu' ]
                     then
-                        make ${MAKEOPTS} tensorflow/configure
+                        make GRAMINE_LOG_LEVEL=all ${MAKEOPTS} tensorflow/configure
                         sed -i "s/\\/usr\\/bin\\/env python/\\/usr\\/bin\\/env python3/" tensorflow/tensorflow/tools/git/gen_git_source.py
-                        make PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
+                        make GRAMINE_LOG_LEVEL=all PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
                     fi
-                    make all
+                    make GRAMINE_LOG_LEVEL=all all
                     make ${MAKEOPTS} run-gramine | tee OUTPUT
                 '''
             }
         } catch (Exception e){
             env.build_ok = false
             sh 'echo "TensorFlow Example Test Failed"'
+        } finally {
+            archiveArtifacts 'CI-Examples/tensorflow-lite/OUTPUT'
         }
     }
 
@@ -166,7 +168,6 @@ stage('test-examples') {
                         chmod +x ./openvino_setup.sh
                         ./openvino_setup.sh
                         source openvino_2021/bin/setupvars.sh
-                        sed -i '$ a sgx.nonpie_binary = true' benchmark_app.manifest.template
                         sed -i 's/intel_models public_models/intel_models/' Makefile
                         make ${MAKEOPTS} intel_models
                         model_name="bert-large-uncased-whole-word-masking-squad-0001"
