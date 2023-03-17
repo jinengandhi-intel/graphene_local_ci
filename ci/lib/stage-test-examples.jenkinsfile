@@ -54,7 +54,9 @@ stage('test-examples') {
             } finally {
                 try{
                     archiveArtifacts 'CI-Examples/tensorflow-lite/OUTPUT'
-                } catch (Excpetion e){}
+                } catch (Exception ee){
+                    sh 'echo "WARNING: TensorFlow Example Test OUTPUT not found"'                   
+                }
             }
         }
     }
