@@ -1,0 +1,27 @@
+stage('coverity-scan') {
+    env.COVERITY_INSTALL="/home/intel/opt/coverity/analysis/bin"
+    env.COVERITY_SERVER="https://coverityent.devtools.intel.com/prod5"
+    env.COVERITY_PROJECT_STREAM="Gramine-master"
+    env.COVERITY_CHECKERS="--concurrency --security --rule --enable-constraint-fpp --enable-fnptr --enable-virtual --webapp-security --enable-audit-checkers --enable-default"
+
+    try {
+        sh '''
+        export PATH=$PATH:$COVERITY_INSTALL
+        sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
+        meson setup build --prefix=/home/intel/gramine_install/usr --buildtype=release -Ddirect=enabled -Dsgx=enabled
+        cov-configure --config config.xml --compiler cc --comptype gcc --template --xml-option=skip_file:"/subprojects/"
+        cov-configure --config config.xml --compiler c++ --comptype gcc --template --xml-option=skip_file:"/subprojects/"
+        cov-configure --config config.xml --python --xml-option=skip_file:"/subprojects/"
+        cov-build --config config.xml --dir int_dir --fs-capture-search . ninja -vC build
+        '''
+    } catch (Exception e) {}
+
+    try {
+        sh '$COVERITY_INSTALL/cov-analyze --dir int_dir $COVERITY_CHECKERS'
+    } catch (Exception e) {}
+
+    try {
+        sh '$COVERITY_INSTALL/cov-commit-defects --dir int_dir --stream $COVERITY_PROJECT_STREAM --url $COVERITY_SERVER --auth-key-file /home/intel/coverity/auth-key.txt'
+    } catch (Exception e) {}
+
+}
