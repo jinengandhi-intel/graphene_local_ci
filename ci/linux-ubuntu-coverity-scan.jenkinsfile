@@ -1,0 +1,34 @@
+node(node_label) {
+    env.ORIG_WKSP = env.WORKSPACE
+    env.build_ok = true
+    try {
+        stage('checkout'){
+            checkout scm
+
+            dir ("gramine") {
+                git url: 'https://github.com/gramineproject/gramine.git'
+            }
+        }
+    
+        dir ("gramine") {
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
+
+
+            load '.ci/lib/config.jenkinsfile'
+            load '.ci/lib/config-release.jenkinsfile'
+
+            load '../ci/lib/stage-build-coverity.jenkinsfile'
+            
+        }
+    } finally {
+        stage('cleanup'){
+            sh 'rm -rf $ORIG_WKSP/*'
+        }
+    }
+
+    if(env.build_ok) {
+        currentBuild.result = "SUCCESS"
+    } else {
+        currentBuild.result = "FAILURE"
+    }
+}
