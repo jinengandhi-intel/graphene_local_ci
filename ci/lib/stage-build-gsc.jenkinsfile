@@ -30,7 +30,7 @@ stage('Build Workloads') {
             then
                 docker build --tag python --file test/python.dockerfile .
             fi
-            if [ "${os_release_id}" = "ubuntu" ]
+            if [ "${os_release_id}" = "ubuntu" ] || [ "${os_release_id}" = "debian" ]
             then
                 docker pull python
             fi
