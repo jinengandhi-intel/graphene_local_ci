@@ -19,7 +19,6 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libaio1 \
     libapr1-dev \
     libaprutil1-dev \
-    libcjson-dev \
     libelf-dev \
     libevent-dev \
     libexpat1 \
