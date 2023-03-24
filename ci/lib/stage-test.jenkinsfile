@@ -1,5 +1,5 @@
 stage('test') {
-    if (env.build_type == "manual") {
+    if (env.build_type == "manual" && env.os_release_id != "almalinux") {
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''

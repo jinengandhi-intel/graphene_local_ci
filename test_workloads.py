@@ -125,7 +125,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif(float(os_version) >= 21 or
-                ((node_label == 'graphene_18.04_5.19') and sgx_mode == '1') or (os_release_id == "debian") \
+                ((node_label == 'graphene_18.04_5.19') and sgx_mode == '1') or (os_release_id in ["debian", "almalinux"]) \
                 or (("dcap" in node_label) and sgx_mode == '1'), \
                     reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
     def test_tensorflow_workload(self):
@@ -182,7 +182,7 @@ class Test_Workload_Results():
             and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id == 'centos') or (os_release_id == "debian") or
+    @pytest.mark.skipif((os_release_id in ["centos", "debian", "almalinux"]) or
                     (float(os_version) >= 21) or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Openvino enabled only for Ubuntu 18 & 20 Server Configurations")
     def test_openvino_workload(self):
