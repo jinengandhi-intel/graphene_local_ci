@@ -26,8 +26,9 @@ stage('test-examples') {
             sh 'echo "Openjdk Example Test Failed"'
         }
     }
-    if ( env.os_release_id != "debian" ) {
-        if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_18.04_5.19") && (env.SGX == '1')) )
+
+    if (!["debian", "almalinux"].contains(env.os_release_id)) {
+        if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_18.04_5.19") && (env.SGX == '1')))
         {
             try {
                 timeout(time: 60, unit: 'MINUTES') {
@@ -96,7 +97,7 @@ stage('test-examples') {
             timeout(time: (env.EDMM ? 45 : 20), unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/r
-                    if [ "${os_release_id}" == 'centos' ] || [ "${os_release_id}" == 'rhel' ]
+                    if [ "${os_release_id}" != 'ubuntu' ] && [ "${os_release_id}" != 'debian' ]
                     then
                         export R_HOME=/usr/lib64/R
                         sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
@@ -124,9 +125,9 @@ stage('test-examples') {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/pytorch
-                    if [ "${os_release_id}" == 'centos' ] || [ "${os_release_id}" == 'rhel' ]
+                    if [ "${os_release_id}" != 'ubuntu' ] && [ "${os_release_id}" != 'debian' ]
                     then
-                        if [ "${os_release_id}" == 'centos' ]
+                        if [ "${os_release_id}" == 'centos' ] || [ "${os_release_id}" == 'almalinux' ]
                         then
                             sed -i '$ a loader.argv0_override="{{ entrypoint }}"' pytorch.manifest.template
                             sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$SETUPTOOLS_PATH\\/\\"," pytorch.manifest.template
@@ -164,7 +165,7 @@ stage('test-examples') {
     }
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
-        if ((Float.parseFloat(env.os_version) < 21) && (env.os_release_id != "centos") || (env.os_release_id != "debian")) {
+        if ((Float.parseFloat(env.os_version) < 21) && (!["centos", "debian", "almalinux"].contains(env.os_release_id))) {
             try {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''#!/bin/bash

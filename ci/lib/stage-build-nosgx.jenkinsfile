@@ -5,19 +5,34 @@ stage('build') {
     script {
         if (env.build_type == "manual") {
             try {
-                sh '''
-                    meson setup build/ \
-                        --werror \
-                        --prefix="$PREFIX" \
-                        --buildtype="$BUILDTYPE" \
-                        -Dskeleton=enabled \
-                        -Ddirect=enabled \
-                        -Dsgx=disabled \
-                        -Dtests=enabled \
-                        $MESON_OPTIONS > meson_cmd_output.txt
-                    ninja -vC build > ninja_build_log.txt
-                    ninja -vC build install > ninja_install_log.txt
-                '''
+                if (env.os_release_id == "almalinux") {
+                    sh '''
+                        meson setup build/ \
+                            --werror \
+                            --prefix="$PREFIX" \
+                            --buildtype="$BUILDTYPE" \
+                            -Dskeleton=enabled \
+                            -Ddirect=enabled \
+                            -Dsgx=disabled \
+                            $MESON_OPTIONS > meson_cmd_output.txt
+                        ninja -vC build > ninja_build_log.txt
+                        ninja -vC build install > ninja_install_log.txt
+                    '''
+                } else {
+                    sh '''
+                        meson setup build/ \
+                            --werror \
+                            --prefix="$PREFIX" \
+                            --buildtype="$BUILDTYPE" \
+                            -Dskeleton=enabled \
+                            -Ddirect=enabled \
+                            -Dsgx=disabled \
+                            -Dtests=enabled \
+                            $MESON_OPTIONS > meson_cmd_output.txt
+                        ninja -vC build > ninja_build_log.txt
+                        ninja -vC build install > ninja_install_log.txt
+                    '''
+                }
             } finally {
                 archiveArtifacts 'build/meson-logs/**/*'
                 archiveArtifacts 'ninja_build_log.txt'
