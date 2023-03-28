@@ -1,223 +1,143 @@
 stage('build') {
+    env.MESON_OPTIONS = ''
     if (env.CC == 'clang') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
 
-    script {
-        if (env.build_type == "manual") {
-            try {
-                sh '''
-                    cd "$WORKSPACE"
-                    git apply rename_protected_file.patch
-                '''
-            } catch (Exception e){
-                env.build_ok = true
-                sh 'echo "Failed to apply Git patch for FS testcase"'
-            }
+    if (env.build_type == "manual") {
+        if (env.run_suites.toBoolean()) {
+            env.MESON_OPTIONS += ' -Dtests=enabled'
+        }
 
-            if (env.node_label == "graphene_oot") {
-                sh '''
-                    cd /opt/intel
-                    git clone https://github.com/intel/linux-sgx-driver.git
-                    cd linux-sgx-driver
-                    git checkout 276c5c6a064d22358542f5e0aa96b1c0ace5d695
+        if (env.build_prefix != "0") {
+            env.MESON_OPTIONS += ' --prefix=' + env.PREFIX
+        }
 
-                '''
+        try {
+            sh '''
+                cd "$WORKSPACE"
+                git apply rename_protected_file.patch
+            '''
+        } catch (Exception e){
+            env.build_ok = true
+            sh 'echo "Failed to apply Git patch for FS testcase"'
+        }
 
-                try {
-                    sh '''
-                    cd "$WORKSPACE"
-                    meson setup build \
-                        --werror \
-                        --prefix="$PREFIX" \
-                        --buildtype="$BUILDTYPE" \
-                        -Ddirect=disabled \
-                        -Dsgx=enabled \
-                        -Dtests=enabled \
-                        -Dsgx_driver=oot \
-                        $MESON_OPTIONS > meson_cmd_output.txt
-                    ninja -vC build > ninja_build_log.txt
-                    ninja -vC build install > ninja_install_log.txt
-                    gramine-sgx-gen-private-key
-                    '''
-                } finally {
-                    archiveArtifacts 'build/meson-logs/**/*'
-                    archiveArtifacts 'ninja_build_log.txt'
-                    archiveArtifacts 'ninja_install_log.txt'                    
-                }
-            } else if (env.node_label.contains("dcap")) {
-                sh '''
-                    curl -fsSL https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
-                    echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
-                    sudo apt-get update
-                    echo N | sudo apt-get install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev libsgx-dcap-quote-verify libsgx-dcap-quote-verify-dev
-                '''
+        if (env.node_label == "graphene_oot") {
+            sh '''
+                cd /opt/intel
+                git clone https://github.com/intel/linux-sgx-driver.git
+                cd linux-sgx-driver
+                git checkout 276c5c6a064d22358542f5e0aa96b1c0ace5d695
+            '''
+            env.MESON_OPTIONS += " -Dsgx_driver=oot"
+        } else if (env.node_label.contains("dcap")) {
+            sh '''
+                curl -fsSL https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
+                echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
+                sudo apt-get update
+                echo N | sudo apt-get install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev libsgx-dcap-quote-verify libsgx-dcap-quote-verify-dev
+            '''
+            env.MESON_OPTIONS += " -Ddcap=enabled"
+        }
 
-                try {
-                    sh '''
-                        cd "$WORKSPACE"
-                        sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
-                        meson setup build \
-                            --werror \
-                            --prefix="$PREFIX" \
-                            --buildtype="$BUILDTYPE" \
-                            -Ddirect=disabled \
-                            -Dtests=enabled \
-                            -Dsgx=enabled \
-                            -Ddcap=enabled \
-                            $MESON_OPTIONS > meson_cmd_output.txt
-                        ninja -vC build > ninja_build_log.txt
-                        ninja -vC build install > ninja_install_log.txt
-                        gramine-sgx-gen-private-key
-                    '''
-                } finally {
-                    archiveArtifacts 'build/meson-logs/**/*'
-                    archiveArtifacts 'ninja_build_log.txt'
-                    archiveArtifacts 'ninja_install_log.txt'
-                }
+        try {
+            sh '''
+                cd "$WORKSPACE"
+                sed -i "/uname/ a '/usr/src/linux-headers-@0@common/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('amd64')[0].strip())," meson.build
+                sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
+                meson setup build \
+                    --werror \
+                    --buildtype="$BUILDTYPE" \
+                    -Ddirect=disabled \
+                    -Dsgx=enabled \
+                    $MESON_OPTIONS > meson_cmd_output.txt
+                ninja -vC build > ninja_build_log.txt
+                ninja -vC build install > ninja_install_log.txt
+                gramine-sgx-gen-private-key
+            '''
+        } finally {
+            archiveArtifacts 'build/meson-logs/**/*'
+            archiveArtifacts 'ninja_build_log.txt'
+            archiveArtifacts 'ninja_install_log.txt'
+        }
 
-            } else {
-                try {
-                    if (env.build_prefix == "0") {
-                        sh '''
-                        cd "$WORKSPACE"
-                        sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
-                        meson setup build \
-                            --werror \
-                            --buildtype="$BUILDTYPE" \
-                            -Ddirect=disabled \
-                            -Dtests=enabled \
-                            -Dsgx=enabled \
-                            $MESON_OPTIONS > meson_cmd_output.txt
-                        ninja -vC build > ninja_build_log.txt
-                        sudo ninja -vC build install > ninja_install_log.txt
-                        gramine-sgx-gen-private-key
-                        '''
-                    } else {
-                        if (env.os_release_id == "debian") {
-                            sh '''
-                            cd "$WORKSPACE"
-                            sed -i "/uname/ a '/usr/src/linux-headers-@0@common/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('amd64')[0].strip())," meson.build
-                            '''
-                        } else {
-                            sh '''
-                            cd "$WORKSPACE"
-                            sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
-                            '''
-                        }
-                        if (env.os_release_id == "almalinux") {
-                            sh '''
-                            meson setup build \
-                                --werror \
-                                --prefix="$PREFIX" \
-                                --buildtype="$BUILDTYPE" \
-                                -Ddirect=disabled \
-                                -Dsgx=enabled \
-                                $MESON_OPTIONS > meson_cmd_output.txt
-                            ninja -vC build > ninja_build_log.txt
-                            ninja -vC build install > ninja_install_log.txt
-                            gramine-sgx-gen-private-key
-                            '''
-                        } else {
-                            sh '''
-                            meson setup build \
-                                --werror \
-                                --prefix="$PREFIX" \
-                                --buildtype="$BUILDTYPE" \
-                                -Ddirect=disabled \
-                                -Dtests=enabled \
-                                -Dsgx=enabled \
-                                $MESON_OPTIONS > meson_cmd_output.txt
-                            ninja -vC build > ninja_build_log.txt
-                            ninja -vC build install > ninja_install_log.txt
-                            gramine-sgx-gen-private-key
-                            '''
-                        }
-                    }
-                } finally {
-                    archiveArtifacts 'build/meson-logs/**/*'
-                    archiveArtifacts 'ninja_build_log.txt'
-                    archiveArtifacts 'ninja_install_log.txt'                      
-                }
-            }
+        if (env.build_prefix != "0") {
+            // Absolute path to libdir, as configured by Meson.
+            // For our current builds this should be "$WORKSPACE/usr/lib/x86_64-linux-gnu":
+            // --prefix is set from $PREFIX above (see config-docker.jenkinsfile) and should be "$WORKSPACE/usr";
+            // --libdir is distro-dependent, but on Debian and derivatives it's "lib/x86_64-linux-gnu"
+            libdir = sh(returnStdout: true, script: '''
+                meson introspect build/ --buildoptions \
+                | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
+            ''').trim()
 
-            if (env.build_prefix != "0") {
-                // Absolute path to libdir, as configured by Meson.
-                // For our current builds this should be "$WORKSPACE/usr/lib/x86_64-linux-gnu":
-                // --prefix is set from $PREFIX above (see config-docker.jenkinsfile) and should be "$WORKSPACE/usr";
-                // --libdir is distro-dependent, but on Debian and derivatives it's "lib/x86_64-linux-gnu"
-                libdir = sh(returnStdout: true, script: '''
-                    meson introspect build/ --buildoptions \
-                    | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
-                ''').trim()
+            env.GRAMINE_PKGLIBDIR = libdir + '/gramine'
 
-                env.GRAMINE_PKGLIBDIR = libdir + '/gramine'
+            // In CI we install to non-standard --prefix (see above). This makes sure the libraries are
+            // available anyway
+            env.PKG_CONFIG_PATH = libdir + '/pkgconfig'
+        }
+        // prevent cheating and testing from repo
+        sh 'rm -rf build'
+        sh 'git clean -Xf subprojects'
+    } else {
+        env.LC_ALL = "C.UTF-8"
+        env.LANG = "C.UTF-8"
 
-                // In CI we install to non-standard --prefix (see above). This makes sure the libraries are
-                // available anyway
-                env.PKG_CONFIG_PATH = libdir + '/pkgconfig'
-            }
-            // prevent cheating and testing from repo
-            sh 'rm -rf build'
-            sh 'git clean -Xf subprojects'
-        } else {
-            env.LC_ALL = "C.UTF-8"
-            env.LANG = "C.UTF-8"
+        if (env.build_type == "package-local") {
+            sh 'sshpass -p intel@123 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r intel@${local_machine}:${package_path} packages'
+        }
+
+        if (env.os_release_id == "centos") {
+            env.ARCH_LIBDIR="/lib64"
 
             if (env.build_type == "package-local") {
-                sh 'sshpass -p intel@123 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r intel@${local_machine}:${package_path} packages'
-            }
-
-            if (env.os_release_id == "centos") {
-                env.ARCH_LIBDIR="/lib64"
-
-                if (env.build_type == "package-local") {
-                    sh "sudo dnf install ./packages/${env.package_version} -y"
-                } else {
-                    if (env.gramine_repo == "unstable") {
-                        sh 'sudo yum install -y gramine --enablerepo=gramine-unstable'
-                    } else {
-                        sh 'sudo yum install -y gramine'
-                    }
-                }
-                if (env.gramine_version.contains("update")) {
-                    sh 'sudo yum update && sudo yum upgrade -y --enablerepo=gramine-unstable'
-                }
+                sh "sudo dnf install ./packages/${env.package_version} -y"
             } else {
-                env.ubuntu_repo = sh(returnStdout: true, script: 'lsb_release -sc').trim()
-
                 if (env.gramine_repo == "unstable") {
-                    env.gramine_branch = "unstable-${ubuntu_repo}"
-                } else if (env.gramine_repo == "stable" && (env.ubuntu_repo != "jammy")) {
-                    env.gramine_branch = "${ubuntu_repo}"
+                    sh 'sudo yum install -y gramine --enablerepo=gramine-unstable'
                 } else {
-                    env.gramine_branch = "${gramine_repo}"
-                }
-
-                sh '''
-                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ ${gramine_branch} main" | sudo tee /etc/apt/sources.list.d/gramine.list
-                    sudo apt-get update
-                '''
-
-                if (env.build_type == "package-in-kernel") {
-                    sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y gramine'
-                } else if (env.build_type == "package-dcap") {
-                    sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y gramine-dcap'
-                } else if (env.build_type == "package-local") {
-                    env.package_name = "gramine_${env.package_version}_amd64.deb"
-                    sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y ./packages/${package_name}'
-                }
-
-                sh 'sudo apt-get update'
-                if (env.gramine_version.contains("update")) {
-                    sh '''
-                        echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ unstable-${ubuntu_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
-                        sudo apt-get update && sudo apt-get --with-new-pkgs -y upgrade
-                    '''
+                    sh 'sudo yum install -y gramine'
                 }
             }
-            sh 'gramine-sgx-gen-private-key'
-       }
+            if (env.gramine_version.contains("update")) {
+                sh 'sudo yum update && sudo yum upgrade -y --enablerepo=gramine-unstable'
+            }
+        } else {
+            env.ubuntu_repo = sh(returnStdout: true, script: 'lsb_release -sc').trim()
+
+            if (env.gramine_repo == "unstable") {
+                env.gramine_branch = "unstable-${ubuntu_repo}"
+            } else if (env.gramine_repo == "stable" && (env.ubuntu_repo != "jammy")) {
+                env.gramine_branch = "${ubuntu_repo}"
+            } else {
+                env.gramine_branch = "${gramine_repo}"
+            }
+
+            sh '''
+                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ ${gramine_branch} main" | sudo tee /etc/apt/sources.list.d/gramine.list
+                sudo apt-get update
+            '''
+
+            if (env.build_type == "package-in-kernel") {
+                sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y gramine'
+            } else if (env.build_type == "package-dcap") {
+                sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y gramine-dcap'
+            } else if (env.build_type == "package-local") {
+                env.package_name = "gramine_${env.package_version}_amd64.deb"
+                sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y ./packages/${package_name}'
+            }
+
+            sh 'sudo apt-get update'
+            if (env.gramine_version.contains("update")) {
+                sh '''
+                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ unstable-${ubuntu_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
+                    sudo apt-get update && sudo apt-get --with-new-pkgs -y upgrade
+                '''
+            }
+        }
+        sh 'gramine-sgx-gen-private-key'
     }
 }
 

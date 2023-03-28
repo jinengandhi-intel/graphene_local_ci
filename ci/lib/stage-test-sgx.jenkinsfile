@@ -7,7 +7,7 @@ stage('test-sgx') {
             .ci/check-no-syscall.sh "$GRAMINE_PKGLIBDIR"/runtime/musl/libc.so
         fi
     '''
-    if (env.os_release_id != "almalinux") {
+    if (env.run_suites.toBoolean()) {
         try {
             timeout(time: 60, unit: 'MINUTES') {
                 sh '''
