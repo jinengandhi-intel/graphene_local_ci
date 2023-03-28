@@ -67,3 +67,8 @@ echo 'OS version : ' + os_version
 if (env.node_label.contains("dcap") && (env.SGX == "1")) {
     env.RA_TYPE = "dcap"
 }
+
+env.run_suites = true
+if (["almalinux"].contains(env.os_release_id)) {
+    env.run_suites = false
+}

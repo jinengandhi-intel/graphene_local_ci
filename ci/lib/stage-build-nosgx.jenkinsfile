@@ -1,87 +1,74 @@
 stage('build') {
+    env.MESON_OPTIONS = ''
     if (env.CC == 'clang') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
-    script {
-        if (env.build_type == "manual") {
-            try {
-                if (env.os_release_id == "almalinux") {
-                    sh '''
-                        meson setup build/ \
-                            --werror \
-                            --prefix="$PREFIX" \
-                            --buildtype="$BUILDTYPE" \
-                            -Dskeleton=enabled \
-                            -Ddirect=enabled \
-                            -Dsgx=disabled \
-                            $MESON_OPTIONS > meson_cmd_output.txt
-                        ninja -vC build > ninja_build_log.txt
-                        ninja -vC build install > ninja_install_log.txt
-                    '''
-                } else {
-                    sh '''
-                        meson setup build/ \
-                            --werror \
-                            --prefix="$PREFIX" \
-                            --buildtype="$BUILDTYPE" \
-                            -Dskeleton=enabled \
-                            -Ddirect=enabled \
-                            -Dsgx=disabled \
-                            -Dtests=enabled \
-                            $MESON_OPTIONS > meson_cmd_output.txt
-                        ninja -vC build > ninja_build_log.txt
-                        ninja -vC build install > ninja_install_log.txt
-                    '''
-                }
-            } finally {
-                archiveArtifacts 'build/meson-logs/**/*'
-                archiveArtifacts 'ninja_build_log.txt'
-                archiveArtifacts 'ninja_install_log.txt'
+
+    if (env.build_type == "manual") {
+        try {
+            if (env.run_suites.toBoolean()) {
+                env.MESON_OPTIONS += " -Dtests=enabled"
             }
 
-            // Absolute path to libdir, as configured by Meson.
-            // For our current builds this should be "$WORKSPACE/usr/lib/x86_64-linux-gnu":
-            // --prefix is set from $PREFIX above (see config-docker.jenkinsfile) and should be "$WORKSPACE/usr";
-            // --libdir is distro-dependent, but on Debian and derivatives it's "lib/x86_64-linux-gnu"
-            libdir = sh(returnStdout: true, script: '''
-                meson introspect build/ --buildoptions \
-                | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
-            ''').trim()
-
-            env.GRAMINE_PKGLIBDIR = libdir + '/gramine'
-
-            // In CI we install to non-standard --prefix (see above). This makes sure the libraries are
-            // available anyway
-            env.PKG_CONFIG_PATH = libdir + '/pkgconfig'
-
-            // prevent cheating and testing from repo
-            sh 'rm -rf build'
-            sh 'git clean -Xf subprojects'
-        } else {
-
-            sh '''sudo apt-key adv --keyserver-options http-proxy=http://proxy-chain.intel.com:911 \
-             --fetch-keys https://packages.grapheneproject.io/graphene.asc
-             echo "deb [arch=amd64 signed-by=EA3C2D624681AC968521587A5EE1171912234070] \
-             https://packages.grapheneproject.io/ unstable main" | sudo tee /etc/apt/sources.list.d/graphene-unstable.list
-             sudo apt update
+            sh '''
+                meson setup build/ \
+                    --werror \
+                    --prefix="$PREFIX" \
+                    --buildtype="$BUILDTYPE" \
+                    -Dskeleton=enabled \
+                    -Ddirect=enabled \
+                    -Dsgx=disabled \
+                    $MESON_OPTIONS > meson_cmd_output.txt
+                ninja -vC build > ninja_build_log.txt
+                ninja -vC build install > ninja_install_log.txt
             '''
-
-            if (env.build_type == "package_in_kernel") {
-                sh 'sudo apt install graphene-inkernel'
-            } else if (env.build_type == "package_oot") {
-                sh 'sudo apt install graphene-oot'
-            } else if (env.build_type == "package_dcap") {
-                sh 'sudo apt install graphene-dcap'
-            } else {
-                currentBuild.result = "ABORTED"
-                error("Aborting the build")
-            }
-
-            //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
-            //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
-            
-            //env.GRAPHENE_PKGLIBDIR = '/usr/lib/x86_64-linux-gnu/graphene'
+        } finally {
+            archiveArtifacts 'build/meson-logs/**/*'
+            archiveArtifacts 'ninja_build_log.txt'
+            archiveArtifacts 'ninja_install_log.txt'
         }
-    }
-            
+
+        // Absolute path to libdir, as configured by Meson.
+        // For our current builds this should be "$WORKSPACE/usr/lib/x86_64-linux-gnu":
+        // --prefix is set from $PREFIX above (see config-docker.jenkinsfile) and should be "$WORKSPACE/usr";
+        // --libdir is distro-dependent, but on Debian and derivatives it's "lib/x86_64-linux-gnu"
+        libdir = sh(returnStdout: true, script: '''
+            meson introspect build/ --buildoptions \
+            | jq -r '(map(select(.name == "prefix")) + map(select(.name == "libdir"))) | map(.value) | join("/")'
+        ''').trim()
+
+        env.GRAMINE_PKGLIBDIR = libdir + '/gramine'
+
+        // In CI we install to non-standard --prefix (see above). This makes sure the libraries are
+        // available anyway
+        env.PKG_CONFIG_PATH = libdir + '/pkgconfig'
+
+        // prevent cheating and testing from repo
+        sh 'rm -rf build'
+        sh 'git clean -Xf subprojects'
+    } else {
+
+        sh '''sudo apt-key adv --keyserver-options http-proxy=http://proxy-chain.intel.com:911 \
+            --fetch-keys https://packages.grapheneproject.io/graphene.asc
+            echo "deb [arch=amd64 signed-by=EA3C2D624681AC968521587A5EE1171912234070] \
+            https://packages.grapheneproject.io/ unstable main" | sudo tee /etc/apt/sources.list.d/graphene-unstable.list
+            sudo apt update
+        '''
+
+        if (env.build_type == "package_in_kernel") {
+            sh 'sudo apt install graphene-inkernel'
+        } else if (env.build_type == "package_oot") {
+            sh 'sudo apt install graphene-oot'
+        } else if (env.build_type == "package_dcap") {
+            sh 'sudo apt install graphene-dcap'
+        } else {
+            currentBuild.result = "ABORTED"
+            error("Aborting the build")
+        }
+
+        //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
+        //sh 'dpkg -i /home/rasp/jenkins/preview_bins/graphenepreview-inkernel_0.0.20210630-1_amd64.deb'
+        
+        //env.GRAPHENE_PKGLIBDIR = '/usr/lib/x86_64-linux-gnu/graphene'
+    }            
 }

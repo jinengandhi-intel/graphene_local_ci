@@ -1,5 +1,5 @@
 stage('test-direct') {
-    if (env.os_release_id != "almalinux") {
+    if (env.run_suites.toBoolean()) {
         try {
             timeout(time: 30, unit: 'MINUTES') {
                 sh '''
