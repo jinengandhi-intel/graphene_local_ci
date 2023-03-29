@@ -117,7 +117,7 @@ RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G wheel -m -d /int
 # Make sure /intel can be written by intel
 RUN chown 1000 /intel
 
-RUN echo '%wheel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+RUN echo 'intel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 RUN echo 'http_proxy="http://proxy-dmz.intel.com:911/"\nhttps_proxy="http://proxy-dmz.intel.com:912/"' >> /etc/environment
 
 # Blow away any random state

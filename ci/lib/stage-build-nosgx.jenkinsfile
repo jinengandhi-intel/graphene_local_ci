@@ -6,8 +6,8 @@ stage('build') {
 
     if (env.build_type == "manual") {
         try {
-            if (env.run_suites.toBoolean()) {
-                env.MESON_OPTIONS += " -Dtests=enabled"
+            if (env.musl_disable.toBoolean()) {
+                env.MESON_OPTIONS += " -Dmusl=disabled"
             }
 
             sh '''

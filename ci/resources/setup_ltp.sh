@@ -14,9 +14,14 @@ else
     cp -f toml_files/tests_direct.toml tests.toml
 fi
 
-if [[ "$base_os" == *"centos"* ]] || [["$base_os" == *"almalinux"*]]
+if [[ "$base_os" == *"centos"* ]]
 then
     cp -f manifest_CentOS.template manifest.template
+fi
+
+if [[ "$base_os" == *"almalinux"* ]]
+then
+    cp -f manifest_Almalinux.template manifest.template
 fi
 
 if [[ "$base_os" == "" ]]

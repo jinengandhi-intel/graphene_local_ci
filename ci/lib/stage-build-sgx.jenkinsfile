@@ -5,8 +5,8 @@ stage('build') {
     }
 
     if (env.build_type == "manual") {
-        if (env.run_suites.toBoolean()) {
-            env.MESON_OPTIONS += ' -Dtests=enabled'
+        if (env.musl_disable.toBoolean()) {
+            env.MESON_OPTIONS += ' -Dmusl=disabled'
         }
 
         if (env.build_prefix != "0") {
@@ -51,6 +51,7 @@ stage('build') {
                     --buildtype="$BUILDTYPE" \
                     -Ddirect=disabled \
                     -Dsgx=enabled \
+                    -Dtests=enabled \
                     $MESON_OPTIONS > meson_cmd_output.txt
                 ninja -vC build > ninja_build_log.txt
                 ninja -vC build install > ninja_install_log.txt

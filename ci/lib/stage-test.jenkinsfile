@@ -1,5 +1,5 @@
 stage('test') {
-    if (env.build_type == "manual" && env.run_suites.toBoolean()) {
+    if (env.build_type == "manual") {
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
@@ -63,7 +63,7 @@ stage('test') {
             junit 'libos/test/regression/libos-regression.xml'
         }
 
-        if (env.CC != "clang") {
+        if (!(env.CC == "clang" || env.musl_disable.toBoolean())) {
             timeout(time: 15, unit: 'MINUTES') {
                 try {
                     sh '''

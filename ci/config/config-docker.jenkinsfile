@@ -68,7 +68,7 @@ if (env.node_label.contains("dcap") && (env.SGX == "1")) {
     env.RA_TYPE = "dcap"
 }
 
-env.run_suites = true
+env.musl_disable = false
 if (["almalinux"].contains(env.os_release_id)) {
-    env.run_suites = false
+    env.musl_disable = true
 }

@@ -1,33 +1,31 @@
 stage('test-direct') {
-    if (env.run_suites.toBoolean()) {
-        try {
-            timeout(time: 30, unit: 'MINUTES') {
-                sh '''
-                    cd libos/test/ltp
-                    make ${MAKEOPTS} -f Makefile.LTP all
-                '''
-                // Run tests in a separate block, so that Jenkins measures build time and run time
-                // separately
-                sh '''
-                    cd libos/test/ltp
-                    python3 -m pytest -v  --junit-xml=ltp.xml
-                '''
-                /*
-                sh '''
-                    cd libos/shim/test/ltp
-                    export CFG=ltp-sudo-syscalls.cfg
-                    export LTPSCENARIO=$PWD/install/runtest/syscalls-sudo
-                    make -f Makefile.LTP ltp_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
-                '''
-                */
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "LTP Test Failed"'
-        } finally {
-            archiveArtifacts 'libos/test/ltp/ltp.xml'
-            junit 'libos/test/ltp/ltp.xml'
+    try {
+        timeout(time: 30, unit: 'MINUTES') {
+            sh '''
+                cd libos/test/ltp
+                make ${MAKEOPTS} -f Makefile.LTP all
+            '''
+            // Run tests in a separate block, so that Jenkins measures build time and run time
+            // separately
+            sh '''
+                cd libos/test/ltp
+                python3 -m pytest -v  --junit-xml=ltp.xml
+            '''
+            /*
+            sh '''
+                cd libos/shim/test/ltp
+                export CFG=ltp-sudo-syscalls.cfg
+                export LTPSCENARIO=$PWD/install/runtest/syscalls-sudo
+                make -f Makefile.LTP ltp_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
+            '''
+            */
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "LTP Test Failed"'
+    } finally {
+        archiveArtifacts 'libos/test/ltp/ltp.xml'
+        junit 'libos/test/ltp/ltp.xml'
     }
 
     try{

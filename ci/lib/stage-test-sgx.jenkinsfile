@@ -7,35 +7,34 @@ stage('test-sgx') {
             .ci/check-no-syscall.sh "$GRAMINE_PKGLIBDIR"/runtime/musl/libc.so
         fi
     '''
-    if (env.run_suites.toBoolean()) {
-        try {
-            timeout(time: 60, unit: 'MINUTES') {
-                sh '''
-                    cd libos/test/ltp
-                    make ${MAKEOPTS} -f Makefile.LTP SGX=1 all
-                '''
-                // Run tests in a separate block, so that Jenkins measures build time and run time
-                // separately
-                sh '''
-                    cd libos/test/ltp
-                    python3 -m pytest -v  --junit-xml=ltp-sgx.xml
-                '''
-                /*
-                sh '''
-                    cd LibOS/shim/test/ltp
-                    export CFG=ltp-sudo-syscalls.cfg
-                    export LTPSCENARIO=$PWD/install-sgx/runtest/syscalls-sudo
-                    make -f Makefile.LTP ltp-sgx_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
-                '''
-                */
-            }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "LTP Test Failed"'
-        } finally {
-            archiveArtifacts 'libos/test/ltp/ltp-sgx.xml'
-            junit 'libos/test/ltp/ltp-sgx.xml'
+
+    try {
+        timeout(time: 60, unit: 'MINUTES') {
+            sh '''
+                cd libos/test/ltp
+                make ${MAKEOPTS} -f Makefile.LTP SGX=1 all
+            '''
+            // Run tests in a separate block, so that Jenkins measures build time and run time
+            // separately
+            sh '''
+                cd libos/test/ltp
+                python3 -m pytest -v  --junit-xml=ltp-sgx.xml
+            '''
+            /*
+            sh '''
+                cd LibOS/shim/test/ltp
+                export CFG=ltp-sudo-syscalls.cfg
+                export LTPSCENARIO=$PWD/install-sgx/runtest/syscalls-sudo
+                make -f Makefile.LTP ltp-sgx_results_2.xml LTPCFG=$CFG LTPTESTFILE=$LTPSCENARIO
+            '''
+            */
         }
+    } catch (Exception e){
+        env.build_ok = false
+        sh 'echo "LTP Test Failed"'
+    } finally {
+        archiveArtifacts 'libos/test/ltp/ltp-sgx.xml'
+        junit 'libos/test/ltp/ltp-sgx.xml'
     }
 
     try{
