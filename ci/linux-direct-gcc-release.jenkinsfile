@@ -19,7 +19,7 @@ node(node_label) {
                 load '.ci/lib/config.jenkinsfile'
 
                 switch(params.base_os) {
-                    case ['centos8', 'almalinux9']:
+                    case ['centos8', 'almalinux9', 'rockylinux9']:
                         load '../ci/config/config-centos8.jenkinsfile'
                         break
                 }

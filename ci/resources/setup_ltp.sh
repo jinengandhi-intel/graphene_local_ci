@@ -19,7 +19,7 @@ then
     cp -f manifest_CentOS.template manifest.template
 fi
 
-if [[ "$base_os" == *"almalinux"* ]]
+if [[ "$base_os" == *"almalinux"* ]] || [[ "$base_os" == *"rocky"* ]]
 then
     cp -f manifest_Almalinux.template manifest.template
 fi

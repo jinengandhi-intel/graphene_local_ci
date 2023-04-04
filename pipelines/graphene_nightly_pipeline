@@ -180,6 +180,19 @@ pipeline {
                         build job: 'local_ci_graphene_sgx_almalinux_server_6.2', propagate: true, wait: true
                     }
                 }
+
+                stage ('Invoke Rockylinux 9 with 6.2 Graphene Native Suite ') {
+                    steps {
+                        build job: 'local_ci_graphene_native_rockylinux_9_6.2', propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Rockylinux 9 with 6.2 Graphene SGX Suite ') {
+                    steps {
+                        sleep(time: 45, unit: "MINUTES")
+                        build job: 'local_ci_graphene_sgx_rockylinux_9_6.2', propagate: true, wait: true
+                    }
+                }
             }
         }
     }
