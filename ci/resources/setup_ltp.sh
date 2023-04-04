@@ -24,6 +24,11 @@ then
     cp -f manifest_Almalinux.template manifest.template
 fi
 
+if [[ "$base_os" == *"rocky"* ]]
+then
+    cp -f manifest_Rockylinux.template manifest.template
+fi
+
 if [[ "$base_os" == "" ]]
 then
     cp -f manifest_RHEL.template manifest.template
