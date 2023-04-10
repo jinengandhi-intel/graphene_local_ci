@@ -23,6 +23,7 @@ pipeline {
                     }
                 }
 
+                /*
 				stage ('Invoke Ubuntu 18.04 with 5.19 Graphene native Suite') {
                     steps {
                         build job: 'local_ci_graphene_native_18.04_5.19', propagate: true, wait: true
@@ -35,7 +36,8 @@ pipeline {
                         build job: 'local_ci_graphene_sgx_18.04_5.19', propagate: true, wait: true
                     }
                 }
-
+                */
+                
                 stage ('Invoke Ubuntu 20.04 with 6.0 Graphene native Jobs') {
                     steps {
                         build job: 'local_ci_graphene_native_20.04_6.0', parameters: [[$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True']], propagate: true, wait: true
