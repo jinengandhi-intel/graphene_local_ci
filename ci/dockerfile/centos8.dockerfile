@@ -1,97 +1,91 @@
-From centos:8
+From quay.io/centos/centos:stream8
 
-ENV http_proxy "http://proxy-dmz.intel.com:911"
-ENV https_proxy "http://proxy-dmz.intel.com:912"
+RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
 
-RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&\
-    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* 
-
-RUN sed 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo  | tee /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
-RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
-
-RUN yum install -y yum-utils epel-release
 RUN dnf copr enable -y ngompa/musl-libc
-RUN yum update -y --exclude=texlive-context && env yum install -y \
-    libunwind \
-    ncurses-devel \
-    bc \
-    bison \
-    flex \
-    make \
-    elfutils-libelf-devel \
-    openssl-devel \
-    rpm-build \
-#   epel-next-release \
-    automake \
-    autoconf \
-    bison \
-    binutils \
-    curl \
-    gawk \
-    gcc-c++ \
-    gdb \
-    git \
-    glibc-static \
-    glibc.i686 \
-    golang \
-    httpd \
-    info \
-    java-11-openjdk \
-    java-11-openjdk-devel \
-    jq \
-    less \
-    libcurl-devel \
-    libevent-devel \
-    libjpeg-turbo-devel \
-    libX11-devel \
-    libXxf86vm \
-    libXtst \
-    libXfixes \
-    libXrender \
-    lsof \
-    musl-devel \
-    musl-gcc \
-    nasm \
-    nc \
-    ncurses-devel \
-    ncurses-libs \
-    net-tools \
-    ninja-build \
-    nodejs \
-    nss_nis \
-    nss-mdns \
-    nss-myhostname \
-    openssl-devel \
-    protobuf-devel \
-    protobuf-c-devel \
-    patch \
-#   libcurl4-openssl-dev \
-#   libprotobuf-c-dev \
-#   linux-headers-generic \
-    pkg-config \
-    protobuf-c-compiler \
-    python3 \
-    python3-click \
-    python3-cryptography \
-    python3-devel \
-    python3-jinja2 \
-    python3-lxml \
-    python3-numpy \
-    python3-pip \
-    python3-protobuf \
-    python3-pyelftools \
-    python3-pytest \
-    python3-scipy \
-    R-core \
-    strace \
-    sqlite \
-    sudo \
-    vim  \
-    texinfo \
-    wget \
-    unzip \
-    zip \
-    zlib-devel
+RUN dnf config-manager --set-enabled -y powertools && \
+    dnf install -y yum-utils && \
+    dnf install -y epel-release && \
+    dnf install -y \
+        libunwind \
+        ncurses-devel \
+        bc \
+        bison \
+        flex \
+        make \
+        elfutils-libelf-devel \
+        openssl-devel \
+        rpm-build \
+        automake \
+        autoconf \
+        bison \
+        binutils \
+        curl \
+        gawk \
+        gcc-c++ \
+        gdb \
+        git \
+        glibc-static \
+        glibc.i686 \
+        golang \
+        httpd \
+        info \
+        java-11-openjdk \
+        java-11-openjdk-devel \
+        jq \
+        less \
+        libcurl-devel \
+        libevent-devel \
+        libjpeg-turbo-devel \
+        libX11-devel \
+        libXxf86vm \
+        libXtst \
+        libXfixes \
+        libXrender \
+        lsof \
+        musl-devel \
+        musl-gcc \
+        nasm \
+        nc \
+        ncurses-devel \
+        ncurses-libs \
+        net-tools \
+        ninja-build \
+        nodejs \
+        nss_nis \
+        nss-mdns \
+        nss-myhostname \
+        openssl-devel \
+        protobuf-devel \
+        protobuf-c-devel \
+        patch \
+    #   libcurl4-openssl-dev \
+    #   libprotobuf-c-dev \
+    #   linux-headers-generic \
+        pkg-config \
+        protobuf-c-compiler \
+        python3 \
+        python3-click \
+        python3-cryptography \
+        python3-devel \
+        python3-jinja2 \
+        python3-lxml \
+        python3-numpy \
+        python3-pip \
+        python3-protobuf \
+        python3-pyelftools \
+        python3-pytest \
+        python3-scipy \
+        R-core \
+        strace \
+        sqlite \
+        sudo \
+        vim  \
+        texinfo \
+        wget \
+        unzip \
+        zip \
+        zlib-devel
 
 # Install wrk2 benchmark. This benchmark is used in `benchmark-http.sh`.
 RUN git clone https://github.com/giltene/wrk2.git \
