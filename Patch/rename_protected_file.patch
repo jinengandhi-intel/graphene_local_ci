@@ -7,7 +7,7 @@ index 8eabe102..0e584615 100644
    { path = "/usr/{{ arch_libdir }}", uri = "file:/usr/{{ arch_libdir }}" },
    { path = "/mounted", uri = "file:tmp" },
 -
-+  { type = "encrypted", path = "protected", uri = "file:protected" , key_name = "_sgx_mrenclave"},
++  { type = "encrypted", path = "/protected", uri = "file:protected" , key_name = "_sgx_mrenclave"},
    { type = "encrypted", path = "/tmp/enc_input", uri = "file:tmp/enc_input" },
    { type = "encrypted", path = "/tmp/enc_output", uri = "file:tmp/enc_output" },
    { type = "encrypted", path = "/mounted/enc_input", uri = "file:tmp/enc_input" },

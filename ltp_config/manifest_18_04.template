@@ -10,7 +10,7 @@ loader.insecure__use_cmdline_argv = true
 fs.root.uri = "file:{{ binary_dir }}"
 
 fs.mounts = [  
-  { path = "etc", uri = "file:etc" },
+  { path = "/etc", uri = "file:etc" },
   { path = "/bin", uri = "file:/bin" },
   { path = "/boot", uri = "file:/boot" },
   { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
