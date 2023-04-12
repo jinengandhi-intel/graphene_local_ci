@@ -102,10 +102,12 @@ RUN python3 -m pip install --upgrade pip --user
 
 RUN python3 -m pip install -U \
     asv \
+    'docutils>=0.17,<0.18' \
     'meson>=0.56,<0.57' \
     numpy \
     pandas \
     pillow \
+    'recommonmark>=0.5.0,<=0.7.1' \
     scikit-learn-intelex \
     scipy \
     'tomli>=1.1.0' \

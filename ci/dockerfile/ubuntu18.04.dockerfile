@@ -64,7 +64,6 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python-pip \
     python3-apport \
     python3-apt \
-    python3-breathe \
     python3-click \
     python3-cryptography \
     python3-jinja2 \
@@ -111,8 +110,6 @@ RUN python3 -m pip install -U \
     pillow \
     scikit-learn-intelex \
     scipy \
-    'Sphinx==1.8' \
-    sphinx_rtd_theme \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \
     torchvision --timeout 120
