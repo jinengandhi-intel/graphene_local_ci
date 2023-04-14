@@ -1,10 +1,5 @@
 From almalinux:9
 
-ENV http_proxy "http://proxy-dmz.intel.com:911"
-ENV https_proxy "http://proxy-dmz.intel.com:912"
-
-RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
-
 RUN sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/almalinux-crb.repo
 
 RUN yum install -y yum-utils epel-release
