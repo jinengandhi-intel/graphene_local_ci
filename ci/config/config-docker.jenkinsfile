@@ -69,6 +69,6 @@ if (env.node_label.contains("dcap") && (env.SGX == "1")) {
 }
 
 env.musl_disable = false
-if (["almalinux", "rockylinux"].contains(env.os_release_id)) {
+if (["almalinux9", "rockylinux9", "centos9"].contains(env.base_os)) {
     env.musl_disable = true
 }
