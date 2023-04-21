@@ -37,6 +37,7 @@ node(node_label) {
     } finally {
         stage('cleanup'){
             sh 'rm -rf $ORIG_WKSP/*'
+            sh "docker rmi local:${env.BUILD_TAG} -f"
         }
     }
 
