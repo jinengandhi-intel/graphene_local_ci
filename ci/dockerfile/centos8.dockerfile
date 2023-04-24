@@ -87,6 +87,8 @@ RUN dnf config-manager --set-enabled -y powertools && \
         zip \
         zlib-devel
 
+RUN dnf clean all && rm -r /var/cache/dnf  && dnf upgrade -y && dnf update -y
+
 # Install wrk2 benchmark. This benchmark is used in `benchmark-http.sh`.
 RUN git clone https://github.com/giltene/wrk2.git \
     && cd wrk2 \
