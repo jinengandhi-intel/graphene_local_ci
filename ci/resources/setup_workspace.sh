@@ -29,3 +29,7 @@ if [[ "$base_os" == *"centos"* ]]; then
   echo "setting up workspace for centos"
   cp -rf $WORKSPACE/utils/rust_centos_setup/* CI-Examples/rust/
 fi
+
+cd $WORKSPACE/gramine/CI-Examples/kselftest/tools/testing/selftest/
+mkdir install_binaries
+cp -rf $WORKSPACE/kselftest/* install_binaries

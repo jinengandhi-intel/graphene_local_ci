@@ -1,0 +1,34 @@
+libos.entrypoint = "{{ execdir }}/bash"
+loader.entrypoint = "file:{{ gramine.libos }}"
+
+loader.log_level = "{{ log_level }}"
+loader.uid = 0
+loader.gid = 0
+
+loader.insecure__use_cmdline_argv = true
+
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr{{ arch_libdir }}"
+loader.env.PATH = "{{ execdir }}"
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+  { path = "/usr/lib", uri = "file:/usr/lib" },
+  { path = "{{ execdir }}", uri = "file:{{ execdir }}" },
+  { path = "/sys/power/state", uri = "file:/sys/power/state" },
+  { path = "/tmp", uri = "file:/tmp" },
+  { path = "/dev/rtc0", uri = "file:/dev/rtc0" },
+]
+
+sgx.debug = true
+sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
+
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ execdir }}/",
+  "file:{{ gramine.runtimedir() }}/",
+  "file:{{ arch_libdir }}/",
+  "file:/usr/{{ arch_libdir }}/",
+  "file:/dev/rtc0",
+  "file:/tmp",
+]

@@ -14,4 +14,9 @@ stage('checkout'){
     dir ('examples') {
         git url: 'https://github.com/gramineproject/examples.git'
     }
+
+    sh '''
+        cd gramine/CI-Examples
+        git clone --depth 1 --branch v5.15 https://github.com/torvalds/linux.git kselftest
+    '''
 }

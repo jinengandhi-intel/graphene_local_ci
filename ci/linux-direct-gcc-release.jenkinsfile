@@ -32,6 +32,7 @@ node(node_label) {
                 load '../ci/lib/stage-test-examples.jenkinsfile'
                 load '../ci/lib/stage-verification-examples.jenkinsfile'
                 load '../ci/lib/stage-test-stress-ng.jenkinsfile'
+                load '../ci/lib/stage-test-kselftest.jenkinsfile'
             }
         }
     } finally {

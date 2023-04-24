@@ -1,0 +1,26 @@
+stage ('kselftest') {
+    env.MODE = "direct"
+    if (env.SGX == "1") {
+        env.MODE = "sgx"
+    }
+    env.kselftest_dir = "CI-Examples/kselftest/tools/testing/selftests"
+
+    env.GRAMINE_TARGETS = "breakpoints capabilities core filesystems filesystems/binderfs filesystems/epoll ipc mincore net nsfs sigaltstack size timers vDSO x86"
+
+    try {
+        timeout(time: 15, unit: 'MINUTES') {
+            sh '''
+                cd ${kselftest_dir}
+                make TARGETS=${GRAMINE_TARGETS} install INSTALL_PATH=$PWD/install_binaries
+                cd install_binaries
+                make ${MAKEOPTS}
+                gramine-${MODE} kselftest ./run_kselftest.sh | tee kselftest_output.log
+                python3 test_kselftest.py
+            '''
+        }
+    } catch (Exception e) {} finally {
+        archiveArtifacts "${kselftest_dir}/kselftest.xml"
+        junit "${kselftest_dir}/kselftest.xml"
+    }
+
+}
