@@ -32,10 +32,6 @@ stage('stress-ng') {
                 env.build_ok = false
                 sh 'echo "Stress-ng Failed"'
             } finally {
-                sh '''
-                    cd CI-Examples/stress-ng
-                    python3 parser_stressng.py --path=.
-                '''
                 archiveArtifacts 'CI-Examples/stress-ng/*.log'
             }
         } else {
@@ -43,4 +39,17 @@ stage('stress-ng') {
         }
     }
 }
-            
+
+stage ('verification') {
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/stress-ng
+                python3 -m pytest -v -s --junit-xml stressng-results.xml tests_stressng.py
+            '''
+        }
+    } catch (Exception e){}
+    finally {
+        junit 'CI-Examples/stress-ng/stressng-results.xml'
+    }
+}

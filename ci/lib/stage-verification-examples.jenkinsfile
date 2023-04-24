@@ -3,10 +3,8 @@ stage ('verification') {
         timeout(time: 2, unit: 'MINUTES') {
             sh 'python3 -m pytest -v -m examples --junit-xml workload-regression.xml test_workloads.py'
         }
-    } catch (Exception e){
-        env.build_ok = true
-        sh 'echo "Workload parser failed"'
-    } finally {
+    } catch (Exception e){}
+    finally {
         junit 'workload-regression.xml'
     }
 }
