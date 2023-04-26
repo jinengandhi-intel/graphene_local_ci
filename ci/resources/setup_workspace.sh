@@ -30,3 +30,19 @@ if [[ "$base_os" == *"centos"* ]]; then
   echo "setting up workspace for centos"
   cp -rf $WORKSPACE/utils/rust_centos_setup/* CI-Examples/rust/
 fi
+
+cd $WORKSPACE/gramine/CI-Examples
+if [[ "$EDMM" == 1 ]]; then
+  for i in $(find -name '*manifest.template');
+  do
+    sed -i '$ a sgx.edmm_heap_prealloc_size = "64M"' $i;
+  done;
+fi
+
+cd $WORKSPACE/gramine/libos/test/ltp
+if [[ "$EDMM" == 1 ]]; then
+  for i in $(find -name '*manifest.template');
+  do
+    sed -i '$ a sgx.edmm_heap_prealloc_size = "64M"' $i;
+  done;
+fi
