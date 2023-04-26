@@ -6,7 +6,6 @@ node(node_label) {
         load 'ci/lib/stage-clone.jenkinsfile'
 
         dir ("gramine") {
-
             sh '../ci/resources/setup_workspace.sh'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
 
