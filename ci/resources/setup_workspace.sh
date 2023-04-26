@@ -1,4 +1,5 @@
 #!/bin/bash
+python3 $WORKSPACE/utils/time_sync_helper.py
 set -x
 
 chmod +x $WORKSPACE/ci/resources/setup_ltp.sh
