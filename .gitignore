@@ -1,0 +1,19 @@
+*.cache
+
+# Ignore all text files
+*.txt
+*.log
+*.xml
+
+# python
+*.py[co]
+__pycache__
+.pytest_cache
+
+# sgx
+*.manifest.sgx
+*.sig
+*.token
+*.cached
+.output.sgx_get_token.*
+.output.sgx_sign.*

@@ -79,14 +79,14 @@ pipeline {
 
 				stage ('Invoke Ubuntu 22.04 with 6.0.9 Graphene native Suite') {
                     steps {
-                        build job: 'local_ci_graphene_native_22.04_6.0.9', propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_22.04_6.0.9', parameters: [[$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True']], propagate: true, wait: true
                     }
                 }
 
                 stage ('Invoke Ubuntu 22.04 with 6.0.9 Graphene SGX Suite') {
                     steps {
                         sleep(time: 15, unit: "MINUTES")
-                        build job: 'local_ci_graphene_sgx_22.04_6.0.9', propagate: true, wait: true
+                        build job: 'local_ci_graphene_sgx_22.04_6.0.9', parameters: [[$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True']], propagate: true, wait: true
                     }
                 }
 

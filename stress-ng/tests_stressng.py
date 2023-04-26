@@ -6,9 +6,9 @@ from itertools import islice
 from collections import defaultdict
 import pytest
 
-test_list={"hdd.log":15, "seek.log":7, "seek-hdd.log":4, "interrupt.log":7, \
-            "filesystem.log":13, "filesystem_all.log":13, "scheduler.log":11, \
-            "scheduler_all.log":11}
+total_test_list={"hdd.log":15, "seek.log":7, "seek-hdd.log":4, "interrupt.log":6, \
+            "filesystem.log":12, "filesystem_all.log":12, "scheduler.log":8, \
+            "scheduler_all.log":9}
 
 def parse_test_logs(log_file):
     test_results = defaultdict(list)
@@ -17,7 +17,7 @@ def parse_test_logs(log_file):
     f_contents = fd.read()
     filename = os.path.basename(log_file)
     if "successful run completed" in f_contents and "error" not in f_contents:
-        test_results["Pass"].append([i+1 for i in range(test_list.get(filename))])
+        test_results["Pass"].append([i+1 for i in range(total_test_list.get(filename))])
     else:
         sub_tests = f_contents.split("starting stressors")
         sub_tests.pop(0) # Removing the content before the first test starts
@@ -27,7 +27,7 @@ def parse_test_logs(log_file):
             if "error" in tests:
                 test_results["Fail"].append(test_number)
     
-        for i in range(test_list.get(filename)):
+        for i in range(total_test_list.get(filename)):
             if (i+1) not in test_results["Fail"]:
                 test_results["Pass"].append(i+1)
                        
