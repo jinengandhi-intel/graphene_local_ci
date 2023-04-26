@@ -41,15 +41,19 @@ stage('stress-ng') {
 }
 
 stage ('verification') {
-    try {
-        timeout(time: 2, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/stress-ng
-                python3 -m pytest -v -s --junit-xml stressng-results.xml tests_stressng.py
-            '''
+    script {
+        if (env.stress_ng_run == "True") {
+            try {
+                timeout(time: 2, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        python3 -m pytest -v -s --junit-xml stressng-results.xml tests_stressng.py
+                    '''
+                }
+            } catch (Exception e){}
+            finally {
+                junit 'CI-Examples/stress-ng/stressng-results.xml'
+            }
         }
-    } catch (Exception e){}
-    finally {
-        junit 'CI-Examples/stress-ng/stressng-results.xml'
     }
 }
