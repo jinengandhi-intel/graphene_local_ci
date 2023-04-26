@@ -27,7 +27,7 @@ stage('test-examples') {
         }
     }
 
-    if (!["debian", "almalinux", "rockylinux"].contains(env.os_release_id)) {
+    if (!["debian11", "almalinux9", "rockylinux9", "centos9"].contains(env.base_os)) {
         if ((Float.parseFloat(env.os_version) < 21) && !((env.node_label == "graphene_18.04_5.19") && (env.SGX == '1')))
         {
             try {

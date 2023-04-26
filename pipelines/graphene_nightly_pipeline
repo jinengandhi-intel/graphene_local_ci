@@ -104,6 +104,20 @@ pipeline {
                     }
                 }
 
+                stage ('Invoke CentOS Stream 9 with 6.2 Graphene Native Suite ') {
+                    steps {
+                        sleep(time: 30, unit: "MINUTES")
+                        build job: 'local_ci_graphene_native_centos9_6.2', propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke CentOS Stream 9 with 6.2 Graphene SGX Suite ') {
+                    steps {
+                        sleep(time: 45, unit: "MINUTES")
+                        build job: 'local_ci_graphene_sgx_centos9_6.2', propagate: true, wait: true
+                    }
+                }
+
                 stage ('Invoke RHEL 8 with 6.0 Graphene Native Suite ') {
                     steps {
                         sleep(time: 30, unit: "MINUTES")
