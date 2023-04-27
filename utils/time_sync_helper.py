@@ -2,46 +2,35 @@ import requests
 import json
 import time
 import subprocess
-import re
 import os
 import base64
 
 class ConnectionDetails:
-    '''This is class contains parameter/data for setting time'''
+    '''This is class contains parameter/data for setting time''' 
 
-    def read_timezone():
-        out = subprocess.Popen(['timedatectl'], \
-                stdout=subprocess.PIPE, \
-                stderr=subprocess.STDOUT)
-        stout, sterr = out.communicate()
-        machine_time_zone = re.findall(r'Time zone:\s(\w+\/\w+)', stout.decode())
-        if len(machine_time_zone) > 0:
-            return machine_time_zone[0]   
-        return 'Asia/Kolkata'
-    
     def string_maker(word):
         byt = word.encode("ascii")
         ssb = base64.b64decode(byt)
         return ssb.decode("ascii")
-
     
     intel_proxy = {
         'http': 'http://proxy-dmz.intel.com:911',
         "https": "http://proxy-dmz.intel.com:912"
     }
 
-    os_release_id = os.environ.get('os_release_id')
+    os_release_id = os.environ.get('base_os')
 
     passphrase = string_maker('aW50ZWxAMTIz')
-    if os_release_id in ['rockylinux']:
-        passphrase = 'aW50ZWw='
+    if os_release_id in ['rockylinux9']:
+        passphrase = string_maker('aW50ZWw=')
     
-    timezone = read_timezone()
+    timezone = 'Asia/Kolkata'
     base_url = 'https://timeapi.io/api/TimeZone/zone?timeZone=' 
     target_url = base_url + timezone
 
 
 class TimeSyncCMD:
+    '''This class has helper methods to set time/timezone'''
     def get_supported_time_format(self, response):
         json_object = json.loads(response.text)
         unformatted_time = json_object["currentLocalTime"]
@@ -53,6 +42,10 @@ class TimeSyncCMD:
     
     def execute_time_cmd(self, time_stamp, passphrase):
         cmd = 'sudo date --set "'+ str(time_stamp) + '"'
+        subprocess.call('echo {} | sudo -S {}'.format(passphrase, cmd), shell=True)
+
+    def set_timezone_cmd(self, time_zone, passphrase):
+        cmd = ' sudo timedatectl set-timezone "'+ str(time_zone) + '"'
         subprocess.call('echo {} | sudo -S {}'.format(passphrase, cmd), shell=True)
 
     def sync_hw_clock(self, passphase):
@@ -67,6 +60,7 @@ if __name__=='__main__':
 
         obj_tsc = TimeSyncCMD()
 
+        obj_tsc.set_timezone_cmd(obj_conn.timezone, obj_conn.passphrase)
         time_stamp = obj_tsc.get_supported_time_format(response)
         obj_tsc.execute_time_cmd(time_stamp, obj_conn.passphrase)
         obj_tsc.sync_hw_clock(obj_conn.passphrase)
