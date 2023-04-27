@@ -2,43 +2,24 @@ import requests
 import json
 import time
 import subprocess
-import re
 import os
 import base64
 
 class ConnectionDetails:
-    '''This is class contains parameter/data for setting time'''
+    '''This is class contains parameter/data for setting time''' 
 
-    def read_timezone():
-        out = subprocess.Popen(['timedatectl'], \
-                stdout=subprocess.PIPE, \
-                stderr=subprocess.STDOUT)
-        stout, sterr = out.communicate()
-        machine_time_zone = re.findall(r'Time zone:\s(\w+\/\w+)', stout.decode())
-        if len(machine_time_zone) > 0:
-            return machine_time_zone[0]   
-        return 'Asia/Kolkata'
-    
-    def string_maker(word):
-        byt = word.encode("ascii")
-        ssb = base64.b64decode(byt)
-        return ssb.decode("ascii")
-
-    
     intel_proxy = {
         'http': 'http://proxy-dmz.intel.com:911',
         "https": "http://proxy-dmz.intel.com:912"
     }
-
-    os_release_id = os.environ.get('base_os')
-    node_label = os.environ.get('node_label')
     
-    timezone = read_timezone()
+    timezone = 'Asia/Kolkata'
     base_url = 'https://timeapi.io/api/TimeZone/zone?timeZone=' 
     target_url = base_url + timezone
 
 
 class TimeSyncCMD:
+    '''This class has helper methods to set time/timezone'''
     def get_supported_time_format(self, response):
         json_object = json.loads(response.text)
         unformatted_time = json_object["currentLocalTime"]
