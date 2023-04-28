@@ -10,6 +10,7 @@ import re
 sgx_mode = os.environ.get('SGX')
 no_cores = os.environ.get('no_cpu')
 os_version = os.environ.get('os_version')
+base_os = os.environ.get('base_os')
 os_release_id = os.environ.get('os_release_id')
 node_label = os.environ.get('node_label')
 
@@ -125,7 +126,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif(float(os_version) >= 21 or
-                ((node_label == 'graphene_18.04_5.19') and sgx_mode == '1') or (os_release_id in ["debian", "almalinux", "rockylinux"]) \
+                ((node_label == 'graphene_18.04_5.19') and sgx_mode == '1') or (base_os in ["debian11", "almalinux9", "rockylinux9", "centos9"]) \
                 or (("dcap" in node_label) and sgx_mode == '1'), \
                     reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
     def test_tensorflow_workload(self):
