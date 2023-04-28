@@ -1,16 +1,16 @@
-From quay.io/centos/centos:stream9
+FROM quay.io/centos/centos:stream9
 
 RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
 
-#RUN dnf copr enable -y ngompa/musl-libc
 RUN dnf config-manager --set-enabled -y crb && \
     dnf install -y yum-utils && \
     dnf install -y epel-release && \
-    dnf install -y --allowerasing \
+    dnf install -y \
         libunwind \
         ncurses-devel \
         bc \
         bison \
+        cargo \
         flex \
         make \
         elfutils-libelf-devel \
@@ -18,9 +18,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         rpm-build \
         automake \
         autoconf \
-        bison \
         binutils \
-        curl \
         gawk \
         gcc-c++ \
         gdb \
@@ -43,8 +41,6 @@ RUN dnf config-manager --set-enabled -y crb && \
         libXfixes \
         libXrender \
         lsof \
-        # musl-devel \
-        # musl-gcc \
         nasm \
         nc \
         ncurses-devel \
@@ -59,9 +55,6 @@ RUN dnf config-manager --set-enabled -y crb && \
         protobuf-devel \
         protobuf-c-devel \
         patch \
-    #   libcurl4-openssl-dev \
-    #   libprotobuf-c-dev \
-    #   linux-headers-generic \
         pkg-config \
         protobuf-c-compiler \
         python3 \
@@ -104,7 +97,8 @@ RUN python3 -m pip install -U \
     pillow \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \
-    'meson>=0.56,<0.57'
+    'meson>=0.56,<0.57' \
+    dataclasses
 
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G wheel -m -d /intel -c "intel Jenkins" intel && \
