@@ -4,6 +4,7 @@ RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
 
 RUN dnf copr enable -y ngompa/musl-libc
 RUN dnf config-manager --set-enabled -y powertools && \
+    dnf update && \
     dnf install -y yum-utils && \
     dnf install -y epel-release && \
     dnf install -y \
