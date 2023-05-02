@@ -236,10 +236,6 @@ stage('test-examples') {
                         echo "Killing $PID"
                         kill -9 $PID
                     fi
-                    if [ "${base_os}" == 'centos8' ]
-                    then
-                        sudo yum install -y *.rpm
-                    fi
                     make ${MAKEOPTS}
                     make ${MAKEOPTS} start-gramine-server &
                     ../../scripts/wait_for_server 300 127.0.0.1 3000
