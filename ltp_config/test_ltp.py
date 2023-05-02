@@ -220,30 +220,33 @@ def check_must_pass(passed, failed, must_pass, conf, system_error_output_valid):
 
 def check_system_error_output_valid(_stderr):
     error_list = []
-    error_list = _stderr.split("error:")
-    for error in error_list:
-        if error == "":
-            ret_code = True
-            continue
-        elif "Mounting file:/proc may expose unsanitized" in error or \
-            "[P1:T1:]" in error or \
-            "Failed to read ELF header" in error or \
-            "Disallowing access to file '/usr/bin/systemd-detect-virt'" in error or \
-            "Disallowing access to file '/lib64/libnss_nis.so.2'" in error or \
-            "Disallowing access to file '/usr/lib64/libnss_nis.so.2'" in error or \
-            "Disallowing access to file '/lib64/libtinfo.so.6'" in error or \
-            "Disallowing access to file '/usr/lib64/libtinfo.so.6'" in error or \
-            "Detected deprecated syntax" in error or \
-            "Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error or \
-            "Sending IPC process-exit notification failed: " in error or \
-            "Failed to send IPC msg" in error or \
-            "bind: invalid handle returned" in error or \
-            "Disallowing access to file '/lib/x86_64-linux-gnu/libnss_nis.so.2" in error :        
-            ret_code = True
-            continue
-        else:
-            ret_code = False
-            return False
+    if "error" in _stderr:
+        error_list = _stderr.split("error:")
+        for error in error_list:
+            if error == "":
+                ret_code = True
+                continue
+            elif "Mounting file:/proc may expose unsanitized" in error or \
+                "[P1:T1:]" in error or \
+                "Failed to read ELF header" in error or \
+                "Disallowing access to file '/usr/bin/systemd-detect-virt'" in error or \
+                "Disallowing access to file '/lib64/libnss_nis.so.2'" in error or \
+                "Disallowing access to file '/usr/lib64/libnss_nis.so.2'" in error or \
+                "Disallowing access to file '/lib64/libtinfo.so.6'" in error or \
+                "Disallowing access to file '/usr/lib64/libtinfo.so.6'" in error or \
+                "Detected deprecated syntax" in error or \
+                "Mounting file:/dev/cpu_dma_latency may expose unsanitized" in error or \
+                "Sending IPC process-exit notification failed: " in error or \
+                "Failed to send IPC msg" in error or \
+                "bind: invalid handle returned" in error or \
+                "Disallowing access to file '/lib/x86_64-linux-gnu/libnss_nis.so.2" in error: 
+                ret_code = True
+                continue
+            else:
+                ret_code = False
+                return False
+    else:
+        ret_code = True
     return ret_code
 
 def test_ltp(cmd, section, capsys):
