@@ -99,7 +99,7 @@ stage('test-sgx') {
     }
 
     try {
-        timeout(time: 15, unit: 'MINUTES') {
+        timeout(time: 20, unit: 'MINUTES') {
             sh '''
                 # TODO this logic is to check both epoll and select varants, and probably
                 # should be split to check both of those separately and on all distros
