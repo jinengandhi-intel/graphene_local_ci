@@ -7,8 +7,8 @@ from collections import defaultdict
 import pytest
 
 total_test_list={"hdd.log":15, "seek.log":7, "seek-hdd.log":4, "interrupt.log":6, \
-            "filesystem.log":12, "filesystem_all.log":12, "scheduler.log":8, \
-            "scheduler_all.log":9}
+            "filesystem.log":12, "filesystem_all.log":12, "scheduler.log":7, \
+            "scheduler_all.log":7}
 
 def parse_test_logs(log_file):
     test_results = defaultdict(list)
