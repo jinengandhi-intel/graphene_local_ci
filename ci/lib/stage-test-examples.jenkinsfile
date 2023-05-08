@@ -125,19 +125,6 @@ stage('test-examples') {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/pytorch
-                    if [ "${os_release_id}" != 'ubuntu' ] && [ "${os_release_id}" != 'debian' ]
-                    then
-                        if [ "${os_release_id}" == 'centos' ] || [ "${os_release_id}" == 'almalinux' ] || [ "${os_release_id}" == 'rockylinux' ]
-                        then
-                            sed -i '$ a loader.argv0_override="{{ entrypoint }}"' pytorch.manifest.template
-                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$SETUPTOOLS_PATH\\/\\"," pytorch.manifest.template
-                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$DATACLASSES_PATH\\/\\"," pytorch.manifest.template
-                            sed -i -e "/file:{{ python.distlib }}/,+d" pytorch.manifest.template
-                        else
-                            sed -i \'s/"file:{{ python.distlib }}/"file:\\/usr\\/local\\/lib\\/python3.6\\/site-packages/\' pytorch.manifest.template
-                            sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/lib\\/python3.6\\/site-packages\\/\\"," pytorch.manifest.template
-                        fi
-                    fi
                     python3 download-pretrained-model.py
                     make ${MAKEOPTS} all
                     gramine-${MODE} ./pytorch ./pytorchexample.py
