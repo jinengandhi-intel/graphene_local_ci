@@ -7,7 +7,8 @@ stage('checkout'){
         }
     } else {
         dir ("gramine") {
-            git url: 'https://github.com/gramineproject/gramine.git'
+            git url: 'https://github.com/llly/gramine.git',
+            branch: "socket_ioctl"
         }
     }
 
