@@ -6,8 +6,19 @@ stage('checkout'){
             sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git -b ${env.gramine_version}"""
         }
     } else {
+        if (["stable", "unstable", "", null].contains(env.gramine_repo)) {
+            env.gramine_git = 'https://github.com/gramineproject/gramine.git'
+        } else {
+            env.gramine_git = env.gramine_repo
+        }
+
+        if (["", null].contains(env.gramine_branch)) {
+            env.gramine_branch = "master"
+        }
+
         dir ("gramine") {
-            git url: 'https://github.com/gramineproject/gramine.git'
+            git url: gramine_git,
+            branch: gramine_branch
         }
     }
 
