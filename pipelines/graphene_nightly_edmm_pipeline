@@ -13,13 +13,13 @@ pipeline {
                 stage ('Invoke Ubuntu 22.04 with 6.0.9 Graphene SGX Suite') {
                     steps {
 						sleep(time: 5, unit: "MINUTES")
-                        build job: 'local_ci_graphene_sgx_22.04_6.0.9', parameters: [[$class: 'StringParameterValue', name: 'EDMM', value: '1']], propagate: true, wait: true
+                        build job: 'local_ci_graphene_sgx_22.04_6.0.9', parameters: [[$class: 'StringParameterValue', name: 'EDMM', value: '1'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch]], propagate: true, wait: true
                     }
                 }
 
                 stage ('Invoke RHEL 8 with 6.0 Graphene SGX Suite ') {
                     steps {
-                        build job: 'local_ci_graphene_sgx_rhel_server_6.0', parameters: [[$class: 'StringParameterValue', name: 'stress_ng_run', value: 'False'], [$class: 'StringParameterValue', name: 'EDMM', value: '1'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_5_12_rhel8'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_sgx_rhel_server_6.0', parameters: [[$class: 'StringParameterValue', name: 'stress_ng_run', value: 'False'], [$class: 'StringParameterValue', name: 'EDMM', value: '1'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_5_12_rhel8'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch]], propagate: true, wait: true
                     }
                 }
             }
