@@ -10,6 +10,7 @@ pipeline {
     {
         stage ('Parallel invocation of test jobs') {
             parallel {
+                /*
                 stage ('Invoke Ubuntu 18.04 with Kernel 6.0 Graphene Native Suite ') {
                     steps {
                         build job: 'local_ci_graphene_native_18.04_6.0', parameters: [[$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch]], propagate: true, wait: true
@@ -22,6 +23,7 @@ pipeline {
                         build job: 'local_ci_graphene_sgx_18.04_6.0', parameters: [[$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch]], propagate: true, wait: true
                     }
                 }
+                */
 
                 /*
 				stage ('Invoke Ubuntu 18.04 with 5.19 Graphene native Suite') {
@@ -160,11 +162,13 @@ pipeline {
                     }
                 }
 
+                /*
                 stage ('Invoke GSC with Ubuntu 18.04') {
                     steps {
                         build job: 'local_ci_graphene_gsc_18.04', propagate: true, wait: true
                     }
                 }
+                */
 
                 stage ('Invoke GSC with Ubuntu 20.04') {
                     steps {
