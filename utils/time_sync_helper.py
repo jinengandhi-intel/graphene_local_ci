@@ -19,10 +19,13 @@ class ConnectionDetails:
     }
 
     os_release_id = os.environ.get('base_os')
+    node_label = os.environ.get('node_label')
 
     passphrase = string_maker('aW50ZWxAMTIz')
     if os_release_id in ['rockylinux9']:
         passphrase = string_maker('aW50ZWw=')
+    if "dcap" in node_label:
+        passphrase = string_maker("eQ==")
     
     timezone = 'Asia/Kolkata'
     base_url = 'https://timeapi.io/api/TimeZone/zone?timeZone=' 
@@ -57,9 +60,7 @@ if __name__=='__main__':
     try:
         obj_conn = ConnectionDetails()
         response = requests.get(obj_conn.target_url, proxies=obj_conn.intel_proxy)
-
         obj_tsc = TimeSyncCMD()
-
         obj_tsc.set_timezone_cmd(obj_conn.timezone, obj_conn.passphrase)
         time_stamp = obj_tsc.get_supported_time_format(response)
         obj_tsc.execute_time_cmd(time_stamp, obj_conn.passphrase)

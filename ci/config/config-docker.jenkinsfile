@@ -72,3 +72,25 @@ env.musl_disable = false
 if (["almalinux9", "rockylinux9", "centos9"].contains(env.base_os)) {
     env.musl_disable = true
 }
+
+if (env.IS_VM == "1") {
+    // only root and `kvm` group can access /dev/kvm, so add `kvm` GID to the in-Docker user
+    kvm_gid = sh(returnStdout: true, script: 'getent group kvm | cut -d: -f3').trim()
+
+    // only root and `sgx` group can access /dev/sgx_vepc, so add `sgx` GID to the in-Docker user
+    sgx_gid = sh(returnStdout: true, script: 'getent group sgx | cut -d: -f3').trim()
+
+    // Required by QEMU to run the same Linux kernel in VM (because we use host kernel as guest
+    // kernel for simplicity)
+    env.DOCKER_ARGS_COMMON += """
+        --volume=/boot:/boot:ro
+        --group-add ${kvm_gid}
+        --device=/dev/kvm:/dev/kvm
+    """
+
+    env.DOCKER_ARGS_SGX += """
+        --volume=/usr/include/x86_64-linux-gnu/asm/sgx.h:/usr/include/asm/sgx.h:ro
+        --group-add ${sgx_gid}
+        --device=/dev/sgx_vepc:/dev/sgx_vepc
+    """
+}
