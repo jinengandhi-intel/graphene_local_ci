@@ -46,7 +46,6 @@ if __name__=='__main__':
     try:
         obj_conn = ConnectionDetails()
         response = requests.get(obj_conn.target_url, proxies=obj_conn.intel_proxy)
-
         obj_tsc = TimeSyncCMD()
         obj_tsc.set_timezone_cmd(obj_conn.timezone)
         time_stamp = obj_tsc.get_supported_time_format(response)
