@@ -186,6 +186,13 @@ pipeline {
                     }
                 }
 
+                stage ('Invoke QEMU-KVM with Ubuntu 22.04 Graphene SGX Suite ') {
+                    steps {
+                        sleep(time: 45, unit: "MINUTES")
+                        build job: 'local_ci_graphene_sgx_kvm', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu22.04"]], propagate: true, wait: true
+                    }
+                }
+
                 stage ('Invoke GSC with Ubuntu 18.04') {
                     steps {
                         build job: 'local_ci_graphene_gsc_18.04', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_18.04_6.0'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:18.04"]], propagate: true, wait: true
