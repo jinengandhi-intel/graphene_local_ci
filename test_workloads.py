@@ -125,8 +125,8 @@ class Test_Workload_Results():
         assert("Final Count is:" in jdk_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(float(os_version) >= 21 or
-                ((node_label == 'graphene_18.04_5.19') and sgx_mode == '1') or (base_os in ["debian11", "almalinux9", "rockylinux9", "centos9"]) \
+    @pytest.mark.skipif((float(os_version) >= 21) \
+                or (base_os in ["debian11", "almalinux9", "rockylinux9", "centos9"]) \
                 or (("dcap" in node_label) and sgx_mode == '1'), \
                     reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
     def test_tensorflow_workload(self):
@@ -152,8 +152,6 @@ class Test_Workload_Results():
         assert("Success 1/1" in nodejs_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((node_label == 'graphene_18.04_5.19') and (sgx_mode == '1')),
-                    reason="Pytorch fails for graphene_18.04_5.19")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
         pytorch_contents = pytorch_result_file.read()
@@ -164,16 +162,13 @@ class Test_Workload_Results():
             and ("Ibizan hound, Ibizan Podenco" in pytorch_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((node_label == 'graphene_18.04_5.19') and (sgx_mode == '1')),
-                    reason="R fails for graphene_18.04_5.19")
     def test_r_workload(self):
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()
         assert("success" in r1_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != "ubuntu") or
-                    ((node_label == 'graphene_18.04_5.19') and (sgx_mode == '1')),
+    @pytest.mark.skipif((os_release_id != "ubuntu"),
                     reason="GCC enabled only for Ubuntu configurations.")
     def test_gcc_workload(self):
         gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")
