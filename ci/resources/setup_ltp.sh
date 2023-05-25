@@ -29,11 +29,6 @@ then
     cp -f manifest_RHEL.template manifest.template
 fi
 
-if [[ "$base_os" == *"18.04"* ]]
-then
-    cp -f manifest_18_04.template manifest.template
-fi
-
 if [[ "$base_os" == *"20.04"* ]] || [[ "$base_os" == *"22.04"* ]]
 then
     cp -f manifest_20_04_21_10.template manifest.template
