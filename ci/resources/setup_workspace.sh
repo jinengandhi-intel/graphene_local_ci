@@ -32,7 +32,3 @@ if [[ "$base_os" == *"centos"* ]]; then
 fi
 
 cd $WORKSPACE/gramine/libos/test/regression
-if [[ "$base_os" == *"ubuntu18.04"* ]]; then
-  sed -i '/  "rwlock",/d' tests.toml tests_musl.toml
-  sed -i -e "/rwlock/,+5d" meson.build
-fi
