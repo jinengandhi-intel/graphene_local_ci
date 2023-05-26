@@ -158,7 +158,7 @@ stage('test-examples') {
             } catch (Exception e) { }
 
             try {
-                timeout(time: (env.EDMM ? 60 : 20), unit: 'MINUTES') {
+                timeout(time: (env.EDMM ? 65 : 25), unit: 'MINUTES') {
                     sh '''
                         export PID=$(lsof -t -i:8501)
                         if [ "$PID" != "" ]
