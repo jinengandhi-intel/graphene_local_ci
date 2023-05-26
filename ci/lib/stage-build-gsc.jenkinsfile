@@ -18,7 +18,7 @@ stage('Build Workloads') {
             fi
             docker build --tag bash-test --file test/bash.dockerfile .
             ./gsc build -nc --insecure-args bash-test test/ubuntu18.04-bash.manifest
-            ./gsc sign-image bash-test enclave-key.pem
+            ./gsc sign-image --remove-gramine-deps bash-test enclave-key.pem
             ./gsc info-image gsc-bash-test
         '''
     } catch (Exception e) {}
@@ -35,7 +35,7 @@ stage('Build Workloads') {
                 docker pull python
             fi
             ./gsc build -nc --insecure-args python test/generic.manifest
-            ./gsc sign-image python enclave-key.pem
+            ./gsc sign-image --remove-gramine-deps python enclave-key.pem
             ./gsc info-image gsc-python
         '''
     } catch (Exception e) {}
@@ -53,7 +53,7 @@ stage('Build Workloads') {
 
             docker build --tag helloworld-test --file test/helloworld.dockerfile .
             ./gsc build -nc --insecure-args helloworld-test test/ubuntu18.04-hello-world.manifest
-            ./gsc sign-image helloworld-test enclave-key.pem
+            ./gsc sign-image --remove-gramine-deps helloworld-test enclave-key.pem
             ./gsc info-image gsc-helloworld-test
         '''
     } catch (Exception e) {}
