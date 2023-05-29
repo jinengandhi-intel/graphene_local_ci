@@ -23,6 +23,10 @@ node (node_label) {
             }
         }
     } finally {
+        try {
+            archiveArtifacts 'libos/test/regression/libos-regression.xml'
+            junit 'libos/test/regression/libos-regression.xml'
+        } catch(Exception e) {}
         stage('cleanup'){
             sh 'rm -rf $ORIG_WKSP/*'
             sh "docker rmi local:${env.BUILD_TAG} -f"

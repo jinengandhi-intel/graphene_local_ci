@@ -8,17 +8,18 @@ stage('build') {
 
         cd initramfs_builder
         {
-           echo '#!/bin/sh'
-           echo 'if test -n $SGX; then GRAMINE=gramine-sgx; else GRAMINE=gramine-direct; fi'
-           echo 'cd $PWD_FOR_VM'
-           echo '( cd device-testing-tools/gramine-device-testing-module; insmod gramine-testing-dev.ko )'
+        echo '#!/bin/sh'
+        echo 'if test -n $SGX; then GRAMINE=gramine-sgx; else GRAMINE=gramine-direct; fi'
+        echo 'cd $PWD_FOR_VM'
+        echo '( cd device-testing-tools/gramine-device-testing-module; insmod gramine-testing-dev.ko )'
 
-           # only couple tests -- executing in a VM with virtio-9p-pci FS passthrough is very slow
-           echo 'cd libos/test/regression'
-           echo 'gramine-test build helloworld; $GRAMINE helloworld'
-           echo 'gramine-test build device_ioctl; $GRAMINE device_ioctl'
-           echo 'echo "TESTS OK"'
-           echo 'poweroff -n -f'
+        # only couple tests -- executing in a VM with virtio-9p-pci FS passthrough is very slow
+        echo 'cd libos/test/regression'
+        echo 'gramine-test build'
+        echo 'gramine-test python3 -m pytest -s -v -k \
+            "test_001_helloworld or test_003_device_ioctl"' --junit-xml libos-regression.xml
+        echo 'echo "TESTS OK"'
+        echo 'poweroff -n -f'
         } > new_init
         make ${MAKEOPTS}
 
@@ -26,6 +27,7 @@ stage('build') {
         sed -i 's/static int gramine_test_dev_change_perms_uevent(/static int gramine_test_dev_change_perms_uevent(const /' main.c
         make ${MAKEOPTS}
     '''
+
 
     env.MESON_OPTIONS = ''
     if (env.UBSAN == '1') {
