@@ -231,6 +231,25 @@ stage('test-sgx') {
             env.build_ok = false
             sh 'echo "ra-tls-secret-prov Example Test Failed"'
         }
+
+        try {
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    export PID=$(lsof -t -i:8000)
+                    if [ "$PID" != "" ]
+                    then
+                        echo "Killing $PID"
+                        kill -9 $PID
+                    fi
+                    cd CI-Examples/ra-tls-nginx
+                    make check 2>&1 | tee nginx_result.txt
+                '''
+            }
+        } catch (Exception e) {
+            env.build_ok = false
+            sh 'echo "ra-tls-nginx Example Test Failed"'
+        }
+
     }
 
     try{

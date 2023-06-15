@@ -212,6 +212,14 @@ class Test_Workload_Results():
         assert("Success 3/4" in secret_prov_contents)
         assert("Success 4/4" in secret_prov_contents)
 
+    @pytest.mark.examples
+    @pytest.mark.sanity
+    @pytest.mark.skipif(not(("dcap" in node_label) and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    def test_ra_tls_nginx_workload(self):
+        nginx_result_file = open("CI-Examples/ra-tls-nginx/nginx_result.txt", "r")
+        nginx_contents = nginx_result_file.read()
+        assert("OK" in nginx_contents)
+
     @pytest.mark.sanity
     def test_helloworld_workload(self):
         helloworld_result_file = open("CI-Examples/helloworld/helloworld_result.txt", "r")
