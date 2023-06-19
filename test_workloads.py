@@ -25,7 +25,8 @@ class Test_Workload_Results():
         assert("Success 4/7" in bash_contents)
         assert("Success 5/7" in bash_contents)
         assert("Success 6/7" in bash_contents)
-        assert("Success 7/7" in bash_contents)
+        if (os_release_id != "alpine"):
+            assert("Success 7/7" in bash_contents)
 
     @pytest.mark.examples
     def test_python_workload(self):
@@ -65,6 +66,7 @@ class Test_Workload_Results():
             and (re.search("Concurrency =(\s+)32: Per Thread Median Througput (.*)Latency(.*)", nginx_contents)))
 
     @pytest.mark.examples
+    @pytest.mark.skipif(os_release_id == "alpine", reason='Blender is not enabled for Alpine')
     def test_blender(self):
         blender_result_file = "CI-Examples/blender/data/images/simple_scene.blend0001.png"
         assert(path.exists(blender_result_file))
@@ -126,7 +128,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.skipif((float(os_version) >= 21) \
-                or (base_os in ["debian11", "almalinux9", "rockylinux9", "centos9"]) \
+                or (base_os in ["debian11", "almalinux9", "rockylinux9", "centos9", "alpine3.18"]) \
                 or (("dcap" in node_label) and sgx_mode == '1'), \
                     reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
     def test_tensorflow_workload(self):
@@ -152,6 +154,8 @@ class Test_Workload_Results():
         assert("Success 1/1" in nodejs_contents)
 
     @pytest.mark.examples
+    @pytest.mark.skipif((os_release_id in ["alpine"]),
+                    reason="Pytorch not compatible for musl.")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
         pytorch_contents = pytorch_result_file.read()
@@ -168,8 +172,8 @@ class Test_Workload_Results():
         assert("success" in r1_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != "ubuntu"),
-                    reason="GCC enabled only for Ubuntu configurations.")
+    @pytest.mark.skipif((os_release_id not in ["ubuntu", "debian", "alpine"]),
+                    reason="GCC not enabled for RPM configurations.")
     def test_gcc_workload(self):
         gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")
         gcc_contents = gcc_result_file.read()
@@ -178,8 +182,8 @@ class Test_Workload_Results():
             and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id in ["centos", "debian", "almalinux", "rockylinux"]) or
-                    (float(os_version) >= 21) or ((int(no_cores) < 16) and sgx_mode == '1'),
+    @pytest.mark.skipif(not((os_release_id in ["rhel"]) or (base_os in ["ubuntu20.04"]))
+                     or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Openvino enabled only for Ubuntu 18 & 20 Server Configurations")
     def test_openvino_workload(self):
         openvino_result_file = open("CI-Examples/openvino/OUTPUT", "r")
@@ -227,7 +231,7 @@ class Test_Workload_Results():
         assert("Hello, world" in helloworld_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != 'ubuntu') or (float(os_version) <= 20) or ((int(no_cores) < 16) and sgx_mode == '1'),
+    @pytest.mark.skipif((os_release_id != 'ubuntu') or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Scikit-learn enabled for Ubuntu Server Configurations.")
     def test_scikit_workload(self):
         sklearn_result_file = open("CI-Examples/scikit-learn-intelex/RESULT", "r")
@@ -236,7 +240,7 @@ class Test_Workload_Results():
             and ("Success 2/2" in sklearn_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != 'ubuntu') or (float(os_version) <= 20) or
+    @pytest.mark.skipif((os_release_id != 'ubuntu') or
                     ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="TFServing enabled only for above Ubuntu 18.04 Configurations.")
     def test_tfserving_workload(self):

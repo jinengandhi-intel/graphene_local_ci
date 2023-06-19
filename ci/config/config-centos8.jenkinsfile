@@ -1,9 +1,5 @@
 // Environment for CentOS/RHEL setup
 env.ARCH_LIBDIR="/lib64"
 
-// Environment for openjdk workload
-env.JAVAHOME = sh(script: "java -XshowSettings:properties -version 2>&1 > /dev/null \
-	            | grep 'java.home' | cut -d'=' -f2", returnStdout: true).trim()
-
 // Environment for bazel workload
 env.PYTHON_BIN_PATH = sh(script: 'which python3', returnStdout: true).trim()

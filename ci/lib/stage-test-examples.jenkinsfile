@@ -14,7 +14,7 @@ stage('test-examples') {
                     cd CI-Examples/openjdk
                     if [ "${os_release_id}" != 'ubuntu' ]
                     then
-                        sed -i -e "/file:\\/usr\\/lib\\/jvm\\/java-11-openjdk-amd64/,+d" java.manifest.template
+                        sed -i -e "/file:\\/usr\\/lib\\/jvm\\/java-11-openjdk-amd64/d" java.manifest.template
                         sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$JAVAHOME\\/lib\\/\\"," java.manifest.template
                     fi
                     make ${MAKEOPTS} all
@@ -24,7 +24,7 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if (!["debian11", "almalinux9", "rockylinux9", "centos9"].contains(env.base_os)) {
+    if (!["debian11", "almalinux9", "rockylinux9", "centos9", "alpine3.18"].contains(env.base_os)) {
         if ((Float.parseFloat(env.os_version) < 21)) {
             try {
                 timeout(time: 60, unit: 'MINUTES') {
@@ -78,7 +78,8 @@ stage('test-examples') {
         timeout(time: (env.EDMM ? 45 : 20), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/r
-                if [ "${os_release_id}" != 'ubuntu' ] && [ "${os_release_id}" != 'debian' ]
+                if [ "${os_release_id}" != 'ubuntu' ] && [ "${os_release_id}" != 'debian' ]  && \
+                [ "${os_release_id}" != 'alpine' ]
                 then
                     export R_HOME=/usr/lib64/R
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
@@ -97,25 +98,15 @@ stage('test-examples') {
         }
     } catch (Exception e) { }
 
-    try {
-        timeout(time: 15, unit: 'MINUTES') {
-            sh '''
-                cd CI-Examples/pytorch
-                python3 download-pretrained-model.py
-                make ${MAKEOPTS} all
-                gramine-${MODE} ./pytorch ./pytorchexample.py
-            '''
-        }
-    } catch (Exception e){
-        env.build_ok = false
-        sh 'echo "Pytorch Example Test Failed"'
-    }
-
-    if (os_release_id == "ubuntu") {
+    if (["ubuntu", "debian", "alpine"].contains(os_release_id)) {
         try {
             timeout(time: (env.EDMM ? 60 : 10), unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/gcc
+                    if [ "${os_release_id}" == 'alpine' ]
+                    then
+                        sed -i "/file:\\/lib64/d" gcc.manifest.template
+                    fi
                     make ${MAKEOPTS} all
                     make ${MAKEOPTS} check | tee OUTPUT
                 '''
@@ -123,56 +114,69 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
-        if ((Float.parseFloat(env.os_version) < 21) && (!["centos", "debian", "almalinux", "rockylinux"].contains(env.os_release_id))) {
-            try {
-                timeout(time: 30, unit: 'MINUTES') {
-                    sh '''#!/bin/bash
-                        set -x
-                        cd CI-Examples/openvino
-                        chmod +x ./openvino_setup.sh
-                        ./openvino_setup.sh
-                        source openvino_2021/bin/setupvars.sh
-                        sed -i 's/intel_models public_models/intel_models/' Makefile
-                        make ${MAKEOPTS} intel_models
-                        model_name="bert-large-uncased-whole-word-masking-squad-0001"
-                        make ${MAKEOPTS} all
-                        gramine-${MODE} benchmark_app -m model/intel/${model_name}/FP32/${model_name}.xml | tee OUTPUT
-                    '''
-                }
-            } catch (Exception e) { }
-        }
+    if (os_release_id != "alpine") {
+        try {
+            timeout(time: 15, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/pytorch
+                    python3 download-pretrained-model.py
+                    make ${MAKEOPTS} all
+                    gramine-${MODE} ./pytorch ./pytorchexample.py
+                '''
+            }
+        } catch (Exception e) { }
 
-        if ((Float.parseFloat(env.os_version) >= 20) && (env.os_release_id == "ubuntu")) {
-            try {
-                timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
-                    sh '''
-                        cd CI-Examples/scikit-learn-intelex
-                        sed -i "s/\\/home\\/user\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
-                        sed -i "s/{{ env.HOME }}\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
-                        python3 scripts/download_dataset.py
-                        make ${MAKEOPTS} all
-                        ./run_tests.sh | tee RESULT
-                    '''
-                }
-            } catch (Exception e) { }
+        if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
+            if ((["rhel"].contains(env.os_release_id)) || (["ubuntu20.04"].contains(env.base_os))) {
+                try {
+                    timeout(time: 30, unit: 'MINUTES') {
+                        sh '''#!/bin/bash
+                            set -x
+                            cd CI-Examples/openvino
+                            chmod +x ./openvino_setup.sh
+                            ./openvino_setup.sh
+                            source openvino_2021/bin/setupvars.sh
+                            sed -i 's/intel_models public_models/intel_models/' Makefile
+                            make ${MAKEOPTS} intel_models
+                            model_name="bert-large-uncased-whole-word-masking-squad-0001"
+                            make ${MAKEOPTS} all
+                            gramine-${MODE} benchmark_app -m model/intel/${model_name}/FP32/${model_name}.xml | tee OUTPUT
+                        '''
+                    }
+                } catch (Exception e) { }
+            }
 
-            try {
-                timeout(time: (env.EDMM ? 65 : 25), unit: 'MINUTES') {
-                    sh '''
-                        export PID=$(lsof -t -i:8501)
-                        if [ "$PID" != "" ]
-                        then
-                            echo "Killing $PID"
-                            kill -9 $PID
-                        fi
-                        cd CI-Examples/tfserving
-                        sudo make install-dependencies
-                        make all
-                        make ${MAKEOPTS} check 2>&1 | tee RESULT
-                    '''
-                }
-            } catch (Exception e) { }
+            if (env.os_release_id == "ubuntu") {
+                try {
+                    timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
+                        sh '''
+                            cd CI-Examples/scikit-learn-intelex
+                            sed -i "s/\\/home\\/user\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
+                            sed -i "s/{{ env.HOME }}\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
+                            python3 scripts/download_dataset.py
+                            make ${MAKEOPTS} all
+                            ./run_tests.sh | tee RESULT
+                        '''
+                    }
+                } catch (Exception e) { }
+
+                try {
+                    timeout(time: (env.EDMM ? 65 : 25), unit: 'MINUTES') {
+                        sh '''
+                            export PID=$(lsof -t -i:8501)
+                            if [ "$PID" != "" ]
+                            then
+                                echo "Killing $PID"
+                                kill -9 $PID
+                            fi
+                            cd CI-Examples/tfserving
+                            sudo make install-dependencies
+                            make all
+                            make ${MAKEOPTS} check 2>&1 | tee RESULT
+                        '''
+                    }
+                } catch (Exception e) { }
+            }
         }
     }
 
@@ -186,6 +190,11 @@ stage('test-examples') {
                     then
                         echo "Killing $PID"
                         kill -9 $PID
+                    fi
+                    if [ "${os_release_id}" = "alpine" ]
+                    then
+                        sed -i -e '/^fs.mounts = \\[.*/a \\{ path = "\\/usr\\/{{ arch_libdir }}", uri="file:\\/usr\\/{{ arch_libdir }}" },' rust-hyper-http-server.manifest.template
+                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/{{ arch_libdir }}\\/\\"," rust-hyper-http-server.manifest.template
                     fi
                     make ${MAKEOPTS}
                     make ${MAKEOPTS} start-gramine-server &
