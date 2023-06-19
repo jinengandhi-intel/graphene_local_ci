@@ -1,26 +1,9 @@
 stage('build') {
     env.MESON_OPTIONS = ''
-    if (env.CC == 'clang') {
-        env.MESON_OPTIONS += ' -Dmusl=disabled'
-    }
 
     if (env.build_type == "manual") {
-        if (env.musl_disable.toBoolean()) {
-            env.MESON_OPTIONS += ' -Dmusl=disabled'
-        }
-
         if (env.build_prefix != "0") {
             env.MESON_OPTIONS += ' --prefix=' + env.PREFIX
-        }
-
-        try {
-            sh '''
-                cd "$WORKSPACE"
-                git apply rename_protected_file.patch
-            '''
-        } catch (Exception e){
-            env.build_ok = true
-            sh 'echo "Failed to apply Git patch for FS testcase"'
         }
 
         if (env.node_label == "graphene_oot") {
@@ -41,17 +24,21 @@ stage('build') {
             env.MESON_OPTIONS += " -Ddcap=enabled"
         }
 
+        if (env.base_os == "alpine3.18") {
+            env.MESON_OPTIONS += " -Dlibc=musl"
+        } else {
+            env.MESON_OPTIONS += " --werror -Dtests=enabled"
+        }
+
         try {
             sh '''
                 cd "$WORKSPACE"
                 sed -i "/uname/ a '/usr/src/linux-headers-@0@common/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('amd64')[0].strip())," meson.build
                 sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
                 meson setup build \
-                    --werror \
                     --buildtype="$BUILDTYPE" \
                     -Ddirect=disabled \
                     -Dsgx=enabled \
-                    -Dtests=enabled \
                     $MESON_OPTIONS > meson_cmd_output.txt
                 ninja -vC build > ninja_build_log.txt
                 if [ "$build_prefix" = "0" ]

@@ -6,8 +6,10 @@ stage('build') {
 
     if (env.build_type == "manual") {
         try {
-            if (env.musl_disable.toBoolean()) {
-                env.MESON_OPTIONS += " -Dmusl=disabled"
+            if (env.base_os == "alpine3.18") {
+                env.MESON_OPTIONS += " -Dlibc=musl"
+            } else {
+                env.MESON_OPTIONS += " -Dtests=enabled"
             }
 
             sh '''
@@ -18,7 +20,6 @@ stage('build') {
                     -Dskeleton=enabled \
                     -Ddirect=enabled \
                     -Dsgx=disabled \
-                    -Dtests=enabled \
                     $MESON_OPTIONS > meson_cmd_output.txt
                 ninja -vC build > ninja_build_log.txt
                 ninja -vC build install > ninja_install_log.txt

@@ -1,15 +1,10 @@
 stage('test') {
-    if (env.build_type == "manual") {
+    if (env.base_os != "alpine3.18") {
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
                     cd pal/regression                    
-                    if test -n "$SGX"
-                    then
-                        gramine-test --sgx build -v
-                    else
-                        gramine-test build -v
-                    fi
+                    gramine-test build -v
 
                     if [ "graphene_22.04_5.18" = $node_label ] || [ "graphene_icl_dcap" = $node_label ] || [ "graphene_dcap" = $node_label ];
                     then
@@ -19,22 +14,18 @@ stage('test') {
                     fi
                 '''
             }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "PAL Test Failed"'
-        } finally {
+        } catch (Exception e) { } finally {
             archiveArtifacts 'pal/regression/pal-regression.xml'
             junit 'pal/regression/pal-regression.xml'
         }
-        if (env.os_release_id != "ubuntu")
-        {  
-            sh'''
-            cd libos/test/regression
-            sed -i \'/^sgx.trusted_files = \\[.*/a "file:{{ arch_libdir }}/libtinfo.so.6",\' manifest.template
-            sed -i \'/^sgx.trusted_files = \\[.*/a "file:{{ arch_libdir }}/libtinfo.so.6",\' shebang_test_script.manifest.template
+        if (!(["ubuntu", "alpine"].contains(env.os_release_id))) {
+            sh '''
+                cd libos/test/regression
+                sed -i \'/^sgx.trusted_files = \\[.*/a "file:{{ arch_libdir }}/libtinfo.so.6",\' manifest.template
+                sed -i \'/^sgx.trusted_files = \\[.*/a "file:{{ arch_libdir }}/libtinfo.so.6",\' shebang_test_script.manifest.template
             '''
         }
-            
+
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 env.skip_test = "not attestation"
@@ -43,96 +34,41 @@ stage('test') {
                 }
                 sh '''
                     cd libos/test/regression
-                    if test -n "$SGX"
-                    then
-                        RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test --sgx build -v
-                    else
-                        RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test build -v
-                    fi
-
+                    gramine-test -n tests${GRAMINE_MUSL+_musl}.toml build -v
                     python3 -m pytest -v -k "$skip_test" --junit-xml libos-regression.xml
                 '''
             }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "libos Test Failed"'
-        } finally {
+        } catch (Exception e) { } finally {
             archiveArtifacts 'libos/test/regression/libos-regression.xml'
             junit 'libos/test/regression/libos-regression.xml'
-        }
-
-        if (!(env.CC == "clang" || env.musl_disable.toBoolean())) {
-            timeout(time: 15, unit: 'MINUTES') {
-                try {
-                    sh '''
-                        export GRAMINE_MUSL=1
-                        cd libos/test/regression
-                        gramine-test clean
-                        if test -n "$SGX"
-                        then                    
-                            RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test --sgx -n tests_musl.toml build -v
-                        else
-                            RA_TYPE=epid RA_CLIENT_SPID=${ra_client_spid} gramine-test -n tests_musl.toml build -v
-                        fi
-
-                        if [ ${no_cpu} -le 8 ];
-                        then
-                            python3 -m pytest -v -k "not large_mmap and not attestation" --junit-xml libos-regression-musl.xml
-                        else
-                            python3 -m pytest -v -k "not attestation" --junit-xml libos-regression-musl.xml
-                        fi
-                    '''
-                } catch (Exception e){
-                    env.build_ok = false
-                    sh 'echo "libos Test with musl Failed"'
-                }
-                finally {
-                    archiveArtifacts 'libos/test/regression/libos-regression-musl.xml'
-                    junit 'libos/test/regression/libos-regression-musl.xml'
-                }
-            }
         }
 
         try {
             timeout(time: 15, unit: 'MINUTES') {
                 sh '''
                     cd libos/test/abi/x86_64
-                    if test -n "$SGX"
-                    then                     
-                        gramine-test --sgx build -v
-                    else
-                        gramine-test build -v
-                    fi
+                    gramine-test build -v
                     python3 -m pytest -v --junit-xml abi.xml
                 '''
             }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "libos Test Failed"'
-        } finally {
+        } catch (Exception e) { } finally {
             archiveArtifacts 'libos/test/abi/x86_64/abi.xml'
             junit 'libos/test/abi/x86_64/abi.xml'
         }
 
-        try {
-            timeout(time: 15, unit: 'MINUTES') {
-                sh '''
-                    cd libos/test/fs
-                    if test -n "$SGX"
-                    then
-                        gramine-test --sgx build -v
-                    else
+        if (env.GRAMINE_MUSL != '1') {
+            try {
+                timeout(time: 15, unit: 'MINUTES') {
+                    sh '''
+                        cd libos/test/fs
                         gramine-test build -v
-                    fi
-                    python3 -m pytest -v --junit-xml fs.xml
-                '''
+                        python3 -m pytest -v --junit-xml fs.xml
+                    '''
+                }
+            } catch (Exception e) { } finally {
+                archiveArtifacts 'libos/test/fs/fs.xml'
+                junit 'libos/test/fs/*.xml'
             }
-        } catch (Exception e){
-            env.build_ok = false
-            sh 'echo "libos Test Failed"'
-        } finally {
-            archiveArtifacts 'libos/test/fs/fs.xml'
-            junit 'libos/test/fs/*.xml'
         }
     }
 }

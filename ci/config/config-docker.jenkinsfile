@@ -68,11 +68,6 @@ if (env.node_label.contains("dcap") && (env.SGX == "1")) {
     env.RA_TYPE = "dcap"
 }
 
-env.musl_disable = false
-if (["almalinux9", "rockylinux9", "centos9"].contains(env.base_os)) {
-    env.musl_disable = true
-}
-
 if (env.IS_VM == "1") {
     // only root and `kvm` group can access /dev/kvm, so add `kvm` GID to the in-Docker user
     kvm_gid = sh(returnStdout: true, script: 'getent group kvm | cut -d: -f3').trim()
@@ -93,4 +88,14 @@ if (env.IS_VM == "1") {
         --group-add ${sgx_gid}
         --device=/dev/sgx_vepc:/dev/sgx_vepc
     """
+}
+
+// Environment for openjdk workload
+env.JAVAHOME = sh(script: "java -XshowSettings:properties -version 2>&1 > /dev/null \
+	            | grep 'java.home' | cut -d'=' -f2", returnStdout: true).trim()
+
+if (["alpine"].contains(env.os_release_id)) {
+    // Docker Build environment
+    env.DOCKER_BUILDKIT=0
+    env.COMPOSE_DOCKER_CLI_BUILD=0
 }

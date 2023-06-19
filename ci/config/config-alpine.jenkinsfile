@@ -1,0 +1,5 @@
+// Environment for Alpine setup
+env.ARCH_LIBDIR="/lib"
+
+// GCC version 
+env.GCC_MAJOR_VERSION = sh(script:  'gcc -v 2>&1 | tail -n1 | awk \'{print $$3}\'', returnStdout: true).trim()
