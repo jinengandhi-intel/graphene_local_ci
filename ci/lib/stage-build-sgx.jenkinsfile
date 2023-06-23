@@ -115,10 +115,8 @@ stage('build') {
 
             if (env.gramine_repo == "unstable") {
                 env.gramine_branch = "unstable-${ubuntu_repo}"
-            } else if (env.gramine_repo == "stable" && (env.ubuntu_repo != "jammy")) {
-                env.gramine_branch = "${ubuntu_repo}"
             } else {
-                env.gramine_branch = "${gramine_repo}"
+                env.gramine_branch = "${ubuntu_repo}"
             }
 
             sh '''
