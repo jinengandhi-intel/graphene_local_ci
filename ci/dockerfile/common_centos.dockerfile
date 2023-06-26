@@ -1,13 +1,16 @@
-FROM centos:GRAMINE_BUILD_VERSION
+ARG BUILD_OS
 
-ENV http_proxy "http://proxy-dmz.intel.com:911"
-ENV https_proxy "http://proxy-dmz.intel.com:912"
+FROM quay.io/centos/centos:$BUILD_OS
 
-RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&\
-    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
-
-RUN sed 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo  | tee /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
 RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
+
+RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
+
+RUN if [[ $BUILD_OS = "stream8" ]]; then \
+        dnf config-manager --set-enabled -y powertools \
+    else \
+        dnf config-manager --set-enabled -y crb; \
+    fi
 
 RUN yum install -y yum-utils epel-release
 
@@ -15,7 +18,6 @@ RUN yum-config-manager --add-repo https://packages.gramineproject.io/rpm/gramine
 
 # Add steps here to set up dependencies
 RUN yum update -y && yum install -y \
-    curl \
     gcc\
     git \
     make \
@@ -23,6 +25,10 @@ RUN yum update -y && yum install -y \
     python3-pytest \
     sudo \
     wget
+
+RUN if [[ $BUILD_OS = "stream8" ]]; then \
+        yum install -y curl; \
+    fi
 
 RUN wget https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/sshpass-1.09-4.el8.x86_64.rpm
 

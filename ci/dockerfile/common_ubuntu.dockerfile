@@ -1,4 +1,6 @@
-FROM ubuntu:GRAMINE_BUILD_VERSION
+ARG BUILD_OS
+
+FROM $BUILD_OS
 
 # Add steps here to set up dependencies
 RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
