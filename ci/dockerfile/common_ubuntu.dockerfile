@@ -5,11 +5,14 @@ FROM $BUILD_OS
 # Add steps here to set up dependencies
 RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
     curl \
-    gcc\
+    diffutils \
+    gcc \
     git \
     lsb-release \
+    lsof \
     make \
     netcat \
+    nginx \
     pkg-config \
     python3-pip \
     python3-pytest \

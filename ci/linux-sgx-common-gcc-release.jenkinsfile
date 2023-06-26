@@ -11,17 +11,21 @@ node (node_label) {
             env.SGX = '1'
 
             load '../ci/config/config-docker.jenkinsfile'
+            env.build_os = env.base_os
             if (env.base_os.contains("ubuntu")) {
                 dockerfile_name = "../ci/dockerfile/common_ubuntu.dockerfile"
             } else if (env.base_os.contains("debian")) {
                 dockerfile_name = "../ci/dockerfile/common_debian.dockerfile"
             } else {
+                if (env.base_os.contains("stream")) {
+                    env.build_os = "quay.io/centos/centos:" + env.base_os
+                }
                 dockerfile_name = "../ci/dockerfile/common_centos.dockerfile"
             }
 
             docker.build(
                 "local:${env.BUILD_TAG}",
-                "--build-arg BUILD_OS=${base_os} -f ${dockerfile_name} ."
+                "--build-arg BUILD_OS=${build_os} -f ${dockerfile_name} ."
             ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
                 load '.ci/lib/config-release.jenkinsfile'
 

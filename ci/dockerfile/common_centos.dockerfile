@@ -1,6 +1,6 @@
 ARG BUILD_OS
 
-FROM quay.io/centos/centos:$BUILD_OS
+FROM $BUILD_OS
 
 RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
 
@@ -18,21 +18,19 @@ RUN yum-config-manager --add-repo https://packages.gramineproject.io/rpm/gramine
 
 # Add steps here to set up dependencies
 RUN yum update -y && yum install -y \
+    diffutils \
     gcc\
     git \
     make \
     python3-pip \
     python3-pytest \
+    sshpass \
     sudo \
     wget
 
 RUN if [[ $BUILD_OS = "stream8" ]]; then \
         yum install -y curl; \
     fi
-
-RUN wget https://rpmfind.net/linux/centos/8-stream/AppStream/x86_64/os/Packages/sshpass-1.09-4.el8.x86_64.rpm
-
-RUN sudo dnf install ./sshpass-1.09-4.el8.x86_64.rpm -y
 
 RUN python3 -m pip install -U 'meson>=0.56,<0.57'
 
