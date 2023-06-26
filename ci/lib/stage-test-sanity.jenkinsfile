@@ -29,6 +29,21 @@ stage('test') {
                 '''
             }
         } catch (Exception e) {}
+
+        try {
+            timeout(time: 5, unit: 'MINUTES') {
+                sh '''
+                    export PID=$(lsof -t -i:8000)
+                    if [ "$PID" != "" ]
+                    then
+                        echo "Killing $PID"
+                        kill -9 $PID
+                    fi
+                    cd CI-Examples/ra-tls-nginx
+                    make check 2>&1 | tee nginx_result.txt
+                '''
+            }
+        } catch (Exception e) { }
     }
 }
 
