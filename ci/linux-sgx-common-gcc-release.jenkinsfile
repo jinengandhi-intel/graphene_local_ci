@@ -11,10 +11,12 @@ node (node_label) {
             env.SGX = '1'
 
             load '../ci/config/config-docker.jenkinsfile'
-            if (env.os_release_id == "stream") {
-                dockerfile_name = "../ci/dockerfile/common_centos.dockerfile"
-            } else {
+            if (env.base_os.contains("ubuntu")) {
                 dockerfile_name = "../ci/dockerfile/common_ubuntu.dockerfile"
+            } else if (env.base_os.contains("debian")) {
+                dockerfile_name = "../ci/dockerfile/common_debian.dockerfile"
+            } else {
+                dockerfile_name = "../ci/dockerfile/common_centos.dockerfile"
             }
 
             docker.build(
