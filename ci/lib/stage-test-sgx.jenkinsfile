@@ -233,7 +233,7 @@ stage('test-sgx') {
         }
 
         try {
-            timeout(time: 5, unit: 'MINUTES') {
+            timeout(time: 2, unit: 'MINUTES') {
                 sh '''
                     export PID=$(lsof -t -i:8000)
                     if [ "$PID" != "" ]

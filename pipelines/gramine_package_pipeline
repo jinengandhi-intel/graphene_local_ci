@@ -1,0 +1,81 @@
+pipeline {
+    agent
+    {
+        node {
+                label 'master'
+                customWorkspace "${env.JobPath}"
+              }
+    }
+    stages
+    {
+        stage ('Parallel invocation of test jobs') {
+            parallel {
+                stage ('Invoke Gramine Package Installation for Ubuntu 20.04') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu:20.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Ubuntu 22.04') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu:22.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Rockylinux 9') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'rockylinux:9'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_rockylinux9_client_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Almalinux 9') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'almalinux:9'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_almalinux9_server_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Centos Stream 8') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'stream8'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_centos_8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Centos Stream 9') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'stream9'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_almalinux9_server_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Debian 11') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'debian:11'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Debian 12') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'debian:12'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Ubuntu 20.04 DCAP') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu:20.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_dcap'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-dcap'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Ubuntu 22.04 DCAP') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu:22.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_dcap'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-dcap'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Gramine Package Installation for Debian 11 DCAP') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'debian:11'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_dcap'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-dcap'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version]], propagate: true, wait: true
+                    }
+                }
+            }
+        }
+    }
+}

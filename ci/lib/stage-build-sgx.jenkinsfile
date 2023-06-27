@@ -108,7 +108,7 @@ stage('build') {
                 }
             }
             if (env.gramine_version.contains("update")) {
-                sh 'sudo yum update && sudo yum upgrade -y --enablerepo=gramine-unstable'
+                sh 'sudo yum update -y && sudo yum upgrade -y --enablerepo=gramine-unstable'
             }
         } else {
             env.ubuntu_repo = sh(returnStdout: true, script: 'lsb_release -sc').trim()
@@ -121,7 +121,7 @@ stage('build') {
 
             sh '''
                 echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ ${gramine_branch} main" | sudo tee /etc/apt/sources.list.d/gramine.list
-                sudo apt-get update
+                sudo apt-get update -y
             '''
 
             if (env.build_type == "package-in-kernel") {
@@ -137,7 +137,7 @@ stage('build') {
             if (env.gramine_version.contains("update")) {
                 sh '''
                     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ unstable-${ubuntu_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
-                    sudo apt-get update && sudo apt-get --with-new-pkgs -y upgrade
+                    sudo apt-get update -y && sudo apt-get --with-new-pkgs -y upgrade
                 '''
             }
         }
