@@ -11,6 +11,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get inst
     vim \
     make \
     meson \
+    nginx \
     netcat-openbsd \
     pkg-config \
     python3-pip \
