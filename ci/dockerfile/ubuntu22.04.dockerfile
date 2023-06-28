@@ -41,7 +41,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libxml2-dev \
     libxrender1 \
     libxxf86vm1 \
-    linux-headers-generic \
+    linux-headers-5.15.0-25-generic \
     libjudy-dev \
     libpixman-1-dev \
     libipsec-mb-dev \
