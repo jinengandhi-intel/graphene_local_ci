@@ -27,6 +27,12 @@ pipeline {
                         build job: 'local_ci_graphene_sgx_build_without_prefix', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'centos8'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_centos_8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
                     }
                 }
+
+                stage ('Invoke Debian 11 with Kernel 6.1 Graphene SGX Suite') {
+                    steps {
+                        build job: 'local_ci_graphene_sgx_build_without_prefix', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'debian11'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                }
             }
         }
     }
