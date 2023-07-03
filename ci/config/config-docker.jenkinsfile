@@ -93,8 +93,7 @@ if (env.IS_VM == "1") {
     """
 }
 
-if (["alpine"].contains(env.os_release_id)) {
-    // Docker Build environment
-    env.DOCKER_BUILDKIT=0
-    env.COMPOSE_DOCKER_CLI_BUILD=0
-}
+
+// Docker Build environment
+env.DOCKER_BUILDKIT=0
+env.COMPOSE_DOCKER_CLI_BUILD=0
