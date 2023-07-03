@@ -5,6 +5,12 @@ import subprocess
 import os
 import base64
 
+node_name = os.environ.get('NODE_NAME')
+
+priviledge = "sudo -S"
+if node_name == "graphene_icl_alpine":
+    priviledge = "doas "
+
 class ConnectionDetails:
     '''This is class contains parameter/data for setting time''' 
 
@@ -30,16 +36,16 @@ class TimeSyncCMD:
         return time_stamp
     
     def execute_time_cmd(self, time_stamp):
-        cmd = 'sudo date --set "'+ str(time_stamp) + '"'
-        subprocess.call('sudo -S {}'.format(cmd), shell=True)
+        cmd = priviledge + ' date --set "'+ str(time_stamp) + '"'
+        subprocess.call('{} {}'.format(priviledge, cmd), shell=True)
 
     def set_timezone_cmd(self, time_zone):
-        cmd = ' sudo timedatectl set-timezone "'+ str(time_zone) + '"'
-        subprocess.call('sudo -S {}'.format(cmd), shell=True)
+        cmd = priviledge + ' timedatectl set-timezone "'+ str(time_zone) + '"'
+        subprocess.call('{} {}'.format(priviledge, cmd), shell=True)
 
     def sync_hw_clock(self):
-        cmd = 'sudo hwclock --systohc'
-        subprocess.call('sudo -S {}'.format(cmd), shell=True)
+        cmd = priviledge + ' hwclock --systohc'
+        subprocess.call('{} {}'.format(priviledge, cmd), shell=True)
     
 
 if __name__=='__main__':
