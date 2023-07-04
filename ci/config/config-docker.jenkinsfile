@@ -90,10 +90,6 @@ if (env.IS_VM == "1") {
     """
 }
 
-// Environment for openjdk workload
-env.JAVAHOME = sh(script: "java -XshowSettings:properties -version 2>&1 > /dev/null \
-	            | grep 'java.home' | cut -d'=' -f2", returnStdout: true).trim()
-
 if (["alpine"].contains(env.os_release_id)) {
     // Docker Build environment
     env.DOCKER_BUILDKIT=0
