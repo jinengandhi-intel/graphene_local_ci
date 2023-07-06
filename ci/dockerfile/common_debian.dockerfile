@@ -20,15 +20,23 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get inst
     sshpass \
     wget
 
-
-# if you don't already have backports repo enabled:
-RUN echo "deb http://deb.debian.org/debian $(lsb_release -sc)-backports main" \
-| sudo tee /etc/apt/sources.list.d/backports.list
-
-RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
-    > /etc/apt/sources.list.d/intel-sgx.list \
-    && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
-    && apt-key add intel-sgx-deb.key
+RUN if [ "$(lsb_release -sc)" = "bullseye" ]; then \
+        # if you don't already have backports repo enabled:
+        echo "deb http://deb.debian.org/debian $(lsb_release -sc)-backports main" \
+        | sudo tee /etc/apt/sources.list.d/backports.list; \
+    fi
+    
+RUN if [ "$(lsb_release -sc)" = "bullseye" ]; then \
+        echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
+        > /etc/apt/sources.list.d/intel-sgx.list \
+        && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
+        && apt-key add intel-sgx-deb.key; \
+    else \
+        echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main' \
+        > /etc/apt/sources.list.d/intel-sgx.list \
+        && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
+        && apt-key add intel-sgx-deb.key; \
+    fi
 
 RUN curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
 
