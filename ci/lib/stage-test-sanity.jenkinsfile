@@ -14,7 +14,7 @@ stage('test') {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/ra-tls-mbedtls
-                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
+                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 RA_TYPE=dcap \
                     make check_dcap | tee mbedtls_result.txt
                 '''
             }
@@ -24,14 +24,14 @@ stage('test') {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/ra-tls-secret-prov
-                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
+                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 RA_TYPE=dcap \
                     make check_dcap | tee secret_prov_result.txt
                 '''
             }
         } catch (Exception e) {}
 
         try {
-            timeout(time: 5, unit: 'MINUTES') {
+            timeout(time: 2, unit: 'MINUTES') {
                 sh '''
                     export PID=$(lsof -t -i:8000)
                     if [ "$PID" != "" ]
@@ -40,7 +40,7 @@ stage('test') {
                         kill -9 $PID
                     fi
                     cd CI-Examples/ra-tls-nginx
-                    make check 2>&1 | tee nginx_result.txt
+                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 make check 2>&1 | tee nginx_result.txt
                 '''
             }
         } catch (Exception e) { }
