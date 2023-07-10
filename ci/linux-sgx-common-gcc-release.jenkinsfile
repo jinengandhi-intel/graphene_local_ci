@@ -7,6 +7,7 @@ node (node_label) {
 
         dir ("gramine") {
             sh 'cp -rf $WORKSPACE/test_workloads.py . '
+            sh 'cp -rf $WORKSPACE/verify_package_version.py . '
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 

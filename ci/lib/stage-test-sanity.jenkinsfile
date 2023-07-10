@@ -47,7 +47,7 @@ stage('test') {
     }
 }
 
-stage ('verification') {
+stage ('workload_verification') {
     try {
         timeout(time: 2, unit: 'MINUTES') {
             sh 'python3 -m pytest -v -m sanity --junit-xml workload-regression.xml test_workloads.py'
@@ -58,5 +58,11 @@ stage ('verification') {
     }
     finally {
         junit 'workload-regression.xml'
+    }
+}
+
+stage ('pkg_version_verification') {
+    timeout(time: 2, unit: 'MINUTES') {
+        sh 'python3 verify_package_version.py'
     }
 }
