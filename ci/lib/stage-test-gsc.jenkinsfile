@@ -35,8 +35,8 @@ stage('Test Helloworld') {
 
 stage('Docker images cleanup') {
     sh '''
-        docker stop $(docker ps -aq)
-        docker rm $(docker ps -aq)
-        docker image prune -af
+        docker stop $(docker ps -aq) &>/dev/null
+        docker rm $(docker ps -aq) &>/dev/null
+        docker image prune -af &>/dev/null
     '''
 }
