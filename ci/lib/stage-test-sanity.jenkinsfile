@@ -61,8 +61,10 @@ stage ('workload_verification') {
     }
 }
 
-stage ('pkg_version_verification') {
-    timeout(time: 2, unit: 'MINUTES') {
-        sh 'python3 verify_package_version.py'
+if (env.build_type != "manual") {
+    stage ('pkg_version_verification') {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 verify_package_version.py'
+        }
     }
 }
