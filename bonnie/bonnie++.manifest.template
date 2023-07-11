@@ -1,0 +1,53 @@
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "/usr/sbin/bonnie++" 
+
+loader.log_level = "all"
+sys.stack.size = "8M"
+sgx.enclave_size = "4G"
+sgx.max_threads = 512
+
+loader.insecure__use_cmdline_argv = true
+loader.insecure__use_host_env = true
+loader.insecure__disable_aslr = true
+loader.env.PATH = "/usr/sbin:/bin"
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/lib/x86_64-linux-gnu"
+
+fs.experimental__enable_sysfs_topology = true
+
+fs.mounts = [  
+  { path = "/bin", uri = "file:/bin" },
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+  { path = "/usr/{{ arch_libdir }}", uri = "file:/usr/{{ arch_libdir }}" },
+  { path = "/usr/sbin", uri = "file:/usr/sbin" },
+  { path = "/tmp", uri = "file:/tmp" },
+]
+
+sgx.file_check_policy = "allow_all_but_log"
+sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
+
+sgx.allowed_files = [
+    "file:.",
+    "file:/sys",
+]
+
+sgx.trusted_files = [
+    "file:/usr/{{ arch_libdir }}/",
+    "file:{{ gramine.libos }}",
+    "file:{{ arch_libdir }}/",
+    "file:/usr/sbin/bonnie++",
+    "file:{{ gramine.runtimedir() }}/ld-linux-x86-64.so.2",
+    "file:{{ gramine.runtimedir() }}/libc.so.6",
+    "file:{{ gramine.runtimedir() }}/libm.so.6",
+    "file:{{ gramine.runtimedir() }}/libdl.so.2",
+    "file:{{ gramine.runtimedir() }}/librt.so.1",
+    "file:{{ gramine.runtimedir() }}/libutil.so.1",
+    "file:{{ gramine.runtimedir() }}/libpthread.so.0",
+    "file:{{ arch_libdir }}/libnss_compat.so.2",
+    "file:{{ arch_libdir }}/libnss_files.so.2",
+    "file:{{ arch_libdir }}/libz.so.1",
+    "file:/usr/{{ arch_libdir }}/libzstd.so.1",
+    "file:/usr/{{ arch_libdir }}/libpixman-1.so.0",
+    "file:/usr/{{ arch_libdir }}/libstdc++.so.6",
+    "file:{{ arch_libdir }}/libgcc_s.so.1",
+]
