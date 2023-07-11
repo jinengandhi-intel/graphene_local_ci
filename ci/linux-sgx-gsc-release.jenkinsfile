@@ -11,9 +11,6 @@ node(node_label) {
         }
     
         dir ("gsc_dev_repo") {
-            sh 'cp -rf $WORKSPACE/gsc/templates/ubuntu/* templates/ubuntu/'
-            sh 'cp -rf $WORKSPACE/gsc/templates/centos/* templates/centos/'
-            sh 'cp -rf $WORKSPACE/gsc/templates/debian/* templates/debian/'
             sh 'cp -rf $WORKSPACE/gsc/test/* test'
             env.WORKSPACE = env.WORKSPACE + "/gsc_dev_repo"
             env.os_release_id=distro_ver.split(":")[0].trim()
