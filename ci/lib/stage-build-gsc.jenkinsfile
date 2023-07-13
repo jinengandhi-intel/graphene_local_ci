@@ -24,7 +24,7 @@ stage('Build Workloads') {
         '''
     } catch (Exception e) {}
 
-    // Build Python Workload
+    // Build Python Latest Workload
     try {
         sh '''
             if [ "${os_release_id}" = "centos" ]
@@ -40,6 +40,18 @@ stage('Build Workloads') {
             ./gsc info-image gsc-python
         '''
     } catch (Exception e) {}
+
+    // Build Python Bullseye Workload
+    if (os_release_id != "centos") {
+        try {
+            sh '''
+                docker pull python:bullseye
+                ./gsc build -nc --insecure-args python:bullseye test/generic.manifest
+                ./gsc sign-image --remove-gramine-deps python:bullseye enclave-key.pem
+                ./gsc info-image gsc-python:bullseye
+            '''
+        } catch (Exception e) {}
+    }
 
     // Build Bash HelloWorld Workload
     try {

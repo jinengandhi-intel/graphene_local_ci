@@ -1,4 +1,4 @@
-stage('Test Bash') {
+stage('Test') {
     try {
         if (env.os_release_id == "debian")
             env.runtime_args = "-c ls"
@@ -8,29 +8,44 @@ stage('Test Bash') {
         sh '''
             docker run --device=/dev/sgx_enclave \
                 -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-                gsc-bash-test ${runtime_args}
+                gsc-bash-test ${runtime_args} 2>&1 | tee bash_result
         '''
     } catch (Exception e) {}
-}
 
-stage('Test Python') {
     try {
         sh '''
             docker run --device=/dev/sgx_enclave \
                 -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-                gsc-python -c 'print("HelloWorld!")'
+                gsc-python -c 'print("HelloWorld!")' 2>&1 | tee python_result
         '''
     } catch (Exception e) {}
-}
 
-stage('Test Helloworld') {
     try {
         sh '''
             docker run --device=/dev/sgx_enclave \
                 -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-                gsc-helloworld-test
+                gsc-python:bullseye -c 'print("HelloWorld!")' 2>&1 | tee python_bullseye_result
         '''
     } catch (Exception e) {}
+
+    try {
+        sh '''
+            docker run --device=/dev/sgx_enclave \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                gsc-helloworld-test 2>&1 | tee helloworld_result
+        '''
+    } catch (Exception e) {}
+}
+
+stage ('verification') {
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 -m pytest -v -m gsc --disable-warnings --junit-xml gsc-workload.xml test_workloads.py'
+        }
+    } catch (Exception e){}
+    finally {
+        junit 'gsc-workload.xml'
+    }
 }
 
 stage('Docker images cleanup') {
