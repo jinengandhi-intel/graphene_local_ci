@@ -1,0 +1,32 @@
+pipeline {
+    agent
+    {
+        node {
+                label 'master'
+                customWorkspace "${env.JobPath}"
+              }
+    }
+    stages {
+        stage ('Parallel invocation of test jobs') {
+            parallel {
+                stage ('Invoke GSC with Ubuntu 20.04') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc_20.04', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:20.04"]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke GSC with CentOS 8') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc_centos', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_centos_8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "centos:8"]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke GSC with Debian 11') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc_debian_11', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "debian:11"]], propagate: true, wait: true
+                    }
+                }
+            }
+        }
+    }
+}

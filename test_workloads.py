@@ -8,7 +8,7 @@ import pytest
 import re
 
 sgx_mode = os.environ.get('SGX')
-no_cores = os.environ.get('no_cpu')
+no_cores = os.environ.get('no_cpu', '8')
 os_version = os.environ.get('os_version')
 base_os = os.environ.get('base_os')
 os_release_id = os.environ.get('os_release_id')
@@ -247,3 +247,31 @@ class Test_Workload_Results():
         tfserving_result = open("CI-Examples/tfserving/RESULT", "r")
         tfserving_contents = tfserving_result.read()
         assert("Success" in tfserving_contents)
+
+    @pytest.mark.gsc
+    def test_gsc_bash_workload(self):
+        gsc_bash_result = open("bash_result", "r")
+        gsc_bash_log = gsc_bash_result.read()
+        if (os_release_id == "debian"):
+            assert(re.search('boot(.*)home(.*)proc', gsc_bash_log, re.DOTALL))
+        else:
+            assert(re.search('Mem:(.*)Swap:', gsc_bash_log, re.DOTALL))
+
+    @pytest.mark.gsc
+    def test_gsc_python_workload(self):
+        gsc_python_result = open("python_result", "r")
+        gsc_python_log = gsc_python_result.read()
+        assert("HelloWorld!" in gsc_python_log)
+
+    @pytest.mark.gsc
+    @pytest.mark.skipif((os_release_id == 'centos'), reason="Not enabled for Centos")
+    def test_gsc_python_bullseye_workload(self):
+        gsc_python_result = open("python_bullseye_result", "r")
+        gsc_python_log = gsc_python_result.read()
+        assert("HelloWorld!" in gsc_python_log)
+
+    @pytest.mark.gsc
+    def test_gsc_helloworld_workload(self):
+        gsc_helloworld_result = open("helloworld_result", "r")
+        gsc_helloworld_log = gsc_helloworld_result.read()
+        assert('"Hello World! Let\'s check escaped symbols: < & > "' in gsc_helloworld_log)
