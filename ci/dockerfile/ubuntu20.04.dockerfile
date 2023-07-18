@@ -109,7 +109,7 @@ RUN python3 -m pip install -U \
     pandas \
     pillow \
     'recommonmark>=0.5.0,<=0.7.1' \
-    scikit-learn-intelex \
+    'scikit-learn-intelex==2023.0.1' \
     scipy \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \

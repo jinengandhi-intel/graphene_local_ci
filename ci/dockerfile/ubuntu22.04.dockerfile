@@ -109,7 +109,7 @@ RUN python3 -m pip install -U \
     'meson>=0.56,<0.57'  \
     pillow \
     'recommonmark>=0.5.0,<=0.7.1' \
-    scikit-learn-intelex \
+    'scikit-learn-intelex==2023.0.1' \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \
     torchvision --timeout 120
