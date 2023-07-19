@@ -44,7 +44,7 @@ RUN apk update && \
     libxfixes \
     libxrender-dev \
     lsof \
-    meson \
+    'meson<1.2' \
     make \
     musl-dev \
     nasm \
