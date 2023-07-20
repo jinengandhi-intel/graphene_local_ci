@@ -33,8 +33,11 @@ fi
 if [[ "$base_os" = *"alpine"* ]]; then
   cd $WORKSPACE
   cp -f $WORKSPACE/Patch/001-build-on-alpine.diff gramine/
-  chmod +x $WORKSPACE/ci/resources/setup_alpine.sh
-  bash $WORKSPACE/ci/resources/setup_alpine.sh
+fi
+
+if [[ "$GRAMINE_MUSL" == "1" ]] || [[ "$base_os" = *"alpine"* ]]; then
+  chmod +x $WORKSPACE/ci/resources/setup_musl.sh
+  bash $WORKSPACE/ci/resources/setup_musl.sh
 fi
 
 if [[ "$base_os" != *"alpine"* ]]; then

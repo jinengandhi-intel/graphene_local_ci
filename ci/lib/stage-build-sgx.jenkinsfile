@@ -26,6 +26,8 @@ stage('build') {
 
         if (env.base_os == "alpine3.18") {
             env.MESON_OPTIONS += " -Dlibc=musl"
+        } else if (env.GRAMINE_MUSL == "1") {
+            env.MESON_OPTIONS += " -Dlibc=musl -Dtests=enabled"
         } else {
             env.MESON_OPTIONS += " --werror -Dtests=enabled"
         }

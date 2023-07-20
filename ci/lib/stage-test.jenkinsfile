@@ -1,23 +1,53 @@
 stage('test') {
     if (env.base_os != "alpine3.18") {
-        try {
-            timeout(time: 15, unit: 'MINUTES') {
-                sh '''
-                    cd pal/regression                    
-                    gramine-test build -v
 
-                    if [ "graphene_22.04_5.18" = $node_label ] || [ "graphene_icl_dcap" = $node_label ] || [ "graphene_dcap" = $node_label ];
-                    then
-                        python3 -m pytest -v -k "not test_120_8gb_enclave" --junit-xml pal-regression.xml
-                    else
-                        python3 -m pytest -v --junit-xml pal-regression.xml
-                    fi
-                '''
+        if (env.GRAMINE_MUSL != "1") {
+            try {
+                timeout(time: 15, unit: 'MINUTES') {
+                    sh '''
+                        cd pal/regression   
+                        gramine-test build -v
+
+                        if [ "graphene_22.04_5.18" = $node_label ] || [ "graphene_icl_dcap" = $node_label ] || [ "graphene_dcap" = $node_label ];
+                        then
+                            python3 -m pytest -v -k "not test_120_8gb_enclave" --junit-xml pal-regression.xml
+                        else
+                            python3 -m pytest -v --junit-xml pal-regression.xml
+                        fi
+                    '''
+                }
+            } catch (Exception e) { } finally {
+                archiveArtifacts 'pal/regression/pal-regression.xml'
+                junit 'pal/regression/pal-regression.xml'
             }
-        } catch (Exception e) { } finally {
-            archiveArtifacts 'pal/regression/pal-regression.xml'
-            junit 'pal/regression/pal-regression.xml'
+
+            try {
+                timeout(time: 15, unit: 'MINUTES') {
+                    sh '''
+                        cd libos/test/abi/x86_64
+                        gramine-test build -v
+                        python3 -m pytest -v --junit-xml abi.xml
+                    '''
+                }
+            } catch (Exception e) { } finally {
+                archiveArtifacts 'libos/test/abi/x86_64/abi.xml'
+                junit 'libos/test/abi/x86_64/abi.xml'
+            }
+
+            try {
+                timeout(time: 15, unit: 'MINUTES') {
+                    sh '''
+                        cd libos/test/fs
+                        gramine-test build -v
+                        python3 -m pytest -v --junit-xml fs.xml
+                    '''
+                }
+            } catch (Exception e) { } finally {
+                archiveArtifacts 'libos/test/fs/fs.xml'
+                junit 'libos/test/fs/*.xml'
+            }
         }
+
         if (!(["ubuntu", "alpine"].contains(env.os_release_id))) {
             sh '''
                 cd libos/test/regression
@@ -41,34 +71,6 @@ stage('test') {
         } catch (Exception e) { } finally {
             archiveArtifacts 'libos/test/regression/libos-regression.xml'
             junit 'libos/test/regression/libos-regression.xml'
-        }
-
-        try {
-            timeout(time: 15, unit: 'MINUTES') {
-                sh '''
-                    cd libos/test/abi/x86_64
-                    gramine-test build -v
-                    python3 -m pytest -v --junit-xml abi.xml
-                '''
-            }
-        } catch (Exception e) { } finally {
-            archiveArtifacts 'libos/test/abi/x86_64/abi.xml'
-            junit 'libos/test/abi/x86_64/abi.xml'
-        }
-
-        if (env.GRAMINE_MUSL != '1') {
-            try {
-                timeout(time: 15, unit: 'MINUTES') {
-                    sh '''
-                        cd libos/test/fs
-                        gramine-test build -v
-                        python3 -m pytest -v --junit-xml fs.xml
-                    '''
-                }
-            } catch (Exception e) { } finally {
-                archiveArtifacts 'libos/test/fs/fs.xml'
-                junit 'libos/test/fs/*.xml'
-            }
         }
     }
 }
