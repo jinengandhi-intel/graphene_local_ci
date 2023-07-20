@@ -1,0 +1,50 @@
+node (node_label) {
+    env.ORIG_WKSP = env.WORKSPACE
+    env.build_ok = true
+    try {
+        checkout scm
+        load 'ci/lib/stage-clone.jenkinsfile'
+
+        dir ("gramine") {
+            env.SGX = '1'
+            env.GRAMINE_MUSL = '1'
+            sh '../ci/resources/setup_workspace.sh'
+            env.WORKSPACE = env.WORKSPACE + "/gramine"
+
+            load '../ci/config/config-docker.jenkinsfile'
+
+            docker.build(
+                "local:${env.BUILD_TAG}",
+                "-f ../ci/dockerfile/${base_os}.dockerfile ."
+            ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
+                load '.ci/lib/config.jenkinsfile'
+
+                switch(params.base_os) {
+                    case ['centos8', 'almalinux9', 'rockylinux9', 'centos9']:
+                        load '../ci/config/config-centos8.jenkinsfile'
+                        break
+                    case ['alpine3.18']:
+                        load '../ci/config/config-alpine.jenkinsfile'
+                        break
+                }
+
+                load '.ci/lib/config-release.jenkinsfile'
+
+                load '../ci/lib/stage-build-sgx.jenkinsfile'
+                load '../ci/lib/stage-test.jenkinsfile'
+                load '../ci/lib/stage-test-sanity.jenkinsfile'
+            }
+        }
+    } finally {
+        stage('cleanup'){
+            sh 'rm -rf $ORIG_WKSP/*'
+            sh "docker rmi local:${env.BUILD_TAG} -f"
+        }
+    }
+
+    if(env.build_ok) {
+        currentBuild.result = "SUCCESS"
+    } else {
+        currentBuild.result = "FAILURE"
+    }
+}

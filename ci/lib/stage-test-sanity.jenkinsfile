@@ -3,7 +3,12 @@ stage('test') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/helloworld
-                make ${MAKEOPTS} all
+                if [ "${GRAMINE_MUSL}" = "1" ]
+                then
+                    CC=musl-gcc make ${MAKEOPTS} all
+                else
+                    make ${MAKEOPTS} all
+                fi
                 make check | tee helloworld_result.txt
             '''
         }
