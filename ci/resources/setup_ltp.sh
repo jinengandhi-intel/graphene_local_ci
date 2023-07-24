@@ -34,7 +34,7 @@ then
     cp -f manifest_20_04_21_10.template manifest.template
 fi
 
-if [[ "$base_os" == *"debian11"* ]]
+if [[ "$base_os" == *"debian"* ]]
 then
     cp -f manifest_Debian_11.template manifest.template
 fi
