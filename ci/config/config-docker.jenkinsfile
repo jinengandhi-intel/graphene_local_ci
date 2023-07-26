@@ -17,6 +17,9 @@ env.DOCKER_ARGS_SGX = '''
     --volume=/usr/bin/stress-ng:/usr/bin/stress-ng
 '''
 
+env.JAVAHOME = sh(script: "java -XshowSettings:properties -version 2>&1 > /dev/null \
+	            | grep 'java.home' | cut -d'=' -f2", returnStdout: true).trim()
+
 if (fileExists("""${env.WORKSPACE}/scripts/docker_seccomp_aug_2022.json""")) {
 	env.DOCKER_ARGS_COMMON += """ --security-opt seccomp=${env.WORKSPACE}/scripts/docker_seccomp_aug_2022.json"""
 }
