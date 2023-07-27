@@ -24,7 +24,7 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if (!["debian11", "debian12", "almalinux9", "rockylinux9", "centos9", "alpine3.18"].contains(env.base_os)) {
+    if (!["debian11", "debian12", "almalinux9", "rockylinux9", "centos9", "alpine3.18", "rhel9"].contains(env.base_os)) {
         if ((Float.parseFloat(env.os_version) < 21)) {
             try {
                 timeout(time: 60, unit: 'MINUTES') {

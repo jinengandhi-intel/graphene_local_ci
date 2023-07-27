@@ -45,7 +45,7 @@ stage('test-sgx') {
             sh '''
                 cd CI-Examples/bash
                 sed -i '/@rm OUTPUT/d' Makefile
-                if [ "${os_release_id}" = "centos" ] || [ "${os_release_id}" = "almalinux" ] || [ "${os_release_id}" = "rockylinux" ]
+                if [ "${os_release_id}" = "centos" ] || [ "${os_release_id}" = "almalinux" ] || [ "${os_release_id}" = "rockylinux" ] || [ "${os_release_id}" = "rhel" ] 
                 then
                     sed -i "s/bin\\/readlink/bin\\/coreutils/" Makefile
                 fi
