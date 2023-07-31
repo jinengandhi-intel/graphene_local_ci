@@ -12,6 +12,7 @@ RUN dnf config-manager --set-enabled -y powertools && \
         ncurses-devel \
         bc \
         bison \
+        cargo \
         flex \
         make \
         elfutils-libelf-devel \
@@ -87,14 +88,6 @@ RUN dnf config-manager --set-enabled -y powertools && \
         unzip \
         zip \
         zlib-devel
-
-RUN mkdir -p /home/intel/rust_libraries
-
-COPY CI-Examples/rust/*.rpm /home/intel/rust_libraries
-
-RUN cd /home/intel/rust_libraries && yum install -y *.rpm
-
-RUN dnf clean all && rm -r /var/cache/dnf  && dnf upgrade -y && dnf update -y
 
 # Install wrk2 benchmark. This benchmark is used in `benchmark-http.sh`.
 RUN git clone https://github.com/giltene/wrk2.git \

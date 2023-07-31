@@ -18,12 +18,15 @@ node (node_label) {
             ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
                 load '.ci/lib/config.jenkinsfile'
 
-                switch(params.base_os) {
-                    case ['centos8', 'almalinux9', 'rockylinux9', 'centos9']:
+                switch(env.os_release_id) {
+                    case ['centos', 'almalinux', 'rockylinux']:
                         load '../ci/config/config-centos8.jenkinsfile'
                         break
-                    case ['alpine3.18']:
+                    case ['alpine']:
                         load '../ci/config/config-alpine.jenkinsfile'
+                        break
+                    case ['debian']:
+                        load '../ci/config/config-debian.jenkinsfile'
                         break
                 }
 
