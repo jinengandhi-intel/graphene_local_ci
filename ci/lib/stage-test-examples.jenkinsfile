@@ -126,7 +126,7 @@ stage('test-examples') {
         } catch (Exception e) { }
 
         if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
-            if ((["rhel"].contains(env.os_release_id)) || (["ubuntu20.04"].contains(env.base_os))) {
+            if (["ubuntu20.04", "rhel8"].contains(env.base_os)) {
                 try {
                     timeout(time: 30, unit: 'MINUTES') {
                         sh '''#!/bin/bash

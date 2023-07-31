@@ -182,7 +182,7 @@ class Test_Workload_Results():
             and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif(not((os_release_id in ["rhel"]) or (base_os in ["ubuntu20.04"]))
+    @pytest.mark.skipif(not(base_os in ["ubuntu20.04", "rhel8"])
                      or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Openvino enabled only for Ubuntu 18 & 20 Server Configurations")
     def test_openvino_workload(self):

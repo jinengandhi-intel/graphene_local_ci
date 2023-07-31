@@ -14,8 +14,9 @@ RUN dnf update -y \
         automake \
         bison \
         binutils \
-        curl \
         cargo \
+        cmake \
+        curl \
         elfutils-libelf-devel \
         epel-release \
         flex \
