@@ -30,11 +30,6 @@ if [[ "$base_os" == *"centos"* ]]; then
   cp -rf $WORKSPACE/utils/rust_centos_setup/* CI-Examples/rust/
 fi
 
-if [[ "$base_os" = *"alpine"* ]]; then
-  cd $WORKSPACE
-  cp -f $WORKSPACE/Patch/001-build-on-alpine.diff gramine/
-fi
-
 if [[ "$GRAMINE_MUSL" == "1" ]] || [[ "$base_os" = *"alpine"* ]]; then
   chmod +x $WORKSPACE/ci/resources/setup_musl.sh
   bash $WORKSPACE/ci/resources/setup_musl.sh
