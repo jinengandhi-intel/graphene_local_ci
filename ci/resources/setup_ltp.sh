@@ -24,7 +24,7 @@ then
     cp -f manifest_Almalinux.template manifest.template
 fi
 
-if [[ "$base_os" == "" ]]
+if [[ "$base_os" == *"rhel"* ]]
 then
     cp -f manifest_RHEL.template manifest.template
 fi

@@ -1,80 +1,71 @@
-FROM quay.io/centos/centos:stream8
+FROM redhat/ubi8:latest
 
-RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
+RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    && dnf update -y
 
-RUN dnf copr enable -y ngompa/musl-libc
-RUN dnf config-manager --set-enabled -y powertools && \
-    dnf update && \
-    dnf install -y yum-utils && \
-    dnf install -y epel-release && \
-    dnf install -y \
-        libunwind \
-        ncurses-devel \
-        bc \
-        bison \
-        cargo \
-        flex \
-        make \
-        elfutils-libelf-devel \
-        openssl-devel \
-        rpm-build \
-        automake \
+RUN rpm --import https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official \
+    && dnf config-manager --disableplugin subscription-manager --add-repo http://vault.centos.org/centos/8/BaseOS/x86_64/os \
+    && dnf config-manager --disableplugin subscription-manager --add-repo http://vault.centos.org/centos/8/AppStream/x86_64/os \
+    && dnf config-manager --disableplugin subscription-manager --add-repo http://vault.centos.org/centos/8/PowerTools/x86_64/os
+
+RUN dnf update -y \
+    &&  dnf install -y \
         autoconf \
+        automake \
         bison \
         binutils \
+        cargo \
+        cmake \
         curl \
+        elfutils-libelf-devel \
+        epel-release \
+        flex \
         gawk \
         gcc-c++ \
-        gdb \
         git \
         glibc-static \
         glibc.i686 \
         golang \
         httpd \
-        info \
         java-11-openjdk \
         java-11-openjdk-devel \
         jq \
         less \
-        libcurl-devel \
+        lsof \
         libevent-devel \
+        libcurl-devel \
         libjpeg-turbo-devel \
         libX11-devel \
         libXxf86vm \
         libXtst \
         libXfixes \
         libXrender \
-        lsof \
-        musl-devel \
-        musl-gcc \
+        libunwind \
+        make \
         nasm \
         nc \
-        ncurses-devel \
-        ncurses-libs \
         net-tools \
-        ninja-build \
         nodejs \
-        nss_nis \
         nss-mdns \
         nss-myhostname \
+        ncurses-devel \
+        ninja-build \
         openssl-devel \
-        protobuf-devel \
-        protobuf-c-devel \
         patch \
-    #   libcurl4-openssl-dev \
-    #   libprotobuf-c-dev \
-    #   linux-headers-generic \
         pkg-config \
         protobuf-c-compiler \
+        protobuf-c-devel \
+        protobuf-compiler \
+        protobuf-devel \
         python3 \
-        python3-click \
         python3-cryptography \
+        python3-pip \
+        python3-protobuf \
+        python3-click \
         python3-devel \
         python3-jinja2 \
         python3-lxml \
         python3-numpy \
-        python3-pip \
-        python3-protobuf \
         python3-pyelftools \
         python3-pytest \
         python3-scipy \
@@ -84,10 +75,19 @@ RUN dnf config-manager --set-enabled -y powertools && \
         sudo \
         vim  \
         texinfo \
-        wget \
         unzip \
         zip \
-        zlib-devel
+        zlib-devel \
+        rpm-build \
+        wget
+
+RUN python3 -B -m pip install -U \
+    'tomli>=1.1.0' \
+    'tomli-w>=0.4.0' \
+    'meson>=0.56,!=1.2.*' \
+    six \
+    torchvision \
+    pillow
 
 # Install wrk2 benchmark. This benchmark is used in `benchmark-http.sh`.
 RUN git clone https://github.com/giltene/wrk2.git \
@@ -97,14 +97,6 @@ RUN git clone https://github.com/giltene/wrk2.git \
     && cp wrk /usr/local/bin \
     && cd .. \
     && rm -rf wrk2
-
-RUN python3 -m pip install -U \
-    six \
-    torchvision \
-    pillow \
-    'tomli>=1.1.0' \
-    'tomli-w>=0.4.0' \
-    'meson>=0.56,<0.57'
 
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G wheel -m -d /intel -c "intel Jenkins" intel && \
@@ -136,4 +128,3 @@ ENV HOME /intel
 
 # Define default command.
 CMD ["bash"]
-
