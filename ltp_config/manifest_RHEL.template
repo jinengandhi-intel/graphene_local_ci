@@ -32,6 +32,7 @@ sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
 sgx.allowed_files = [
     "file:/tmp",
     "file:etc",
+    "file:/usr",
     "file:{{ gramine.runtimedir() }}",
     "file:/bin",
     "file:{{ gramine.runtimedir() }}/libnss_compat.so.2",
