@@ -44,7 +44,6 @@ RUN dnf update -y \
         nc \
         net-tools \
         nodejs \
-        nss_nis \
         nss-mdns \
         nss-myhostname \
         ncurses-devel \
