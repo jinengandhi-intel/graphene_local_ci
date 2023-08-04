@@ -71,6 +71,7 @@ RUN apk update && \
     py3-pip \
     py3-protobuf \
     py3-pytest \
+    py3-setuptools \
     py3-scipy \
     py3-tomli \
     py3-tomli-w \
