@@ -23,6 +23,7 @@ RUN yum update -y && yum install -y \
     git \
     make \
     python3-pip \
+    python3-pkg-resources \
     python3-pytest \
     sshpass \
     sudo \

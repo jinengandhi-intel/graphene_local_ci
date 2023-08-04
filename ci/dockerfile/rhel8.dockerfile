@@ -67,6 +67,7 @@ RUN dnf update -y \
         python3-jinja2 \
         python3-lxml \
         python3-numpy \
+        python3-pkg-resources \
         python3-pyelftools \
         python3-pytest \
         python3-scipy \

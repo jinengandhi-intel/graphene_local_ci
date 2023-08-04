@@ -68,6 +68,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-jinja2 \
     python3-lxml \
     python3-pip \
+    python3-pkg-resources \
     python3-protobuf \
     python3-pyelftools \
     python3-pytest \

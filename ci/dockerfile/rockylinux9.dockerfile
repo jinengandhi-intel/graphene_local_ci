@@ -72,6 +72,7 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     python3-lxml \
     python3-numpy \
     python3-pip \
+    python3-pkg-resources \
     python3-protobuf \
     python3-pyelftools \
     python3-pytest \

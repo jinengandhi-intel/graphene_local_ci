@@ -73,6 +73,7 @@ RUN dnf config-manager --set-enabled -y powertools && \
         python3-jinja2 \
         python3-lxml \
         python3-numpy \
+        python3-pkg-resources \
         python3-pip \
         python3-protobuf \
         python3-pyelftools \

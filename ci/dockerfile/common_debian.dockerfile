@@ -15,6 +15,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get inst
     netcat-openbsd \
     pkg-config \
     python3-pip \
+    python3-pkg-resources \
     python3-pytest \
     sudo \
     sshpass \
