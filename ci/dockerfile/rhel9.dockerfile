@@ -27,9 +27,13 @@ RUN dnf update -y \
         httpd \
         java-11-openjdk \
         java-11-openjdk-devel \
+        Judy \
         jq \
         less \
         lsof \
+        libaio \
+        libatomic \
+        libbsd \
         libevent-devel \
         libcurl-devel \
         libjpeg-turbo-devel \
