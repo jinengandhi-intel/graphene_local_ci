@@ -12,7 +12,7 @@ pipeline {
                 stage ('Invoke Ubuntu 20.04 with 6.2 Gramine native Jobs') {
                     steps {
                         sleep(time: 15, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_20.04_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_20.04_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"]], propagate: true, wait: true
                     }
                 }
 
