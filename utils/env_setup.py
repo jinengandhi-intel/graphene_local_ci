@@ -36,17 +36,31 @@ class TimeSyncCMD:
         return time_stamp
     
     def execute_time_cmd(self, time_stamp):
-        cmd = priviledge + ' date --set "'+ str(time_stamp) + '"'
-        subprocess.call('{} {}'.format(priviledge, cmd), shell=True)
+        cmd = ' date --set "'+ str(time_stamp) + '"'
+        subprocess.run(f"{priviledge} {cmd}", shell=True)
 
     def set_timezone_cmd(self, time_zone):
-        cmd = priviledge + ' timedatectl set-timezone "'+ str(time_zone) + '"'
-        subprocess.call('{} {}'.format(priviledge, cmd), shell=True)
+        if node_name == "graphene_icl_alpine":
+            cmd = " setup-timezone -z "
+        else:
+            cmd = " timedatectl set-timezone "
+        subprocess.run(f"{priviledge} {cmd} {time_zone}", shell=True)
 
     def sync_hw_clock(self):
-        cmd = priviledge + ' hwclock --systohc'
-        subprocess.call('{} {}'.format(priviledge, cmd), shell=True)
-    
+        subprocess.run(f"{priviledge} hwclock --systohc", shell=True)
+
+class HostSetup():
+    def setup():
+        subprocess.run(f"{priviledge} service docker restart", shell=True)
+        subprocess.run("sleep 10s", shell=True)
+        subprocess.run(f"{priviledge} chown $USER /var/run/docker.sock", shell=True)
+        subprocess.run(f"{priviledge} chmod 777 /dev/cpu_dma_latency", shell=True)
+        subprocess.run(f"{priviledge} chown $USER /dev/cpu_dma_latency", shell=True)
+        if (os.path.exists("/dev/sgx_enclave")):
+            subprocess.run(f"{priviledge} chmod 777 /dev/sgx_enclave", shell=True)
+            subprocess.run(f"{priviledge} chmod 777 /dev/sgx_provision", shell=True)
+        print("System setup is done")
+
 
 if __name__=='__main__':
     try:
@@ -58,5 +72,6 @@ if __name__=='__main__':
         obj_tsc.execute_time_cmd(time_stamp)
         obj_tsc.sync_hw_clock()
         print('Successfully updated system time!')
+        HostSetup.setup()
     except Exception as e:
         print('Failed to update system time!' + e)
