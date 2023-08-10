@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 
-python3 $WORKSPACE/utils/time_sync_helper.py
+python3 $WORKSPACE/utils/env_setup.py
 
 cd $WORKSPACE/examples
 for i in $(find -name '*manifest.template');
