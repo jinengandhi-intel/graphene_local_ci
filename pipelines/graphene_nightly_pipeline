@@ -12,7 +12,7 @@ pipeline {
                 stage ('Invoke Ubuntu 20.04 with 6.2 Gramine native Jobs') {
                     steps {
                         sleep(time: 15, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_20.04_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_20.04_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_non_sgx_20.04_5.15'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"]], propagate: true, wait: true
                     }
                 }
 
@@ -25,7 +25,7 @@ pipeline {
                 stage ('Invoke Ubuntu 22.04 with 5.19 Gramine native Suite') {
                     steps {
                         sleep(time: 15, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_22.04_5.19', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu22.04"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_22.04_5.19', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_non_sgx_20.04_5.15'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu22.04"]], propagate: true, wait: true
                     }
                 }
 
@@ -111,7 +111,7 @@ pipeline {
                 stage ('Invoke Gramine Native Suite with Debian 11 Kernel 6.1') {
                     steps {
                         sleep(time: 30, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_debian_11_6.1', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "debian11"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_debian_11_6.1', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_non_sgx_20.04_5.15'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "debian11"]], propagate: true, wait: true
                     }
                 }
 
@@ -124,14 +124,14 @@ pipeline {
 
                 stage ('Invoke OOT with 5.15 Gramine Native Suite') {
                     steps {
-                        sleep(time: 30, unit: "MINUTES")
+                        sleep(time: 45, unit: "MINUTES")
                         build job: 'local_ci_graphene_native_oot', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_oot'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"]], propagate: true, wait: true
                     }
                 }
 
                 stage ('Invoke OOT with 5.15 Gramine SGX Suite') {
                     steps {
-                        sleep(time: 90, unit: "MINUTES")
+                        sleep(time: 105, unit: "MINUTES")
                         build job: 'local_ci_graphene_sgx_oot', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_oot'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"]], propagate: true, wait: true
                     }
                 }
@@ -185,7 +185,7 @@ pipeline {
 
                 stage ('Invoke Alpine 3.18 with 6.1 Gramine SGX Suite ') {
                     steps {
-                        sleep(time: 90, unit: "MINUTES")
+                        sleep(time: 30, unit: "MINUTES")
                         build job: 'local_ci_graphene_sgx_alpine_3.18_6.1', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_alpine'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "alpine3.18"]], propagate: true, wait: true
                     }
                 }
