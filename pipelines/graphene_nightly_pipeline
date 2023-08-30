@@ -97,13 +97,14 @@ pipeline {
 
                 stage ('Invoke Gramine native Jobs with DCAP Driver') {
                     steps {
-                        sleep(time: 30, unit: "MINUTES")
+                        sleep(time: 40, unit: "MINUTES")
                         build job: 'local_ci_graphene_native_dcap', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_dcap'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"]], propagate: true, wait: true
                     }
                 }
 
                 stage ('Invoke Gramine SGX Jobs with DCAP Driver') {
                     steps {
+                        sleep(time: 30, unit: "MINUTES")
                         build job: 'local_ci_graphene_sgx_dcap', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_dcap'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"]], propagate: true, wait: true
                     }
                 }
