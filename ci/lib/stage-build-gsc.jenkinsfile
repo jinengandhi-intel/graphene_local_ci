@@ -1,23 +1,24 @@
 stage('Build Workloads') {
-
+    env.config_os = distro_ver.replace("/", "\\/")
     sh '''
         docker system prune -af
         openssl genrsa -3 -out enclave-key.pem 3072
         cp -f config.yaml.template config.yaml
-        sed -i -E 's/Distro: "(.+)"/Distro: "'"$distro_ver"'"/g' config.yaml
+        sed -i -E 's/Distro: "(.+)"/Distro: "'"$config_os"'"/g' config.yaml
     '''
 
     // Build Bash Workload
     try {
-        sh '''
-            if [ "${os_release_id}" = "centos" ]
-            then
-                cp -rf test/centos8-bash.dockerfile test/bash.dockerfile
-            else
+        if ((env.os_release_id == "centos") || env.os_release_id.contains("redhat")) {
+            sh 'cp -rf test/centos8-bash.dockerfile test/bash.dockerfile'
+        } else {
+            sh '''
                 cp -rf test/ubuntu20.04-bash.dockerfile test/bash.dockerfile
                 sed -i -e "s/FROM ubuntu:20.04/FROM $distro_ver/g" test/bash.dockerfile
-            fi
-            docker build --tag bash-test --file test/bash.dockerfile .
+            '''
+        }
+        sh '''
+            docker build --tag bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build -nc --insecure-args bash-test test/ubuntu20.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps bash-test enclave-key.pem
             ./gsc info-image gsc-bash-test
@@ -27,44 +28,38 @@ stage('Build Workloads') {
     // Build Python Latest Workload
     try {
         sh '''
-            if [ "${os_release_id}" = "centos" ]
+            if [ "${os_release_id}" != "debian" ]
             then
-                docker build --tag python --file test/python.dockerfile .
+                docker build --tag gramine_python --build-arg BUILD_OS=${distro_ver} --file test/python.dockerfile .
             fi
-            if [ "${os_release_id}" = "ubuntu" ] || [ "${os_release_id}" = "debian" ]
+            if [ "${distro_ver}" = "debian:11" ]
             then
-                docker pull python
+                docker pull python:bullseye
+                docker image tag python:bullseye gramine_python
             fi
-            ./gsc build -nc --insecure-args python test/generic.manifest
-            ./gsc sign-image --remove-gramine-deps python enclave-key.pem
-            ./gsc info-image gsc-python
+            if [ "${distro_ver}" = "debian:12" ]
+            then
+                docker pull python:bookworm
+                docker image tag python:bookworm gramine_python
+            fi
+            ./gsc build -nc --insecure-args gramine_python test/generic.manifest
+            ./gsc sign-image --remove-gramine-deps gramine_python enclave-key.pem
+            ./gsc info-image gsc-gramine_python
         '''
     } catch (Exception e) {}
 
-    // Build Python Bullseye Workload
-    if (os_release_id != "centos") {
-        try {
-            sh '''
-                docker pull python:bullseye
-                ./gsc build -nc --insecure-args python:bullseye test/generic.manifest
-                ./gsc sign-image --remove-gramine-deps python:bullseye enclave-key.pem
-                ./gsc info-image gsc-python:bullseye
-            '''
-        } catch (Exception e) {}
-    }
-
     // Build Bash HelloWorld Workload
     try {
-        sh '''
-            if [ "${os_release_id}" = "centos" ]
-            then
-                cp -rf test/centos8-helloworld.dockerfile test/helloworld.dockerfile
-            else
+        if ((env.os_release_id == "centos") || env.os_release_id.contains("redhat")) {
+            sh 'cp -rf test/centos8-helloworld.dockerfile test/helloworld.dockerfile'
+        } else {
+            sh '''
                 cp -rf test/ubuntu20.04-hello-world.dockerfile test/helloworld.dockerfile
                 sed -i -e "s/FROM ubuntu:20.04/FROM $distro_ver/g" test/helloworld.dockerfile
-            fi
-
-            docker build --tag helloworld-test --file test/helloworld.dockerfile .
+            '''
+        }
+        sh '''
+            docker build --tag helloworld-test --build-arg BUILD_OS=${distro_ver} --file test/helloworld.dockerfile .
             ./gsc build -nc --insecure-args helloworld-test test/ubuntu20.04-hello-world.manifest
             ./gsc sign-image --remove-gramine-deps helloworld-test enclave-key.pem
             ./gsc info-image gsc-helloworld-test

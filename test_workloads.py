@@ -252,7 +252,7 @@ class Test_Workload_Results():
     def test_gsc_bash_workload(self):
         gsc_bash_result = open("bash_result", "r")
         gsc_bash_log = gsc_bash_result.read()
-        if (os_release_id == "debian"):
+        if (os_release_id == "debian") or ("redhat" in os_release_id):
             assert(re.search('boot(.*)home(.*)proc', gsc_bash_log, re.DOTALL))
         else:
             assert(re.search('Mem:(.*)Swap:', gsc_bash_log, re.DOTALL))
@@ -260,13 +260,6 @@ class Test_Workload_Results():
     @pytest.mark.gsc
     def test_gsc_python_workload(self):
         gsc_python_result = open("python_result", "r")
-        gsc_python_log = gsc_python_result.read()
-        assert("HelloWorld!" in gsc_python_log)
-
-    @pytest.mark.gsc
-    @pytest.mark.skipif((os_release_id == 'centos'), reason="Not enabled for Centos")
-    def test_gsc_python_bullseye_workload(self):
-        gsc_python_result = open("python_bullseye_result", "r")
         gsc_python_log = gsc_python_result.read()
         assert("HelloWorld!" in gsc_python_log)
 

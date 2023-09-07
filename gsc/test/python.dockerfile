@@ -1,10 +1,12 @@
-From centos:8
+ARG BUILD_OS
 
-RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&\
-    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
+FROM $BUILD_OS
 
-RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
+ARG BUILD_OS
 
-RUN yum update -y && yum install -y python3
+COPY test/setup.sh ./setup.sh
+
+RUN chmod +x ./setup.sh
+RUN /bin/bash -c './setup.sh'
 
 CMD ["python3"]

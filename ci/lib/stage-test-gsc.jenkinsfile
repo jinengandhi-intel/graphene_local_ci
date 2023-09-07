@@ -1,8 +1,8 @@
 stage('Test') {
     try {
-        if (env.os_release_id == "debian")
+        if ((env.os_release_id == "debian") || env.os_release_id.contains("redhat")) {
             env.runtime_args = "-c ls"
-        else {
+        } else {
             env.runtime_args = "-c free"
         }
         sh '''
@@ -16,15 +16,7 @@ stage('Test') {
         sh '''
             docker run --device=/dev/sgx_enclave \
                 -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-                gsc-python -c 'print("HelloWorld!")' 2>&1 | tee python_result
-        '''
-    } catch (Exception e) {}
-
-    try {
-        sh '''
-            docker run --device=/dev/sgx_enclave \
-                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-                gsc-python:bullseye -c 'print("HelloWorld!")' 2>&1 | tee python_bullseye_result
+                gsc-gramine_python -c 'print("HelloWorld!")' 2>&1 | tee python_result
         '''
     } catch (Exception e) {}
 
