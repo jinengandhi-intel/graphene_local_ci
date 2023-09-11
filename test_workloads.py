@@ -184,7 +184,7 @@ class Test_Workload_Results():
     @pytest.mark.examples
     @pytest.mark.skipif(not(base_os in ["ubuntu20.04"])
                      or ((int(no_cores) < 16) and sgx_mode == '1'),
-                    reason="Openvino enabled only for Ubuntu 18 & 20 Server Configurations")
+                    reason="Openvino enabled only for Ubuntu 20 Server Configurations")
     def test_openvino_workload(self):
         openvino_result_file = open("CI-Examples/openvino/OUTPUT", "r")
         openvino_contents = openvino_result_file.read()
@@ -275,3 +275,13 @@ class Test_Workload_Results():
         gsc_helloworld_result = open("helloworld_result", "r")
         gsc_helloworld_log = gsc_helloworld_result.read()
         assert('"Hello World! Let\'s check escaped symbols: < & > "' in gsc_helloworld_log)
+
+    @pytest.mark.examples
+    @pytest.mark.skipif((os_release_id != 'ubuntu'),
+                    reason="MongoDB enabled only for Ubuntu20.04 and 22.04")
+    def test_mongodb_workload(self):
+        mongodb_result = open("CI-Examples/mongodb/OUTPUT", "r")
+        mongodb_contents = mongodb_result.read()
+        assert(("item: 'card'" in mongodb_contents) and \
+               ("item: 'pen'" in mongodb_contents) and \
+               ("item: 'lamp'" in mongodb_contents))
