@@ -50,14 +50,6 @@ static void bad_fd_setup(struct tcase *tc)
 		tc->exp_errno = EBADF;
 }
 
-static void wo_file_setup(struct tcase *tc)
-{
-	if (tst_kvercmp(4, 6, 0) < 0)
-		tc->exp_errno = EBADF;
-	else
-		tc->exp_errno = ETXTBSY;
-}
-
 static void dir_setup(struct tcase *tc)
 {
 	if (tst_kvercmp(4, 6, 0) < 0)
@@ -78,16 +70,16 @@ static struct tcase tcases[] = {
 	{"no-perm", &fd, "", O_RDONLY | O_CLOEXEC, 0, 1, EPERM, 0, NULL},
 	{"module-exists", &fd, "", O_RDONLY | O_CLOEXEC, 0, 0, EEXIST, 1,
 		NULL},
-	{"file-not-readable", &fd, "", O_WRONLY | O_CLOEXEC, 0, 0, 0, 0,
-		wo_file_setup},
+	{"file-not-readable", &fd, "", O_WRONLY | O_CLOEXEC, 0, 0, EBADF, 0,
+		NULL},
+	{"file-readwrite", &fd, "", O_RDWR | O_CLOEXEC, 0, 0, ETXTBSY, 0,
+		NULL},
 	{"directory", &fd_dir, "", O_RDONLY | O_CLOEXEC, 0, 0, 0, 0, dir_setup},
 };
 
 static void setup(void)
 {
 	unsigned long int i;
-
-	finit_module_supported_by_kernel();
 
 	tst_module_exists(MODULE_NAME, &mod_path);
 
@@ -140,6 +132,11 @@ static void run(unsigned int n)
 }
 
 static struct tst_test test = {
+	.tags = (const struct tst_tag[]) {
+		{"linux-git", "032146cda855"},
+		{"linux-git", "39d637af5aa7"},
+		{}
+	},
 	.test = run,
 	.tcnt = ARRAY_SIZE(tcases),
 	.setup = setup,

@@ -12,11 +12,6 @@
 MEMCG_TESTFUNC=test
 TST_CNT=3
 
-. memcg_lib.sh
-
-# Allocate memory bigger than per-cpu kernel memory
-MEM_TO_ALLOC=$((PAGESIZES * 2))
-
 # Test the memory charge won't move to subgroup
 # $1 - memory.limit_in_bytes in sub group
 test_subgroup()
@@ -66,5 +61,10 @@ test3()
 {
 	test_subgroup 0
 }
+
+. memcg_lib.sh
+
+# Allocate memory bigger than per-cpu kernel memory
+MEM_TO_ALLOC=$((PAGESIZES * 2))
 
 tst_run

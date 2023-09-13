@@ -25,7 +25,7 @@
 
 #include "tst_test.h"
 #include "tst_clone.h"
-#include "lapi/clone.h"
+#include "lapi/sched.h"
 #include "tst_safe_file_at.h"
 
 static pid_t clone_newuser(void)
@@ -118,7 +118,7 @@ static void setup(void)
 {
 	int fd = SAFE_OPEN("restricted", O_CREAT | O_WRONLY, 0700);
 
-	SAFE_WRITE(fd, 1, "\n", 1);
+	SAFE_WRITE(SAFE_WRITE_ALL, fd, "\n", 1);
 	SAFE_CLOSE(fd);
 
 	SAFE_TRY_FILE_PRINTF("/proc/sys/user/max_user_namespaces", "%d", 10);
@@ -134,9 +134,10 @@ static struct tst_test test = {
 		"CONFIG_USER_NS",
 		NULL
 	},
-	.save_restore = (const char * const[]) {
-		"?/proc/sys/user/max_user_namespaces",
-		NULL,
+	.save_restore = (const struct tst_path_val[]) {
+		{"/proc/sys/user/max_user_namespaces", NULL, TST_SR_SKIP},
+		{"/proc/sys/kernel/unprivileged_userns_clone", "1", TST_SR_SKIP},
+		{}
 	},
 	.tags = (const struct tst_tag[]) {
 		{"linux-git", "d2f007dbe7e4"},

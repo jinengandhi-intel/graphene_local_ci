@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright 2019 Google LLC
+ * Copyright (c) Linux Test Project, 2019-2021
  */
 
 #include <errno.h>
@@ -30,10 +31,18 @@ void tst_alg_bind_addr(int algfd, const struct sockaddr_alg *addr)
 
 	if (ret == 0)
 		return;
+
+	if (errno == ELIBBAD && tst_fips_enabled()) {
+		tst_brk(TCONF,
+			"FIPS enabled => %s algorithm '%s' disabled",
+			addr->salg_type, addr->salg_name);
+	}
+
 	if (errno == ENOENT) {
 		tst_brk(TCONF, "kernel doesn't support %s algorithm '%s'",
 			addr->salg_type, addr->salg_name);
 	}
+
 	tst_brk(TBROK | TERRNO,
 		"unexpected error binding AF_ALG socket to %s algorithm '%s'",
 		addr->salg_type, addr->salg_name);
@@ -64,29 +73,54 @@ void tst_alg_bind(int algfd, const char *algtype, const char *algname)
 	tst_alg_bind_addr(algfd, &addr);
 }
 
-bool tst_have_alg(const char *algtype, const char *algname)
+int tst_try_alg(const char *algtype, const char *algname)
 {
 	long ret;
+	int retval = 0;
 	int algfd;
 	struct sockaddr_alg addr;
-	bool have_alg = true;
 
 	algfd = tst_alg_create();
 
 	init_sockaddr_alg(&addr, algtype, algname);
 
 	ret = bind(algfd, (const struct sockaddr *)&addr, sizeof(addr));
-	if (ret != 0) {
-		if (errno != ENOENT) {
-			tst_brk(TBROK | TERRNO,
-				"unexpected error binding AF_ALG socket to %s algorithm '%s'",
-				algtype, algname);
-		}
-		have_alg = false;
-	}
+
+	if (ret != 0)
+		retval = errno;
 
 	close(algfd);
-	return have_alg;
+	return retval;
+}
+
+bool tst_have_alg(const char *algtype, const char *algname)
+{
+	int ret;
+
+	ret = tst_try_alg(algtype, algname);
+
+	switch (ret) {
+	case 0:
+		return true;
+	case ENOENT:
+		tst_res(TCONF, "kernel doesn't have %s algorithm '%s'",
+			algtype, algname);
+		return false;
+	case ELIBBAD:
+		if (tst_fips_enabled()) {
+			tst_res(TCONF,
+				"FIPS enabled => %s algorithm '%s' disabled",
+				algtype, algname);
+			return false;
+		}
+	/* fallthrough */
+	default:
+		errno = ret;
+		tst_brk(TBROK | TERRNO,
+			"unexpected error binding AF_ALG socket to %s algorithm '%s'",
+			algtype, algname);
+		return false;
+	}
 }
 
 void tst_require_alg(const char *algtype, const char *algname)

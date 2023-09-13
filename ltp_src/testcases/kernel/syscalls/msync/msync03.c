@@ -116,12 +116,12 @@ static void setup(void)
 
 	memset(write_buf, 'a', BUF_SIZE);
 	while (nwrite < page_sz) {
-		SAFE_WRITE(cleanup, 1, fd, write_buf, BUF_SIZE);
+		SAFE_WRITE(cleanup, SAFE_WRITE_ALL, fd, write_buf, BUF_SIZE);
 		nwrite += BUF_SIZE;
 	}
 
 	addr1 = SAFE_MMAP(cleanup, 0, page_sz, PROT_READ | PROT_WRITE,
-			  MAP_PRIVATE | MAP_LOCKED, fd, 0);
+			  MAP_SHARED | MAP_LOCKED, fd, 0);
 
 	/* addr2 is not a multiple of PAGESIZE */
 	addr2 = addr1 + 1;

@@ -1,5 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (c) Linux Test Project, 2016-2023
 # Copyright (c) 2015-2018 Oracle and/or its affiliates. All Rights Reserved.
 # Copyright (c) International Business Machines  Corp., 2001
 
@@ -19,15 +20,20 @@ nfs_parse_args()
 	case "$1" in
 	v) VERSION="$(echo $2 | tr ',' ' ')";;
 	t) SOCKET_TYPE="$(echo $2 | tr ',' ' ')";;
+	*) [ "$NFS_PARSE_ARGS_CALLER" ] && $NFS_PARSE_ARGS_CALLER "$@";;
 	esac
 }
 
-TST_OPTS="v:t:"
+NFS_PARSE_ARGS_CALLER="$TST_PARSE_ARGS"
+TST_OPTS="v:t:$TST_OPTS"
 TST_PARSE_ARGS=nfs_parse_args
 TST_USAGE=nfs_usage
-TST_NEEDS_TMPDIR=1
+TST_ALL_FILESYSTEMS=1
+TST_SKIP_FILESYSTEMS="exfat,ext2,ext3,fuse,ntfs,vfat,tmpfs"
+TST_MOUNT_DEVICE=1
+TST_FORMAT_DEVICE=1
 TST_NEEDS_ROOT=1
-TST_NEEDS_CMDS="$TST_NEEDS_CMDS mount exportfs"
+TST_NEEDS_CMDS="$TST_NEEDS_CMDS mount exportfs mount.nfs"
 TST_SETUP="${TST_SETUP:-nfs_setup}"
 TST_CLEANUP="${TST_CLEANUP:-nfs_cleanup}"
 TST_NEEDS_DRIVERS="nfsd"
@@ -36,8 +42,6 @@ TST_NEEDS_DRIVERS="nfsd"
 # through lo interface instead of ltp_ns_veth* netns interfaces (useful for
 # debugging whether test failures are related to veth/netns).
 LTP_NFS_NETNS_USE_LO=${LTP_NFS_NETNS_USE_LO:-}
-
-. tst_net.sh
 
 get_socket_type()
 {
@@ -52,6 +56,37 @@ get_socket_type()
 	done
 }
 
+# directory mounted by NFS client
+get_local_dir()
+{
+	local v="$1"
+	local n="$2"
+
+	echo "$TST_TMPDIR/$v/$n"
+}
+
+# directory on NFS server
+get_remote_dir()
+{
+	local v="$1"
+	local n="$2"
+
+	echo "$TST_MNTPOINT/$v/$n"
+}
+
+nfs_get_remote_path()
+{
+	local v
+	local type=$(get_socket_type ${2:-0})
+
+	for v in $VERSION; do
+		break;
+	done
+
+	v=${1:-$v}
+	echo "$(get_remote_dir $v $type)"
+}
+
 nfs_server_udp_enabled()
 {
 	local config f
@@ -64,19 +99,34 @@ nfs_server_udp_enabled()
 
 nfs_setup_server()
 {
-	local export_cmd="exportfs -i -o fsid=$$,no_root_squash,rw *:$remote_dir"
+	local remote_dir="$1"
+	local fsid="$2"
+	local export_cmd="exportfs -i -o fsid=$fsid,no_root_squash,rw *:$remote_dir"
 
-	if ! tst_rhost_run -c "test -d $remote_dir"; then
-		tst_rhost_run -s -c "mkdir -p $remote_dir; $export_cmd"
+	[ -z "$fsid" ] && tst_brk TBROK "empty fsid"
+
+	if tst_net_use_netns; then
+		if ! test -d $remote_dir; then
+			mkdir -p $remote_dir; $export_cmd
+		fi
+	else
+		if ! tst_rhost_run -c "test -d $remote_dir"; then
+			tst_rhost_run -s -c "mkdir -p $remote_dir; $export_cmd"
+		fi
 	fi
 }
 
 nfs_mount()
 {
+	local local_dir="$1"
+	local remote_dir="$2"
+	local opts="$3"
 	local host_type=rhost
 	local mount_dir
 
-	[ -n "$LTP_NETNS" ] && host_type=
+	mkdir -p "$local_dir"
+
+	tst_net_use_netns && host_type=
 
 	if [ $TST_IPV6 ]; then
 		mount_dir="[$(tst_ipaddr $host_type)]:$remote_dir"
@@ -87,7 +137,7 @@ nfs_mount()
 	local mnt_cmd="mount -v -t nfs $opts $mount_dir $local_dir"
 
 	tst_res TINFO "Mounting NFS: $mnt_cmd"
-	if [ -n "$LTP_NETNS" ] && [ -z "$LTP_NFS_NETNS_USE_LO" ]; then
+	if tst_net_use_netns && [ -z "$LTP_NFS_NETNS_USE_LO" ]; then
 		tst_rhost_run -c "$mnt_cmd" > mount.log
 	else
 		$mnt_cmd > mount.log
@@ -106,6 +156,8 @@ nfs_mount()
 
 		tst_brk TBROK "mount command failed"
 	fi
+
+	cd "$local_dir"
 }
 
 nfs_setup()
@@ -113,7 +165,6 @@ nfs_setup()
 	local i
 	local type
 	local n=0
-	local opts
 	local local_dir
 	local remote_dir
 	local mount_dir
@@ -128,6 +179,8 @@ nfs_setup()
 		done
 	fi
 
+	tst_res TINFO "$(mount.nfs -V)"
+
 	for i in $VERSION; do
 		type=$(get_socket_type $n)
 		tst_res TINFO "setup NFSv$i, socket type $type"
@@ -136,21 +189,12 @@ nfs_setup()
 			tst_brk TCONF "UDP support disabled on NFS server"
 		fi
 
-		local_dir="$TST_TMPDIR/$i/$n"
-		remote_dir="$TST_TMPDIR/$i/$type"
-		mkdir -p $local_dir
-
-		nfs_setup_server
-
-		opts="-o proto=$type,vers=$i"
-		nfs_mount
+		remote_dir="$(get_remote_dir $i $type)"
+		nfs_setup_server "$remote_dir" "$(($$ + n))"
+		nfs_mount "$(get_local_dir $i $n)" "$remote_dir" "-o proto=$type,vers=$i"
 
 		n=$(( n + 1 ))
 	done
-
-	if [ "$n" -eq 1 ]; then
-		cd ${VERSION}/0
-	fi
 }
 
 nfs_cleanup()
@@ -165,17 +209,31 @@ nfs_cleanup()
 
 	local n=0
 	for i in $VERSION; do
-		local_dir="$TST_TMPDIR/$i/$n"
+		local_dir="$(get_local_dir $i $n)"
 		grep -q "$local_dir" /proc/mounts && umount $local_dir
 		n=$(( n + 1 ))
 	done
+	sleep 2
 
 	n=0
 	for i in $VERSION; do
 		type=$(get_socket_type $n)
-		remote_dir="$TST_TMPDIR/$i/$type"
-		tst_rhost_run -c "test -d $remote_dir && exportfs -u *:$remote_dir"
-		tst_rhost_run -c "test -d $remote_dir && rm -rf $remote_dir"
+		remote_dir="$(get_remote_dir $i $type)"
+
+		if tst_net_use_netns; then
+			if test -d $remote_dir; then
+				exportfs -u *:$remote_dir
+				sleep 1
+				rm -rf $remote_dir
+			fi
+		else
+			tst_rhost_run -c "test -d $remote_dir && exportfs -u *:$remote_dir"
+			sleep 1
+			tst_rhost_run -c "test -d $remote_dir && rm -rf $remote_dir"
+		fi
+
 		n=$(( n + 1 ))
 	done
 }
+
+. tst_net.sh

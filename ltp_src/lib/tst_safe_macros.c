@@ -18,6 +18,26 @@
 #include "lapi/setns.h"
 #include "tst_safe_macros.h"
 #include "lapi/personality.h"
+#include "lapi/pidfd.h"
+
+int safe_access(const char *file, const int lineno,
+	    const char *pathname, int mode)
+{
+	int rval;
+
+	rval = access(pathname, mode);
+
+	if (rval == -1) {
+		tst_brk_(file, lineno, TBROK | TERRNO,
+			"access(%s,%d) failed", pathname, mode);
+	} else if (rval) {
+		tst_brk_(file, lineno, TBROK | TERRNO,
+			"Invalid access(%s,%d) return value %d", pathname,
+			mode, rval);
+	}
+
+	return rval;
+}
 
 int safe_setpgid(const char *file, const int lineno, pid_t pid, pid_t pgid)
 {
@@ -105,6 +125,25 @@ int safe_personality(const char *filename, unsigned int lineno,
 	}
 
 	return prev_persona;
+}
+
+int safe_pidfd_open(const char *file, const int lineno, pid_t pid,
+		   unsigned int flags)
+{
+	int rval;
+
+	rval = pidfd_open(pid, flags);
+
+	if (rval == -1) {
+		tst_brk_(file, lineno, TBROK | TERRNO,
+			 "pidfd_open(%i, %i) failed", pid, flags);
+	} else if (rval < 0) {
+		tst_brk_(file, lineno, TBROK | TERRNO,
+			 "Invalid pidfd_open(%i, %i) return value %d",
+			 pid, flags, rval);
+	}
+
+	return rval;
 }
 
 int safe_setregid(const char *file, const int lineno,

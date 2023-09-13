@@ -1,133 +1,95 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright (c) Huawei Technologies Co., Ltd., 2015
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
- * the GNU General Public License for more details.
+ * Copyright (C) 2022 SUSE LLC Andrea Cervesato <andrea.cervesato@suse.com>
  */
 
-/*
- * Verify that:
- * The kernel imposes a limit of at least 32 nested levels on user namespaces.
+/*\
+ * [Description]
+ *
+ * Verify that the kernel allows at least 32 nested levels of user namespaces.
  */
 
 #define _GNU_SOURCE
-#include <sys/wait.h>
-#include <assert.h>
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include "userns_helper.h"
-#include "test.h"
+#include <sys/wait.h>
+#include "common.h"
+#include "tst_test.h"
+#include "lapi/sched.h"
 
 #define MAXNEST 32
 
-char *TCID = "userns07";
-int TST_TOTAL = 1;
-
-static void setup(void)
+static void child_fn1(const int level)
 {
-	check_newuser();
-	tst_tmpdir();
-	TST_CHECKPOINT_INIT(NULL);
-}
-
-static void cleanup(void)
-{
-	tst_rmdir();
-}
-
-static int child_fn1(void *arg)
-{
-	pid_t cpid1;
-	long level = (long)arg;
-	int status;
+	const struct tst_clone_args args = { CLONE_NEWUSER, SIGCHLD };
+	pid_t cpid;
 	int parentuid;
 	int parentgid;
 
-	TST_SAFE_CHECKPOINT_WAIT(NULL, 0);
+	TST_CHECKPOINT_WAIT(0);
 
-	if (level == MAXNEST)
-		return 0;
-	cpid1 = ltp_clone_quick(CLONE_NEWUSER | SIGCHLD,
-		(void *)child_fn1, (void *)(level + 1));
-	if (cpid1 < 0) {
-		printf("level %ld:unexpected error: (%d) %s\n",
-			level, errno, strerror(errno));
-		return 1;
+	if (level == MAXNEST) {
+		tst_res(TPASS, "nested all children");
+		return;
+	}
+
+	cpid = SAFE_CLONE(&args);
+	if (!cpid) {
+		child_fn1(level + 1);
+		return;
 	}
 
 	parentuid = geteuid();
 	parentgid = getegid();
 
-	updatemap(cpid1, UID_MAP, 0, parentuid, NULL);
-	updatemap(cpid1, GID_MAP, 0, parentgid, NULL);
+	updatemap(cpid, UID_MAP, 0, parentuid);
+	updatemap(cpid, GID_MAP, 0, parentgid);
 
-	TST_SAFE_CHECKPOINT_WAKE(cleanup, 0);
+	TST_CHECKPOINT_WAKE(0);
 
-	if (waitpid(cpid1, &status, 0) == -1)
-		return 1;
-
-	if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
-		printf("child exited abnormally\n");
-		return 1;
-	} else if (WIFSIGNALED(status)) {
-		printf("child was killed with signal = %d", WTERMSIG(status));
-		return 1;
-	}
-	return 0;
+	tst_reap_children();
 }
 
-static void test_max_nest(void)
+static void run(void)
 {
-	pid_t cpid1;
+	const struct tst_clone_args args = { CLONE_NEWUSER, SIGCHLD };
+	pid_t cpid;
 	int parentuid;
 	int parentgid;
-	int fd;
 	char path[BUFSIZ];
 
-	cpid1 = ltp_clone_quick(CLONE_NEWUSER | SIGCHLD,
-		(void *)child_fn1, (void *)0);
-	if (cpid1 < 0)
-		tst_brkm(TBROK | TERRNO, cleanup, "clone failed");
+	cpid = SAFE_CLONE(&args);
+	if (!cpid) {
+		child_fn1(0);
+		return;
+	}
 
 	parentuid = geteuid();
 	parentgid = getegid();
 
 	if (access("/proc/self/setgroups", F_OK) == 0) {
-		sprintf(path, "/proc/%d/setgroups", cpid1);
-		fd = SAFE_OPEN(cleanup, path, O_WRONLY, 0644);
-		SAFE_WRITE(cleanup, 1, fd, "deny", 4);
-		SAFE_CLOSE(cleanup, fd);
+		sprintf(path, "/proc/%d/setgroups", cpid);
+		SAFE_FILE_PRINTF(path, "deny");
 	}
 
-	updatemap(cpid1, UID_MAP, 0, parentuid, cleanup);
-	updatemap(cpid1, GID_MAP, 0, parentgid, cleanup);
+	updatemap(cpid, UID_MAP, 0, parentuid);
+	updatemap(cpid, GID_MAP, 0, parentgid);
 
-	TST_SAFE_CHECKPOINT_WAKE(cleanup, 0);
-	tst_record_childstatus(cleanup, cpid1);
+	TST_CHECKPOINT_WAKE(0);
 }
 
-int main(int argc, char *argv[])
-{
-	int lc;
-
-	setup();
-	tst_parse_opts(argc, argv, NULL, NULL);
-
-	for (lc = 0; TEST_LOOPING(lc); lc++) {
-		tst_count = 0;
-		test_max_nest();
-	}
-
-	cleanup();
-	tst_exit();
-}
-
+static struct tst_test test = {
+	.test_all = run,
+	.needs_root = 1,
+	.forks_child = 1,
+	.needs_checkpoints = 1,
+	.needs_kconfigs = (const char *[]) {
+		"CONFIG_USER_NS",
+		NULL,
+	},
+	.save_restore = (const struct tst_path_val[]) {
+		{"/proc/sys/kernel/unprivileged_userns_clone", "1", TST_SR_SKIP},
+		{}
+	},
+};

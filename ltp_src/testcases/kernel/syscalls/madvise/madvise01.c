@@ -11,7 +11,6 @@
  */
 
 #include <sys/types.h>
-#include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
 #include <errno.h>
@@ -55,6 +54,8 @@ static struct tcase {
 	{MADV_FREE,        "MADV_FREE",        &amem},  /* since Linux 4.5 */
 	{MADV_WIPEONFORK,  "MADV_WIPEONFORK",  &amem},  /* since Linux 4.14 */
 	{MADV_KEEPONFORK,  "MADV_KEEPONFORK",  &amem},  /* since Linux 4.14 */
+	{MADV_COLD,        "MADV_COLD",        &amem},  /* since Linux 5.4 */
+	{MADV_PAGEOUT,     "MADV_PAGEOUT",     &amem},  /* since Linux 5.4 */
 
 };
 
@@ -70,7 +71,7 @@ static void setup(void)
 
 	/* Writing 40 KB of random data into this file [32 * 1280 = 40960] */
 	for (i = 0; i < 1280; i++)
-		SAFE_WRITE(1, fd, STR, strlen(STR));
+		SAFE_WRITE(SAFE_WRITE_ALL, fd, STR, strlen(STR));
 
 	SAFE_FSTAT(fd, &st);
 

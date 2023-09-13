@@ -82,6 +82,181 @@ static void do_entrypoint_checks(struct entrypoint *ep)
 	} END_FOR_EACH_PTR(bb);
 }
 
+/* The old API can not comply with the rules. So when we see one of
+ * these symbols we know that it will result in further
+ * warnings. Probably these will suggest inappropriate things. Usually
+ * these symbols should be removed and the new API used
+ * instead. Otherwise they can be ignored until all tests have been
+ * converted to the new API.
+ */
+static bool check_symbol_deprecated(const struct symbol *const sym)
+{
+	static struct ident *TCID_id, *TST_TOTAL_id;
+	const struct ident *id = sym->ident;
+
+	if (!TCID_id) {
+		TCID_id = built_in_ident("TCID");
+		TST_TOTAL_id = built_in_ident("TST_TOTAL");
+	}
+
+	if (id != TCID_id && id != TST_TOTAL_id)
+		return false;
+
+	warning(sym->pos,
+		"Ignoring deprecated API symbol: '%s'. Should this code be converted to the new API?",
+		show_ident(id));
+
+	return true;
+}
+
+/* Check for LTP-003 and LTP-004
+ *
+ * Try to find cases where the static keyword was forgotten.
+ */
+static void check_symbol_visibility(const struct symbol *const sym)
+{
+	const unsigned long mod = sym->ctype.modifiers;
+	const char *const name = show_ident(sym->ident);
+	const int has_lib_prefix = !strncmp("tst_", name, 4) ||
+		!strncmp("TST_", name, 4) ||
+		!strncmp("ltp_", name, 4) ||
+		!strncmp("safe_", name, 5);
+
+	if (!(mod & MOD_TOPLEVEL))
+		return;
+
+	if (has_lib_prefix && (mod & MOD_STATIC) && !(mod & MOD_INLINE)) {
+		warning(sym->pos,
+			"LTP-003: Symbol '%s' has the LTP public library prefix, but is static (private).",
+			name);
+		return;
+	}
+
+	if ((mod & MOD_STATIC))
+		return;
+
+	if (tu_kind == LTP_LIB && !has_lib_prefix) {
+		warning(sym->pos,
+			"LTP-003: Symbol '%s' is a public library function, but is missing the 'tst_' prefix",
+			name);
+		return;
+	}
+
+	if (sym->same_symbol)
+		return;
+
+	if (sym->ident == &main_ident)
+		return;
+
+	warning(sym->pos,
+		"Symbol '%s' has no prototype or library ('tst_') prefix. Should it be static?",
+		name);
+}
+
+/* See base_type() in dissect.c */
+static struct symbol *unwrap_base_type(const struct symbol *sym)
+{
+	switch (sym->ctype.base_type->type) {
+	case SYM_ARRAY:
+	case SYM_NODE:
+	case SYM_PTR:
+		return unwrap_base_type(sym->ctype.base_type);
+	default:
+		return sym->ctype.base_type;
+	}
+}
+
+/* Checks if some struct array initializer is terminated with a blank
+ * (zeroed) item i.e. {}
+ */
+static bool is_terminated_with_null_struct(const struct symbol *const sym)
+{
+	const struct expression *const arr_init = sym->initializer;
+	const struct expression *item_init =
+		last_ptr_list((struct ptr_list *)arr_init->expr_list);
+
+	if (item_init->type == EXPR_POS)
+		item_init = item_init->init_expr;
+
+	if (item_init->type != EXPR_INITIALIZER)
+		return false;
+
+	return ptr_list_empty((struct ptr_list *)item_init->expr_list);
+}
+
+/* LTP-005: Check array sentinel value
+ *
+ * This is most important for the tags array. It is only accessed when
+ * the test fails. So we perform a static check to ensure it ends with
+ * {}.
+ */
+static void check_struct_array_initializer(const struct symbol *const sym)
+{
+	if (is_terminated_with_null_struct(sym))
+		return;
+
+	warning(sym->pos,
+		"LTP-005: Struct array doesn't appear to be null-terminated; did you forget to add '{}' as the final entry?");
+}
+
+/* Find struct tst_test test = { ... } and perform tests on its initializer */
+static void check_test_struct(const struct symbol *const sym)
+{
+	static struct ident *tst_test, *tst_test_test;
+	struct ident *ctype_name = NULL;
+	struct expression *init = sym->initializer;
+	struct expression *entry;
+
+	if (!sym->ctype.base_type)
+		return;
+
+	ctype_name = sym->ctype.base_type->ident;
+
+	if (!init)
+		return;
+
+	if (!tst_test_test) {
+		tst_test = built_in_ident("tst_test");
+		tst_test_test = built_in_ident("test");
+	}
+
+	if (sym->ident != tst_test_test)
+		return;
+
+	if (ctype_name != tst_test)
+		return;
+
+	FOR_EACH_PTR(init->expr_list, entry) {
+		if (entry->init_expr->type != EXPR_SYMBOL)
+			continue;
+
+		switch (entry->ctype->ctype.base_type->type) {
+		case SYM_PTR:
+		case SYM_ARRAY:
+			break;
+		default:
+			return;
+		}
+
+		const struct symbol *entry_init = entry->init_expr->symbol;
+		const struct symbol *entry_ctype = unwrap_base_type(entry_init);
+
+		if (entry_ctype->type == SYM_STRUCT)
+			check_struct_array_initializer(entry_init);
+	} END_FOR_EACH_PTR(entry);
+
+}
+
+/* AST level checks */
+static void do_symbol_checks(struct symbol *sym)
+{
+	if (check_symbol_deprecated(sym))
+		return;
+
+	check_symbol_visibility(sym);
+	check_test_struct(sym);
+}
+
 /* Compile the AST into a graph of basicblocks */
 static void process_symbols(struct symbol_list *list)
 {
@@ -89,6 +264,8 @@ static void process_symbols(struct symbol_list *list)
 
 	FOR_EACH_PTR(list, sym) {
 		struct entrypoint *ep;
+
+		do_symbol_checks(sym);
 
 		expand_symbol(sym);
 		ep = linearize_symbol(sym);

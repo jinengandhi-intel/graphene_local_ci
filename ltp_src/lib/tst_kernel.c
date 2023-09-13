@@ -37,7 +37,12 @@ static int get_kernel_bits_from_uname(struct utsname *buf)
 int tst_kernel_bits(void)
 {
 	struct utsname buf;
-	int kernel_bits = get_kernel_bits_from_uname(&buf);
+	static int kernel_bits;
+
+	if (kernel_bits)
+		return kernel_bits;
+
+	kernel_bits = get_kernel_bits_from_uname(&buf);
 
 	if (kernel_bits == -1)
 		return -1;
@@ -80,12 +85,12 @@ int tst_kernel_bits(void)
 #endif  /* __ANDROID__ */
 
 	tst_resm(TINFO, "uname.machine=%s kernel is %ibit",
-	         buf.machine, kernel_bits);
+		 buf.machine, kernel_bits);
 
 	return kernel_bits;
 }
 
-static int tst_search_driver(const char *driver, const char *file)
+static int tst_search_driver_(const char *driver, const char *file)
 {
 	struct stat st;
 	char buf[PATH_MAX];
@@ -111,6 +116,12 @@ static int tst_search_driver(const char *driver, const char *file)
 		return -1;
 	}
 
+	/* always search for x86_64 */
+	char *fix = strstr(driver, "x86-64");
+
+	if (fix)
+		fix[3] = '_';
+
 	SAFE_ASPRINTF(NULL, &search, "/%s.ko", driver);
 
 	f = SAFE_FOPEN(NULL, path, "r");
@@ -134,28 +145,19 @@ static int tst_search_driver(const char *driver, const char *file)
 	return ret;
 }
 
-static int tst_check_driver_(const char *driver)
-{
-	if (!tst_search_driver(driver, "modules.dep") ||
-		!tst_search_driver(driver, "modules.builtin"))
-		return 0;
-
-	return -1;
-}
-
-int tst_check_driver(const char *driver)
+static int tst_search_driver(const char *driver, const char *file)
 {
 #ifdef __ANDROID__
 	/*
 	 * Android may not have properly installed modules.* files. We could
-	 * search modules in /system/lib/modules, but to to determine built-in
+	 * search modules in /system/lib/modules, but to determine built-in
 	 * drivers we need modules.builtin. Therefore assume all drivers are
 	 * available.
 	 */
 	return 0;
 #endif
 
-	if (!tst_check_driver_(driver))
+	if (!tst_search_driver_(driver, file))
 		return 0;
 
 	int ret = -1;
@@ -173,9 +175,26 @@ int tst_check_driver(const char *driver)
 		while ((ix = strchr(ix, find)))
 			*ix++ = replace;
 
-		ret = tst_check_driver_(driver2);
+		ret = tst_search_driver_(driver2, file);
 		free(driver2);
 	}
 
 	return ret;
+}
+
+int tst_check_builtin_driver(const char *driver)
+{
+	if (!tst_search_driver(driver, "modules.builtin"))
+		return 0;
+
+	return -1;
+}
+
+int tst_check_driver(const char *driver)
+{
+	if (!tst_search_driver(driver, "modules.dep") ||
+		!tst_search_driver(driver, "modules.builtin"))
+		return 0;
+
+	return -1;
 }

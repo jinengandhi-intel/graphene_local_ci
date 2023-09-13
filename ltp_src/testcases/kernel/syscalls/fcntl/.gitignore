@@ -8,8 +8,6 @@
 /fcntl04_64
 /fcntl05
 /fcntl05_64
-/fcntl06
-/fcntl06_64
 /fcntl07
 /fcntl07_64
 /fcntl08
@@ -74,3 +72,5 @@
 /fcntl37_64
 /fcntl38
 /fcntl38_64
+/fcntl39
+/fcntl39_64

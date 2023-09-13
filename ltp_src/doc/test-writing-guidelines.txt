@@ -121,9 +121,11 @@ architecture or similarly complicated code, put it into a header instead.
 2.1 C coding style
 ^^^^^^^^^^^^^^^^^^
 
-LTP adopted Linux kernel coding style. If you aren't familiar with its rules
-locate 'linux/Documentation/CodingStyle' in the kernel sources and read it,
-it's a well written introduction.
+LTP adopted Linux kernel coding style:
+https://www.kernel.org/doc/html/latest/process/coding-style.html
+
+If you aren't familiar with its rules please read it, it's a well written
+introduction.
 
 Run `make check` in the test's directory and/or use `make check-$TCID`,
 it uses (among other checks) our vendored version of
@@ -133,6 +135,14 @@ script from kernel git tree.
 NOTE: If `make check` does not report any problems, the code still may be wrong
       as all tools used for checking only look for common mistakes.
 
+2.1.1 LTP-004: Test executable symbols are marked static
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Test executables should not export symbols unnecessarily. This means
+that all top-level variables and functions should be marked with the
+static keyword. The only visible symbols should be those included from
+shared object files.
+
 2.2 Shell coding style
 ^^^^^^^^^^^^^^^^^^^^^^
 
@@ -140,7 +150,7 @@ When writing testcases in shell write in *portable shell* only, it's a good
 idea to try to run the test using alternative shell (alternative to bash, for
 example dash) too.
 
-*Portable shell* means Shell Command Language as defined by POSIX with a
+*Portable shell* means Shell Command Language as defined by POSIX with an
 exception of few widely used extensions, namely 'local' keyword used inside of
 functions and '-o' and '-a' test parameters (that are marked as obsolete in
 POSIX).
@@ -205,7 +215,7 @@ expression of kernel config variables that has to be satisfied in order for a
 test to run. This is mostly used for kernel namespaces at the moment.
 
 Sometimes it also makes sense to define a few macros instead of creating
-configure test. One example are Linux specific POSIX clock ids in
+configure test. One example is Linux specific POSIX clock ids in
 'include/lapi/posix_clocks.h'.
 
 3.1 Dealing with messed up legacy code
@@ -294,7 +304,7 @@ See 'testcases/commands/file/' for example.
 5.3 Subexecutables
 ^^^^^^^^^^^^^^^^^^
 
-If you test needs to execute a binary, place it in the same directory as the
+If your test needs to execute a binary, place it in the same directory as the
 testcase and name the file starting with '${test_binary_name}_'.  Once the
 test is executed by the framework, the path to the directory with all LTP
 binaries is added to the '$PATH' and you can execute it just by its name.
@@ -324,3 +334,77 @@ It's easier to maintain a '.gitignore' file per directory with tests, rather
 than having single file in the project root directory. This way, we don't have
 to update all the gitignore files when moving directories, and they get deleted
 automatically when a directory with tests is removed.
+
+7 Testing pre-release kernel features
+-------------------------------------
+
+Tests for features not yet in a mainline kernel release are accepted. However
+they must only be added to the +staging+ runtest file. Once a feature is part
+of the stable kernel ABI the associated test must be moved out of staging.
+
+This is primarily to help test kernel RCs by avoiding the need to download
+separate LTP patchsets.
+
+8 LTP C And Shell Test API Comparison
+-------------------------------------
+
+Comparison of
+https://github.com/linux-test-project/ltp/wiki/C-Test-API[C Test API] and
+https://github.com/linux-test-project/ltp/wiki/Shell-Test-API[Shell Test API].
+
+[options="header"]
+|================================================================================
+|  C API ('struct tst_test' members) | shell API ('$TST_*' environment variables)
+| '.all_filesystems' | 'TST_ALL_FILESYSTEMS'
+| '.bufs' | –
+| '.caps' | –
+| '.child_needs_reinit' | not applicable
+| '.cleanup' | 'TST_CLEANUP'
+| '.dev_extra_opts' | 'TST_DEV_EXTRA_OPTS'
+| '.dev_fs_opts' | 'TST_DEV_FS_OPTS'
+| '.dev_fs_type' | 'TST_FS_TYPE'
+| '.dev_min_size' | not applicable
+| '.format_device' | 'TST_FORMAT_DEVICE'
+| '.max_runtime' | –
+| '.min_cpus' | not applicable
+| '.min_kver' | 'TST_MIN_KVER'
+| '.min_mem_avail' | not applicable
+| '.mnt_flags' | 'TST_MNT_PARAMS'
+| '.mntpoint', '.mnt_data' | 'TST_MNTPOINT'
+| '.mount_device' | 'TST_MOUNT_DEVICE'
+| '.needs_cgroup_ctrls' | –
+| '.needs_checkpoints' | 'TST_NEEDS_CHECKPOINTS'
+| '.needs_cmds' | 'TST_NEEDS_CMDS'
+| '.needs_devfs' | –
+| '.needs_device' | 'TST_NEEDS_DEVICE'
+| '.needs_drivers' | 'TST_NEEDS_DRIVERS'
+| '.needs_kconfigs' | 'TST_NEEDS_KCONFIGS'
+| '.needs_overlay' |
+| '.needs_rofs' | –
+| '.needs_root' | 'TST_NEEDS_ROOT'
+| '.needs_tmpdir' | 'TST_NEEDS_TMPDIR'
+| '.options' | 'TST_PARSE_ARGS', 'TST_OPTS'
+| '.resource_files' | –
+| '.restore_wallclock' | not applicable
+| '.sample' | –
+| '.save_restore' | –
+| '.scall' | not applicable
+| '.setup' | 'TST_SETUP'
+| '.skip_filesystems' | 'TST_SKIP_FILESYSTEMS'
+| '.skip_in_compat' | –
+| '.skip_in_lockdown' | –
+| '.supported_archs' | not applicable
+| '.tags' | –
+| '.taint_check' | –
+| '.tcnt' | 'TST_CNT'
+| '.tconf_msg' | not applicable
+| '.test', '.test_all' | 'TST_TESTFUNC'
+| '.test_variants' | –
+| '.timeout' | 'TST_TIMEOUT'
+| '.tst_hugepage' | not applicable
+| .format_device | 'TST_DEVICE'
+| not applicable | 'TST_NEEDS_KCONFIGS_IFS'
+| not applicable | 'TST_NEEDS_MODULE'
+| not applicable | 'TST_POS_ARGS'
+| not applicable | 'TST_USAGE'
+|================================================================================

@@ -1,149 +1,116 @@
-/* Copyright (c) 2014 Red Hat, Inc.
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of version 2 the GNU General Public License as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- ***********************************************************************
- * File: mountns02.c
+// SPDX-License-Identifier: GPL-2.0
+/*
+ * Copyright (c) 2014 Red Hat, Inc.
+ * Copyright (C) 2021 SUSE LLC Andrea Cervesato <andrea.cervesato@suse.com>
+ */
+
+/*\
+ * [Description]
  *
  * Tests a private mount: private mount does not forward or receive
  * propagation.
- * Description:
- * 1. Creates directories "A", "B" and files "A/A", "B/B"
- * 2. Unshares mount namespace and makes it private (so mounts/umounts
- *    have no effect on a real system)
- * 3. Bind mounts directory "A" to "A"
- * 4. Makes directory "A" private
- * 5. Clones a new child process with CLONE_NEWNS flag
- * 6. There are two test cases (where X is parent namespace and Y child
- *    namespace):
- *    1)
- *	X: bind mounts "B" to "A"
- *	Y: must see "A/A" and must not see "A/B"
- *	X: umounts "A"
- *    2)
- *	Y: bind mounts "B" to "A"
- *	X: must see "A/A" and must not see "A/B"
- *	Y: umounts A
- ***********************************************************************/
+ *
+ * [Algorithm]
+ *
+ * - Creates directories DIR_A, DIR_B and files DIR_A/"A", DIR_B/"B"
+ * - Unshares mount namespace and makes it private (so mounts/umounts have no
+ *   effect on a real system)
+ * - Bind mounts directory DIR_A to DIR_A
+ * - Makes directory DIR_A private
+ * - Clones a new child process with CLONE_NEWNS flag
+ * - There are two test cases (where X is parent namespace and Y child
+ *   namespace):
+ *  1. First test case
+ *   .. X: bind mounts DIR_B to DIR_A
+ *   .. Y: must see DIR_A/"A" and must not see DIR_A/"B"
+ *   .. X: umounts DIR_A
+ *  2. Second test case
+ *   .. Y: bind mounts DIR_B to DIR_A
+ *   .. X: must see DIR_A/"A" and must not see DIR_A/"B"
+ *   .. Y: umounts DIRA
+ */
 
-#define _GNU_SOURCE
 #include <sys/wait.h>
 #include <sys/mount.h>
-#include <stdio.h>
-#include <errno.h>
-#include "mountns_helper.h"
-#include "test.h"
-#include "safe_macros.h"
+#include "mountns.h"
+#include "tst_test.h"
+#include "lapi/sched.h"
 
-char *TCID	= "mountns02";
-int TST_TOTAL	= 2;
-
-#if defined(MS_SHARED) && defined(MS_PRIVATE) && defined(MS_REC)
-
-int child_func(void *arg LTP_ATTRIBUTE_UNUSED)
+static void child_func(void)
 {
-	int ret = 0;
+	TST_CHECKPOINT_WAIT(0);
 
-	TST_SAFE_CHECKPOINT_WAIT(NULL, 0);
+	if ((access(DIRA "/A", F_OK) != 0) || (access(DIRA "/B", F_OK) == 0))
+		tst_res(TFAIL, "private mount in parent failed");
+	else
+		tst_res(TPASS, "private mount in parent passed");
 
-	if ((access(DIRA"/A", F_OK) != 0) || (access(DIRA"/B", F_OK) == 0))
-		ret = 2;
+	TST_CHECKPOINT_WAKE_AND_WAIT(0);
 
-	TST_SAFE_CHECKPOINT_WAKE_AND_WAIT(NULL, 0);
+	SAFE_MOUNT(DIRB, DIRA, "none", MS_BIND, NULL);
 
-	/* bind mounts DIRB to DIRA making contents of DIRB visible
-	 * in DIRA */
-	if (mount(DIRB, DIRA, "none", MS_BIND, NULL) == -1) {
-		perror("mount");
-		return 1;
-	}
+	TST_CHECKPOINT_WAKE_AND_WAIT(0);
 
-	TST_SAFE_CHECKPOINT_WAKE_AND_WAIT(NULL, 0);
-
-	umount(DIRA);
-	return ret;
+	SAFE_UMOUNT(DIRA);
 }
 
-static void test(void)
+static void run(void)
 {
-	int status;
+	const struct tst_clone_args args = { CLONE_NEWNS, SIGCHLD };
 
-	/* unshares the mount ns */
-	if (unshare(CLONE_NEWNS) == -1)
-		tst_brkm(TBROK | TERRNO, cleanup, "unshare failed");
+	SAFE_UNSHARE(CLONE_NEWNS);
+
 	/* makes sure parent mounts/umounts have no effect on a real system */
-	SAFE_MOUNT(cleanup, "none", "/", "none", MS_REC|MS_PRIVATE, NULL);
+	SAFE_MOUNT("none", "/", "none", MS_REC | MS_PRIVATE, NULL);
 
-	/* bind mounts DIRA to itself */
-	SAFE_MOUNT(cleanup, DIRA, DIRA, "none", MS_BIND, NULL);
+	SAFE_MOUNT(DIRA, DIRA, "none", MS_BIND, NULL);
 
-	/* makes mount DIRA private */
-	SAFE_MOUNT(cleanup, "none", DIRA, "none", MS_PRIVATE, NULL);
+	SAFE_MOUNT("none", DIRA, "none", MS_PRIVATE, NULL);
 
-	if (do_clone_tests(CLONE_NEWNS, child_func, NULL, NULL, NULL) == -1)
-		tst_brkm(TBROK | TERRNO, cleanup, "clone failed");
-
-	/* bind mounts DIRB to DIRA making contents of DIRB visible
-	 * in DIRA */
-	SAFE_MOUNT(cleanup, DIRB, DIRA, "none", MS_BIND, NULL);
-
-	TST_SAFE_CHECKPOINT_WAKE_AND_WAIT(cleanup, 0);
-
-	SAFE_UMOUNT(cleanup, DIRA);
-
-	TST_SAFE_CHECKPOINT_WAKE_AND_WAIT(cleanup, 0);
-
-	if ((access(DIRA"/A", F_OK) != 0) || (access(DIRA"/B", F_OK) == 0))
-		tst_resm(TFAIL, "private mount in child failed");
-	else
-		tst_resm(TPASS, "private mount in child passed");
-
-	TST_SAFE_CHECKPOINT_WAKE(cleanup, 0);
-
-
-	SAFE_WAIT(cleanup, &status);
-	if (WIFEXITED(status)) {
-		if ((WEXITSTATUS(status) == 0))
-			tst_resm(TPASS, "private mount in parent passed");
-		else
-			tst_resm(TFAIL, "private mount in parent failed");
-	}
-	if (WIFSIGNALED(status)) {
-		tst_resm(TBROK, "child was killed with signal %s",
-			 tst_strsig(WTERMSIG(status)));
+	if (!SAFE_CLONE(&args)) {
+		child_func();
 		return;
 	}
 
-	SAFE_UMOUNT(cleanup, DIRA);
+	SAFE_MOUNT(DIRB, DIRA, "none", MS_BIND, NULL);
+
+	TST_CHECKPOINT_WAKE_AND_WAIT(0);
+
+	SAFE_UMOUNT(DIRA);
+
+	TST_CHECKPOINT_WAKE_AND_WAIT(0);
+
+	if ((access(DIRA "/A", F_OK) != 0) || (access(DIRA "/B", F_OK) == 0))
+		tst_res(TFAIL, "private mount in child failed");
+	else
+		tst_res(TPASS, "private mount in child passed");
+
+	TST_CHECKPOINT_WAKE(0);
+
+	SAFE_WAIT(NULL);
+
+	SAFE_UMOUNT(DIRA);
 }
 
-int main(int argc, char *argv[])
+static void setup(void)
 {
-	int lc;
-
-	tst_parse_opts(argc, argv, NULL, NULL);
-
-	setup();
-
-	for (lc = 0; TEST_LOOPING(lc); lc++)
-		test();
-
-	cleanup();
-	tst_exit();
+	create_folders();
 }
 
-#else
-int main(void)
+static void cleanup(void)
 {
-	tst_brkm(TCONF, NULL, "needed mountflags are not defined");
+	umount_folders();
 }
-#endif
+
+static struct tst_test test = {
+	.setup = setup,
+	.cleanup = cleanup,
+	.test_all = run,
+	.needs_root = 1,
+	.forks_child = 1,
+	.needs_checkpoints = 1,
+	.needs_kconfigs = (const char *[]) {
+		"CONFIG_USER_NS",
+		NULL,
+	},
+};
