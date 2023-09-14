@@ -25,6 +25,7 @@ fs.mounts = [
 
 sgx.file_check_policy = "allow_all_but_log"
 sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
+sgx.require_exinfo = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
 
 sgx.allowed_files = [
     "file:.",

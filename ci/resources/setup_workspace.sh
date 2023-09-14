@@ -7,6 +7,9 @@ cd $WORKSPACE/examples
 for i in $(find -name '*manifest.template');
 do
   sed -i '$ a sgx.debug = true' $i;
+  if [[ "$EDMM" == 1 ]]; then
+    sed -i '$ a sgx.require_exinfo = true' $i;
+  fi
 done;
 
 cd $WORKSPACE/gramine
@@ -19,6 +22,9 @@ cp -rf $WORKSPACE/utils/tfserving CI-Examples/
 
 if [[ "$SGX" == 1 ]]; then
   cp -rf ~/jenkins/sandstone-50-bin CI-Examples/
+  if [[ "$EDMM" == 1 ]]; then
+    sed -i '$ a sgx.require_exinfo = true' CI-Examples/sandstone-50-bin/sandstone.manifest.template;
+  fi
   cp -f $WORKSPACE/Patch/rename_protected_file.patch .
   git apply rename_protected_file.patch
 fi
