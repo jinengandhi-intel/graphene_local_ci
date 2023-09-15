@@ -16,8 +16,9 @@ Let's start with an example, following code is a simple test for a 'getenv()'.
 
 [source,c]
 -------------------------------------------------------------------------------
-/*
- * This is test for basic functionality of getenv().
+/*\
+ * [Description]
+ * Tests basic functionality of getenv().
  *
  *  - create an env variable and verify that getenv() can get get it
  *  - call getenv() with nonexisting variable name, check that it returns NULL
@@ -93,14 +94,35 @@ in range of [0, '.tcnt' - 1].
 
 IMPORTANT: Only one of '.test' and '.test_all' can be set at a time.
 
-Each test has a default timeout set to 300s. The default timeout can be
-overridden by setting '.timeout' in the test structure or by calling
-'tst_set_timeout()' in the test 'setup()'. There are a few testcases whose run
-time may vary arbitrarily, for these timeout can be disabled by setting it to
--1.
+Each test has a limit on how long it can run and the limit composes of two
+parts max_runtime and timeout. The max_runtime is a limit for how long can the
+'.test_all' or a set of '.test' functions take and the timeout is static part
+that should cover the duration of test setup and cleanup plus some safety.
 
-Test can find out how much time (in seconds) is remaining to timeout,
-by calling 'tst_timeout_remaining()'.
+Any test that runs for more than a second or two has to make sure to:
+
+- set the runtime either by setting the '.max_runtime' in tst_test or by
+  calling 'tst_set_max_runtime()' in the test setup
+
+- monitor remaning runtime by regular calls to 'tst_remaining_runtime()' and
+  exit when runtime has been used up
+
+Test is free to exit before max_runtime has been used up for example when
+minimal number of iteration was finished.
+
+The limit is applied to a single call of the '.test_all' function that means
+that for example when '.test_variants' or '.all_filesystems' is set the whole
+test will be limited by 'variants * (max_runtime + timeout)' seconds and the
+test runtime will be likely close to 'variants * max_runtime' seconds.
+
+[source,c]
+-------------------------------------------------------------------------------
+/*
+ * Returns number of seconds or zero in case that runtime has been used up.
+ */
+
+int tst_remaining_runtime(void);
+-------------------------------------------------------------------------------
 
 LAPI headers
 ++++++++++++
@@ -298,6 +320,9 @@ The 'TST_EXP_FAIL2()' is the same as 'TST_EXP_FAIL()' except the return value is
 expected to be non-negative integer if call passes. These macros build upon the
 +TEST()+ macro and associated variables.
 
+'TST_EXP_FAIL_SILENT()' and 'TST_EXP_FAIL2_SILENT()' variants are less verbose
+and do not print TPASS messages when SCALL fails as expected.
+
 [source,c]
 -------------------------------------------------------------------------------
 TEST(socket(AF_INET, SOCK_RAW, 1));
@@ -328,10 +353,24 @@ if (!TST_PASS)
 	return;
 -------------------------------------------------------------------------------
 
-If the return value of 'wait' is positive. This macro will print a pass result
-and set +TST_PASS+ appropriately. If the return value is zero or negative, then
+If the return value of 'wait' is positive or zero, this macro will print a pass
+result and set +TST_PASS+ appropriately. If the return value is negative, then
 it will print fail.  There are many similar macros to those shown here, please
 see 'tst_test_macros.h'.
+
+[source,c]
+-------------------------------------------------------------------------------
+TST_EXP_EQ_LI(val1, val2);
+TST_EXP_EQ_UI(val1, val2);
+TST_EXP_EQ_SZ(val1, val2);
+TST_EXP_EQ_SSZ(val1, val2);
+
+/* Use as */
+TST_EXP_EQ_LI(sig_caught, SIGCHLD);
+-------------------------------------------------------------------------------
+
+Set of macros for different integer type comparsions. These macros print the
+variable names as well as values in both pass and fail scenarios.
 
 [source,c]
 -------------------------------------------------------------------------------
@@ -360,12 +399,13 @@ WARNING: This function is not thread safe.
 
 [source,c]
 -------------------------------------------------------------------------------
-void tst_set_timeout(unsigned int timeout);
+void tst_set_max_runtime(int max_runtime);
 -------------------------------------------------------------------------------
 
-Allows for setting timeout per test iteration dynamically in the test setup(),
+Allows for setting max_runtime per test iteration dynamically in the test setup(),
 the timeout is specified in seconds. There are a few testcases whose runtime
-can vary arbitrarily, these can disable timeouts by setting it to -1.
+can vary arbitrarily, these can disable timeouts by setting it to
+TST_UNLIMITED_RUNTIME.
 
 [source,c]
 -------------------------------------------------------------------------------
@@ -407,16 +447,16 @@ Instead of writing:
 
 [source,c]
 -------------------------------------------------------------------------------
-	fd = open("/dev/null", O_RDONLY);
-	if (fd < 0)
-		tst_brk(TBROK | TERRNO, "opening /dev/null failed");
+fd = open("/dev/null", O_RDONLY);
+if (fd < 0)
+	tst_brk(TBROK | TERRNO, "opening /dev/null failed");
 -------------------------------------------------------------------------------
 
 You write just:
 
 [source,c]
 -------------------------------------------------------------------------------
-	fd = SAFE_OPEN("/dev/null", O_RDONLY);
+fd = SAFE_OPEN("/dev/null", O_RDONLY);
 -------------------------------------------------------------------------------
 
 IMPORTANT: The SAFE_CLOSE() function also sets the passed file descriptor to -1
@@ -427,7 +467,7 @@ example, do:
 
 [source,c]
 -------------------------------------------------------------------------------
-	SAFE_FILE_SCANF("/proc/sys/kernel/pid_max", "%lu", &pid_max);
+SAFE_FILE_SCANF("/proc/sys/kernel/pid_max", "%lu", &pid_max);
 -------------------------------------------------------------------------------
 
 See 'include/tst_safe_macros.h', 'include/tst_safe_stdio.h' and
@@ -457,19 +497,24 @@ NOTE: The test parameters must not collide with common test parameters defined
 [source,c]
 -------------------------------------------------------------------------------
 int tst_parse_int(const char *str, int *val, int min, int max);
+int tst_parse_long(const char *str, long *val, long min, long max);
 int tst_parse_float(const char *str, float *val, float min, float max);
+int tst_parse_filesize(const char *str, long long *val, long long min, long long max);
 -------------------------------------------------------------------------------
 
 Helpers for parsing the strings returned in the 'struct tst_option'.
 
-Both return zero on success and 'errno', mostly 'EINVAL' or 'ERANGE', on
+Helpers return zero on success and 'errno', mostly 'EINVAL' or 'ERANGE', on
 failure.
 
-Both functions are no-op if 'str' is 'NULL'.
+Helpers functions are no-op if 'str' is 'NULL'.
 
 The valid range for result includes both 'min' and 'max'.
 
-.Example Usage
+In particular, 'tst_parse_filesize' function accepts prefix multiplies such as
+"k/K for kilobytes, "m/M" for megabytes and "g/G" for gigabytes. For example,
+10K are converted into 10240 bytes.
+
 [source,c]
 -------------------------------------------------------------------------------
 #include <limits.h>
@@ -477,12 +522,6 @@ The valid range for result includes both 'min' and 'max'.
 
 static char *str_threads;
 static int threads = 10;
-
-static struct tst_option options[] = {
-	{"t:", &str_threads, "Number of threads (default 10)"},
-	...
-	{NULL, NULL, NULL}
-};
 
 static void setup(void)
 {
@@ -505,7 +544,9 @@ static void test_threads(void)
 
 static struct tst_test test = {
 	...
-	.options = options,
+	.options = (struct tst_option[]) {
+		{"t:", &str_threads, "Number of threads (default 10)"},
+		{},
 	...
 };
 -------------------------------------------------------------------------------
@@ -517,7 +558,7 @@ static struct tst_test test = {
 Testcases for newly added kernel functionality require kernel newer than a
 certain version to run. All you need to skip a test on older kernels is to
 set the '.min_kver' string in the 'struct tst_test' to a minimal required
-kernel version, e.g. '.min_kver = "2.6.30"'.
+kernel version, e.g. '.min_kver = "4.10.0"'.
 
 For more complicated operations such as skipping a test for a certain range
 of kernel versions, following functions could be used:
@@ -543,11 +584,27 @@ positive means that it's newer.
 
 The second function 'tst_kvercmp2()' allows for specifying per-vendor table of
 kernel versions as vendors typically backport fixes to their kernels and the
-test may be relevant even if the kernel version does not suggests so. See
-'testcases/kernel/syscalls/inotify/inotify04.c' for example usage.
+test may be relevant even if the kernel version does not suggests so.
+
+[source,c]
+-------------------------------------------------------------------------------
+if (tst_kvercmp(5, 19, 0) >= 0)
+	tst_res(TCONF, "Test valid only for kernel < 5.19");
+
+static struct tst_kern_exv kvers[] = {
+	{ "UBUNTU", "4.4.0-48.69" },
+	{ NULL, NULL},
+};
+
+if (tst_kvercmp2(4, 4, 27, kvers) < 0)
+	/* code for kernel < v4.4.27 or ubuntu kernel < 4.4.0-48.69 */
+-------------------------------------------------------------------------------
 
 WARNING: The shell 'tst_kvercmp' maps the result into unsigned integer - the
          process exit value.
+
+NOTE: See also LTP
+      https://github.com/linux-test-project/ltp/wiki/Supported-kernel,-libc,-toolchain-versions#13-minimal-supported-kernel-version[minimal supported kernel version].
 
 1.7 Fork()-ing
 ~~~~~~~~~~~~~~
@@ -791,6 +848,8 @@ start for you. See 'testcases/kernel/device-drivers/block' for details.
 1.12 Useful macros
 ~~~~~~~~~~~~~~~~~~
 
+These macros are defined in 'include/tst_common.h'.
+
 [source,c]
 -------------------------------------------------------------------------------
 ARRAY_SIZE(arr)
@@ -805,6 +864,14 @@ LTP_ALIGN(x, a)
 -------------------------------------------------------------------------------
 
 Aligns the x to be next multiple of a. The a must be power of 2.
+
+[source,c]
+-------------------------------------------------------------------------------
+TST_TO_STR(s)  /* stringification */
+TST_TO_STR_(s) /* macro expansion */
+-------------------------------------------------------------------------------
+
+Macros for stringification.
 
 1.13 Filesystem type detection and skiplist
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -830,13 +897,22 @@ static struct tst_test test = {
 };
 -------------------------------------------------------------------------------
 
-When the '.all_filesystem' flag is set the '.skip_filesystems' list is passed
+When the '.all_filesystems' flag is set the '.skip_filesystems' list is passed
 to the function that detects supported filesystems any listed filesystem is
 not included in the resulting list of supported filesystems.
 
 If test needs to adjust expectations based on filesystem type it's also
 possible to detect filesystem type at the runtime. This is preferably used
 when only subset of the test is not applicable for a given filesystem.
+
+NOTE: ext2, ext3 or ext4 in '.skip_filesystems' on tests which does *not* use
+      '.all_filesystems' needs to be defined as 'ext2/ext3/ext4'. The reason
+      is that it is hard to detect used filesystem due to overlapping the functionality.
+      OTOH tests which use '.skip_filesystems' *with* '.all_filesystems' can skip
+      only filesystems which are actually used in '.all_filesystems': ext2, ext3,
+      ext4, xfs, btrfs, vfat, exfat, ntfs, tmpfs (defined in 'fs_type_whitelist[]').
+      It does not make sense to list other filesystems.
+
 
 [source,c]
 -------------------------------------------------------------------------------
@@ -1011,12 +1087,12 @@ is created for that intention.
 -------------------------------------------------------------------------------
 #include "tst_test.h"
 
-voud tst_find_backing_dev(const char *path, char *dev);
+void tst_find_backing_dev(const char *path, char *dev, size_t dev_size);
 -------------------------------------------------------------------------------
 
-This function finds the block dev that this path belongs to, it uses stat function
-to get the major/minor number of the path. Then scan them in '/proc/self/mountinfo'
-and list 2th column value after ' - ' string as its block dev if match succeeds.
+This function finds the block dev that this path belongs to, using uevent in sysfs.
+For Btrfs it uses '/sys/fs/btrfs/UUID/devices/DEV_NAME/uevent'; for other
+filesystems it uses '/sys/dev/block/MAJOR:MINOR/uevent'.
 
 [source,c]
 -------------------------------------------------------------------------------
@@ -1027,6 +1103,17 @@ uint64_t tst_get_device_size(const char *dev_path);
 
 This function gets size of the given block device, it checks the 'dev_path' is
 valid first, if yes, return the size in MB, otherwise return -1.
+
+[source,c]
+-------------------------------------------------------------------------------
+#include "tst_test.h"
+
+int tst_dev_block_size(const char *path);
+-------------------------------------------------------------------------------
+
+This function returns the physical device block size for the specific `path`.
+It finds the device where `path` is located and then uses `ioctl` (BLKSSZGET)
+to get a physical device block size.
 
 1.16 Formatting a device with a filesystem
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1283,7 +1370,7 @@ long long tst_timer_elapsed_us(void);
 int tst_timer_expired_ms(long long ms);
 -------------------------------------------------------------------------------
 
-The 'tst_timer_check()' function checks if specified 'clk_id' is suppored and
+The 'tst_timer_check()' function checks if specified 'clk_id' is supported and
 exits the test with 'TCONF' otherwise. It's expected to be used in test
 'setup()' before any resources that needs to be cleaned up are initialized,
 hence it does not include a cleanup function parameter.
@@ -1527,37 +1614,44 @@ itself is not available on the system.
 
 LTP library can be instructed to save and restore value of specified
 (/proc|sys) files. This is achieved by initialized tst_test struct
-field 'save_restore'. It is a 'NULL' terminated array of strings where
-each string represents a file, whose value is saved at the beginning
-and restored at the end of the test. Only first line of a specified
-file is saved and restored.
+field 'save_restore'. It is a NULL-terminated array of struct
+'tst_path_val' where each tst_path_val.path represents a file, whose
+value is saved at the beginning and restored at the end of the test.
+If non-NULL string is passed in tst_path_val.val, it is written
+to the respective file at the beginning of the test. Only the first line
+of a specified file is saved and restored.
 
-Pathnames can be optionally prefixed to specify how strictly (during
-'store') are handled errors:
+By default, the test will end with TCONF if the file is read-only or
+does not exist. If the optional write of new value fails, the test will end
+with 'TBROK'. This behavior can be changed using tst_path_val.flags:
 
-* (no prefix) - test ends with 'TCONF', if file doesn't exist
-* '?'         - test prints info message and continues,
-                if file doesn't exist or open/read fails
-* '!'         - test ends with 'TBROK', if file doesn't exist
+* 'TST_SR_TBROK_MISSING' – End test with 'TBROK' if the file does not exist
+* 'TST_SR_TCONF_MISSING' – End test with 'TCONF' if the file does not exist
+* 'TST_SR_SKIP_MISSING' – Continue without saving the file if it does not exist
+* 'TST_SR_TBROK_RO' – End test with 'TBROK' if the file is read-only
+* 'TST_SR_TCONF_RO' – End test with 'TCONF' if the file is read-only
+* 'TST_SR_SKIP_RO' – Continue without saving the file if it is read-only
+* 'TST_SR_IGNORE_ERR' – Ignore errors when writing new value into the file
+
+Common flag combinations also have shortcuts:
+
+* 'TST_SR_TCONF' – Equivalent to 'TST_SR_TCONF_MISSING | TST_SR_TCONF_RO'
+* 'TST_SR_TBROK' – Equivalent to 'TST_SR_TBROK_MISSING | TST_SR_TBROK_RO'
+* 'TST_SR_SKIP' – Equivalent to 'TST_SR_SKIP_MISSING | TST_SR_SKIP_RO'
 
 'restore' is always strict and will TWARN if it encounters any error.
 
 [source,c]
 -------------------------------------------------------------------------------
-static const char *save_restore[] = {
-	"/proc/sys/kernel/core_pattern",
-	NULL,
-};
-
-static void setup(void)
-{
-	FILE_PRINTF("/proc/sys/kernel/core_pattern", "/mypath");
-}
-
 static struct tst_test test = {
 	...
 	.setup = setup,
-	.save_restore = save_restore,
+	.save_restore = (const struct tst_path_val[]) {
+		{"/proc/sys/kernel/core_pattern", NULL, TST_SR_TCONF},
+		{"/proc/sys/user/max_user_namespaces", NULL, TST_SR_SKIP},
+		{"/sys/kernel/mm/ksm/run", "1", TST_SR_TBROK},
+		{}
+	},
 };
 -------------------------------------------------------------------------------
 
@@ -1940,15 +2034,25 @@ For full documentation see the comments in 'include/tst_fuzzy_sync.h'.
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Many of the LTP tests need to use hugepage in their testing, this allows the
-test can reserve hugepages from system only via '.request_hugepages = xx'.
+test can reserve hugepages from system via '.hugepages = {xx, TST_REQUEST}'.
 
-If set non-zero number of 'request_hugepages', test will try to reserve the
-expected number of hugepage for testing in setup phase. If system does not
-have enough hpage for using, it will try the best to reserve 80% available
-number of hpages. With success test stores the reserved hugepage number in
-'tst_hugepages'. For the system without hugetlb supporting, variable
-'tst_hugepages' will be set to 0. If the hugepage number needs to be set to 0
-on supported hugetlb system, please use '.request_hugepages = TST_NO_HUGEPAGES'.
+We achieved two policies for reserving hugepages:
+
+TST_REQUEST:
+  It will try the best to reserve available huge pages and return the number
+  of available hugepages in tst_hugepages, which may be 0 if hugepages are
+  not supported at all.
+
+TST_NEEDS:
+  This is an enforced requirement, LTP should strictly do hpages applying and
+  guarantee the 'HugePages_Free' no less than pages which makes that test can
+  use these specified numbers correctly. Otherwise, test exits with TCONF if
+  the attempt to reserve hugepages fails or reserves less than requested.
+
+With success test stores the reserved hugepage number in 'tst_hugepages'. For
+system without hugetlb supporting, variable 'tst_hugepages' will be set to 0.
+If the hugepage number needs to be set to 0 on supported hugetlb system, please
+use '.hugepages = {TST_NO_HUGEPAGES}'.
 
 Also, we do cleanup and restore work for the hpages resetting automatically.
 
@@ -1960,7 +2064,7 @@ static void run(void)
 {
 	...
 
-	if (tst_hugepages == test.request_hugepages)
+	if (tst_hugepages == test.hugepages.number)
 		TEST(do_hpage_test);
 	else
 		...
@@ -1969,7 +2073,7 @@ static void run(void)
 
 struct tst_test test = {
 	.test_all = run,
-	.request_hugepages = 2,
+	.hugepages = {2, TST_REQUEST},
 	...
 };
 -------------------------------------------------------------------------------
@@ -1987,13 +2091,14 @@ static void run(void)
 
 static void setup(void)
 {
-        if (tst_hugepages != test.requested_hugepages)
-                tst_brk(TCONF, "...");
+	/* TST_NEEDS achieved this automatically in the library */
+	if (tst_hugepages != test.hugepages.number)
+		tst_brk(TCONF, "...");
 }
 
 struct tst_test test = {
 	.test_all = run,
-	.request_hugepages = 2,
+	.hugepages = {2, TST_NEEDS},
 	...
 };
 -------------------------------------------------------------------------------
@@ -2013,6 +2118,21 @@ terminated array of strings such as:
 },
 -------------------------------------------------------------------------------
 
+Also can check required command version whether is satisfied by using 'needs_cmds'
+such as:
+
+[source,c]
+-------------------------------------------------------------------------------
+.needs_cmds = (const char *const []) {
+	"mkfs.ext4 >= 1.43.0",
+	NULL
+},
+-------------------------------------------------------------------------------
+
+Currently, we only support mkfs.ext4 command version check.
+If you want to support more commands, please fill your own .parser and .table_get
+method in the version_parsers structure of lib/tst_cmd.c.
+
 1.36 Assert sys or proc file value
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Using TST_ASSERT_INT/STR(path, val) to assert that integer value or string stored in
@@ -2024,11 +2144,13 @@ the field value of file.
 1.36 Using Control Group
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Some LTP tests need specific Control Group configurations. tst_cgroup.h provides
-APIs to discover and use CGroups. There are many differences between CGroups API
-V1 and V2. We encapsulate the details of configuring CGroups in high-level
-functions which follow the V2 kernel API. Allowing one to use CGroups without
-caring too much about the current system's configuration.
+Some LTP tests need specific Control Group configurations.  'tst_cgroup.h'
+provides APIs to discover and use CGroups. There are many differences between
+CGroups API V1 and V2. We encapsulate the details of configuring CGroups in
+high-level functions which follow the V2 kernel API where possible. Allowing one
+to write code that works on both V1 or V2. At least some of the time anyway;
+often the behavioural differences between V1 and V2 are too great. In such cases
+we revert to branching on the CGroup version.
 
 Also, the LTP library will automatically mount/umount and configure the CGroup
 hierarchies if that is required (e.g. if you run the tests from init with no
@@ -2037,9 +2159,6 @@ system manager).
 [source,c]
 -------------------------------------------------------------------------------
 #include "tst_test.h"
-#include "tst_cgroup.h"
-
-static const struct tst_cgroup_group *cg;
 
 static void run(void)
 {
@@ -2050,34 +2169,24 @@ static void run(void)
 
 static void setup(void)
 {
-	tst_cgroup_require("memory", NULL);
-	cg = tst_cgroup_get_test_group();
-	SAFE_CGROUP_PRINTF(cg, "cgroup.procs", "%d", getpid());
-	SAFE_CGROUP_PRINTF(cg, "memory.max", "%lu", MEMSIZE);
-	if (SAFE_CGROUP_HAS(cg, "memory.swap.max"))
-		SAFE_CGROUP_PRINTF(cg, "memory.swap.max", "%zu", memsw);
-}
-
-static void cleanup(void)
-{
-	tst_cgroup_cleanup();
+	SAFE_CG_PRINTF(tst_cg, "cgroup.procs", "%d", getpid());
+	SAFE_CG_PRINTF(tst_cg, "memory.max", "%lu", MEMSIZE);
+	if (SAFE_CG_HAS(tst_cg, "memory.swap.max"))
+		SAFE_CG_PRINTF(tst_cg, "memory.swap.max", "%zu", memsw);
 }
 
 struct tst_test test = {
 	.setup = setup,
 	.test_all = run,
 	.cleanup = cleanup,
+	.needs_cgroup_ctrls = (const char *const []){ "memory", NULL },
 	...
 };
 -------------------------------------------------------------------------------
 
 Above, we first ensure the memory controller is available on the
-test's CGroup with 'tst_cgroup_require'. We then get a structure,
-'cg', which represents the test's CGroup. Note that
-'tst_cgroup_get_test_group' should not be called many times, as it is
-allocated in a guarded buffer (See section 2.2.31). Therefor it is
-best to call it once in 'setup' and not 'run' because 'run' may be
-repeated with the '-i' option.
+test's CGroup with '.needs_cgroup_ctrls'. This populates a structure,
+'tst_cg', which represents the test's CGroup.
 
 We then write the current processes PID into 'cgroup.procs', which
 moves the current process into the test's CGroup. After which we set
@@ -2088,7 +2197,7 @@ on both CGroup versions, then we use the V2 naming.
 
 Some controller features, such as 'memory.swap', can be
 disabled. Therefor we need to check if they exist before accessing
-them. This can be done with 'SAFE_CGROUP_HAS' which can be called on
+them. This can be done with 'SAFE_CG_HAS' which can be called on
 any control file or feature.
 
 Most tests only require setting a few limits similar to the above. In
@@ -2097,29 +2206,29 @@ cleanup is also mostly hidden. However things can get much worse.
 
 [source,c]
 -------------------------------------------------------------------------------
-static const struct tst_cgroup_group *cg;
-static const struct tst_cgroup_group *cg_drain;
-static struct tst_cgroup_group *cg_child;
+static struct tst_cg_group *cg_child;
 
 static void run(void)
 {
 	char buf[BUFSIZ];
 	size_t mem = 0;
 
-	cg_child = tst_cgroup_group_mk(cg, "child");
-	SAFE_CGROUP_PRINTF(cg_child, "cgroup.procs", "%d", getpid());
+	cg_child = tst_cg_group_mk(tst_cg, "child");
+	SAFE_CG_PRINTF(cg_child, "cgroup.procs", "%d", getpid());
 
-	if (TST_CGROUP_VER(cg, "memory") != TST_CGROUP_V1)
-		SAFE_CGROUP_PRINT(cg, "cgroup.subtree_control", "+memory");
-	if (TST_CGROUP_VER(cg, "cpuset") != TST_CGROUP_V1)
-		SAFE_CGROUP_PRINT(cg, "cgroup.subtree_control", "+cpuset");
+	if (!TST_CG_VER_IS_V1(tst_cg, "memory"))
+		SAFE_CG_PRINT(tst_cg, "cgroup.subtree_control", "+memory");
+	if (!TST_CG_VER_IS_V1(tst_cg, "cpuset"))
+		SAFE_CG_PRINT(tst_cg, "cgroup.subtree_control", "+cpuset");
 
 	if (!SAFE_FORK()) {
-		SAFE_CGROUP_PRINTF(cg_child, "cgroup.procs", "%d", getpid());
+		SAFE_CG_PRINTF(cg_child, "cgroup.procs", "%d", getpid());
 
-		if (SAFE_CGROUP_HAS(cg_child, "memory.swap"))
-			SAFE_CGROUP_SCANF(cg_child, "memory.swap.current", "%zu", &mem);
-		SAFE_CGROUP_READ(cg_child, "cpuset.mems", buf, sizeof(buf));
+		if (SAFE_CG_HAS(cg_child, "memory.swap")) {
+			SAFE_CG_SCANF(cg_child,
+					  "memory.swap.current", "%zu", &mem);
+		}
+		SAFE_CG_READ(cg_child, "cpuset.mems", buf, sizeof(buf));
 
 		// Do something with cpuset.mems and memory.current values
 		...
@@ -2128,45 +2237,43 @@ static void run(void)
 	}
 
 	tst_reap_children();
-	SAFE_CGROUP_PRINTF(cg_drain, "cgroup.procs", "%d", getpid());
-	cg_child = tst_cgroup_group_rm(cg_child);
-}
-
-static void setup(void)
-{
-	tst_cgroup_require("memory", NULL);
-	tst_cgroup_require("cpuset", NULL);
-
-	cg = tst_cgroup_get_test_group();
-	cg_drain = tst_cgroup_get_drain_group();
+	SAFE_CG_PRINTF(tst_cg_drain, "cgroup.procs", "%d", getpid());
+	cg_child = tst_cg_group_rm(cg_child);
 }
 
 static void cleanup(void)
 {
 	if (cg_child) {
-		SAFE_CGROUP_PRINTF(cg_drain, "cgroup.procs", "%d", getpid());
-		cg_child = tst_cgroup_group_rm(cg_child);
+		SAFE_CG_PRINTF(tst_cg_drain, "cgroup.procs", "%d", getpid());
+		cg_child = tst_cg_group_rm(cg_child);
 	}
-
-	tst_cgroup_cleanup();
 }
 
 struct tst_test test = {
 	.setup = setup,
 	.test_all = run,
-	.cleanup = cleanup,
+	.needs_cgroup_ctrls = (const char *const []){
+		"cpuset",
+		"memory",
+		NULL
+	},
 	...
 };
 -------------------------------------------------------------------------------
 
-Starting with setup; we can see here that we also fetch the 'drain'
+Starting with setup; we can see here that we fetch the 'drain'
 CGroup. This is a shared group (between parallel tests) which may
-contain processes from other tests. It should have default settings and
-these should not be changed by the test. It can be used to remove
+contain processes from other tests. It should have default settings
+and these should not be changed by the test. It can be used to remove
 processes from other CGroups incase the hierarchy root is not
 accessible.
 
-In 'run', we first create a child CGroup with 'tst_cgroup_mk'. As we
+Note that 'tst_cg_get_drain_group' should not be called many times,
+as it is allocated in a guarded buffer (See section 2.2.31). Therefor
+it is best to call it once in 'setup' and not 'run' because 'run' may
+be repeated with the '-i' option.
+
+In 'run', we first create a child CGroup with 'tst_cg_mk'. As we
 create this CGroup in 'run' we should also remove it at the end of
 run. We also need to check if it exists and remove it in cleanup as
 well. Because there are 'SAFE_' functions which may jump to cleanup.
@@ -2197,22 +2304,23 @@ destroying the child CGroup. So there is no need to transfer the child
 to drain. However the parent process must be moved otherwise we will
 get 'EBUSY' when trying to remove the child CGroup.
 
-Another example of an edge case is the following.
+Another example of a behavioral difference between versions is shown below.
 
 [source,c]
 -------------------------------------------------------------------------------
-	if (TST_CGROUP_VER(cg, "memory") == TST_CGROUP_V1)
-		SAFE_CGROUP_PRINTF(cg, "memory.swap.max", "%lu", ~0UL);
+	if (TST_CG_VER_IS_V1(tst_cg, "memory"))
+		SAFE_CG_PRINTF(tst_cg, "memory.swap.max", "%lu", ~0UL);
 	else
-		SAFE_CGROUP_PRINT(cg, "memory.swap.max", "max");
+		SAFE_CG_PRINT(tst_cg, "memory.swap.max", "max");
 -------------------------------------------------------------------------------
 
 CGroups V2 introduced a feature where 'memory[.swap].max' could be set to
 "max". This does not appear to work on V1 'limit_in_bytes' however. For most
 tests, simply using a large number is sufficient and there is no need to use
 "max". Importantly though, one should be careful to read both the V1 and V2
-kernel docs. The LTP library can not handle all edge cases. It does the minimal
-amount of work to make testing on both V1 and V2 feasible.
+kernel docs. Presently the LTP library does not attempt to handle most
+differences in semantics. It does the minimal amount of work to make testing on
+both V1 and V2 feasible.
 
 1.37 Require minimum numbers of CPU for a testcase
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2238,6 +2346,7 @@ struct tst_test test = {
 	.tags = (const struct tst_tag[]) {
 		{"linux-git", "9392a27d88b9"},
 		{"linux-git", "ff002b30181d"},
+		{"known-fail", "ustat() is known to fail with EINVAL on Btrfs"},
 		{"linux-stable-git", "c4a23c852e80"},
 		{"CVE", "2020-29373"},
 		{}
@@ -2260,6 +2369,48 @@ struct tst_test test = {
 	}
 };
 -------------------------------------------------------------------------------
+
+1.39 Testing on the specific architecture
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Testcases for specific arch should be limited on that only being supported
+platform to run, we now involve a .supported_archs to achieve this feature
+in LTP library. All you need to run a test on the expected arch is to set
+the '.supported_archs' array in the 'struct tst_test' to choose the required
+arch list. e.g.
+
+    .supported_archs = (const char *const []){"x86_64", "ppc64", NULL}
+
+This helps move the TCONF info from code to tst_test metadata as well.
+
+And, we also export a struct tst_arch to save the system architecture for
+using in the whole test cases.
+
+    extern const struct tst_arch {
+             char name[16];
+             enum tst_arch_type type;
+    } tst_arch;
+
+[source,c]
+-------------------------------------------------------------------------------
+#include "tst_test.h"
+
+static struct tst_test test = {
+       ...
+       .setup = setup,
+       .supported_archs = (const char *const []) {
+                 "x86_64",
+                 "ppc64",
+                 "s390x",
+                 NULL
+       },
+};
+-------------------------------------------------------------------------------
+
+1.40 Require minimum size of MemAvailable for a testcase
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some tests require more than specific size(MB) of MemAvailable. It can be defined
+with `.min_mem_avail = N`.
 
 2. Common problems
 ------------------

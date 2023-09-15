@@ -18,10 +18,8 @@
  * - The user ID of the process has write access to the file.
  */
 
-#include <sys/types.h>
 #include <pwd.h>
 #include <utime.h>
-#include <sys/stat.h>
 #include <time.h>
 
 #include "tst_test.h"
@@ -79,10 +77,14 @@ static void run(void)
 	SAFE_STAT(TEMP_FILE, &statbuf);
 
 	if (statbuf.st_atime < mintime || statbuf.st_atime > maxtime)
-		tst_res(TFAIL, "utime() did not set expected atime");
+		tst_res(TFAIL, "utime() did not set expected atime, "
+			"mintime: %ld, maxtime: %ld, st_atime: %ld",
+			mintime, maxtime, statbuf.st_atime);
 
 	if (statbuf.st_mtime < mintime || statbuf.st_mtime > maxtime)
-		tst_res(TFAIL, "utime() did not set expected mtime");
+		tst_res(TFAIL, "utime() did not set expected mtime, "
+			"mintime: %ld, maxtime: %ld, st_mtime: %ld",
+			mintime, maxtime, statbuf.st_mtime);
 }
 
 static struct tst_test test = {
@@ -93,7 +95,6 @@ static struct tst_test test = {
 	.mntpoint = MNTPOINT,
 	.all_filesystems = 1,
 	.skip_filesystems = (const char *const[]) {
-		"v9",
 		"vfat",
 		"exfat",
 		NULL

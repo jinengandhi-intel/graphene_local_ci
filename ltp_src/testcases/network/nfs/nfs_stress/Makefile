@@ -9,12 +9,6 @@ include $(top_srcdir)/include/mk/testcases.mk
 nfs04_create_file: CPPFLAGS += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE
 nfs05_make_tree: LDLIBS += -lpthread
 
-INSTALL_TARGETS		:= nfs_lib.sh \
-			   nfs01 \
-			   nfs02 \
-			   nfs03 \
-			   nfs04 \
-			   nfs05 \
-			   nfs06
+INSTALL_TARGETS	:= *.sh
 
 include $(top_srcdir)/include/mk/generic_leaf_target.mk

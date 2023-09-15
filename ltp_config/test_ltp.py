@@ -18,11 +18,10 @@ import pytest
 from graminelibos.regression import HAS_SGX, run_command
 
 sgx_mode = os.environ.get('SGX')
+DEFAULT_LTP_SCENARIO = 'install/runtest/syscalls-new'
 if sgx_mode == '1':
-    DEFAULT_LTP_SCENARIO = 'install-sgx/runtest/syscalls-new'
-    DEFAULT_LTP_CONFIG = 'ltp_tests.cfg ltp-sgx_tests.cfg ltp-bug-1075_tests.cfg'
+    DEFAULT_LTP_CONFIG = 'ltp_tests.cfg ltp-sgx_tests.cfg'
 else:
-    DEFAULT_LTP_SCENARIO = 'install/runtest/syscalls-new'
     DEFAULT_LTP_CONFIG = 'ltp_tests.cfg'
 
 LTP_SCENARIO = os.environ.get('LTP_SCENARIO', DEFAULT_LTP_SCENARIO)
@@ -251,10 +250,7 @@ def check_system_error_output_valid(_stderr):
 
 def test_ltp(cmd, section, capsys):
     must_pass = section.getintset('must-pass')
-    if sgx_mode == '1':
-        binary_dir_ltp = "install-sgx/testcases/bin"
-    else:
-        binary_dir_ltp = "install/testcases/bin"
+    binary_dir_ltp = "install/testcases/bin"
     loader = 'gramine-sgx' if HAS_SGX else 'gramine-direct'
     timeout = int(section.getfloat('timeout') * LTP_TIMEOUT_FACTOR)
     full_cmd = [loader, *cmd]

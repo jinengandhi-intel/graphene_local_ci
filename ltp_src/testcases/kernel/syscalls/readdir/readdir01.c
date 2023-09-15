@@ -34,7 +34,7 @@ static void setup(void)
 	for (i = 0; i < nfiles; i++) {
 		sprintf(fname, "%s_%d", prefix, i);
 		fd = SAFE_OPEN(fname, O_RDWR | O_CREAT, 0700);
-		SAFE_WRITE(1, fd, "hello\n", 6);
+		SAFE_WRITE(SAFE_WRITE_ALL, fd, "hello\n", 6);
 		SAFE_CLOSE(fd);
 	}
 }
@@ -59,6 +59,8 @@ static void verify_readdir(void)
 		tst_res(TFAIL, "found %s files than were created, created: %d, found: %d",
 					cnt > nfiles ? "more" : "less", nfiles, cnt);
 	}
+
+	SAFE_CLOSEDIR(test_dir);
 }
 
 static struct tst_test test = {

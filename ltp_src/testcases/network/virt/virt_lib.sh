@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0-or-later
-# Copyright (c) 2018-2019 Petr Vorel <pvorel@suse.cz>
+# Copyright (c) 2018-2022 Petr Vorel <pvorel@suse.cz>
 # Copyright (c) 2014-2021 Oracle and/or its affiliates. All Rights Reserved.
 # Author: Alexey Kodanev <alexey.kodanev@oracle.com>
 #
@@ -18,6 +18,13 @@
 
 TST_SETUP="${TST_SETUP:-virt_lib_setup}"
 TST_CLEANUP="${TST_CLEANUP:-cleanup_vifaces}"
+TST_NEEDS_ROOT=1
+
+# Max performance loss (%) for virtual devices during network load
+VIRT_PERF_THRESHOLD=${VIRT_PERF_THRESHOLD:-80}
+if [ -n "$VIRT_PERF_THRESHOLD_MIN" ] && [ "$VIRT_PERF_THRESHOLD" -lt $VIRT_PERF_THRESHOLD_MIN ]; then
+	 VIRT_PERF_THRESHOLD="$VIRT_PERF_THRESHOLD_MIN"
+fi
 
 virt_lib_usage()
 {
@@ -37,10 +44,6 @@ virt_lib_setup()
 {
 	case "$virt_type" in
 	vxlan|geneve)
-		if tst_kvcmp -lt "3.8"; then
-			tst_brk TCONF "test must be run with kernel 3.8 or newer"
-		fi
-
 		if [ "$TST_IPV6" ] && tst_kvcmp -lt "3.12"; then
 			tst_brk TCONF "test must be run with kernels >= 3.12"
 		fi
@@ -57,23 +60,6 @@ virt_lib_setup()
 
 	ROD_SILENT "ip link delete ltp_v0"
 }
-
-TST_NEEDS_ROOT=1
-. tst_net.sh
-
-ip_virt_local="$(TST_IPV6= tst_ipaddr_un)"
-ip6_virt_local="$(TST_IPV6=6 tst_ipaddr_un)"
-
-ip_virt_remote="$(TST_IPV6= tst_ipaddr_un rhost)"
-ip6_virt_remote="$(TST_IPV6=6 tst_ipaddr_un rhost)"
-
-vxlan_dstport=0
-
-# Max performance loss (%) for virtual devices during network load
-VIRT_PERF_THRESHOLD=${VIRT_PERF_THRESHOLD:-80}
-if [ -n "$VIRT_PERF_THRESHOLD_MIN" ] && [ "$VIRT_PERF_THRESHOLD" -lt $VIRT_PERF_THRESHOLD_MIN ]; then
-	 VIRT_PERF_THRESHOLD="$VIRT_PERF_THRESHOLD_MIN"
-fi
 
 cleanup_vifaces()
 {
@@ -262,10 +248,6 @@ virt_minimize_timeout()
 
 vxlan_setup_subnet_uni()
 {
-	if tst_kvcmp -lt "3.10"; then
-		tst_brk TCONF "test must be run with kernel 3.10 or newer"
-	fi
-
 	[ "$(ip link add type $virt_type help 2>&1 | grep remote)" ] || \
 		tst_brk TCONF "iproute doesn't support remote unicast address"
 
@@ -384,3 +366,13 @@ virt_gre_setup()
 	virt_setup "local $(tst_ipaddr) remote $(tst_ipaddr rhost) dev $(tst_iface)" \
 	"local $(tst_ipaddr rhost) remote $(tst_ipaddr) dev $(tst_iface rhost)"
 }
+
+. tst_net.sh
+
+ip_virt_local="$(TST_IPV6= tst_ipaddr_un)"
+ip6_virt_local="$(TST_IPV6=6 tst_ipaddr_un)"
+
+ip_virt_remote="$(TST_IPV6= tst_ipaddr_un rhost)"
+ip6_virt_remote="$(TST_IPV6=6 tst_ipaddr_un rhost)"
+
+vxlan_dstport=0

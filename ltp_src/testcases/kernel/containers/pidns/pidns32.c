@@ -1,101 +1,69 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright (c) Huawei Technologies Co., Ltd., 2015
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
- * the GNU General Public License for more details.
+ * Copyright (C) 2023 SUSE LLC Andrea Cervesato <andrea.cervesato@suse.com>
  */
 
-/*
- * Verify that:
- * The kernel imposes a limit of 32 nested levels of pid namespaces.
+/*\
+ * [Description]
+ *
+ * Clone a process with CLONE_NEWPID flag and check for the maxium amount of
+ * nested containers.
  */
 
 #define _GNU_SOURCE
-#include <sys/wait.h>
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include "pidns_helper.h"
-#include "test.h"
+#include <sys/mman.h>
+#include "tst_test.h"
+#include "tst_atomic.h"
+#include "lapi/sched.h"
 
 #define MAXNEST 32
 
-char *TCID = "pidns32";
-int TST_TOTAL = 1;
+static const struct tst_clone_args args = { CLONE_NEWPID, SIGCHLD };
+static int *level;
+
+static pid_t child_func(void)
+{
+	pid_t cpid = 0;
+
+	if (tst_atomic_inc(level) == MAXNEST)
+		return cpid;
+
+	cpid = SAFE_CLONE(&args);
+	if (!cpid) {
+		child_func();
+		return cpid;
+	}
+
+	tst_reap_children();
+
+	return cpid;
+}
 
 static void setup(void)
 {
-	tst_require_root();
-	check_newpid();
-	tst_tmpdir();
+	level = SAFE_MMAP(NULL, sizeof(int), PROT_READ | PROT_WRITE, MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 }
 
 static void cleanup(void)
 {
-	tst_rmdir();
+	SAFE_MUNMAP(level, sizeof(int));
 }
 
-static int child_fn1(void *arg)
+static void run(void)
 {
-	pid_t cpid1;
-	long level = (long)arg;
-	int status;
+	*level = 0;
 
-	if (level == MAXNEST)
-		return 0;
-	cpid1 = ltp_clone_quick(CLONE_NEWPID | SIGCHLD,
-		(void *)child_fn1, (void *)(level + 1));
-	if (cpid1 < 0) {
-		printf("level %ld:unexpected error: (%d) %s\n",
-			level, errno, strerror(errno));
-		return 1;
-	}
-	if (waitpid(cpid1, &status, 0) == -1)
-		return 1;
+	if (!child_func())
+		return;
 
-	if (WIFEXITED(status) && WEXITSTATUS(status) != 0) {
-		printf("child exited abnormally\n");
-		return 1;
-	} else if (WIFSIGNALED(status)) {
-		printf("child was killed with signal = %d", WTERMSIG(status));
-		return 1;
-	}
-	return 0;
+	TST_EXP_EQ_LI(*level, MAXNEST);
 }
 
-static void test_max_nest(void)
-{
-	pid_t cpid1;
-
-	cpid1 = ltp_clone_quick(CLONE_NEWPID | SIGCHLD,
-		(void *)child_fn1, (void *)1);
-	if (cpid1 < 0)
-		tst_brkm(TBROK | TERRNO, cleanup, "clone failed");
-
-	tst_record_childstatus(cleanup, cpid1);
-}
-
-int main(int argc, char *argv[])
-{
-	int lc;
-
-	setup();
-	tst_parse_opts(argc, argv, NULL, NULL);
-
-	for (lc = 0; TEST_LOOPING(lc); lc++) {
-		tst_count = 0;
-		test_max_nest();
-	}
-
-	cleanup();
-	tst_exit();
-}
+static struct tst_test test = {
+	.test_all = run,
+	.needs_root = 1,
+	.setup = setup,
+	.cleanup = cleanup,
+	.forks_child = 1,
+};

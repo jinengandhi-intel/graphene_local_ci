@@ -1,11 +1,14 @@
 #!/bin/sh
 # Copyright (c) 2021 Petr Vorel <pvorel@suse.cz>
 
-LTP_C_API_TESTS="${LTP_C_API_TESTS:-test05 test07 test09 test12 test15 test18
-tst_bool_expr test_exec test_timer tst_res_hexd tst_strstatus tst_fuzzy_sync03
-test_zero_hugepage.sh}"
+LTP_C_API_TESTS="${LTP_C_API_TESTS:-test05 test07 test09 test15 test_runtime01
+tst_needs_cmds01 tst_needs_cmds02 tst_needs_cmds03 tst_needs_cmds06
+tst_needs_cmds07 tst_bool_expr test_exec test_timer tst_res_hexd tst_strstatus
+tst_fuzzy_sync03 test_zero_hugepage.sh test_kconfig.sh
+test_children_cleanup.sh}"
 
-LTP_SHELL_API_TESTS="${LTP_SHELL_API_TESTS:-shell/tst_check_driver.sh shell/net/*.sh}"
+LTP_SHELL_API_TESTS="${LTP_SHELL_API_TESTS:-shell/tst_check_driver.sh
+shell/tst_check_kconfig0[1-5].sh shell/tst_errexit.sh shell/net/*.sh}"
 
 cd $(dirname $0)
 PATH="$PWD/../../testcases/lib/:$PATH"
@@ -44,9 +47,6 @@ runtest_res()
 
 	local res="$1"
 	shift
-
-	tst_color_enabled
-	local color=$?
 
 	printf "runtest " >&2
 	tst_print_colored $res "$res: " >&2
@@ -178,6 +178,8 @@ if [ -z "$run" -o "$run" = "c" ]; then
 fi
 
 if [ -z "$run" -o "$run" = "s" ]; then
+	export KCONFIG_PATH=config02
+	runtest_res TINFO "KCONFIG_PATH='$KCONFIG_PATH'"
 	run_shell_tests
 	shell_fail=$?
 fi

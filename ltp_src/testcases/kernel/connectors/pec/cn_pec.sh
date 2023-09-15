@@ -11,15 +11,13 @@
 
 TST_OPTS="n:"
 TST_SETUP=setup
-TST_TESTFUNC=test
+TST_TESTFUNC=do_test
 TST_PARSE_ARGS=parse_args
 TST_USAGE=usage
 TST_NEEDS_ROOT=1
 TST_NEEDS_TMPDIR=1
 TST_NEEDS_CHECKPOINTS=1
 TST_TEST_DATA="fork exec exit uid gid"
-
-. tst_test.sh
 
 num_events=10
 
@@ -68,7 +66,7 @@ setup()
 	tst_res TINFO "Test process events connector"
 }
 
-test()
+do_test()
 {
 	local event=$2
 	local gen_pid list_pid gen_rc lis_rc
@@ -146,4 +144,5 @@ test()
 	fi
 }
 
+. tst_test.sh
 tst_run

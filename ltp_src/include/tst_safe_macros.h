@@ -24,6 +24,11 @@
 #include "safe_macros_fn.h"
 #include "tst_cmd.h"
 
+int safe_access(const char *filename, const int lineno, const char *pathname,
+		   int mode);
+#define SAFE_ACCESS(path, mode) \
+	safe_access(__FILE__, __LINE__, (path), (mode))
+
 #define SAFE_BASENAME(path) \
 	safe_basename(__FILE__, __LINE__, NULL, (path))
 
@@ -181,6 +186,9 @@ int safe_getgroups(const char *file, const int lineno, int size, gid_t list[]);
 #define SAFE_STRTOUL(str, min, max) \
 	safe_strtoul(__FILE__, __LINE__, NULL, (str), (min), (max))
 
+#define SAFE_STRTOF(str, min, max) \
+	safe_strtof(__FILE__, __LINE__, NULL, (str), (min), (max))
+
 #define SAFE_SYSCONF(name) \
 	safe_sysconf(__FILE__, __LINE__, NULL, name)
 
@@ -292,6 +300,23 @@ static inline int safe_ftruncate(const char *file, const int lineno,
 }
 #define SAFE_FTRUNCATE(fd, length) \
 	safe_ftruncate(__FILE__, __LINE__, (fd), (length))
+
+static inline int safe_posix_fadvise(const char *file, const int lineno,
+                                int fd, off_t offset, off_t len, int advice)
+{
+	int rval;
+
+	rval = posix_fadvise(fd, offset, len, advice);
+
+	if (rval)
+		tst_brk_(file, lineno, TBROK,
+			"posix_fadvise(%d,%ld,%ld,%d) failed: %s",
+			fd, (long)offset, (long)len, advice, tst_strerrno(rval));
+
+	return rval;
+}
+#define SAFE_POSIX_FADVISE(fd, offset, len, advice) \
+	safe_posix_fadvise(__FILE__, __LINE__, (fd), (offset), (len), (advice))
 
 static inline int safe_truncate(const char *file, const int lineno,
                                 const char *path, off_t length)
@@ -601,6 +626,11 @@ int safe_mincore(const char *file, const int lineno, void *start,
 int safe_personality(const char *filename, unsigned int lineno,
 		    unsigned long persona);
 #define SAFE_PERSONALITY(persona) safe_personality(__FILE__, __LINE__, persona)
+
+int safe_pidfd_open(const char *filename, const int lineno, pid_t pid,
+		   unsigned int flags);
+#define SAFE_PIDFD_OPEN(pid, flags) \
+	safe_pidfd_open(__FILE__, __LINE__, (pid), (flags))
 
 #define SAFE_SETENV(name, value, overwrite) do {		\
 	if (setenv(name, value, overwrite)) {			\

@@ -8,15 +8,11 @@
 # Restructure for LTP: Shi Weihua <shiwh@cn.fujitsu.com>
 # Added memcg enable/disable functionality: Rishikesh K Rajak <risrajak@linux.vnet.ibm.com>
 
-MEMCG_TESTFUNC=test
+MEMCG_TESTFUNC=do_test
 MEMCG_SHMMAX=1
 TST_TEST_DATA="--mmap-anon --mmap-file --shm"
-. memcg_lib.sh
 
-MEMORY_LIMIT=$PAGESIZE
-MEMORY_TO_ALLOCATE=$((MEMORY_LIMIT * 2))
-
-test()
+do_test()
 {
 	ROD echo $MEMORY_LIMIT \> memory.limit_in_bytes
 
@@ -35,5 +31,10 @@ test()
 		tst_res TFAIL "memory.failcnt is $failcnt, <= 0 expected"
 	fi
 }
+
+. memcg_lib.sh
+
+MEMORY_LIMIT=$PAGESIZE
+MEMORY_TO_ALLOCATE=$((MEMORY_LIMIT * 2))
 
 tst_run

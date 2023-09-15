@@ -79,13 +79,6 @@ cpuset_log_error()
 	done < "$1"
 }
 
-version_check()
-{
-	if tst_kvcmp -lt "2.6.28"; then
-		tst_brkm TCONF "kernel is below 2.6.28"
-	fi
-}
-
 ncpus_check()
 {
 	if [ $NR_CPUS -lt $1 ]; then
@@ -150,8 +143,6 @@ check()
 
 	cpuset_check
 
-	version_check
-
 	ncpus_check ${1:-2}
 
 	nnodes_check ${2:-2}
@@ -193,7 +184,7 @@ cleanup()
 	echo $CHILDREN_VALUE > $CLONE_CHILDREN
 	echo $SCHED_LB_VALUE > $SCHED_LB
 
-	find "$CPUSET" -type d | sort | sed -n '2,$p' | tac | while read subdir
+	find "$CPUSET" -type d | sort | sed -n '2,$p' | tac | while read -r subdir
 	do
 		while read pid
 		do

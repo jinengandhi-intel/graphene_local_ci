@@ -1,5 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0-or-later
+# Copyright (c) Linux Test Project, 2019-2022
 # Copyright (c) 2018-2019 Oracle and/or its affiliates. All Rights Reserved.
 # Copyright (c) International Business Machines  Corp., 2001
 #
@@ -14,8 +15,6 @@ TST_SETUP="${TST_SETUP:-init}"
 TST_CLEANUP="${TST_CLEANUP:-cleanup}"
 TST_NEEDS_CMDS="grep telnet"
 
-. tst_net.sh
-
 NFRUN()
 {
 	local rule
@@ -23,7 +22,7 @@ NFRUN()
 	if [ "$use_iptables" = 1 ]; then
 		ip${TST_IPV6}tables $@
 	else
-		$(ip${TST_IPV6}tables-translate $@ | sed 's,\\,,g')
+		$(ip${TST_IPV6}tables-translate $@ | sed "s/[\']//g")
 	fi
 }
 
@@ -67,9 +66,9 @@ init()
 cleanup()
 {
 	if lsmod | grep -q "ip${TST_IPV6}_tables"; then
-		NFTRUN -F -t filter > /dev/null 2>&1
-		NFTRUN -F -t nat > /dev/null 2>&1
-		NFTRUN -F -t mangle > /dev/null 2>&1
+		NFRUN -F -t filter > /dev/null 2>&1
+		NFRUN -F -t nat > /dev/null 2>&1
+		NFRUN -F -t mangle > /dev/null 2>&1
 		rmmod -v ipt_limit ipt_multiport ipt_LOG ipt_REJECT \
 			 ip${TST_IPV6}table_mangle ip${TST_IPV6}table_nat ip_conntrack \
 			 ip${TST_IPV6}table_filter ip${TST_IPV6}_tables nf_nat_ipv${TST_IPVER} nf_nat \
@@ -379,3 +378,5 @@ test6()
 	tst_res TINFO "$toolname limited logging succsess"
 	tst_res TPASS "$toolname can log packets with limited rate"
 }
+
+. tst_net.sh

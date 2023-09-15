@@ -368,11 +368,14 @@ int safe_listen(const char *file, const int lineno, void (cleanup_fn)(void),
 		int socket, int backlog)
 {
 	int rval;
+	int res = TBROK;
 
 	rval = listen(socket, backlog);
 
 	if (rval == -1) {
-		tst_brkm_(file, lineno, TBROK | TERRNO, cleanup_fn,
+		if (errno == ENOSYS)
+			res = TCONF;
+		tst_brkm_(file, lineno, res | TERRNO, cleanup_fn,
 			"listen(%d, %d) failed", socket, backlog);
 	} else if (rval) {
 		tst_brkm_(file, lineno, TBROK | TERRNO, cleanup_fn,
@@ -460,6 +463,23 @@ int safe_gethostname(const char *file, const int lineno,
 	} else if (rval) {
 		tst_brkm_(file, lineno, TBROK | TERRNO, NULL,
 			"Invalid gethostname(%p, %zu) return value %d", name,
+			size, rval);
+	}
+
+	return rval;
+}
+
+int safe_sethostname(const char *file, const int lineno,
+		     const char *name, size_t size)
+{
+	int rval = sethostname(name, size);
+
+	if (rval == -1) {
+		tst_brkm_(file, lineno, TBROK | TERRNO, NULL,
+			"sethostname(%p, %zu) failed", name, size);
+	} else if (rval) {
+		tst_brkm_(file, lineno, TBROK | TERRNO, NULL,
+			"Invalid sethostname(%p, %zu) return value %d", name,
 			size, rval);
 	}
 

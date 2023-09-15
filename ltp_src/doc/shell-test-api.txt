@@ -40,6 +40,7 @@ do_test()
 	fi
 }
 
+. tst_test.sh
 tst_run
 -------------------------------------------------------------------------------
 
@@ -90,6 +91,7 @@ test2()
 	tst_res TPASS "Test $1 passed"
 }
 
+. tst_test.sh
 tst_run
 # output:
 # foo 1 TPASS: Test 1 passed
@@ -118,6 +120,7 @@ do_test()
 	esac
 }
 
+. tst_test.sh
 tst_run
 # output:
 # foo 1 TPASS: Test 1 passed
@@ -145,6 +148,7 @@ do_test()
 	tst_res TPASS "Test $1 passed with data '$2'"
 }
 
+. tst_test.sh
 tst_run
 # output:
 # foo 1 TPASS: Test 1 passed with data 'foo'
@@ -174,6 +178,7 @@ do_test()
 	esac
 }
 
+. tst_test.sh
 tst_run
 # output:
 # foo 1 TPASS: Test 1 passed with data 'foo'
@@ -189,26 +194,55 @@ space as default value is used. Of course, it's possible to use separate functio
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Similarily to the C library various checks and preparations can be requested
-simply by setting right '$TST_NEEDS_FOO'.
+simply by setting right '$TST_FOO'.
 
 [options="header"]
 |=============================================================================
-| Variable name      | Action done
-| 'TST_NEEDS_ROOT'   | Exit the test with 'TCONF' unless executed under root.
-|                    | Alternatively the 'tst_require_root' command can be used.
-| 'TST_NEEDS_TMPDIR' | Create test temporary directory and cd into it.
-| 'TST_NEEDS_DEVICE' | Prepare test temporary device, the path to testing
-                       device is stored in '$TST_DEVICE' variable.
-                       The option implies 'TST_NEEDS_TMPDIR'.
-| 'TST_NEEDS_CMDS'   | String with command names that has to be present for
-                       the test (see below).
-| 'TST_NEEDS_MODULE' | Test module name needed for the test (see below).
-| 'TST_NEEDS_DRIVERS'| Checks kernel drivers support for the test.
-| 'TST_TIMEOUT'      | Maximum timeout set for the test in sec. Must be int >= 1,
-                       or -1 (special value to disable timeout), default is 300.
-                       Variable is meant be set in tests, not by user.
-                       It's an equivalent of `tst_test.timeout` in C, can be set
-                       via 'tst_set_timeout(timeout)' after test has started.
+| Variable name            | Action done
+| 'TST_ALL_FILESYSTEMS'    | Testing on all available filesystems
+                             ('tst_test.all_filesystems' equivalent).
+                             When 'TST_SKIP_FILESYSTEMS' any listed filesystem is not
+                             included in the resulting list of supported filesystems.
+| 'TST_DEV_EXTRA_OPTS'     | Pass extra 'mkfs' options _after_ device name,
+                             to 'tst_mkfs', use with 'TST_FORMAT_DEVICE=1'.
+| 'TST_DEV_FS_OPTS'        | Pass 'mkfs' options _before_ the device name,
+                             to 'tst_mkfs', use with 'TST_FORMAT_DEVICE=1'.
+| 'TST_FORMAT_DEVICE'      | Format a block device with a filesystem, see
+                             https://github.com/linux-test-project/ltp/wiki/Shell-Test-API#formatting-device-with-a-filesystem[Formatting device with a filesystem].
+                             See also 'TST_DEV_EXTRA_OPTS', 'TST_DEV_FS_OPTS', 'TST_FS_TYPE'.
+                             Implies 'TST_NEEDS_DEVICE=1' (no need to set it).
+| 'TST_DEVICE'             | Block device name for 'tst_mount' and 'tst_mkfs', see
+                             https://github.com/linux-test-project/ltp/wiki/Shell-Test-API#formatting-device-with-a-filesystem[Formatting device with a filesystem].
+| 'TST_FS_TYPE'            | Override the default filesystem to be used. Also
+                             contains currently used filesystem during looping
+                             filesystems in 'TST_ALL_FILESYSTEMS=1'
+                             ('tst_device->fs_type' equivalent).
+| 'TST_MNTPOINT'           | Holds path to mountpoint used in 'tst_mount', see
+                             https://github.com/linux-test-project/ltp/wiki/Shell-Test-API#formatting-device-with-a-filesystem[Formatting device with a filesystem].
+| 'TST_MNT_PARAMS'         | Extra mount params for 'tst_mount', see
+                             https://github.com/linux-test-project/ltp/wiki/Shell-Test-API#formatting-device-with-a-filesystem[Formatting device with a filesystem].
+| 'TST_MOUNT_DEVICE'       | Mount device, see
+                             https://github.com/linux-test-project/ltp/wiki/Shell-Test-API#mounting-and-unmounting-filesystems[Mounting and unmounting filesystems].
+| 'TST_NEEDS_ROOT'         | Exit the test with 'TCONF' unless executed under root.
+                             Alternatively the 'tst_require_root' command can be used.
+| 'TST_NEEDS_TMPDIR'       | Create test temporary directory and cd into it.
+| 'TST_NEEDS_DEVICE'       | Prepare test temporary device, the path to testing
+                             device is stored in '$TST_DEVICE' variable.
+                             The option implies 'TST_NEEDS_TMPDIR'.
+| 'TST_NEEDS_CMDS'         | String with command names that has to be present for
+                             the test (see below).
+| 'TST_NEEDS_MODULE'       | Test module name needed for the test (see below).
+| 'TST_NEEDS_DRIVERS'      | Checks kernel drivers support for the test.
+| 'TST_NEEDS_KCONFIGS'     | Checks kernel kconfigs support for the test (see below).
+| 'TST_NEEDS_KCONFIGS_IFS' | Used for splitting '$TST_NEEDS_KCONFIGS' variable,
+                             default value is comma, it only supports single character.
+| 'TST_SKIP_FILESYSTEMS'   | Comma separated list of filesystems on which test will be skipped
+                             (tst_test.skip_filesystems equivalent).
+| 'TST_TIMEOUT'            | Maximum timeout set for the test in sec. Must be int >= 1,
+                             or -1 (special value to disable timeout), default is 300.
+                             Variable is meant be set in tests, not by user.
+                             It's an equivalent of `tst_test.timeout` in C, can be set
+                             via 'tst_set_timeout(timeout)' after test has started.
 |=============================================================================
 
 [options="header"]
@@ -260,6 +294,7 @@ do_test()
 	...
 }
 
+. tst_test.sh
 tst_run
 -------------------------------------------------------------------------------
 
@@ -319,6 +354,7 @@ do_test()
 	...
 }
 
+. tst_test.sh
 tst_run
 -------------------------------------------------------------------------------
 
@@ -361,6 +397,7 @@ do_test()
 	...
 }
 
+. tst_test.sh
 tst_run
 -------------------------------------------------------------------------------
 
@@ -492,7 +529,24 @@ tst_random 0 1000
 Formatting device with a filesystem
 +++++++++++++++++++++++++++++++++++
 
-The 'tst_mkfs' helper will format device with the filesystem.
+'TST_FORMAT_DEVICE=1' can be used to format device before running the test.
+Uses '$TST_FS_TYPE' (by default ext2), '$TST_DEVICE' a block device to be
+formatted, usually prepared by the library (TST_NEEDS_DEVICE=1 must be set).
+'$TST_DEV_FS_OPTS' a 'mkfs' options _before_ the device path and
+'$TST_DEV_EXTRA_OPTS' extra 'mkfs'' options _after_ the device path.
+
+[source,sh]
+-------------------------------------------------------------------------------
+TST_FORMAT_DEVICE=1
+TST_DEV_FS_OPTS="-b 1024 -O quota"
+TST_DEV_EXTRA_OPTS="5m"
+TST_TESTFUNC=test
+
+test()
+{
+	tst_res TPASS "device formatted"
+}
+-------------------------------------------------------------------------------
 
 [source,sh]
 -------------------------------------------------------------------------------
@@ -602,14 +656,18 @@ with syntax similar to the shell test command.
 
 [source,sh]
 -------------------------------------------------------------------------------
-# Exit the test if kernel version is older or equal to 2.6.8
-if tst_kvcmp -le 2.6.8; then
-	tst_brk TCONF "Kernel newer than 2.6.8 is needed"
+# Exit the test if kernel version is older or equal to 4.0.0
+if tst_kvcmp -le 4.0.0; then
+	tst_brk TCONF "Kernel newer than 4.0.0 is needed"
 fi
 
-# Exit the test if kernel is newer than 3.8 and older than 4.0.1
-if tst_kvcmp -gt 3.8 -a -lt 4.0.1; then
-	tst_brk TCONF "Kernel must be older than 3.8 or newer than 4.0.1"
+# Exit the test if kernel is newer than 3.16 and older than 4.0.1
+if tst_kvcmp -gt 3.16 -a -lt 4.0.1; then
+	tst_brk TCONF "Kernel must be older than 3.16 or newer than 4.0.1"
+fi
+
+if tst_kvcmp -lt "6.1 RHEL9:5.14.0-191"; then
+	# code for kernel < 6.1 or RHEL9 kernel < 5.14.0-191
 fi
 -------------------------------------------------------------------------------
 
@@ -629,7 +687,18 @@ fi
 The format for kernel version has to either be with one dot e.g. '2.6' or with
 two dots e.g. '4.8.1'.
 
-.tst_fs_has_free
+Kernel version can also be followed by a space separated list of extra versions
+prefixed by distribution which when matched take precedence, e.g. '6.1 RHEL9:5.14.0-191'.
+
+For more info see 'tst_kvercmp()' and 'tst_kvercmp2()' in
+https://github.com/linux-test-project/ltp/wiki/C-Test-API#16-runtime-kernel-version-detection[C Test API].
+
+NOTE: See also LTP
+      https://github.com/linux-test-project/ltp/wiki/Supported-kernel,-libc,-toolchain-versions#13-minimal-supported-kernel-version[minimal supported kernel version].
+
+tst_fs_has_free
++++++++++++++++
+
 [source,sh]
 -------------------------------------------------------------------------------
 #!/bin/sh
@@ -649,7 +718,9 @@ satisfied, 1 if not, and 2 on error.
 
 The second argument supports suffixes kB, MB and GB, the default unit is Byte.
 
-.tst_retry
+tst_retry
++++++++++
+
 [source,sh]
 -------------------------------------------------------------------------------
 #!/bin/sh
@@ -701,7 +772,9 @@ correct daemon name.
 | SYSLOG_DAEMON | Syslog daemon name (syslog, syslog-ng, rsyslog).
 |==============================================================================
 
-.Cron daemon restart example
+Cron daemon restart example
++++++++++++++++++++++++++++
+
 [source,sh]
 -------------------------------------------------------------------------------
 #!/bin/sh
@@ -742,3 +815,19 @@ TST_NEEDS_CHECKPOINTS=1
 Since both the implementations are compatible, it's also possible to start
 a child binary process from a shell test and synchronize with it. This process
 must have checkpoints initialized by calling 'tst_reinit()'.
+
+1.7 Parsing kernel .config
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+The shell library provides an implementation of the kconfig parsing interface
+compatible with the C version.
+
+It's possible to pass kernel kconfig list for tst_require_kconfigs API with
+'$TST_NEEDS_KCONFIGS'.
+Optional '$TST_NEEDS_KCONFIGS_IFS' is used for splitting, default value is comma.
+
+-------------------------------------------------------------------------------
+#!/bin/sh
+TST_NEEDS_KCONFIGS="CONFIG_EXT4_FS, CONFIG_QUOTACTL=y"
+
+. tst_test.sh
+-------------------------------------------------------------------------------

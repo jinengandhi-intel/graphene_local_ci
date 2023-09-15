@@ -22,7 +22,7 @@
 #include "tst_test.h"
 #include "tst_safe_macros.h"
 
-#define TESTFILE	"test_file"
+#define TESTFILE	"fstat03_testfile"
 
 static int fd_ok;
 static int fd_ebadf = -1;

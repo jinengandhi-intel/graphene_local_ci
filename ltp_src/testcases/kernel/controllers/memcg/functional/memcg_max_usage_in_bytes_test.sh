@@ -9,12 +9,6 @@
 MEMCG_TESTFUNC=test
 TST_CNT=4
 
-. memcg_lib.sh
-
-MEM_TO_ALLOC=$((PAGESIZE * 1024))
-MEM_EXPECTED_UPPER=$((MEM_TO_ALLOC + MEM_USAGE_RANGE))
-MEM_LIMIT=$((MEM_TO_ALLOC * 2))
-
 # Run test cases which checks memory.[memsw.]max_usage_in_bytes after make
 # some memory allocation
 test_max_usage_in_bytes()
@@ -87,5 +81,11 @@ test4()
 	EXPECT_PASS echo $MEM_LIMIT \> memory.memsw.limit_in_bytes
 	test_max_usage_in_bytes 1 1
 }
+
+. memcg_lib.sh
+
+MEM_TO_ALLOC=$((PAGESIZE * 1024))
+MEM_EXPECTED_UPPER=$((MEM_TO_ALLOC + MEM_USAGE_RANGE))
+MEM_LIMIT=$((MEM_TO_ALLOC * 2))
 
 tst_run

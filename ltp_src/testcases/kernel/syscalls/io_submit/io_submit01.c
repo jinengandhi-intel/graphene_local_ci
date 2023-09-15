@@ -79,9 +79,11 @@ static void setup(void)
 {
 	TEST(io_setup(1, &ctx));
 	if (TST_RET == -ENOSYS)
-		tst_brk(TCONF | TRERRNO, "io_setup(): AIO not supported by kernel");
-	else if (TST_RET)
-		tst_brk(TBROK | TRERRNO, "io_setup() failed");
+		tst_brk(TCONF, "io_setup(): AIO not supported by kernel");
+	else if (TST_RET) {
+		tst_brk(TBROK, "io_setup() returned %ld(%s)",
+			TST_RET, tst_strerrno(-TST_RET));
+	}
 
 	io_prep_pread(&inv_fd_iocb, -1, buf, sizeof(buf), 0);
 
@@ -114,13 +116,19 @@ static const char *errno_name(int err)
 static void verify_io_submit(unsigned int n)
 {
 	struct tcase *t = &tcases[n];
-	int ret;
+	struct io_event evbuf;
+	struct timespec timeout = { .tv_sec = 1 };
+	int i, ret;
 
 	ret = io_submit(*t->ctx, t->nr, t->iocbs);
 
 	if (ret == t->exp_errno) {
 		tst_res(TPASS, "io_submit() with %s failed with %s",
 			t->desc, errno_name(t->exp_errno));
+
+		for (i = 0; i < ret; i++)
+			io_getevents(*t->ctx, 1, 1, &evbuf, &timeout);
+
 		return;
 	}
 

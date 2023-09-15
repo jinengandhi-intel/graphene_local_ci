@@ -74,12 +74,12 @@ static void run(void)
 }
 
 static struct tst_test test = {
-	.min_kver = "2.6.32",
 	.setup = setup,
 	.test_all = run,
 	.needs_root = 1,
 	.tags = (const struct tst_tag[]){
 		{"linux-git", "ce683e5f9d04"},
 		{"CVE", "CVE-2016-4997"},
+		{}
 	}
 };

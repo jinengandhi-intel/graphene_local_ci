@@ -155,7 +155,7 @@ int main(int ac, char **av)
 					 "unlink(%s) Failed, errno=%d : %s",
 					 mname, errno, strerror(errno));
 			}
-			SAFE_TOUCH(cleanup, fname, 0700, NULL);
+			creat(fname, 0700);
 		}
 	}
 
@@ -178,7 +178,7 @@ void setup(void)
 
 	sprintf(fname, "./tfile_%d", getpid());
 	sprintf(mname, "./rnfile_%d", getpid());
-	SAFE_TOUCH(cleanup, fname, 0700, NULL);
+	creat(fname, 0700);
 }
 
 /***************************************************************

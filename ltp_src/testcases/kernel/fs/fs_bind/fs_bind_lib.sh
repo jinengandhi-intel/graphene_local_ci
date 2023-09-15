@@ -2,19 +2,16 @@
 # SPDX-License-Identifier: GPL-2.0-or-later
 # Copyright (c) International Business Machines  Corp., 2005
 # Copyright (c) 2021 Joerg Vehlow <joerg.vehlow@aox-tech.de>
+# Copyright (c) Linux Test Project, 2022-2023
 # Based on work by: Avantika Mathur (mathurav@us.ibm.com)
 
 TST_NEEDS_TMPDIR=1
 TST_NEEDS_ROOT=1
 TST_MIN_KVER=2.6.15
-TST_SETUP=fs_bind_setup
-TST_CLEANUP=fs_bind_cleanup
+TST_SETUP="${TST_SETUP:-fs_bind_setup}"
+TST_CLEANUP="${TST_CLEANUP:-fs_bind_cleanup}"
 TST_TESTFUNC=fs_bind_test
 TST_NEEDS_CMDS="mount umount awk sed"
-
-. tst_test.sh
-
-[ -z "$FS_BIND_TESTFUNC" ] && tst_brk TBROK "Please set FS_BIND_TESTFUNC before sourcing fs_bind_lib.sh"
 
 # Test interface:
 #
@@ -113,7 +110,7 @@ fs_bind_check()
 	    fi
 
 		if [ $use_ns -eq 1 ]; then
-			output="$(ns_exec ${FS_BIND_MNTNS_PID} mnt diff -r "$PWD/$dir1" "$PWD/$dir2" 2> /dev/null)"
+			output="$(tst_ns_exec ${FS_BIND_MNTNS_PID} mnt diff -r "$PWD/$dir1" "$PWD/$dir2" 2> /dev/null)"
 		else
 			output="$(diff -r "$dir1" "$dir2" 2> /dev/null)"
 		fi
@@ -201,13 +198,13 @@ _fs_bind_setup_test()
 fs_bind_create_ns()
 {
 	[ -n "$FS_BIND_MNTNS_PID" ] && tst_brk TBROK "Namespace exist already"
-	FS_BIND_MNTNS_PID=$(ns_create mnt)
+	FS_BIND_MNTNS_PID=$(tst_ns_create mnt)
 }
 
 fs_bind_exec_ns()
 {
 	[ -z "$FS_BIND_MNTNS_PID" ] && tst_brk TBROK "Namespace does not exist"
-	EXPECT_PASS ns_exec $FS_BIND_MNTNS_PID mnt "$@"
+	EXPECT_PASS tst_ns_exec $FS_BIND_MNTNS_PID mnt "$@"
 }
 
 fs_bind_destroy_ns()
@@ -245,3 +242,6 @@ fs_bind_test()
 
 	_fs_bind_cleanup_test
 }
+
+. tst_test.sh
+[ -z "$FS_BIND_TESTFUNC" ] && tst_brk TBROK "Please set FS_BIND_TESTFUNC before sourcing fs_bind_lib.sh"

@@ -150,7 +150,7 @@ static void setup(void)
 
 	TEST_PAUSE;
 
-	tst_tmpdir();
+	// tst_tmpdir();
 
 	/* Get the path of temporary file to be created */
 	if (getcwd(Path_name, sizeof(Path_name)) == NULL) {

@@ -13,7 +13,6 @@ TST_OPTS="c:"
 TST_PARSE_ARGS="parse_args"
 TST_USAGE="usage"
 TST_NEEDS_ROOT=1
-. tst_net.sh
 
 do_setup()
 {
@@ -26,7 +25,7 @@ do_setup()
 		if [ -n "$TST_IPV6" ]; then
 			tst_brk TCONF "'arp' doesn't support IPv6"
 		fi
-		SHOW_CMD="arp -a"
+		SHOW_CMD="arp -an"
 		DEL_CMD="ROD arp -d $(tst_ipaddr rhost) -i $(tst_iface)"
 		;;
 	*)
@@ -85,4 +84,5 @@ do_test()
 	tst_res TPASS "verified adding/removing $entry_name cache entry"
 }
 
+. tst_net.sh
 tst_run

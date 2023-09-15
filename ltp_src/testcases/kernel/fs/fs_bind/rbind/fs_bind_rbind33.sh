@@ -6,7 +6,6 @@
 
 FS_BIND_TESTFUNC=test
 
-. fs_bind_lib.sh
 
 test()
 {
@@ -18,11 +17,11 @@ test()
 
 	EXPECT_PASS mount --rbind dir1 dir2
 	EXPECT_PASS mount --make-rslave dir2
-	EXPECT_PASS mount --make-share dir2
+	EXPECT_PASS mount --make-shared dir2
 
 	EXPECT_PASS mount --rbind dir2 dir3
 	EXPECT_PASS mount --make-rslave dir3
-	EXPECT_PASS mount --make-share dir3
+	EXPECT_PASS mount --make-shared dir3
 
 	EXPECT_PASS mount --rbind dir3 dir4
 	EXPECT_PASS mount --make-rslave dir4
@@ -56,4 +55,5 @@ test()
 	EXPECT_PASS umount dir4
 }
 
+. fs_bind_lib.sh
 tst_run

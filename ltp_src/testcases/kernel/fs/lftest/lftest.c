@@ -65,12 +65,12 @@ static void run(void)
 	tst_res(TINFO, "total time for test to run: %d minute(s) and %d seconds",
 	        diff / 60, diff % 60);
 
-	tst_res(TPASS, "test successfull");
+	tst_res(TPASS, "test successful");
 }
 
 static struct tst_test test = {
 	.options = (struct tst_option[]) {
-		{"n:", &str_bufnum, "-n COUNT Number of megabytes to write (default 100)"},
+		{"n:", &str_bufnum, "COUNT Number of megabytes to write (default 100)"},
 		{}
 	},
 	.needs_tmpdir = 1,
