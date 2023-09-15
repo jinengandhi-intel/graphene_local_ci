@@ -30,7 +30,7 @@ static struct test_case_t {
 static void file_create(char *name)
 {
 	sprintf(name, "tfile_%d", getpid());
-	SAFE_TOUCH(name, 0777, NULL);
+	SAFE_CREAT(name, 0777);
 }
 
 static void fifo_create(char *name)

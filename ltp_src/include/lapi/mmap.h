@@ -8,6 +8,11 @@
 #define LAPI_MMAP_H__
 
 #include "config.h"
+#include <sys/mman.h>
+
+#ifndef MAP_SHARED_VALIDATE
+# define MAP_SHARED_VALIDATE 0x03
+#endif
 
 #ifndef MAP_HUGETLB
 # define MAP_HUGETLB 0x40000
@@ -64,6 +69,14 @@
 #ifndef MADV_WIPEONFORK
 # define MADV_WIPEONFORK 18
 # define MADV_KEEPONFORK 19
+#endif
+
+#ifndef MADV_COLD
+# define MADV_COLD	20
+#endif
+
+#ifndef MADV_PAGEOUT
+# define MADV_PAGEOUT	21
 #endif
 
 #ifndef MAP_FIXED_NOREPLACE

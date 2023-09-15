@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright (c) 2018-2020 Petr Vorel <pvorel@suse.cz>
+# Copyright (c) 2018-2021 Petr Vorel <pvorel@suse.cz>
 set -ex
 
 # workaround for missing oldstable-updates repository
@@ -7,6 +7,9 @@ set -ex
 grep -v oldstable-updates /etc/apt/sources.list > /tmp/sources.list && mv /tmp/sources.list /etc/apt/sources.list
 
 apt update
+
+# workaround for Ubuntu impish asking to interactively configure tzdata
+export DEBIAN_FRONTEND="noninteractive"
 
 apt="apt install -y --no-install-recommends"
 
@@ -34,12 +37,11 @@ $apt \
 	libjson-perl \
 	libkeyutils-dev \
 	libkeyutils1 \
-	libmm-dev \
 	libmnl-dev \
 	libnuma-dev \
 	libnuma1 \
 	libselinux1-dev \
-	libsepol1-dev \
+	libsepol-dev \
 	libssl-dev \
 	libtirpc-dev \
 	linux-libc-dev \

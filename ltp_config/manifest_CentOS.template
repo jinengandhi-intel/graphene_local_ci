@@ -18,6 +18,9 @@ fs.mounts = [
   { path = "/usr", uri = "file:/usr" },
   { path = "/tmp", uri = "file:/tmp" },
   { path = "/dev/cpu_dma_latency", uri = "file:/dev/cpu_dma_latency" },
+  { path = "/proc", uri = "file:/proc" },
+  # for tests that require POSIX shared memory support
+  { type = "untrusted_shm", path = "/dev/shm", uri = "dev:/dev/shm" },
 ]
 
 # for flock tests
@@ -38,12 +41,17 @@ sgx.allowed_files = [
     "file:{{ gramine.runtimedir() }}/libnss_compat.so.2",
     "file:{{ arch_libdir }}/libnss_compat.so.2",
     "file:{{ arch_libdir }}/libnss_systemd.so.2",
-    "file:install-sgx/testcases/bin/pipe2_02_child",
-    "file:install-sgx/testcases/bin/execvp01_child",
-    "file:install-sgx/testcases/bin/execv01_child",
-    "file:install-sgx/testcases/bin/execlp01_child",
-    "file:install-sgx/testcases/bin/execl01_child",
+    "file:install/testcases/bin/pipe2_02_child",
+    "file:install/testcases/bin/execvp01_child",
+    "file:install/testcases/bin/execv01_child",
+    "file:install/testcases/bin/execlp01_child",
+    "file:install/testcases/bin/execl01_child",
+    "file:install/testcases/bin/mmapfile",
+    "file:install/testcases/bin/msync_file",
     "file:/dev/cpu_dma_latency",
+    "dev:/dev/shm/", # for tests that require POSIX shared memory support
+    "file:/proc",
+    "file:install/testcases/bin/test_mlock04",
 ]
 
 sgx.trusted_files = [

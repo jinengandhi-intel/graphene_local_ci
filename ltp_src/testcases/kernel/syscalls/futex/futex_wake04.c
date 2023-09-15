@@ -21,7 +21,6 @@
  */
 
 #include <stdio.h>
-#include <sys/mman.h>
 #include <fcntl.h>
 #include <sys/time.h>
 #include <string.h>
@@ -48,9 +47,6 @@ static struct futex_test_variants variants[] = {
 
 static void setup(void)
 {
-	if (tst_hugepages == 0)
-		tst_brk(TCONF, "No enough hugepages for testing.");
-
 	struct futex_test_variants *tv = &variants[tst_variant];
 
 	tst_res(TINFO, "Testing variant: %s", tv->desc);
@@ -133,7 +129,6 @@ static struct tst_test test = {
 	.test_all = wakeup_thread2,
 	.test_variants = ARRAY_SIZE(variants),
 	.needs_root = 1,
-	.min_kver = "2.6.32",
 	.needs_tmpdir = 1,
-	.request_hugepages = 1,
+	.hugepages = {1, TST_NEEDS},
 };

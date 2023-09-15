@@ -8,9 +8,7 @@
 
 TST_SETUP="setup"
 TST_CLEANUP="cleanup"
-TST_NEEDS_DEVICE=1
 TST_CNT=4
-. ima_setup.sh
 
 setup()
 {
@@ -91,4 +89,5 @@ cleanup()
 	TST_MNT_PARAMS="$params_backup"
 }
 
+. ima_setup.sh
 tst_run

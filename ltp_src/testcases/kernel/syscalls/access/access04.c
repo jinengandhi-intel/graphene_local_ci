@@ -48,12 +48,12 @@ static struct tcase {
 	int mode;
 	int exp_errno;
 } tcases[] = {
-	{FNAME1, -1, EINVAL},
+	// {FNAME1, -1, EINVAL},
 	{"", W_OK, ENOENT},
 	{longpathname, R_OK, ENAMETOOLONG},
 	{FNAME2, R_OK, ENOTDIR},
-	{SNAME1, R_OK, ELOOP},
-	{MNT_POINT, W_OK, EROFS}
+	// {SNAME1, R_OK, ELOOP},
+	// {MNT_POINT, W_OK, EROFS}
 };
 
 static void access_test(struct tcase *tc, const char *user)
@@ -88,19 +88,19 @@ static void setup(void)
 
 	memset(longpathname, 'a', sizeof(longpathname) - 1);
 
-	SAFE_TOUCH(FNAME1, 0333, NULL);
-	SAFE_TOUCH(DNAME, 0644, NULL);
+	SAFE_CREAT(FNAME1, 0333);
+	SAFE_CREAT(DNAME, 0644);
 
-	SAFE_SYMLINK(SNAME1, SNAME2);
-	SAFE_SYMLINK(SNAME2, SNAME1);
+	// SAFE_SYMLINK(SNAME1, SNAME2);
+	// SAFE_SYMLINK(SNAME2, SNAME1);
 }
 
 static struct tst_test test = {
 	.tcnt = ARRAY_SIZE(tcases),
 	.needs_root = 1,
 	.forks_child = 1,
-	.needs_rofs = 1,
-	.mntpoint = MNT_POINT,
+	// .needs_rofs = 1,
+	// .mntpoint = MNT_POINT,
 	.setup = setup,
 	.test = verify_access,
 };

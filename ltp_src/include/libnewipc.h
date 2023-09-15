@@ -31,7 +31,6 @@
 #define MSGSIZE	1024
 #define MSGTYPE	1
 #define NR_MSGQUEUES	16
-#define min(a, b)	(((a) < (b)) ? (a) : (b))
 
 #define SEM_RD	0400
 #define SEM_ALT	0200
@@ -54,6 +53,8 @@ int get_used_sysvipc(const char *file, const int lineno, const char *sysvipc_fil
 	get_used_sysvipc(__FILE__, __LINE__, "/proc/sysvipc/msg")
 #define GET_USED_SEGMENTS() \
 	get_used_sysvipc(__FILE__, __LINE__, "/proc/sysvipc/shm")
+#define GET_USED_ARRAYS() \
+	get_used_sysvipc(__FILE__, __LINE__, "/proc/sysvipc/sem")
 
 void *probe_free_addr(const char *file, const int lineno);
 #define PROBE_FREE_ADDR() \

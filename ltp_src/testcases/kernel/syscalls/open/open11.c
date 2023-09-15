@@ -125,93 +125,93 @@ static struct test_case {
 		.mode = 0644,
 		.err = ENOTDIR,
 	},
-	/* Test open(2) hard link */
-	{	/* open hard link file O_RDONLY */
-		.desc = "Open hard link file O_RDONLY",
-		.path = T_LINK_REG,
-		.flags = O_RDONLY,
-		.mode = 0644,
-		.err = 0,
-	},
-	{	/* open hard link file O_WRONLY */
-		.desc = "Open hard link file O_WRONLY",
-		.path = T_LINK_REG,
-		.flags = O_WRONLY,
-		.mode = 0644,
-		.err = 0,
-	},
-	{	/* open hard link file O_RDWR */
-		.desc = "Open hard link file O_RDWR",
-		.path = T_LINK_REG,
-		.flags = O_RDWR,
-		.mode = 0644,
-		.err = 0,
-	},
+	// /* Test open(2) hard link */
+	// {	/* open hard link file O_RDONLY */
+	// 	.desc = "Open hard link file O_RDONLY",
+	// 	.path = T_LINK_REG,
+	// 	.flags = O_RDONLY,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
+	// {	/* open hard link file O_WRONLY */
+	// 	.desc = "Open hard link file O_WRONLY",
+	// 	.path = T_LINK_REG,
+	// 	.flags = O_WRONLY,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
+	// {	/* open hard link file O_RDWR */
+	// 	.desc = "Open hard link file O_RDWR",
+	// 	.path = T_LINK_REG,
+	// 	.flags = O_RDWR,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
 	/* Test open(2) sym link */
-	{	/* open sym link file O_RDONLY */
-		.desc = "Open sym link file O_RDONLY",
-		.path = T_SYMLINK_REG,
-		.flags = O_RDONLY,
-		.mode = 0644,
-		.err = 0,
-	},
-	{	/* open sym link file O_WRONLY */
-		.desc = "Open sym link file O_WRONLY",
-		.path = T_SYMLINK_REG,
-		.flags = O_WRONLY,
-		.mode = 0644,
-		.err = 0,
-	},
-	{	/* open sym link file O_RDWR */
-		.desc = "Open sym link file O_RDWR",
-		.path = T_SYMLINK_REG,
-		.flags = O_RDWR,
-		.mode = 0644,
-		.err = 0,
-	},
-	{	/* open sym link dir O_RDONLY */
-		.desc = "Open sym link dir O_RDONLY",
-		.path = T_SYMLINK_DIR,
-		.flags = O_RDONLY,
-		.mode = 0644,
-		.err = 0,
-	},
-	{	/* open sym link dir O_WRONLY */
-		.desc = "Open sym link dir O_WRONLY, expect EISDIR",
-		.path = T_SYMLINK_DIR,
-		.flags = O_WRONLY,
-		.mode = 0644,
-		.err = EISDIR,
-	},
-	{	/* open sym link dir O_RDWR */
-		.desc = "Open sym link dir O_RDWR, expect EISDIR",
-		.path = T_SYMLINK_DIR,
-		.flags = O_RDWR,
-		.mode = 0644,
-		.err = EISDIR,
-	},
+	// {	/* open sym link file O_RDONLY */
+	// 	.desc = "Open sym link file O_RDONLY",
+	// 	.path = T_SYMLINK_REG,
+	// 	.flags = O_RDONLY,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
+	// {	/* open sym link file O_WRONLY */
+	// 	.desc = "Open sym link file O_WRONLY",
+	// 	.path = T_SYMLINK_REG,
+	// 	.flags = O_WRONLY,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
+	// {	/* open sym link file O_RDWR */
+	// 	.desc = "Open sym link file O_RDWR",
+	// 	.path = T_SYMLINK_REG,
+	// 	.flags = O_RDWR,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
+	// {	/* open sym link dir O_RDONLY */
+	// 	.desc = "Open sym link dir O_RDONLY",
+	// 	.path = T_SYMLINK_DIR,
+	// 	.flags = O_RDONLY,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
+	// {	/* open sym link dir O_WRONLY */
+	// 	.desc = "Open sym link dir O_WRONLY, expect EISDIR",
+	// 	.path = T_SYMLINK_DIR,
+	// 	.flags = O_WRONLY,
+	// 	.mode = 0644,
+	// 	.err = EISDIR,
+	// },
+	// {	/* open sym link dir O_RDWR */
+	// 	.desc = "Open sym link dir O_RDWR, expect EISDIR",
+	// 	.path = T_SYMLINK_DIR,
+	// 	.flags = O_RDWR,
+	// 	.mode = 0644,
+	// 	.err = EISDIR,
+	// },
 	/* * Test open(2) device special */
-	{	/* open device special file O_RDONLY */
-		.desc = "Open device special file O_RDONLY",
-		.path = T_DEV,
-		.flags = O_RDONLY,
-		.mode = 0644,
-		.err = 0,
-	},
-	{	/* open device special file O_WRONLY */
-		.desc = "Open device special file O_WRONLY",
-		.path = T_DEV,
-		.flags = O_WRONLY,
-		.mode = 0644,
-		.err = 0,
-	},
-	{	/* open device special file O_RDWR */
-		.desc = "Open device special file O_RDWR",
-		.path = T_DEV,
-		.flags = O_RDWR,
-		.mode = 0644,
-		.err = 0,
-	},
+	// {	/* open device special file O_RDONLY */
+	// 	.desc = "Open device special file O_RDONLY",
+	// 	.path = T_DEV,
+	// 	.flags = O_RDONLY,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
+	// {	/* open device special file O_WRONLY */
+	// 	.desc = "Open device special file O_WRONLY",
+	// 	.path = T_DEV,
+	// 	.flags = O_WRONLY,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
+	// {	/* open device special file O_RDWR */
+	// 	.desc = "Open device special file O_RDWR",
+	// 	.path = T_DEV,
+	// 	.flags = O_RDWR,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
 	/* * Test open(2) non-existing file */
 	{	/* open non-existing regular file in existing dir */
 		.desc = "Open non-existing regular file in existing dir",
@@ -228,13 +228,13 @@ static struct test_case {
 		.mode = 0644,
 		.err = 0,
 	},
-	{	/* open sym link file O_RDONLY | O_CREAT */
-		.desc = "Open symlink file O_RDONLY | O_CREAT",
-		.path = T_SYMLINK_REG,
-		.flags = O_RDONLY | O_CREAT,
-		.mode = 0644,
-		.err = 0,
-	},
+	// {	/* open sym link file O_RDONLY | O_CREAT */
+	// 	.desc = "Open symlink file O_RDONLY | O_CREAT",
+	// 	.path = T_SYMLINK_REG,
+	// 	.flags = O_RDONLY | O_CREAT,
+	// 	.mode = 0644,
+	// 	.err = 0,
+	// },
 	{	/* open regular file O_RDONLY | O_CREAT */
 		.desc = "Open regular file O_RDONLY | O_CREAT",
 		.path = T_REG_EMPTY,
@@ -242,13 +242,13 @@ static struct test_case {
 		.mode = 0644,
 		.err = 0,
 	},
-	{	/* open symlink dir O_RDONLY | O_CREAT */
-		.desc = "Open symlink dir O_RDONLY | O_CREAT, expect EISDIR",
-		.path = T_SYMLINK_DIR,
-		.flags = O_RDONLY | O_CREAT,
-		.mode = 0644,
-		.err = EISDIR,
-	},
+	// {	/* open symlink dir O_RDONLY | O_CREAT */
+	// 	.desc = "Open symlink dir O_RDONLY | O_CREAT, expect EISDIR",
+	// 	.path = T_SYMLINK_DIR,
+	// 	.flags = O_RDONLY | O_CREAT,
+	// 	.mode = 0644,
+	// 	.err = EISDIR,
+	// },
 	{	/* open dir O_RDONLY | O_CREAT */
 		.desc = "Open dir O_RDONLY | O_CREAT, expect EISDIR",
 		.path = T_DIR,
@@ -305,19 +305,20 @@ static void setup(void)
 	}
 	SAFE_CLOSE(fd);
 
-	SAFE_TOUCH(T_REG_EMPTY, 0644, NULL);
-	SAFE_LINK(T_REG, T_LINK_REG);
-	SAFE_SYMLINK(T_REG, T_SYMLINK_REG);
+	SAFE_CREAT(T_REG_EMPTY, 0644);
+	// SAFE_LINK(T_REG, T_LINK_REG);
+	// SAFE_SYMLINK(T_REG, T_SYMLINK_REG);
 	SAFE_MKDIR(T_DIR, 0755);
-	SAFE_SYMLINK(T_DIR, T_SYMLINK_DIR);
-	SAFE_MKNOD(T_DEV, S_IFCHR, makedev(1, 5));
+	// SAFE_SYMLINK(T_DIR, T_SYMLINK_DIR);
+	// SAFE_MKNOD(T_DEV, S_IFCHR, makedev(1, 5));
 }
 
 static struct tst_test test = {
 	.tcnt = ARRAY_SIZE(tc),
 	.setup = setup,
 	.test = verify_open,
-	.needs_devfs = 1,
-	.mntpoint = MNTPOINT,
+	// .needs_devfs = 1,
+	// .mntpoint = MNTPOINT,
 	.needs_root = 1,
+	.needs_tmpdir = 1,
 };

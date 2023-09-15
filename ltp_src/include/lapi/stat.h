@@ -176,6 +176,10 @@ static inline int statx(int dirfd, const char *pathname, unsigned int flags,
 # define STATX_BTIME		0x00000800U
 #endif
 
+#ifndef STATX_MNT_ID
+# define STATX_MNT_ID		0x00001000U
+#endif
+
 #ifndef STATX_ALL
 # define STATX_ALL		0x00000fffU
 #endif
@@ -217,6 +221,10 @@ static inline int statx(int dirfd, const char *pathname, unsigned int flags,
 
 #ifndef STATX_ATTR_AUTOMOUNT
 # define STATX_ATTR_AUTOMOUNT	0x00001000
+#endif
+
+#ifndef STATX_ATTR_VERITY
+# define STATX_ATTR_VERITY	0x00100000
 #endif
 
 #ifndef AT_SYMLINK_NOFOLLOW

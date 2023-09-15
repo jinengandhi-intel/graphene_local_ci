@@ -9,10 +9,7 @@ clean-extra += clean-build
 CFG = ltp_tests.cfg
 XML_FILE = ltp.xml	
 ifeq ($(SGX),1)
-	BUILDDIR:=$(BUILDDIR)-sgx
-	INSTALLDIR:=$(INSTALLDIR)-sgx
-	LTP_SCENARIO = "install-sgx/runtest/syscalls-new"
-	CFG = ltp_tests.cfg ltp-sgx_tests.cfg ltp-bug-1075_tests.cfg
+	CFG = ltp_tests.cfg ltp-sgx_tests.cfg
 	XML_FILE = ltp-sgx.xml	
 endif
 
@@ -33,9 +30,6 @@ $(BUILDDIR)/BUILD_SUCCESS: $(SRCDIR)/configure
 	# Out-of-tree build steps were taken from ltp/INSTALL.
 	# The instructions below assume that SRCDIR and BUILDDIR are absolute.
 	sed -i 's/un.release/"$(VERSION)"/g' $(SRCDIR)/lib/tst_kconfig.c
-	@if [ $(SGX) = 1 ]; then \
-		sed -i 's/MAP_SHARED/MAP_PRIVATE/g' $(SRCDIR)/lib/tst_test.c;\
-	fi
 	mkdir -p $(BUILDDIR)
 	# Kernel module tests are not meaningful for our LibOS and building them causes troubles on
 	# incompatible host kernels.
@@ -75,4 +69,7 @@ clean:
 		ltp*.xml \
 		etc/ \
 		.pytest_cache \
-		__pycache__
+		__pycache__ \
+	        *.manifest \
+		*.manifest.sgx* \
+		*.sig

@@ -33,7 +33,6 @@ autom4te.cache
 /m4/Makefile
 /m4/Makefile.in
 
-/execltp
 /ltp-devel.spec
 /README.ltp-devel
 /tags
@@ -45,7 +44,6 @@ autom4te.cache
 /lib/ltp.pc
 /pan/ltp-bump
 /pan/ltp-pan
-/pan/ltp-scanner
 
 cscope.*
 ncscope.*

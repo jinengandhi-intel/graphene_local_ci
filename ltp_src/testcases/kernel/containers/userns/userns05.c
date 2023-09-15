@@ -1,52 +1,29 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * Copyright (c) Huawei Technologies Co., Ltd., 2015
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
- * the GNU General Public License for more details.
+ * Copyright (C) 2022 SUSE LLC Andrea Cervesato <andrea.cervesato@suse.com>
  */
 
-/*
- * Verify that:
- * A process created via fork(2) or clone(2) without the
- * CLONE_NEWUSER flag is a member of the same user namespace as its
- * parent.
- * When unshare an user namespace, the calling process is moved into
- * a new user namespace which is not shared with any previously
- * existing process.
+/*\
+ * [Description]
+ *
+ * Verify that if a process created via fork(2) or clone(2) without the
+ * CLONE_NEWUSER flag is a member of the same user namespace as its parent.
+ *
+ * When unshare an user namespace, the calling process is moved into a new user
+ * namespace which is not shared with any previously existing process.
  */
 
 #define _GNU_SOURCE
-#include <sys/wait.h>
-#include <assert.h>
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include "userns_helper.h"
-#include "test.h"
+#include "tst_test.h"
+#include "lapi/sched.h"
+#include "common.h"
 
-char *TCID = "user_namespace5";
-int TST_TOTAL = 1;
-
-static void cleanup(void)
+static void child_fn1(void)
 {
-	tst_rmdir();
-}
-
-/*
- * child_fn1() - Inside a new user namespace
- */
-static int child_fn1(void)
-{
-	TST_SAFE_CHECKPOINT_WAIT(NULL, 0);
-	return 0;
+	TST_CHECKPOINT_WAIT(0);
 }
 
 static unsigned int getusernsidbypid(int pid)
@@ -57,86 +34,73 @@ static unsigned int getusernsidbypid(int pid)
 
 	sprintf(path, "/proc/%d/ns/user", pid);
 
-	if (readlink(path, userid, BUFSIZ) == -1)
-		tst_resm(TFAIL | TERRNO, "readlink failure.");
+	SAFE_READLINK(path, userid, BUFSIZ);
 
-	if (sscanf(userid, "user:[%u]", &id) != 1)
-		tst_resm(TFAIL, "sscanf failure.");
+	if (sscanf(userid, "user:[%u]", &id) < 0)
+		tst_brk(TBROK | TERRNO, "sscanf failure");
+
 	return id;
 }
 
-static void test_userns_id(void)
+static void run(void)
 {
+	const struct tst_clone_args args1 = { .exit_signal = SIGCHLD };
+	const struct tst_clone_args args2 = { CLONE_NEWUSER, SIGCHLD };
 	int cpid1, cpid2, cpid3;
 	unsigned int parentuserns, cpid1userns, cpid2userns, newparentuserns;
 
 	parentuserns = getusernsidbypid(getpid());
-	cpid1 = ltp_clone_quick(SIGCHLD, (void *)child_fn1,
-		NULL);
-	if (cpid1 < 0)
-		tst_brkm(TBROK | TERRNO, cleanup, "clone failed");
+
+	cpid1 = SAFE_CLONE(&args1);
+	if (!cpid1) {
+		child_fn1();
+		return;
+	}
+
 	cpid1userns = getusernsidbypid(cpid1);
-	TST_SAFE_CHECKPOINT_WAKE(cleanup, 0);
+
+	TST_CHECKPOINT_WAKE(0);
 
 	/* A process created via fork(2) or clone(2) without the
-	CLONE_NEWUSER flag is a member of the same user namespace as its
-	parent.*/
-	if (parentuserns != cpid1userns)
-		tst_resm(TFAIL, "userns:parent should be equal to cpid1");
+	 * CLONE_NEWUSER flag is a member of the same user namespace as its
+	 * parent
+	 */
+	TST_EXP_EQ_LI(parentuserns, cpid1userns);
 
-	cpid2 = ltp_clone_quick(CLONE_NEWUSER | SIGCHLD,
-		(void *)child_fn1, NULL);
-	if (cpid2 < 0)
-		tst_brkm(TBROK | TERRNO, cleanup, "clone failed");
+	cpid2 = SAFE_CLONE(&args2);
+	if (!cpid2) {
+		child_fn1();
+		return;
+	}
+
 	cpid2userns = getusernsidbypid(cpid2);
-	TST_SAFE_CHECKPOINT_WAKE(cleanup, 0);
 
-	if (parentuserns == cpid2userns)
-		tst_resm(TFAIL, "userns:parent should be not equal to cpid2");
+	TST_CHECKPOINT_WAKE(0);
 
-	switch (cpid3 = fork()) {
-	case -1:
-		tst_brkm(TBROK | TERRNO, cleanup, "fork");
-	case 0:
-		if (unshare(CLONE_NEWUSER) == -1) {
-			printf("parent pid unshare failure: (%d) %s",
-				errno, strerror(errno));
-			exit(1);
-		}
+	TST_EXP_EXPR(parentuserns != cpid2userns,
+		"parent namespace != child namespace");
+
+	cpid3 = SAFE_FORK();
+	if (!cpid3) {
+		SAFE_UNSHARE(CLONE_NEWUSER);
 		newparentuserns = getusernsidbypid(getpid());
 
 		/* When unshare an user namespace, the calling process
-		is moved into a new user namespace which is not shared
-		with any previously existing process.*/
-		if (parentuserns == newparentuserns)
-			exit(1);
-		exit(0);
+		 * is moved into a new user namespace which is not shared
+		 * with any previously existing process
+		 */
+		TST_EXP_EXPR(parentuserns != newparentuserns,
+			"parent namespace != unshared child namespace");
 	}
-
-	tst_record_childstatus(cleanup, cpid1);
-	tst_record_childstatus(cleanup, cpid2);
-	tst_record_childstatus(cleanup, cpid3);
 }
 
-static void setup(void)
-{
-	check_newuser();
-
-	tst_tmpdir();
-	TST_CHECKPOINT_INIT(NULL);
-}
-
-int main(int argc, char *argv[])
-{
-	int lc;
-
-	tst_parse_opts(argc, argv, NULL, NULL);
-	setup();
-
-	for (lc = 0; TEST_LOOPING(lc); lc++) {
-		tst_count = 0;
-		test_userns_id();
-	}
-	cleanup();
-	tst_exit();
-}
+static struct tst_test test = {
+	.test_all = run,
+	.needs_root = 1,
+	.forks_child = 1,
+	.needs_checkpoints = 1,
+	.needs_kconfigs = (const char *[]) {
+		"CONFIG_USER_NS",
+		NULL,
+	},
+};

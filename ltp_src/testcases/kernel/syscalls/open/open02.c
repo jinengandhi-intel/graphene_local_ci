@@ -4,20 +4,17 @@
  * Ported to LTP: Wayne Boyer
  *	06/2017 Modified by Guangwen Feng <fenggw-fnst@cn.fujitsu.com>
  */
-/*
- * DESCRIPTION
- *	1. open a new file without O_CREAT, ENOENT should be returned.
- *	2. open a file with O_RDONLY | O_NOATIME and the caller was not
- *	   privileged, EPERM should be returned.
+
+/*\
+ * [Description]
+ *
+ * 1. open a new file without O_CREAT, ENOENT should be returned.
+ * 2. open a file with O_RDONLY | O_NOATIME and the caller was not
+ * privileged, EPERM should be returned.
  */
 
 #define _GNU_SOURCE
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <fcntl.h>
 #include <pwd.h>
 #include "tst_test.h"
 
@@ -31,18 +28,18 @@ static struct tcase {
 	const char *desc;
 } tcases[] = {
 	{TEST_FILE, O_RDWR, ENOENT, "new file without O_CREAT"},
-	{TEST_FILE2, O_RDONLY | O_NOATIME, EPERM, "unpriviledget O_RDONLY | O_NOATIME"},
+	{TEST_FILE2, O_RDONLY | O_NOATIME, EPERM, "unprivileged O_RDONLY | O_NOATIME"},
 };
 
 void setup(void)
 {
 	struct passwd *ltpuser;
 
-	SAFE_TOUCH(TEST_FILE2, 0644, NULL);
+	SAFE_CREAT(TEST_FILE2, 0644);
 
 	ltpuser = SAFE_GETPWNAM("nobody");
 
-	SAFE_SETEUID(ltpuser->pw_uid);
+	SAFE_SETUID(ltpuser->pw_uid);
 }
 
 static void verify_open(unsigned int n)
@@ -55,7 +52,7 @@ static void verify_open(unsigned int n)
 
 void cleanup(void)
 {
-	SAFE_SETEUID(0);
+	SAFE_SETUID(0);
 }
 
 static struct tst_test test = {

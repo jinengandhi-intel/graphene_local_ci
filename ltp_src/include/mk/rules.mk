@@ -1,5 +1,13 @@
 target_rel_dir := $(if $(cwd_rel_from_top),$(cwd_rel_from_top)/,)
 
+%.o: %.S
+ifdef VERBOSE
+	$(AS) $(ASFLAGS) -c -o $@ $<
+else
+	@$(AS) $(ASFLAGS) -c -o $@ $<
+	@echo AS $(target_rel_dir)$@
+endif
+
 %.o: %.c
 ifdef VERBOSE
 	$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
@@ -47,6 +55,15 @@ else
 	@echo CHECK $(target_rel_dir)$<
 	@-$(CHECK_NOFLAGS) $<
 	@-$(CHECK) $(CHECK_FLAGS) $(CPPFLAGS) $(CFLAGS) $<
+endif
+
+.PHONY: $(CHECK_HEADER_TARGETS)
+$(CHECK_HEADER_TARGETS): check-%.h: %.h
+ifdef VERBOSE
+	-$(CHECK_NOFLAGS) $<
+else
+	@echo CHECK $(target_rel_dir)$<
+	@-$(CHECK_NOFLAGS) $<
 endif
 
 .PHONY: $(SHELL_CHECK_TARGETS)

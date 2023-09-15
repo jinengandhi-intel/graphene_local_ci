@@ -26,10 +26,9 @@ usage()
 	echo "  -6    IPv6 tests"
 	echo "  -m    multicast tests"
 	echo "  -n    NFS tests"
-	echo "  -r    RPC tests"
 	echo "  -s    SCTP tests"
 	echo "  -t    TCP/IP command tests"
-	echo "  -c    TI-RPC tests"
+	echo "  -c    RPC and TI-RPC tests"
 	echo "  -d    TS-RPC tests"
 	echo "  -a    Application stress tests (HTTP, SSH, DNS)"
 	echo "  -e    Interface stress tests"
@@ -56,7 +55,6 @@ do
 	6) TEST_CASES="$TEST_CASES net.ipv6 net.ipv6_lib";;
 	m) TEST_CASES="$TEST_CASES net.multicast";;
 	n) TEST_CASES="$TEST_CASES net.nfs";;
-	r) TEST_CASES="$TEST_CASES net.rpc";;
 	s) TEST_CASES="$TEST_CASES net.sctp";;
 	t) TEST_CASES="$TEST_CASES net.tcp_cmds";;
 	c) TEST_CASES="$TEST_CASES net.rpc_tests";;
@@ -87,13 +85,6 @@ if [ "$OPTIND" -eq 1 ]; then
 	exit 1
 fi
 shift $(($OPTIND - 1))
-
-TST_NO_DEFAULT_RUN=1
-. tst_net.sh
-
-# Reset variables.
-# Don't break the tests which are using 'testcases/lib/cmdlib.sh'
-unset TST_ID TST_LIB_LOADED TST_NO_DEFAULT_RUN
 
 rm -f $CMDFILE
 

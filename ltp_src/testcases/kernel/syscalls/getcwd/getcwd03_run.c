@@ -39,7 +39,6 @@ static void verify_getcwd(void)
 	SAFE_CHDIR(dir);
 
 	res1 = getcwd(NULL, 0);
-	tst_res(TINFO, "res1 is: %s", res1);
 	if (!res1) {
 		tst_res(TFAIL | TERRNO, "getcwd() failed to "
 			"get working directory of a directory");
@@ -50,7 +49,6 @@ static void verify_getcwd(void)
 	SAFE_CHDIR(dir_link);
 
 	res2 = getcwd(NULL, 0);
-	tst_res(TINFO, "res2 is: %s", res2);
 	if (!res2) {
 		tst_res(TFAIL | TERRNO, "getcwd() failed to get "
 			"working directory of a symbolic link");
@@ -66,11 +64,8 @@ static void verify_getcwd(void)
 
 	SAFE_CHDIR("/");
 	SAFE_READLINK(dir_link, link, sizeof(link));
-	// tst_res(TINFO, "link is: %s", link);
-	// tst_res(TINFO, "SAFE_BASENAME(res1) is: %s", SAFE_BASENAME(res1));
-	// tst_res(TINFO, "res1 is: %s", res1);
 
-	if (strcmp(link, res1)) {
+	if (strcmp(link, SAFE_BASENAME(res1))) {
 		tst_res(TFAIL,
 			"link information didn't match the working directory");
 		goto end;

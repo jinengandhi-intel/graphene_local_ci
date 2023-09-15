@@ -17,7 +17,6 @@ TST_SETUP=setup
 TST_CLEANUP=cleanup
 TST_PARSE_ARGS=rpc_parse_args
 TST_NEEDS_CMDS="pkill rpcinfo"
-. rpc_lib.sh
 
 usage()
 {
@@ -45,7 +44,7 @@ rpc_parse_args()
 
 setup()
 {
-	check_portmap_rpcbind
+	check_rpc
 
 	if [ -n "$SERVER" ]; then
 		CLEANER="rpc_cleaner"
@@ -91,4 +90,5 @@ do_test()
 	EXPECT_RHOST_PASS $CLIENT $(tst_ipaddr) $PROGNUMNOSVC $CLIENT_EXTRA_OPTS
 }
 
+. rpc_lib.sh
 tst_run

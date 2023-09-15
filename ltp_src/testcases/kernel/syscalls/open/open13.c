@@ -39,7 +39,7 @@
 #include "safe_macros.h"
 #include "lapi/fcntl.h"
 
-#define TESTFILE	"testfile"
+#define TESTFILE	"/tmp/open13_testfile"
 #define FILE_MODE	(S_IRWXU | S_IRWXG | S_IRWXO | S_ISUID | S_ISGID)
 
 static void setup(void);
@@ -95,16 +95,11 @@ int main(int ac, char **av)
 
 static void setup(void)
 {
-	if ((tst_kvercmp(2, 6, 39)) < 0) {
-		tst_brkm(TCONF, NULL, "This test can only run on kernels "
-			"that are 2.6.39 or higher");
-	}
-
 	tst_sig(NOFORK, DEF_HANDLER, cleanup);
 
 	tst_tmpdir();
 
-	SAFE_TOUCH(cleanup, TESTFILE, FILE_MODE, NULL);
+	SAFE_CREAT(cleanup, TESTFILE, FILE_MODE);
 
 	TEST_PAUSE;
 }
@@ -131,7 +126,7 @@ static void verify_fchmod(void)
 
 static void verify_fchown(void)
 {
-	TEST(fchown(fd, 1000, 1000));
+	TEST(fchown(fd, 0, 0));
 	check_result("fchown(2)");
 }
 
@@ -157,6 +152,22 @@ static void check_result(const char *call_name)
 	}
 
 	tst_resm(TPASS, "%s failed with EBADF", call_name);
+}
+
+static void check_fchmod_result(const char *call_name)
+{
+	if (TEST_RETURN == 0) {
+		tst_resm(TFAIL, "%s succeeded unexpectedly", call_name);
+		return;
+	}
+
+	if (TEST_ERRNO != EINVAL) {
+		tst_resm(TFAIL | TTERRNO, "%s failed unexpectedly, "
+			"expected EBADF", call_name);
+		return;
+	}
+
+	tst_resm(TPASS, "%s failed with EINVAL", call_name);
 }
 
 static void cleanup(void)

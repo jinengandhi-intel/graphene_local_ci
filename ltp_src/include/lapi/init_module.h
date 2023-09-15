@@ -8,8 +8,8 @@
 #define LAPI_INIT_MODULE_H__
 
 #include "config.h"
-#include "lapi/syscalls.h"
 #include "tst_test.h"
+#include "lapi/syscalls.h"
 
 static inline int init_module(void *module_image, unsigned long len,
 			      const char *param_values)
@@ -20,18 +20,6 @@ static inline int init_module(void *module_image, unsigned long len,
 static inline int finit_module(int fd, const char *param_values, int flags)
 {
 	return tst_syscall(__NR_finit_module, fd, param_values, flags);
-}
-
-static inline void finit_module_supported_by_kernel(void)
-{
-       long ret;
-
-       if ((tst_kvercmp(3, 8, 0)) < 0) {
-               /* Check if the syscall is backported on an older kernel */
-               ret = syscall(__NR_finit_module, 0, "", 0);
-               if (ret == -1 && errno == ENOSYS)
-                       tst_brk(TCONF, "Test not supported on kernel version < v3.8");
-       }
 }
 
 #endif /* LAPI_INIT_MODULE_H__ */
