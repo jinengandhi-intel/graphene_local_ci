@@ -30,9 +30,9 @@ timeout 60s
 #   GB.
 #
 seek 0			# 0 means 1 stressor per CPU
-seek 0 seek-ops 1000000
-seek 0 seek-ops 5000000
-seek 0 seek-ops 5000000 seek-punch
-seek 0 seek-punch
-seek 16 seek-punch aggressive
-seek 16 seek-size 2048M all 16
+seek 0 --seek-ops 1000000
+seek 0 --seek-ops 5000000
+seek 0 --seek-ops 5000000 --seek-punch
+seek 0 --seek-punch
+seek 16 --seek-punch --aggressive
+seek 16 --seek-size 2048M
