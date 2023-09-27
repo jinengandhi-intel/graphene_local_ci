@@ -1,7 +1,5 @@
 # Relative path to gramine root
-THIS_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-#GRAMINEDIR = ../..
-GRAMINEDIR ?= $(THIS_DIR)../..
+ARCH_LIBDIR ?= /lib/$(shell $(CC) -dumpmachine)
 
 ifeq ($(DEBUG),1)
 GRAMINE_LOG_LEVEL = debug
@@ -14,8 +12,6 @@ all: stress-ng.manifest
 ifeq ($(SGX),1)
 all: stress-ng.manifest.sgx stress-ng.sig
 endif
-
-include ../../scripts/Makefile.configs
 
 stress-ng.manifest: stress-ng.manifest.template
 			gramine-manifest \

@@ -21,9 +21,8 @@ verbose
 #  of time in seconds, minutes, hours, days or years with the  suf‐
 #  fix s, m, h, d or y.
 #
-timeout 60s
 
-seek 8 hdd 8 parallel 2 timeout 90s
-seek 0 hdd 0 parallel 5 timeout 90s
-seek 8 hdd 8 parallel 5 aggressive timeout 90s
-seek 0 hdd 0 parallel 8 aggressive timeout 120s
+seek 8 --hdd 8 --parallel 2 --timeout 90s
+seek 0 --hdd 0 --parallel 5 --timeout 90s
+seek 8 --hdd 8 --parallel 5 --aggressive --timeout 90s
+seek 0 --hdd 0 --parallel 8 --aggressive --timeout 120s

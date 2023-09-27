@@ -22,14 +22,18 @@ def parse_test_logs(log_file):
         sub_tests = f_contents.split("starting stressors")
         sub_tests.pop(0) # Removing the content before the first test starts
         test_number = 0
-        for tests in sub_tests:
-            test_number += 1
-            if "error" in tests:
-                test_results["Fail"].append(test_number)
-    
-        for i in range(total_test_list.get(filename)):
-            if (i+1) not in test_results["Fail"]:
-                test_results["Pass"].append(i+1)
+        if sub_tests:
+            for tests in sub_tests:
+                test_number += 1
+                if "error" in tests:
+                    test_results["Fail"].append(test_number)
+
+            for i in range(total_test_list.get(filename)):
+                if (i+1) not in test_results["Fail"]:
+                    test_results["Pass"].append(i+1)
+        else:
+            test_results["Fail"] = list(range(1, total_test_list.get(filename)+1))
+            test_results["Pass"] = []
                        
     fd.close()
     print(test_results)

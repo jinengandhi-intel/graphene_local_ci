@@ -32,20 +32,19 @@ timeout 60s
 #   --hdd-opt options one by one to cover a range of I/O options.
 #
 hdd 0			# 0 means 1 stressor per CPU
-hdd 0 aggressive
-hdd 0 hdd-ops 1000000
-hdd 0 hdd-ops 1000000 hdd-bytes 1G
-hdd 0 hdd-ops 2000000 hdd-bytes 30% hdd-opts syncfs
-hdd 0 hdd-ops 2000000 hdd-bytes 30% hdd-opts fadv-dontneed hdd-write-size 4K
-hdd 0 hdd-ops 2000000 hdd-bytes 30% hdd-opts fadv-dontneed hdd-write-size 16K
+hdd 0 --aggressive
+hdd 0 --hdd-ops 1000000
+hdd 0 --hdd-ops 1000000 --hdd-bytes 1G
+hdd 0 --hdd-ops 2000000 --hdd-bytes 30% --hdd-opts syncfs
+hdd 0 --hdd-ops 2000000 --hdd-bytes 30% --hdd-opts fadv-dontneed --hdd-write-size 4K
+hdd 0 --hdd-ops 2000000 --hdd-bytes 30% --hdd-opts fadv-dontneed --hdd-write-size 16K
 
-hdd 1 hdd-ops 1000000
-hdd 1 hdd-ops 1000000 hdd-bytes 10%
+hdd 1 --hdd-ops 1000000
+hdd 1 --hdd-ops 1000000 --hdd-bytes 10%
 
-hdd 3 hdd-ops 1000000 hdd-bytes 10%
-hdd 3 hdd-ops 1000000 hdd-bytes 10% all 1
+hdd 3 --hdd-ops 1000000 --hdd-bytes 10%
 
-hdd 5 hdd-ops 1000000 hdd-bytes 10% hdd-opts dsync
-hdd 5 hdd-ops 1000000 hdd-bytes 10% hdd-opts fadv-normal aggressive
-hdd 5 hdd-ops 1000000 hdd-bytes 10% hdd-opts fadv-rand ignite-cpu
-hdd 5 hdd-ops 1000000 hdd-bytes 10% hdd-opts iovec keep-name
+hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts dsync
+hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts fadv-normal --aggressive
+hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts fadv-rnd --ignite-cpu
+hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts iovec --keep-name
