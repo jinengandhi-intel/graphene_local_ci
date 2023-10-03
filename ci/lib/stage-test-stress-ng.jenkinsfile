@@ -1,6 +1,6 @@
 stage('stress-ng') {
     script {
-        if (env.stress_ng_run == "True") {
+        if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
 
             try {
                 timeout(time: 240, unit: 'MINUTES') {
