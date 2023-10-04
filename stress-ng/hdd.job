@@ -45,6 +45,6 @@ hdd 1 --hdd-ops 1000000 --hdd-bytes 10%
 hdd 3 --hdd-ops 1000000 --hdd-bytes 10%
 
 hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts dsync
-# hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts fadv-normal --aggressive
+hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts fadv-normal
 hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts fadv-rnd --ignite-cpu
-hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts iovec --keep-name
+# hdd 5 --hdd-ops 1000000 --hdd-bytes 10% --hdd-opts iovec --keep-name

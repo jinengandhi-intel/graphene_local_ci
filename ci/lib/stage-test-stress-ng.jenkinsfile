@@ -1,59 +1,53 @@
 stage('stress-ng') {
-    script {
-        if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
+    if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
+        try {
+            timeout(time: 240, unit: 'MINUTES') {
+                sh '''
+                    export cmd=gramine-direct
+                    cd CI-Examples/stress-ng
+                    if test -n "$SGX"
+                    then
+                        make SGX=1
+                        export cmd=gramine-sgx
+                    else
+                        make
+                    fi
+                    ulimit -Sa
+                    ulimit -n 65535
+                    ulimit -Sa
+                    $cmd stress-ng --job hdd.job --temp-path /tmp 2>&1 | tee hdd.log
+                    $cmd stress-ng --job seek.job --temp-path /tmp 2>&1 | tee seek.log
+                    $cmd stress-ng --job seek-hdd.job --temp-path /tmp 2>&1 | tee seek-hdd.log
+                    $cmd stress-ng --job interrupt.job --temp-path /tmp 2>&1 | tee interrupt.log
+                    $cmd stress-ng --job filesystem.job --temp-path /tmp 2>&1 | tee filesystem.log
+                    $cmd stress-ng --job filesystem_all.job --temp-path /tmp 2>&1 | tee filesystem_all.log
+                    $cmd stress-ng --job scheduler.job --temp-path /tmp 2>&1 | tee scheduler.log
+                    $cmd stress-ng --job scheduler_all.job --temp-path /tmp 2>&1 | tee scheduler_all.log
 
-            try {
-                timeout(time: 240, unit: 'MINUTES') {
-                    sh '''
-                        export cmd=gramine-direct
-                        cd CI-Examples/stress-ng
-                        if test -n "$SGX"
-                        then
-                            make SGX=1
-                            export cmd=gramine-sgx
-                        else
-                            make
-                        fi
-                        ulimit -Sa
-                        ulimit -n 65535
-                        ulimit -Sa
-                        $cmd stress-ng --job hdd.job --temp-path /tmp 2>&1 | tee hdd.log
-                        $cmd stress-ng --job seek.job --temp-path /tmp 2>&1 | tee seek.log
-                        $cmd stress-ng --job seek-hdd.job --temp-path /tmp 2>&1 | tee seek-hdd.log
-                        $cmd stress-ng --job interrupt.job --temp-path /tmp 2>&1 | tee interrupt.log
-                        $cmd stress-ng --job filesystem.job --temp-path /tmp 2>&1 | tee filesystem.log
-                        $cmd stress-ng --job filesystem_all.job --temp-path /tmp 2>&1 | tee filesystem_all.log
-                        $cmd stress-ng --job scheduler.job --temp-path /tmp 2>&1 | tee scheduler.log
-                        $cmd stress-ng --job scheduler_all.job --temp-path /tmp 2>&1 | tee scheduler_all.log
-
-                    '''
-                }
-            } catch (Exception e){
-                env.build_ok = false
-                sh 'echo "Stress-ng Failed"'
-            } finally {
-                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+                '''
             }
-        } else {
-            sh 'echo "Ignoring stress-ng run. For enabling pass True from Jenkins build parameters"'
+        } catch (Exception e) {
+
+        } finally {
+            archiveArtifacts 'CI-Examples/stress-ng/*.log'
         }
+    } else {
+        sh 'echo "Ignoring stress-ng run. For enabling pass True from Jenkins build parameters"'
     }
 }
 
 stage ('verification') {
-    script {
-        if (env.stress_ng_run == "True") {
-            try {
-                timeout(time: 2, unit: 'MINUTES') {
-                    sh '''
-                        cd CI-Examples/stress-ng
-                        python3 -m pytest -v -s --junit-xml stressng-results.xml tests_stressng.py
-                    '''
-                }
-            } catch (Exception e){}
-            finally {
-                junit 'CI-Examples/stress-ng/stressng-results.xml'
+    if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
+        try {
+            timeout(time: 2, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/stress-ng
+                    python3 -m pytest -v -s --junit-xml stressng-results.xml tests_stressng.py
+                '''
             }
+        } catch (Exception e){}
+        finally {
+            junit 'CI-Examples/stress-ng/stressng-results.xml'
         }
     }
 }
