@@ -104,7 +104,6 @@ RUN git clone https://github.com/giltene/wrk2.git \
 RUN python3 -m pip install --upgrade pip --user
 
 RUN python3 -m pip install -U \
-    asv \
     'docutils>=0.17,<0.18' \
     'meson>=0.56,<0.57' \
     numpy \

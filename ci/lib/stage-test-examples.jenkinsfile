@@ -124,62 +124,64 @@ stage('test-examples') {
                 '''
             }
         } catch (Exception e) { }
+    }
 
-        if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
-            if (["ubuntu20.04"].contains(env.base_os)) {
-                try {
-                    timeout(time: 30, unit: 'MINUTES') {
-                        sh '''#!/bin/bash
-                            set -x
-                            cd CI-Examples/openvino
-                            chmod +x ./openvino_setup.sh
-                            ./openvino_setup.sh
-                            source openvino_2021/bin/setupvars.sh
-                            sed -i 's/intel_models public_models/intel_models/' Makefile
-                            make ${MAKEOPTS} intel_models
-                            model_name="bert-large-uncased-whole-word-masking-squad-0001"
-                            make ${MAKEOPTS} all
-                            gramine-${MODE} benchmark_app -m model/intel/${model_name}/FP32/${model_name}.xml | tee OUTPUT
-                        '''
-                    }
-                } catch (Exception e) { }
-            }
+    if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
+        if (["ubuntu20.04", "rhel8"].contains(env.base_os)) {
+            try {
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh '''#!/bin/bash
+                        set -x
+                        cd CI-Examples/openvino
+                        chmod +x ./openvino_setup.sh
+                        ./openvino_setup.sh
+                        source openvino_2021/bin/setupvars.sh
+                        sed -i 's/intel_models public_models/intel_models/' Makefile
+                        make ${MAKEOPTS} intel_models
+                        model_name="bert-large-uncased-whole-word-masking-squad-0001"
+                        make ${MAKEOPTS} all
+                        gramine-${MODE} benchmark_app -m model/intel/${model_name}/FP32/${model_name}.xml | tee OUTPUT
+                    '''
+                }
+            } catch (Exception e) { }
+        }
 
-            if (env.os_release_id == "ubuntu") {
-                try {
-                    timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
-                        sh '''
-                            cd CI-Examples/scikit-learn-intelex
-                            sed -i "s/\\/home\\/user\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
-                            sed -i "s/{{ env.HOME }}\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
-                            python3 scripts/download_dataset.py
-                            make ${MAKEOPTS} all
-                            ./run_tests.sh | tee RESULT
-                        '''
-                    }
-                } catch (Exception e) { }
+        if (["ubuntu20.04", "ubuntu22.04", "debian11"].contains(env.base_os)) {
+            try {
+                timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/scikit-learn-intelex
+                        sed -i "s/\\/home\\/user\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
+                        sed -i "s/{{ env.HOME }}\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
+                        python3 scripts/download_dataset.py
+                        make ${MAKEOPTS} all
+                        ./run_tests.sh | tee RESULT
+                    '''
+                }
+            } catch (Exception e) { }
+        }
 
-                try {
-                    timeout(time: (env.EDMM ? 65 : 25), unit: 'MINUTES') {
-                        sh '''
-                            export PID=$(lsof -t -i:8501)
-                            if [ "$PID" != "" ]
-                            then
-                                echo "Killing $PID"
-                                kill -9 $PID
-                            fi
-                            cd CI-Examples/tfserving
-                            sudo make install-dependencies
-                            make all
-                            make ${MAKEOPTS} check 2>&1 | tee RESULT
-                        '''
-                    }
-                } catch (Exception e) { }
-            }
+        if (["ubuntu"].contains(env.os_release_id)) {
+            try {
+                timeout(time: (env.EDMM ? 65 : 25), unit: 'MINUTES') {
+                    sh '''
+                        export PID=$(lsof -t -i:8501)
+                        if [ "$PID" != "" ]
+                        then
+                            echo "Killing $PID"
+                            kill -9 $PID
+                        fi
+                        cd CI-Examples/tfserving
+                        sudo make install-dependencies
+                        make all
+                        make ${MAKEOPTS} check 2>&1 | tee RESULT
+                    '''
+                }
+            } catch (Exception e) { }
         }
     }
 
-    if (env.os_release_id != "debian") {
+    if (env.base_os != "debian11") {
         try {
             timeout(time: 30, unit: 'MINUTES') {
                 sh '''
@@ -204,7 +206,7 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if (env.os_release_id == "ubuntu") {
+    if (["ubuntu"].contains(env.os_release_id)) {
         try {
             timeout(time: 30, unit: 'MINUTES') {
 

@@ -51,6 +51,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     nasm \
     net-tools \
     netcat-openbsd \
+    ninja-build \
     nodejs \
     openjdk-11-jdk \
     pkg-config \
@@ -65,6 +66,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-lxml \
     python3-numpy \
     python3-pandas \
+    python3-pil \
     python3-pip \
     python3-pkg-resources \
     python3-protobuf \
@@ -74,6 +76,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-recommonmark \
     python3-scipy \
     python3-sphinx-rtd-theme \
+    python3-torchvision \
     r-base \
     sqlite3 \
     shellcheck \
@@ -101,14 +104,10 @@ RUN git clone https://github.com/giltene/wrk2.git \
 RUN python3 -m pip install --upgrade pip --user
 
 RUN python3 -m pip install -U \
-    asv \
     'meson>=0.56,<0.57'  \
-    ninja \
-    pillow \
     scikit-learn-intelex \
     'tomli>=1.1.0' \
-    'tomli-w>=0.4.0' \
-    torchvision --timeout 120
+    'tomli-w>=0.4.0' --timeout 120
 
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G sudo -m -d /intel -c "intel Jenkins" intel && \
