@@ -109,7 +109,7 @@ class Test_Workload_Results():
         assert(("Loop iteration 1 finished" in sandstone_contents) and ("exit: pass" in sandstone_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif(os_release_id == "debian", reason='rust is not working on debian currently')
+    @pytest.mark.skipif(base_os == "debian11", reason='rust is not working on debian currently')
     def test_rust_workload(self):
         data = open("CI-Examples/rust/RESULT", "r")
         result_file = data.read().split("Result file: ")[1].strip()
@@ -182,7 +182,7 @@ class Test_Workload_Results():
             and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif(not(base_os in ["ubuntu20.04"])
+    @pytest.mark.skipif(not(base_os in ["ubuntu20.04", "rhel8"])
                      or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Openvino enabled only for Ubuntu 20 Server Configurations")
     def test_openvino_workload(self):
@@ -231,8 +231,8 @@ class Test_Workload_Results():
         assert("Hello, world" in helloworld_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != 'ubuntu') or ((int(no_cores) < 16) and sgx_mode == '1'),
-                    reason="Scikit-learn enabled for Ubuntu Server Configurations.")
+    @pytest.mark.skipif((base_os not in ["ubuntu20.04", "ubuntu22.04", "debian11"]) or ((int(no_cores) < 16) and sgx_mode == '1'),
+                    reason="Scikit-learn enabled for Ubuntu & Debian 11 Server Configurations.")
     def test_scikit_workload(self):
         sklearn_result_file = open("CI-Examples/scikit-learn-intelex/RESULT", "r")
         sklearn_contents = sklearn_result_file.read()
@@ -240,7 +240,7 @@ class Test_Workload_Results():
             and ("Success 2/2" in sklearn_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != 'ubuntu') or
+    @pytest.mark.skipif((os_release_id not in ['ubuntu']) or
                     ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="TFServing enabled only for above Ubuntu 18.04 Configurations.")
     def test_tfserving_workload(self):
@@ -270,7 +270,7 @@ class Test_Workload_Results():
         assert('"Hello World! Let\'s check escaped symbols: < & > "' in gsc_helloworld_log)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != 'ubuntu'),
+    @pytest.mark.skipif((os_release_id not in ['ubuntu']),
                     reason="MongoDB enabled only for Ubuntu20.04 and 22.04")
     def test_mongodb_workload(self):
         mongodb_result = open("CI-Examples/mongodb/OUTPUT", "r")
