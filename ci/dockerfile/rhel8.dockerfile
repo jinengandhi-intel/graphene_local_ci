@@ -3,6 +3,8 @@ FROM redhat/ubi8:latest
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
     && dnf update -y
 
+RUN rm -f /var/lib/rpm/__db*
+
 RUN rpm --import https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official \
     && dnf config-manager --disableplugin subscription-manager --add-repo http://vault.centos.org/centos/8/BaseOS/x86_64/os \
     && dnf config-manager --disableplugin subscription-manager --add-repo http://vault.centos.org/centos/8/AppStream/x86_64/os \
