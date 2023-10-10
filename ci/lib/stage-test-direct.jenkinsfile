@@ -62,7 +62,7 @@ stage('test-direct') {
         }
     } catch (Exception e) { }
 
-    if (env.os_release_id == "ubuntu" && (Float.parseFloat(env.os_version) < 21)) 
+    if (env.os_release_id == "ubuntu")
     {
         try {
             timeout(time: 10, unit: 'MINUTES') {
@@ -163,14 +163,12 @@ stage('test-direct') {
         }
     } catch (Exception e) { }
 
-    if (env.no_cpu.toInteger() > 16) {
-        try{
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/go_helloworld
-                    make check
-                '''
-            }
-        } catch (Exception e) { }
-    }
+    try{
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/go_helloworld
+                make check
+            '''
+        }
+    } catch (Exception e) { }
 }
