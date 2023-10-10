@@ -60,7 +60,7 @@ stage('test-sgx') {
         }
     } catch (Exception e) { }
  
-    if (env.os_release_id == "ubuntu" && (Float.parseFloat(env.os_version) < 21)) 
+    if (env.os_release_id == "ubuntu")
     {  
         try {
             timeout(time: 15, unit: 'MINUTES') {
