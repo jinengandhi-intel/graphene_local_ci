@@ -26,6 +26,12 @@ pipeline {
                         build job: 'local_ci_graphene_gsc_debian_11', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "debian:11"]], propagate: true, wait: true
                     }
                 }
+
+                stage ('Invoke GSC with Debian 12') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc_debian_11', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "debian:12"]], propagate: true, wait: true
+                    }
+                }
             }
         }
     }
