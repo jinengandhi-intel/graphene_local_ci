@@ -41,9 +41,8 @@ class Test_Workload_Results():
             assert("Success SGX quote" in python_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != "ubuntu" or
-                    float(os_version) >= 21),
-                    reason="Memcached libraries not available for CENT/RHEL")
+    @pytest.mark.skipif((os_release_id != "ubuntu"),
+                    reason="Memcached libraries available for Ubuntu")
     def test_memcached_workload(self):
         memcached_result_file = open("CI-Examples/memcached/OUTPUT.txt", "r")
         memcached_contents = memcached_result_file.read()
@@ -182,7 +181,7 @@ class Test_Workload_Results():
             and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif(not(base_os in ["ubuntu20.04", "rhel8"])
+    @pytest.mark.skipif(not(base_os in ["ubuntu20.04"])
                      or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Openvino enabled only for Ubuntu 20 Server Configurations")
     def test_openvino_workload(self):
