@@ -2,7 +2,7 @@ timestamps {
     stage('stress-ng') {
         if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
             try {
-                timeout(time: 240, unit: 'MINUTES') {
+                timeout(time: 150, unit: 'MINUTES') {
                     sh '''
                         export cmd=gramine-direct
                         cd CI-Examples/stress-ng
