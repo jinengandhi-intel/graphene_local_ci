@@ -180,14 +180,14 @@ pipeline {
 
                 stage ('Invoke Alpine 3.18 with 6.1 Gramine Native Suite ') {
                     steps {
-                        sleep(time: 15, unit: "MINUTES")
+                        sleep(time: 45, unit: "MINUTES")
                         build job: 'local_ci_graphene_native_alpine_3.18_6.1', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_alpine'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "alpine3.18"]], propagate: true, wait: true
                     }
                 }
 
                 stage ('Invoke Alpine 3.18 with 6.1 Gramine SGX Suite ') {
                     steps {
-                        sleep(time: 30, unit: "MINUTES")
+                        sleep(time: 90, unit: "MINUTES")
                         build job: 'local_ci_graphene_sgx_alpine_3.18_6.1', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_alpine'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "alpine3.18"]], propagate: true, wait: true
                     }
                 }
