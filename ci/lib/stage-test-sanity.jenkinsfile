@@ -19,7 +19,7 @@ stage('test') {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/ra-tls-mbedtls
-                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 RA_TYPE=dcap \
+                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1  RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 RA_TYPE=dcap \
                     make check_dcap | tee mbedtls_result.txt
                 '''
             }
@@ -29,7 +29,7 @@ stage('test') {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/ra-tls-secret-prov
-                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 RA_TYPE=dcap \
+                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 RA_TYPE=dcap \
                     make check_dcap | tee secret_prov_result.txt
                 '''
             }
