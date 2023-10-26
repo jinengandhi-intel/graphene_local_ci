@@ -81,6 +81,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     sqlite3 \
     shellcheck \
     sphinx-doc \
+    stress-ng \
     texinfo \
     uthash-dev \
     vim \

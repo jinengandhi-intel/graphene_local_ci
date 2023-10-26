@@ -79,6 +79,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-venv \
     r-base \
     sqlite3 \
+    stress-ng \
     shellcheck \
     sphinx-doc \
     texinfo \

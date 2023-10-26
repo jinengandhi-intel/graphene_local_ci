@@ -81,6 +81,7 @@ RUN dnf config-manager --set-enabled -y powertools && \
         python3-scipy \
         R-core \
         strace \
+        stress-ng \
         sqlite \
         sudo \
         vim  \
