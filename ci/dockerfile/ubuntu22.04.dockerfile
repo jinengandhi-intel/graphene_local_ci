@@ -84,6 +84,7 @@ RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     r-base \
     shellcheck \
     sphinx-doc \
+    stress-ng \
     sqlite3 \
     texinfo \
     uthash-dev \

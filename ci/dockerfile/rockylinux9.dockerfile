@@ -79,6 +79,7 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     python3-scipy \
     R-core \
     strace \
+    stress-ng \
     sqlite \
     sudo \
     vim  \
