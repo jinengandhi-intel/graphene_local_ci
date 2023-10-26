@@ -1,7 +1,7 @@
 FROM debian:11
 
 # Add steps here to set up dependencies
-RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     autoconf \
     bc \
     bison \
