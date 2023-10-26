@@ -3,7 +3,7 @@ ARG BUILD_OS
 FROM $BUILD_OS
 
 # Add steps here to set up dependencies
-RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
     curl \
     diffutils \
     gcc \
@@ -28,7 +28,7 @@ RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bio
 
 RUN curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
 
-RUN apt-get update && python3 -m pip install -U 'meson>=0.56,<0.57'
+RUN apt-get update -y && python3 -m pip install -U 'meson>=0.56,<0.57'
 
 RUN apt install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev
 

@@ -3,7 +3,7 @@ FROM ubuntu:22.04
 ARG IS_VM
 
 # Add steps here to set up dependencies
-RUN apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     autoconf \
     bc \
     bison \
@@ -117,7 +117,7 @@ RUN python3 -m pip install -U \
 
 # Dependencies required for building kernel modules and running VMs
 RUN if [ "$IS_VM" = "1" ]; then \
-    apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     cpio \
     dwarves \
     g++-12 \

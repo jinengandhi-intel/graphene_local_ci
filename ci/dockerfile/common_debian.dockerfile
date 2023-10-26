@@ -3,7 +3,7 @@ ARG BUILD_OS
 FROM $BUILD_OS
 
 # Add steps here to set up dependencies
-RUN apt-get update && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
     curl \
     gcc\
     git \
@@ -41,7 +41,7 @@ RUN if [ "$(lsb_release -sc)" = "bullseye" ]; then \
 
 RUN curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
 
-RUN apt-get update
+RUN apt-get update -y
 
 RUN apt install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev
 
