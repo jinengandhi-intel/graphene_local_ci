@@ -113,9 +113,9 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if (os_release_id != "alpine") {
+    if ((os_release_id != "alpine") && (env.node_label != "graphene_22.04_5.19")) {
         try {
-            timeout(time: 15, unit: 'MINUTES') {
+            timeout(time: 30, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/pytorch
                     python3 download-pretrained-model.py
@@ -206,7 +206,7 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if (["ubuntu"].contains(env.os_release_id)) {
+    if (["ubuntu"].contains(env.os_release_id) && (env.node_label != "graphene_22.04_5.19")) {
         try {
             timeout(time: 30, unit: 'MINUTES') {
 

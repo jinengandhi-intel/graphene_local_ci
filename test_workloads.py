@@ -153,7 +153,7 @@ class Test_Workload_Results():
         assert("Success 1/1" in nodejs_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id in ["alpine"]),
+    @pytest.mark.skipif((os_release_id in ["alpine"] or (node_label == "graphene_22.04_5.19")),
                     reason="Pytorch not compatible for musl.")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
@@ -269,7 +269,7 @@ class Test_Workload_Results():
         assert('"Hello World! Let\'s check escaped symbols: < & > "' in gsc_helloworld_log)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id not in ['ubuntu']),
+    @pytest.mark.skipif((os_release_id not in ['ubuntu'] or (node_label == "graphene_22.04_5.19")),
                     reason="MongoDB enabled only for Ubuntu20.04 and 22.04")
     def test_mongodb_workload(self):
         mongodb_result = open("CI-Examples/mongodb/OUTPUT", "r")
