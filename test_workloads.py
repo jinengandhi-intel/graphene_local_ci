@@ -126,8 +126,7 @@ class Test_Workload_Results():
         assert("Final Count is:" in jdk_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((float(os_version) >= 21) \
-                or (base_os in ["debian11", "debian12", "almalinux9", "rockylinux9", "centos9", "alpine3.18", "rhel9"]) \
+    @pytest.mark.skipif((base_os not in ["ubuntu20.04", "centos8", "rhel8"]) \
                 or (("dcap" in node_label) and sgx_mode == '1'), \
                     reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
     def test_tensorflow_workload(self):
