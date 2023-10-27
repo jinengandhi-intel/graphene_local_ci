@@ -34,12 +34,15 @@ node (node_label) {
                 load '.ci/lib/config-release.jenkinsfile'
 
                 load '../ci/lib/stage-build-sgx.jenkinsfile'
-                load '../ci/lib/stage-test.jenkinsfile'
-                load '../ci/lib/stage-test-sgx.jenkinsfile'
-                load '../ci/lib/stage-test-examples.jenkinsfile'
-                load '../ci/lib/stage-verification-examples.jenkinsfile'
-                load '../ci/lib/stage-test-sandstone.jenkinsfile'
-                load '../ci/lib/stage-test-stress-ng.jenkinsfile'
+                if (env.stress_ng_run == "False") {
+                    load '../ci/lib/stage-test.jenkinsfile'
+                    load '../ci/lib/stage-test-sgx.jenkinsfile'
+                    load '../ci/lib/stage-test-examples.jenkinsfile'
+                    load '../ci/lib/stage-verification-examples.jenkinsfile'
+                    load '../ci/lib/stage-test-sandstone.jenkinsfile'
+                } else {
+                    load '../ci/lib/stage-test-stress-ng.jenkinsfile'
+                }
             }
         }
     } finally {
