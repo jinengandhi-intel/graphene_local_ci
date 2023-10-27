@@ -6,47 +6,27 @@ stage('test-examples') {
         env.MODE = "direct"
     }
 
-    if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1')))
-    {
+    if (["ubuntu20.04", "rhel8", "centos8"].contains(env.base_os)) {
         try {
-            timeout(time: 30, unit: 'MINUTES') {
+            timeout(time: 60, unit: 'MINUTES') {
                 sh '''
-                    cd CI-Examples/openjdk
+                    cd CI-Examples/tensorflow-lite
+                    ../common_tools/download --output bazel-0.16.1-installer-linux-x86_64.sh \
+                    --sha256 17ab70344645359fd4178002f367885e9019ae7507c9c1ade8220f3628383444 \
+                    --url https://github.com/bazelbuild/bazel/releases/download/0.16.1/bazel-0.16.1-installer-linux-x86_64.sh
+                    chmod +x ./bazel-0.16.1-installer-linux-x86_64.sh
+                    ./bazel-0.16.1-installer-linux-x86_64.sh --user
                     if [ "${os_release_id}" != 'ubuntu' ]
                     then
-                        sed -i -e "/file:\\/usr\\/lib\\/jvm\\/java-11-openjdk-amd64/d" java.manifest.template
-                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$JAVAHOME\\/lib\\/\\"," java.manifest.template
+                        make GRAMINE_LOG_LEVEL=all ${MAKEOPTS} tensorflow/configure
+                        sed -i "s/\\/usr\\/bin\\/env python/\\/usr\\/bin\\/env python3/" tensorflow/tensorflow/tools/git/gen_git_source.py
+                        make GRAMINE_LOG_LEVEL=all PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
                     fi
-                    make ${MAKEOPTS} all
-                    gramine-${MODE} java MultiThreadMain | tee OUTPUT
+                    make all
+                    make ${MAKEOPTS} run-gramine | tee OUTPUT
                 '''
             }
         } catch (Exception e) { }
-    }
-
-    if (!["debian11", "debian12", "almalinux9", "rockylinux9", "centos9", "alpine3.18", "rhel9"].contains(env.base_os)) {
-        if ((Float.parseFloat(env.os_version) < 21)) {
-            try {
-                timeout(time: 60, unit: 'MINUTES') {
-                    sh '''
-                        cd CI-Examples/tensorflow-lite
-                        ../common_tools/download --output bazel-0.16.1-installer-linux-x86_64.sh \
-                        --sha256 17ab70344645359fd4178002f367885e9019ae7507c9c1ade8220f3628383444 \
-                        --url https://github.com/bazelbuild/bazel/releases/download/0.16.1/bazel-0.16.1-installer-linux-x86_64.sh
-                        chmod +x ./bazel-0.16.1-installer-linux-x86_64.sh
-                        ./bazel-0.16.1-installer-linux-x86_64.sh --user
-                        if [ "${os_release_id}" != 'ubuntu' ]
-                        then
-                            make GRAMINE_LOG_LEVEL=all ${MAKEOPTS} tensorflow/configure
-                            sed -i "s/\\/usr\\/bin\\/env python/\\/usr\\/bin\\/env python3/" tensorflow/tensorflow/tools/git/gen_git_source.py
-                            make GRAMINE_LOG_LEVEL=all PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
-                        fi
-                        make all
-                        make ${MAKEOPTS} run-gramine | tee OUTPUT
-                    '''
-                }
-            } catch (Exception e) { }
-        }
     }
 
     try {
@@ -126,7 +106,72 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
+    if (env.base_os != "debian11") {
+        try {
+            timeout(time: 30, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/rust
+                    export PID=$(lsof -t -i:3000)
+                    if [ "$PID" != "" ]
+                    then
+                        echo "Killing $PID"
+                        kill -9 $PID
+                    fi
+                    if [ "${os_release_id}" = "alpine" ]
+                    then
+                        sed -i -e '/^fs.mounts = \\[.*/a \\{ path = "\\/usr\\/{{ arch_libdir }}", uri="file:\\/usr\\/{{ arch_libdir }}" },' rust-hyper-http-server.manifest.template
+                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/{{ arch_libdir }}\\/\\"," rust-hyper-http-server.manifest.template
+                    fi
+                    make ${MAKEOPTS}
+                    make ${MAKEOPTS} start-gramine-server &
+                    ../../scripts/wait_for_server 300 127.0.0.1 3000
+                    LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:3000 | tee RESULT
+                '''
+            }
+        } catch (Exception e) { }
+    }
+
+    if (["ubuntu"].contains(env.os_release_id) && (env.node_label != "graphene_22.04_5.19")) {
+        try {
+            timeout(time: 30, unit: 'MINUTES') {
+
+                env.ubuntu_repo = sh(returnStdout: true, script: 'lsb_release -sc').trim()
+
+                sh '''
+                cd CI-Examples/mongodb
+                curl -fsSL https://pgp.mongodb.com/server-7.0.asc | \
+                    sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
+                echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu ${ubuntu_repo}/mongodb-org/7.0 multiverse" | \
+                    sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
+                sudo apt-get update
+                sudo apt-get install -y mongodb-org
+                make
+                gramine-${MODE} mongod &
+                sleep 60
+                mongosh scripts/insert.js
+                mongosh scripts/fetch.js | tee OUTPUT
+                '''
+            }
+        } catch (Exception e) { }
+    }
+
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
+
+        try {
+            timeout(time: 30, unit: 'MINUTES') {
+                sh '''
+                    cd CI-Examples/openjdk
+                    if [ "${os_release_id}" != 'ubuntu' ]
+                    then
+                        sed -i -e "/file:\\/usr\\/lib\\/jvm\\/java-11-openjdk-amd64/d" java.manifest.template
+                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$JAVAHOME\\/lib\\/\\"," java.manifest.template
+                    fi
+                    make ${MAKEOPTS} all
+                    gramine-${MODE} java MultiThreadMain | tee OUTPUT
+                '''
+            }
+        } catch (Exception e) { }
+
         if (["ubuntu20.04"].contains(env.base_os)) {
             try {
                 timeout(time: 30, unit: 'MINUTES') {
@@ -179,54 +224,5 @@ stage('test-examples') {
                 }
             } catch (Exception e) { }
         }
-    }
-
-    if (env.base_os != "debian11") {
-        try {
-            timeout(time: 30, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/rust
-                    export PID=$(lsof -t -i:3000)
-                    if [ "$PID" != "" ]
-                    then
-                        echo "Killing $PID"
-                        kill -9 $PID
-                    fi
-                    if [ "${os_release_id}" = "alpine" ]
-                    then
-                        sed -i -e '/^fs.mounts = \\[.*/a \\{ path = "\\/usr\\/{{ arch_libdir }}", uri="file:\\/usr\\/{{ arch_libdir }}" },' rust-hyper-http-server.manifest.template
-                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/{{ arch_libdir }}\\/\\"," rust-hyper-http-server.manifest.template
-                    fi
-                    make ${MAKEOPTS}
-                    make ${MAKEOPTS} start-gramine-server &
-                    ../../scripts/wait_for_server 300 127.0.0.1 3000
-                    LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:3000 | tee RESULT
-                '''
-            }
-        } catch (Exception e) { }
-    }
-
-    if (["ubuntu"].contains(env.os_release_id) && (env.node_label != "graphene_22.04_5.19")) {
-        try {
-            timeout(time: 30, unit: 'MINUTES') {
-
-                env.ubuntu_repo = sh(returnStdout: true, script: 'lsb_release -sc').trim()
-
-                sh '''
-                cd CI-Examples/mongodb
-                curl -fsSL https://pgp.mongodb.com/server-7.0.asc | \
-                    sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
-                echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu ${ubuntu_repo}/mongodb-org/7.0 multiverse" | \
-                    sudo tee /etc/apt/sources.list.d/mongodb-org-7.0.list
-                sudo apt-get update
-                sudo apt-get install -y mongodb-org
-                make
-                gramine-${MODE} mongod &
-                sleep 60
-                mongosh scripts/insert.js
-                mongosh scripts/fetch.js | tee OUTPUT
-                '''
-            }
-        } catch (Exception e) { }
     }
 }
