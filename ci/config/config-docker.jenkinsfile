@@ -48,7 +48,7 @@ env.no_cpu = sh(script:'nproc', returnStdout: true).trim()
 // Extract OS and version details from jenkins parameter 'base_os'
 if (env.base_os) {
     echo 'base OS : ' + base_os
-    env.os_release_id=base_os.split(/\d/)[0].trim()
+    env.os_release_id=base_os.split(/\d/)[0].trim().split(/:/)[0].trim()
     env.os_version=base_os.substring(os_release_id.length()).trim()
 } else {
     if (fileExists('/etc/os-release')) {
