@@ -6,17 +6,14 @@ node (node_label) {
         load 'ci/lib/stage-clone.jenkinsfile'
 
         dir ("gramine") {
-            sh 'cp -rf $WORKSPACE/test_workloads.py . '
-            sh 'cp -rf $WORKSPACE/verify_package_version.py . '
+            sh '../ci/resources/setup_pkg.sh'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
             env.SGX = '1'
 
             load '../ci/config/config-docker.jenkinsfile'
             env.build_os = env.base_os
-            if (env.base_os.contains("ubuntu")) {
-                dockerfile_name = "../ci/dockerfile/common_ubuntu.dockerfile"
-            } else if (env.base_os.contains("debian")) {
-                dockerfile_name = "../ci/dockerfile/common_debian.dockerfile"
+            if (["ubuntu", "debian", "ubi"].contains(env.os_release_id)) {
+                dockerfile_name = "../ci/dockerfile/common_${env.os_release_id}.dockerfile"
             } else {
                 if (env.base_os.contains("stream")) {
                     env.build_os = "quay.io/centos/centos:" + env.base_os
