@@ -72,5 +72,16 @@ stage('test') {
             archiveArtifacts 'libos/test/regression/libos-regression.xml'
             junit 'libos/test/regression/libos-regression.xml'
         }
+
+        timeout(time: 15, unit: 'MINUTES') {
+            try {
+                sh '''
+                    python3 -m pytest -v --junit-xml tests.xml tests/
+                '''
+            } finally {
+                archiveArtifacts 'tests.xml'
+                junit 'tests.xml'
+            }
+        }
     }
 }
