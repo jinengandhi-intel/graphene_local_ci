@@ -26,7 +26,6 @@ timestamps {
 
             } finally {
                 archiveArtifacts 'CI-Examples/stress-ng/*.log'
-                sh 'rm -f CI-Examples/stress-ng/*.log'
             }
         } else {
             sh 'echo "Ignoring stress-ng run. For enabling pass True from Jenkins build parameters"'
@@ -62,7 +61,6 @@ timestamps {
 
             } finally {
                 archiveArtifacts 'CI-Examples/stress-ng/*.log'
-                sh 'rm -f CI-Examples/stress-ng/*.log'
             }
         } else {
             sh 'echo "Ignoring stress-ng run. For enabling pass True from Jenkins build parameters"'
