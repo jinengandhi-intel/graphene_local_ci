@@ -1,15 +1,21 @@
 timestamps {
-    stage('stress-ng 1') {
-        if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
+    if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
+        
+        if (env.SGX == "1") {
+            env.cmd = "gramine-sgx"
+        }
+        else {
+            env.cmd = "gramine-direct"
+        }
+    
+        stage('hdd') {
             try {
-                timeout(time: 55, unit: 'MINUTES') {
+                timeout(time: 20, unit: 'MINUTES') {
                     sh '''
-                        export cmd=gramine-direct
                         cd CI-Examples/stress-ng
                         if test -n "$SGX"
                         then
                             make clean && make SGX=1
-                            export cmd=gramine-sgx
                         else
                             make
                         fi
@@ -17,8 +23,59 @@ timestamps {
                         ulimit -n 65535
                         ulimit -Sa
                         $cmd stress-ng --job hdd.job --temp-path /tmp 2>&1 | tee hdd.log
+                    '''
+                }
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+            }
+        }
+
+        stage('seek') {
+            try {
+                timeout(time: 20, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
                         $cmd stress-ng --job seek.job --temp-path /tmp 2>&1 | tee seek.log
+                    '''
+                }
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+            }
+        }
+
+        stage('seek-hdd') {
+            try {
+                timeout(time: 20, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
                         $cmd stress-ng --job seek-hdd.job --temp-path /tmp 2>&1 | tee seek-hdd.log
+                    '''
+                }
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+            }
+        }
+
+        stage('filesystem') {
+            try {
+                timeout(time: 20, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
                         $cmd stress-ng --job filesystem.job --temp-path /tmp 2>&1 | tee filesystem.log
                     '''
                 }
@@ -27,34 +84,17 @@ timestamps {
             } finally {
                 archiveArtifacts 'CI-Examples/stress-ng/*.log'
             }
-        } else {
-            sh 'echo "Ignoring stress-ng run. For enabling pass True from Jenkins build parameters"'
-        }
-    }
+        }                   
 
-    stage('stress-ng 2') {
-        if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
+        stage('filesystem_all') {
             try {
-                timeout(time: 80, unit: 'MINUTES') {
+                timeout(time: 30, unit: 'MINUTES') {
                     sh '''
-                        export cmd=gramine-direct
                         cd CI-Examples/stress-ng
-                        if test -n "$SGX"
-                        then
-                            make clean && make SGX=1
-                            export cmd=gramine-sgx
-                        else
-                            make clean && make
-                        fi
                         ulimit -Sa
                         ulimit -n 65535
                         ulimit -Sa
                         $cmd stress-ng --job filesystem_all.job --temp-path /tmp 2>&1 | tee filesystem_all.log
-                        $cmd stress-ng --job scheduler.job --temp-path /tmp 2>&1 | tee scheduler.log
-                        $cmd stress-ng --job scheduler_all.job --temp-path /tmp 2>&1 | tee scheduler_all.log
-                        $cmd stress-ng --job interrupt.job --temp-path /tmp 2>&1 | tee interrupt.log
-                        $cmd stress-ng --job interrupt_all.job --temp-path /tmp 2>&1 | tee interrupt_all.log
-
                     '''
                 }
             } catch (Exception e) {
@@ -62,24 +102,96 @@ timestamps {
             } finally {
                 archiveArtifacts 'CI-Examples/stress-ng/*.log'
             }
-        } else {
-            sh 'echo "Ignoring stress-ng run. For enabling pass True from Jenkins build parameters"'
         }
-    }
 
-    stage ('verification') {
-        if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
+        stage('scheduler') {
             try {
-                timeout(time: 2, unit: 'MINUTES') {
+                timeout(time: 20, unit: 'MINUTES') {
                     sh '''
                         cd CI-Examples/stress-ng
-                        python3 -m pytest -v -s --junit-xml stressng-results.xml tests_stressng.py
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
+                        $cmd stress-ng --job scheduler.job --temp-path /tmp 2>&1 | tee scheduler.log
                     '''
                 }
-            } catch (Exception e){}
-            finally {
-                junit 'CI-Examples/stress-ng/stressng-results.xml'
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
             }
         }
+
+        stage('scheduler_all') {
+            try {
+                timeout(time: 20, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
+                        $cmd stress-ng --job scheduler_all.job --temp-path /tmp 2>&1 | tee scheduler_all.log
+                    '''
+                }
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+            }
+        }
+
+        stage('interrupt') {
+            try {
+                timeout(time: 20, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
+                        $cmd stress-ng --job interrupt.job --temp-path /tmp 2>&1 | tee interrupt.log
+                    '''
+                }
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+            }
+        }
+
+        stage('interrupt_all') {
+            try {
+                timeout(time: 20, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
+                        $cmd stress-ng --job interrupt_all.job --temp-path /tmp 2>&1 | tee interrupt_all.log
+                    '''
+                }
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+            }
+        }
+
+        stage ('verification') {
+            if ((env.stress_ng_run == "True") && (env.no_cpu.toInteger() > 16)) {
+                try {
+                    timeout(time: 2, unit: 'MINUTES') {
+                        sh '''
+                            cd CI-Examples/stress-ng
+                            python3 -m pytest -v -s --junit-xml stressng-results.xml tests_stressng.py
+                        '''
+                    }
+                } catch (Exception e){}
+                finally {
+                    junit 'CI-Examples/stress-ng/stressng-results.xml'
+                }
+            }
+        }
+    } else {
+        sh 'echo "Ignoring stress-ng run. For enabling pass True from Jenkins build parameters"'
     }
 }
