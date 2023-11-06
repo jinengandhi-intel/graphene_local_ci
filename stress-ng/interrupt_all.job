@@ -122,8 +122,8 @@ clock-ops 1000000	# stop after 1000000 bogo ops
 #   start N workers sending SIGUSR1 kill signals to a SIG_IGN signal
 #   handler. Most of the process time will end up in kernel space.
 #
-kill 0			# 0 means 1 stressor per CPU
-kill-ops 1000000	# stop after 1000000 bogo ops
+# kill 0			# Failed to send IPC msg. Test is commented out in interrupt.job
+# kill-ops 1000000	# Failed to send IPC msg. Test is commented out in interrupt.job
 
 #
 # schedpolicy stressor options:
