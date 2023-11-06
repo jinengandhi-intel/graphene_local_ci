@@ -4,7 +4,6 @@ stage('Build Workloads') {
         docker system prune -af
         openssl genrsa -3 -out enclave-key.pem 3072
         cp -f config.yaml.template config.yaml
-        sed -i -E 's/Distro: "(.+)"/Distro: "'"$config_os"'"/g' config.yaml
     '''
 
     // Build Bash Workload
@@ -47,6 +46,10 @@ stage('Build Workloads') {
             ./gsc info-image gsc-gramine_python
         '''
     } catch (Exception e) {}
+
+    sh '''
+        sed -i -E 's/Distro: "(.+)"/Distro: "'"$config_os"'"/g' config.yaml
+    '''
 
     // Build Bash HelloWorld Workload
     try {
