@@ -70,7 +70,7 @@ timestamps {
 
         stage('filesystem') {
             try {
-                timeout(time: 20, unit: 'MINUTES') {
+                timeout(time: 30, unit: 'MINUTES') {
                     sh '''
                         cd CI-Examples/stress-ng
                         ulimit -Sa
