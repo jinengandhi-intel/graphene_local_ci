@@ -39,6 +39,7 @@ RUN dnf config-manager --set-enabled -y powertools && \
         libcurl-devel \
         libevent-devel \
         libjpeg-turbo-devel \
+        libmemcached \
         libX11-devel \
         libXxf86vm \
         libXtst \

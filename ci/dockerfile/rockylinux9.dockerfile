@@ -40,6 +40,7 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     libcurl-devel \
     libevent-devel \
     libjpeg-turbo-devel \
+    libmemcached \
     libX11-devel \
     libXxf86vm \
     libXtst \
