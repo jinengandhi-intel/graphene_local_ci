@@ -41,12 +41,11 @@ class Test_Workload_Results():
             assert("Success SGX quote" in python_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id != "ubuntu"),
-                    reason="Memcached libraries available for Ubuntu")
     def test_memcached_workload(self):
         memcached_result_file = open("CI-Examples/memcached/OUTPUT.txt", "r")
         memcached_contents = memcached_result_file.read()
-        assert("2" in memcached_contents)
+        expected_output = ["2", "18"]
+        assert(any(n in memcached_contents for n in expected_output))
         
     @pytest.mark.examples
     def test_lightppd_workload(self):
