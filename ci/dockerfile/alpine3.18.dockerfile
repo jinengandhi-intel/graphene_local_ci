@@ -37,6 +37,7 @@ RUN apk update && \
     libunwind \
     linux-headers \
     libevent \
+    libevent-dev \
     libjpeg-turbo \
     libx11-dev \
     libxxf86vm \
