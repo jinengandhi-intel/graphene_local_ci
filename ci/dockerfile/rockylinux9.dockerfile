@@ -68,6 +68,8 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     python3-click \
     python3-cryptography \
     python3-devel \
+    python3-flask \
+    python3-gunicorn \
     python3-jinja2 \
     python3-lxml \
     python3-numpy \

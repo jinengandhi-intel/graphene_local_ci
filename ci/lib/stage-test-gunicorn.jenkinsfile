@@ -1,0 +1,30 @@
+ if (env.SGX == "1") {
+    env.MODE = "sgx"
+}
+else {
+    env.MODE = "direct"
+}
+
+try {
+        timeout(time: 15, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/gunicorn
+                make
+                gramine-${MODE} gunicorn & echo $! > server.PID
+                ../common_tools/wait_for_server 300 127.0.0.1 8000
+                curl http://127.0.0.1:8000/hello | tee OUTPUT
+                kill $(cat server.PID)
+            '''
+        }
+    } catch (Exception e) { }
+
+stage ('verification') {
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 -m pytest -v -k test_gunicorn_workload --junit-xml workload-regression.xml test_workloads.py'
+        }
+    } catch (Exception e){}
+    finally {
+        junit 'workload-regression.xml'
+    }
+}

@@ -15,6 +15,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     gettext \
     git \
     golang \
+    gunicorn \
     jq \
     libaio1 \
     libapr1-dev \
@@ -62,6 +63,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-breathe \
     python3-click \
     python3-cryptography \
+    python3-flask \
     python3-jinja2 \
     python3-lxml \
     python3-numpy \

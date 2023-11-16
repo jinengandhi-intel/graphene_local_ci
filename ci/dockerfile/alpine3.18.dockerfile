@@ -65,6 +65,8 @@ RUN apk update && \
     py3-click \
     py3-cryptography \
     py3-elftools \
+    py3-flask \
+    py3-gunicorn \
     py3-jinja2 \
     py3-lxml \
     py3-numpy \

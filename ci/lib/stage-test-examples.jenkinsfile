@@ -155,6 +155,19 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
+    try {
+        timeout(time: 15, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/gunicorn
+                make
+                gramine-${MODE} gunicorn & echo $! > server.PID
+                ../common_tools/wait_for_server 300 127.0.0.1 8000
+                curl http://127.0.0.1:8000/hello | tee OUTPUT
+                kill $(cat server.PID)
+            '''
+        }
+    } catch (Exception e) { }
+
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
 
         try {

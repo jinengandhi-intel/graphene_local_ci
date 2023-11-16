@@ -65,6 +65,8 @@ RUN dnf update -y \
         python3-protobuf \
         python3-click \
         python3-devel \
+        python3-flask \
+        python3-gunicorn \
         python3-jinja2 \
         python3-lxml \
         python3-numpy \

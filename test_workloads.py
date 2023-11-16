@@ -276,3 +276,9 @@ class Test_Workload_Results():
         assert(("item: 'card'" in mongodb_contents) and \
                ("item: 'pen'" in mongodb_contents) and \
                ("item: 'lamp'" in mongodb_contents))
+
+    @pytest.mark.examples
+    def test_gunicorn_workload(self):
+        gunicorn_result = open("CI-Examples/gunicorn/OUTPUT", "r")
+        gunicorn_contents = gunicorn_result.read()
+        assert('{"data":"Hello World"}' in gunicorn_contents)
