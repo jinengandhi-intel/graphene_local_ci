@@ -40,3 +40,9 @@ if [[ "$base_os" != *"alpine"* ]]; then
   chmod +x $WORKSPACE/ci/resources/setup_ltp.sh
   bash $WORKSPACE/ci/resources/setup_ltp.sh
 fi
+
+if [[ "$base_os" == *"rhel8"* ]]; then
+    cp -rf /etc/yum.repos.d/redhat.repo $WORKSPACE/gramine
+    cp -rf /etc/rhsm/ca/redhat-uep.pem $WORKSPACE/gramine
+    cp -rf /etc/pki/entitlement/ $WORKSPACE/gramine
+fi

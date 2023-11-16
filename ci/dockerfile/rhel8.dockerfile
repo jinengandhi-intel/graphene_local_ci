@@ -3,12 +3,19 @@ FROM redhat/ubi8:latest
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
     && dnf update -y
 
-RUN rm -f /var/lib/rpm/__db*
+COPY redhat.repo /etc/yum.repos.d/redhat.repo
 
-RUN rpm --import https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official \
-    && dnf config-manager --disableplugin subscription-manager --add-repo http://vault.centos.org/centos/8/BaseOS/x86_64/os \
-    && dnf config-manager --disableplugin subscription-manager --add-repo http://vault.centos.org/centos/8/AppStream/x86_64/os \
-    && dnf config-manager --disableplugin subscription-manager --add-repo http://vault.centos.org/centos/8/PowerTools/x86_64/os
+COPY redhat-uep.pem /etc/rhsm/ca/redhat-uep.pem
+
+COPY entitlement /etc/pki/entitlement
+
+RUN sed -i 's/enabled = 1/enabled = 0/' /etc/yum.repos.d/redhat.repo
+
+RUN rm -rf /etc/rhsm-host
+
+RUN subscription-manager repos --enable rhel-8-for-x86_64-appstream-rpms \
+    && subscription-manager repos --enable rhel-8-for-x86_64-baseos-rpms \
+    && subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms
 
 RUN dnf update -y \
     &&  dnf install -y \

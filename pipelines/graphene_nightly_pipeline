@@ -141,7 +141,7 @@ pipeline {
                 stage ('Invoke RHEL 8 with 6.2 Gramine Native Suite ') {
                     steps {
                         sleep(time: 45, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_rhel_server_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel8"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_rhel_server_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel8"]], propagate: true, wait: true
                     }
                 }
 
