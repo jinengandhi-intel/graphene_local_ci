@@ -34,6 +34,7 @@ RUN apk update && \
     openjdk11 \
     jq \
     less \
+    libmemcached \
     libunwind \
     linux-headers \
     libevent \
