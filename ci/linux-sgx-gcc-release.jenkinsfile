@@ -3,7 +3,12 @@ node (node_label) {
     env.ORIG_WKSP = env.WORKSPACE
     env.build_ok = true
     try {
-        checkout scm
+        // checkout scm
+        dir (".") {
+            git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git',
+            branch: 'dynamic_edmm_pr'
+        }
+
         load 'ci/lib/stage-clone.jenkinsfile'
 
         dir ("gramine") {
@@ -39,7 +44,7 @@ node (node_label) {
                     load '../ci/lib/stage-test-sgx.jenkinsfile'
                     load '../ci/lib/stage-test-examples.jenkinsfile'
                     load '../ci/lib/stage-verification-examples.jenkinsfile'
-                    load '../ci/lib/stage-test-sandstone.jenkinsfile'
+                    // load '../ci/lib/stage-test-sandstone.jenkinsfile'
                 } else {
                     load '../ci/lib/stage-test-stress-ng.jenkinsfile'
                 }

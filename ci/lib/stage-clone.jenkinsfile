@@ -23,6 +23,7 @@ stage('checkout'){
     }
 
     dir ('examples') {
-        git url: 'https://github.com/gramineproject/examples.git'
+        git url: 'https://github.com/anjalirai-intel/examples.git',
+        branch: 'dynamic_edmm_update'
     }
 }

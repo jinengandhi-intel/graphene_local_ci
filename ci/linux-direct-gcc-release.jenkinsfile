@@ -2,7 +2,12 @@ node(node_label) {
     env.ORIG_WKSP = env.WORKSPACE
     env.build_ok = true
     try {
-        checkout scm
+        // checkout scm
+        dir (".") {
+            git url: 'https://github.com/jinengandhi-intel/graphene_local_ci.git',
+            branch: 'dynamic_edmm_pr'
+        }
+
         load 'ci/lib/stage-clone.jenkinsfile'
 
         dir ("gramine") {

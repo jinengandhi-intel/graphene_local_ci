@@ -26,7 +26,8 @@ sys.experimental__enable_flock = true
 sys.brk.max_size = "32M"
 sys.stack.size = "4M"
 sgx.debug = true
-sgx.max_threads = 13
+#sgx.max_threads = 13
+sgx.max_threads = {{ '1' if env.get('EDMM', '0') == '1' else '13' }}
 sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
 
 sgx.allowed_files = [
