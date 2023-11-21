@@ -26,7 +26,7 @@ stage('build') {
         make ${MAKEOPTS}
 
         cd ../gramine-device-testing-module
-        sed -i 's/static int gramine_test_dev_change_perms_uevent(/static int gramine_test_dev_change_perms_uevent(const /' main.c
+        # Need this for kernel 6.2 sed -i 's/static int gramine_test_dev_change_perms_uevent(/static int gramine_test_dev_change_perms_uevent(const /' main.c
         make ${MAKEOPTS}
     '''
 
