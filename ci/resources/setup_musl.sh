@@ -14,6 +14,7 @@ do
   sed -i 's/{ uri = "file:{{ gramine.runtimedir() }}", path = "\/lib"/{ uri = "file:{{ gramine.runtimedir(libc='\''musl'\'') }}", path = "'$arch_lib'"/' $i;
   sed -i 's/{ path = "\/gramine_lib", uri = "file:{{ gramine.runtimedir() }}/{ path = "\/gramine_lib", uri = "file:{{ gramine.runtimedir(libc='\''musl'\'') }}/' $i;
   sed -i 's/^\s*"file:{{ gramine.runtimedir() /  "file:{{ gramine.runtimedir(libc='\''musl'\'') /' $i;
+  sed -i 's/loader.log_level = "{{ log_level }}"/loader.log_level = "all"/' *manifest.template
   if [[ "$base_os" == *"alpine"* ]]; then
     sed -i 's/loader.env.LD_LIBRARY_PATH = "\/lib/loader.env.LD_LIBRARY_PATH = "\/usr\/local\/lib/' $i;
   fi
