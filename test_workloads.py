@@ -275,3 +275,12 @@ class Test_Workload_Results():
         assert(("item: 'card'" in mongodb_contents) and \
                ("item: 'pen'" in mongodb_contents) and \
                ("item: 'lamp'" in mongodb_contents))
+
+    @pytest.mark.gsc
+    def test_gsc_gramine_build_bash_workload(self):
+        gsc_bash_result = open("build_gramine_bash_result", "r")
+        gsc_bash_log = gsc_bash_result.read()
+        if (os_release_id == "debian") or ("redhat" in os_release_id):
+            assert(re.search('boot(.*)home(.*)proc', gsc_bash_log, re.DOTALL))
+        else:
+            assert(re.search('Mem:(.*)Swap:', gsc_bash_log, re.DOTALL))
