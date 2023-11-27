@@ -65,4 +65,26 @@ stage('Build Workloads') {
             ./gsc info-image gsc-helloworld-test
         '''
     } catch (Exception e) {}
+
+    // GSC build-gramine Bash Workload
+    try {
+        if ((env.os_release_id == "centos") || env.os_release_id.contains("redhat")) {
+            sh 'cp -rf test/centos8-bash.dockerfile test/bash.dockerfile'
+        } else {
+            sh '''
+                cp -rf test/ubuntu20.04-bash.dockerfile test/bash.dockerfile
+                sed -i -e "s/FROM ubuntu:20.04/FROM $distro_ver/g" test/bash.dockerfile
+            '''
+        }
+        sh '''
+            docker build --tag build-gramine-bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
+            ./gsc build-gramine bash20.04
+            sed -i 's|Repository: "https://github.com/gramineproject/gramine.git"|#Repository: "https://github.com/gramineproject/gramine.git"|g' config.yaml
+            sed -i 's|Branch:     "master"|#Branch:     "master"|g' config.yaml
+            sed -i 's|Gramine:|Gramine:\\n    Image: "bash20.04"|g' config.yaml
+            ./gsc build -nc --insecure-args build-gramine-bash-test test/ubuntu20.04-bash.manifest
+            ./gsc sign-image --remove-gramine-deps build-gramine-bash-test enclave-key.pem
+            ./gsc info-image gsc-build-gramine-bash-test
+        '''
+    } catch (Exception e) {}
 }

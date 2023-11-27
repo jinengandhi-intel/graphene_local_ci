@@ -27,6 +27,19 @@ stage('Test') {
                 gsc-helloworld-test 2>&1 | tee helloworld_result
         '''
     } catch (Exception e) {}
+
+    try {
+        if ((env.os_release_id == "debian") || env.os_release_id.contains("redhat")) {
+            env.runtime_args = "-c ls"
+        } else {
+            env.runtime_args = "-c free"
+        }
+        sh '''
+            docker run --device=/dev/sgx_enclave \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                gsc-build-gramine-bash-test ${runtime_args} 2>&1 | tee build_gramine_bash_result
+        '''
+    } catch (Exception e) {}
 }
 
 stage ('verification') {
