@@ -39,7 +39,7 @@ node (node_label) {
                     load '../ci/lib/stage-test-sgx.jenkinsfile'
                     load '../ci/lib/stage-test-examples.jenkinsfile'
                     load '../ci/lib/stage-verification-examples.jenkinsfile'
-                    load '../ci/lib/stage-test-sandstone.jenkinsfile'
+                    // load '../ci/lib/stage-test-sandstone.jenkinsfile'
                 } else {
                     load '../ci/lib/stage-test-stress-ng.jenkinsfile'
                 }

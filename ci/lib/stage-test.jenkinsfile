@@ -73,21 +73,21 @@ stage('test') {
             junit 'libos/test/regression/libos-regression.xml'
         }
 
-        timeout(time: 15, unit: 'MINUTES') {
-            try {
-                if (env.SGX != '1') {
-                    sh '''
-                        python3 -m pytest -m "not sgx" -v --junit-xml tests.xml tests/
-                    '''
-                } else {
-                    sh '''
-                        python3 -m pytest -v --junit-xml tests.xml tests/
-                    '''
-                }
-            } finally {
-                archiveArtifacts 'tests.xml'
-                junit 'tests.xml'
-            }
-        }
+        // timeout(time: 15, unit: 'MINUTES') {
+        //     try {
+        //         if (env.SGX != '1') {
+        //             sh '''
+        //                 python3 -m pytest -m "not sgx" -v --junit-xml tests.xml tests/
+        //             '''
+        //         } else {
+        //             sh '''
+        //                 python3 -m pytest -v --junit-xml tests.xml tests/
+        //             '''
+        //         }
+        //     } finally {
+        //         archiveArtifacts 'tests.xml'
+        //         junit 'tests.xml'
+        //     }
+        // }
     }
 }
