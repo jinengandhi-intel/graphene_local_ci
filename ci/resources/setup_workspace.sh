@@ -41,6 +41,14 @@ if [[ "$base_os" != *"alpine"* ]]; then
   bash $WORKSPACE/ci/resources/setup_ltp.sh
 fi
 
+if [[ "$node_label" == "graphene_oot" ]]; then
+  cd $WORKSPACE
+  for i in $(find -name '*manifest.template');
+  do
+    sed -i '/sgx.use_exinfo/d' $i;
+  done;
+fi
+
 if [[ "$base_os" == *"rhel8"* ]]; then
     cp -rf /etc/yum.repos.d/redhat.repo $WORKSPACE/gramine
     cp -rf /etc/rhsm/ca/redhat-uep.pem $WORKSPACE/gramine
