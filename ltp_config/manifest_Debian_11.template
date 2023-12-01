@@ -29,7 +29,6 @@ sgx.nonpie_binary = true
 sgx.debug = true
 sgx.max_threads = 13
 sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
-sgx.use_exinfo=true
 
 sgx.allowed_files = [
     "file:/tmp",
