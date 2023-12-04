@@ -128,7 +128,7 @@ dentry 0		# 0 means 1 stressor per CPU
 #   start N workers that create and remove directories  using  mkdir
 #   and rmdir.
 #
-dir 0			# 0 means 1 stressor per CPU
+# dir 0			# 0 means 1 stressor per CPU
 # dir-ops 1000000	# stop after 1000000 bogo ops
 # dir-dirs 8192		# exercise 8192 directories per stressor
 

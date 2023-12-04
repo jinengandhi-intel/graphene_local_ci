@@ -8,6 +8,7 @@ node (node_label) {
 
         dir ("gramine") {
             env.SGX = '1'
+            env.EDMM = '1'
             sh '../ci/resources/setup_workspace.sh'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
 
