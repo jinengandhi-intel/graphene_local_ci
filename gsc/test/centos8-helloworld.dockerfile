@@ -10,9 +10,7 @@ RUN if [ "$BUILD_OS" = "centos:8" ]; then \
     echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf; \
     fi
 
-RUN if [ "$BUILD_OS" = "redhat/ubi8-minimal:8.8" ]; then \
-    microdnf update -y; \
-    else \
+RUN if [ "$BUILD_OS" != "redhat/ubi8-minimal:8.8" ]; then \
     yum update -y; \
     fi
 

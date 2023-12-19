@@ -10,5 +10,5 @@ elif [[ "$BUILD_OS" = "centos:8" ]]; then
 elif [[ "$BUILD_OS" = "redhat/ubi8:8.8" ]]; then
     yum update -y && yum install -y python3
 elif [[ "$BUILD_OS" = "redhat/ubi8-minimal:8.8" ]]; then
-    microdnf update -y && microdnf install -y python3;
+    microdnf install -y python3;
 fi
