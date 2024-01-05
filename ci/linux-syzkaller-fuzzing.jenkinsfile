@@ -1,0 +1,111 @@
+node (node_label) {
+    env.ORIG_WKSP = env.WORKSPACE
+    env.TERM = "xterm"
+    try {
+        stage('checkout') {
+            checkout scm
+
+            dir ("graminer") {
+                git url: 'https://github.com/jinengandhi-intel/graminer.git',
+                branch: 'gramine-fuzzing'
+            }
+            env.WORKSPACE = env.WORKSPACE + "/graminer"
+        }
+
+        stage ('Build Syzcaller with Gramine') {
+            dir ("graminer") {
+                timeout(time: env.fuzz_timeout, unit: 'HOURS') {
+                    try {
+                        sh '''
+                        # Download GO package and set environment variable
+
+                        wget https://dl.google.com/go/go1.20.1.linux-amd64.tar.gz
+                        tar -xf go1.20.1.linux-amd64.tar.gz
+                        export GOROOT=`pwd`/go
+                        export PATH=$GOROOT/bin:$PATH
+
+                        export LINUX=/home/intel/fuzz_setup/linux
+                        mkdir images
+                        ln -s $PWD/tools/create-image.sh $PWD/images/
+                        ln -s $PWD/tools/create-gramine-image.sh $PWD/images/
+                        ln -s $PWD/tools/gramine-scripts/build-scripts/$VERSION.sh $PWD/images/
+
+                        cd images
+                        ./create-gramine-image.sh -v $VERSION -k $LINUX
+                        '''
+                    } catch (Exception e) { }
+                }
+            }
+        }
+
+        stage ('Syzcaller Setup') {
+            dir ("graminer") {
+                sh '''
+                    export GOROOT=`pwd`/go
+                    export PATH=$GOROOT/bin:$PATH
+
+                    export LINUX=/home/intel/fuzz_setup/linux
+                    mkdir workdir
+                    export WORKDIR=`pwd`/workdir
+
+                    cp tools/gramine-scripts/gramine_supported_syscalls.cfg ./
+                    sed -i "s|\\$LINUX|$LINUX|" gramine_supported_syscalls.cfg
+                    sed -i "s|\\$WORKDIR|$WORKDIR|" gramine_supported_syscalls.cfg
+                    if [ "${gramine_mode}" = 'non-sgx' ]
+                    then
+                        make clean && make GRAMINE=1
+                    else
+                        make clean && make GRAMINE=1 SGX=1
+                    fi
+                '''
+            }
+        }
+
+        stage('Run Syzkaller and analyze results') {
+            parallel run_fuzzer: {
+                dir ("graminer") {
+                    timeout(time: env.fuzz_timeout, unit: 'HOURS') {
+                        try {
+                            sh '''
+                                export GOROOT=`pwd`/go
+                                export PATH=$GOROOT/bin:$PATH
+                                if [ "${gramine_mode}" = 'non-sgx' ]
+                                then
+                                    GRAMINE=1 ./bin/syz-manager -config gramine_supported_syscalls.cfg --debug
+                                else
+                                    SGX=1 GRAMINE=1 ./bin/syz-manager -config gramine_supported_syscalls.cfg --debug
+                                fi
+                            '''
+                        } catch (Exception e) { }
+                    }
+                }
+            },
+            analyze_results: {
+                dir ("graminer") {
+                    try {
+                        env.counter = env.fuzz_timeout.toInteger()*60
+                        env.sleep_time = env.counter*0.1
+                        sh '''
+                        hours_passed=0
+                        sleep 10m
+                        httrack http://127.0.0.1:56741 -r2 --path fuzz_reports
+                        while [ $hours_passed -ne $fuzz_timeout ]
+                        do
+                            sudo python3 tools/gramine_crash_logs_parser.py $WORKSPACE/workdir/gramine-outputs/crashes
+                            httrack http://127.0.0.1:56741 -r2 --path fuzz_reports --update
+                            hours_passed=$((hours_passed+1))
+                            sleep ${sleep_time}m
+                        done
+                        '''
+                    } catch (Exception e) {}
+                }
+            }
+        }
+    } finally {
+        stage('Archive and Cleanup') {
+            try {
+                archiveArtifacts "graminer/fuzz_reports/**/*"
+            } catch (Exception e) {}
+        }
+    }
+}
