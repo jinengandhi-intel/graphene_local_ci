@@ -1,4 +1,11 @@
 stage('test-direct') {
+    sh '''
+        find ${GRAMINE_LIBDIR} -exec file {} \\; | \
+            grep ELF | \
+            cut -d':' -f1 | \
+            xargs -L1 .ci/check-rwx.py
+    '''
+
     if (os_release_id != "alpine") {
         try {
             timeout(time: 30, unit: 'MINUTES') {
