@@ -10,6 +10,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     clang \
     curl \
     default-jdk \
+    file \
     flex \
     gawk \
     gdb \

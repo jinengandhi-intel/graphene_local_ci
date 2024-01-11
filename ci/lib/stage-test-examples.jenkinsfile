@@ -139,6 +139,12 @@ stage('test-examples') {
 
                 sh '''
                 cd CI-Examples/mongodb
+                export PID=$(lsof -t -i:27017)
+                if [ "$PID" != "" ]
+                then
+                    echo "Killing $PID"
+                    kill -9 $PID
+                fi
                 curl -fsSL https://pgp.mongodb.com/server-7.0.asc | \
                     sudo gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor
                 echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu ${ubuntu_repo}/mongodb-org/7.0 multiverse" | \
@@ -147,7 +153,7 @@ stage('test-examples') {
                 sudo apt-get install -y mongodb-org
                 make
                 gramine-${MODE} mongod &
-                sleep 60
+                ../common_tools/wait_for_server 120 127.0.0.1 27017
                 mongosh scripts/insert.js
                 mongosh scripts/fetch.js | tee OUTPUT
                 '''
