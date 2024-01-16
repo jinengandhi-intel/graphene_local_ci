@@ -20,7 +20,7 @@ from graminelibos.regression import HAS_SGX, run_command
 sgx_mode = os.environ.get('SGX')
 if sgx_mode == '1':
     DEFAULT_LTP_SCENARIO = 'install-sgx/runtest/syscalls-new'
-    DEFAULT_LTP_CONFIG = 'ltp_tests.cfg ltp-sgx_tests.cfg ltp-bug-1075_tests.cfg'
+    DEFAULT_LTP_CONFIG = 'ltp_tests.cfg ltp-sgx_tests.cfg'
 else:
     DEFAULT_LTP_SCENARIO = 'install/runtest/syscalls-new'
     DEFAULT_LTP_CONFIG = 'ltp_tests.cfg'
