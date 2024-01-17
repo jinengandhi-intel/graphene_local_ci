@@ -103,6 +103,11 @@ RUN python3 -m pip install -U \
     'meson>=0.56,<0.57' \
     dataclasses
 
+# Add mongodb workload
+RUN echo -e "[mongodb-org-7.0]\nname=MongoDB Repository\nbaseurl=https://repo.mongodb.org/yum/redhat/8/mongodb-org/7.0/x86_64/\ngpgcheck=1\nenabled=1\ngpgkey=https://www.mongodb.org/static/pgp/server-7.0.asc" >> /etc/yum.repos.d/mongodb-org-7.0.repo
+
+RUN dnf update -y && dnf install -y mongodb-org
+
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G wheel -m -d /intel -c "intel Jenkins" intel && \
     chmod 777 /intel
