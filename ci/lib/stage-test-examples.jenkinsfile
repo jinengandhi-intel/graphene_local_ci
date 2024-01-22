@@ -212,7 +212,7 @@ stage('test-examples') {
             } catch (Exception e) { }
         }
 
-        if (["ubuntu"].contains(env.os_release_id)) {
+        if (["ubuntu", "debian"].contains(env.os_release_id)) {
             try {
                 timeout(time: (env.EDMM ? 65 : 25), unit: 'MINUTES') {
                     sh '''
@@ -223,7 +223,6 @@ stage('test-examples') {
                             kill -9 $PID
                         fi
                         cd CI-Examples/tfserving
-                        sudo make install-dependencies
                         make all
                         make ${MAKEOPTS} check 2>&1 | tee RESULT
                     '''

@@ -237,9 +237,9 @@ class Test_Workload_Results():
             and ("Success 2/2" in sklearn_contents))
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id not in ['ubuntu']) or
+    @pytest.mark.skipif((os_release_id not in ["ubuntu", "debian"]) or
                     ((int(no_cores) < 16) and sgx_mode == '1'),
-                    reason="TFServing enabled only for above Ubuntu 18.04 Configurations.")
+                    reason="TFServing enabled only for above Ubuntu and debian Configurations.")
     def test_tfserving_workload(self):
         tfserving_result = open("CI-Examples/tfserving/RESULT", "r")
         tfserving_contents = tfserving_result.read()

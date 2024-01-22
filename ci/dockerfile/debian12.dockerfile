@@ -92,7 +92,13 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     wget \
     zlib1g \
     sudo \
-    zlib1g-dev
+    zlib1g-dev \
+    gnupg2 \
+    binutils
+
+RUN curl -fsSLo /usr/share/keyrings/tensorflow-serving.gpg https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.release.pub.gpg
+RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/tensorflow-serving.gpg] http://storage.googleapis.com/tensorflow-serving-apt stable tensorflow-model-server tensorflow-model-server-universal" | tee /etc/apt/sources.list.d/tensorflow-serving.list
+RUN apt-get update && apt-get install tensorflow-model-server
 
 # Install wrk2 benchmark. This benchmark is used in `benchmark-http.sh`.
 RUN git clone https://github.com/giltene/wrk2.git \
