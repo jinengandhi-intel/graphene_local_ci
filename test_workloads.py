@@ -284,3 +284,10 @@ class Test_Workload_Results():
             assert(re.search('boot(.*)home(.*)proc', gsc_bash_log, re.DOTALL))
         else:
             assert(re.search('Mem:(.*)Swap:', gsc_bash_log, re.DOTALL))
+
+    @pytest.mark.examples
+    def test_iperf_workload(self):
+        iperf_result = open("CI-Examples/iperf/OUTPUT", "r")
+        iperf_contents = iperf_result.read()
+        assert(re.search("local 127.0.0.1 port \d+ connected to 127.0.0.1 port 5201", iperf_contents) and \
+               ("iperf Done" in iperf_contents))

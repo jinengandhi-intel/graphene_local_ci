@@ -229,4 +229,23 @@ stage('test-examples') {
             } catch (Exception e) { }
         }
     }
+
+    try {
+        timeout(time: 10, unit: 'MINUTES') {
+            sh '''
+                export PID=$(lsof -t -i:5201)
+                if [ "$PID" != "" ]
+                then
+                    echo "Killing $PID"
+                    kill -9 $PID
+                fi
+                cd CI-Examples/iperf
+                make all
+                gramine-${MODE} iperf3 & echo $! > server.PID
+                ../common_tools/wait_for_server 10 127.0.0.1 5201;
+                LD_LIBRARY_PATH=./install ./install/iperf3 -c localhost -p 5201 2>&1 | tee OUTPUT
+                kill $(cat server.PID)
+            '''
+        }
+    } catch (Exception e) { }
 }
