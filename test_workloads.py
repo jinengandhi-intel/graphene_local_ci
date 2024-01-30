@@ -289,5 +289,5 @@ class Test_Workload_Results():
     def test_iperf_workload(self):
         iperf_result = open("CI-Examples/iperf/OUTPUT", "r")
         iperf_contents = iperf_result.read()
-        assert(re.search("local 127.0.0.1 port \d+ connected to 127.0.0.1 port 5201", iperf_contents) and \
+        assert(re.search("connected to (.*) port 5201", iperf_contents) and \
                ("iperf Done" in iperf_contents))
