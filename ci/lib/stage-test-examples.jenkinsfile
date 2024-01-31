@@ -241,7 +241,7 @@ stage('test-examples') {
                 cd CI-Examples/iperf
                 make all
                 gramine-${MODE} iperf3 & echo $! > server.PID
-                ../common_tools/wait_for_server 50 127.0.0.1 5201;
+                ../common_tools/wait_for_server 120 127.0.0.1 5201;
                 LD_LIBRARY_PATH=./install ./install/iperf3 -c localhost -p 5201 2>&1 | tee OUTPUT
                 kill $(cat server.PID)
             '''
