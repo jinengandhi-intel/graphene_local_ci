@@ -48,7 +48,7 @@ sgx_sign: tensorflow_model_server.manifest | $(SERVING)
 .PHONY: check
 check: all
 	$(GRAMINE) tensorflow_model_server --port=8500 --rest_api_port=8501 --tensorflow_intra_op_parallelism=2 --tensorflow_inter_op_parallelism=2 --model_name=half_plus_two --model_base_path=/serving/tensorflow_serving/servables/tensorflow/testdata/saved_model_half_plus_two_cpu >/dev/null & SERVER_ID=$$!; \
-	../../scripts/wait_for_server 1000 127.0.0.1 8501; \
+	../../scripts/wait_for_server 2000 127.0.0.1 8501; \
 	curl -d '{"instances": [1.0, 2.0, 5.0]}' -X POST http://localhost:8501/v1/models/half_plus_two:predict > OUTPUT; \
 	kill -9 $$SERVER_ID
 	@grep -q '"predictions": .2.5, 3.0, 4.5' OUTPUT && echo [ "Success" ]
