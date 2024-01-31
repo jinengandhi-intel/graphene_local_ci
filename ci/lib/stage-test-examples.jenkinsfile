@@ -226,6 +226,10 @@ stage('test-examples') {
                     '''
                 }
             } catch (Exception e) { }
+            } finally {
+                archiveArtifacts 'CI-Examples/tfserving/RESULT'
+            }
+
         }
     }
 
