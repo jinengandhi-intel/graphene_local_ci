@@ -45,7 +45,7 @@ if [[ "$node_label" == "graphene_oot" ]]; then
   cd $WORKSPACE
   for i in $(find -name '*manifest.template');
   do
-    sed -i '/sgx.use_exinfo/d' $i;
+    sed -i 's/sgx.use_exinfo/sgx.insecure__allow_memfaults_without_exinfo/' $i;
   done;
 fi
 
