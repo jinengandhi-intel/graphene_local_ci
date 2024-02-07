@@ -143,7 +143,7 @@ def parse_test_output(stdout, _stderr, cmd):
     failed = set()
     conf = set()
     subtest = 0
-    woken_string = re.compile(r'woken up early | \[\d+\,\d+\]')
+    woken_string = re.compile(r'woken up early .* \[\d+\,\d+\]')
     woken_string_result  = woken_string.findall(stdout)
 
     for line in stdout.splitlines():
