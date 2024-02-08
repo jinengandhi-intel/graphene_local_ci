@@ -1,0 +1,95 @@
+# This manifest file was tested on Ubuntu 18.04 with statically built Sandstone 48+.
+#
+# I was lazy to create a Makefile. Please obtain the Sandstone statically built executable and run
+# the following commands to generate the final manifest.sgx file (I assume that Graphene is built
+# under home directory):
+#
+# ```
+# # ... replace with your Graphene path ...
+# sed -e 's|/build/graphene|/home/dimakuv/graphene|g' sandstone.manifest.template > sandstone.manifest
+#
+# ~/graphene/Pal/src/host/Linux-SGX/signer/pal-sgx-sign -libpal ~/graphene/Runtime/libpal-Linux-SGX.so \
+#     -key ~/graphene/Pal/src/host/Linux-SGX/signer/enclave-key.pem -manifest sandstone.manifest \
+#     -output sandstone.manifest.sgx -exec ./sandstone
+#
+#  ~/gramine/Pal/src/host/Linux-SGX/signer/pal-sgx-get-token -output sandstone.token -sig sandstone.sig
+# ```
+#
+# After this, you can run Sandstone tests like this:
+# ```
+# SGX=1 ~/gramine/Runtime/pal_loader ./sandstone \
+#     --on-crash=kill --no-memory-sampling --temperature-threshold=disable -n1 -o - -e adcx
+# ```
+
+# Dmitrii 11/3
+#loader.exec = file:sandstone
+
+# From Jinen Gandhi 10/28
+#loader.pal_internal_mem_size = "256M"
+loader.entrypoint = "file:{{ gramine.libos }}"
+libos.entrypoint = "/sd-test"
+# use `inline` for gramine debug messages
+loader.log_level = "error"
+
+# From Shama 11/18
+loader.env.MALLOC_ARENA_MAX = "1"
+loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/{{ arch_libdir }}:/usr/local/lib"
+
+loader.insecure__use_cmdline_argv = true
+loader.insecure__use_host_env = true
+loader.insecure__disable_aslr = true
+
+fs.mounts = [
+  { path = "/lib", uri = "file:{{ gramine.runtimedir() }}" },
+  { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+  { path = "/usr/{{ arch_libdir }}", uri = "file:/usr/{{ arch_libdir }}" },
+  { path = "/usr/local/lib", uri = "file:/usr/local/lib" },
+  { path = "/tmp", uri = "file:/tmp" },
+  # for tests that require POSIX shared memory support
+  { type = "untrusted_shm", path = "/dev/shm", uri = "dev:/dev/shm" },
+  { path = "/sd-test", uri = "file:sd-test" },
+]
+
+#s.mount.sys.type = "chroot"
+#s.mount.sys.path = "/sys"
+#s.mount.sys.uri = "file:/sys"
+
+# Thiago 11/17 - Shama originally suggested 4 GB, Thiago 11 GB, SGX requires a power of 2, so...
+sgx.enclave_size = "8G"
+sgx.max_threads = 1024
+sgx.use_exinfo = true
+sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
+#sgx.use_exinfo = true
+sgx.static_address = true
+sgx.allow_file_creation = true
+#sgx.enable_stats = true
+#sgx.debug = true
+sgx.allowed_files = [
+  "file:/tmp/",
+  "dev:/dev/shm/", # for tests that require POSIX shared memory support
+]
+
+sgx.trusted_files = [
+  "file:{{ gramine.libos }}",
+  "file:{{ gramine.runtimedir() }}/ld-linux-x86-64.so.2",
+  "file:{{ gramine.runtimedir() }}/libc.so.6",
+  "file:{{ gramine.runtimedir() }}/libm.so.6",
+  "file:{{ gramine.runtimedir() }}/libdl.so.2",
+  "file:{{ gramine.runtimedir() }}/librt.so.1",
+  "file:{{ gramine.runtimedir() }}/libutil.so.1",
+  "file:{{ gramine.runtimedir() }}/libpthread.so.0",
+  #"file:/lib/x86_64-linux-gnu/libnss_compat.so.2",
+  #"file:/lib/x86_64-linux-gnu/libnss_files.so.2",
+  #"file:/lib/x86_64-linux-gnu/libnss_nis.so.2",
+  "file:{{ arch_libdir }}/libz.so.1",
+  "file:{{ arch_libdir }}/libzstd.so.1",
+  "file:{{ arch_libdir }}/libstdc++.so.6",
+  "file:{{ arch_libdir }}/libgcc_s.so.1",
+  "file:sd_150_test.list",
+  "file:sd_150_test_16GB.list",
+  "file:sd-test",
+  ]
+
+# Thiago recommendation 10/28
+sys.stack.size = "8M"
+sgx.nonpie_binary = true

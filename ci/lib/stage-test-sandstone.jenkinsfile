@@ -2,29 +2,35 @@ stage('test') {
     if (env.no_cpu.toInteger() > 16)
     {
         try{
-            timeout(time: 120, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/sandstone-50-bin
-                    make 
-                    make start-sandstone 2>&1 | tee OUTPUT.txt
-                '''
-            }
+            sh '''
+                cd CI-Examples/sd-test
+                make
+                make start-sd-test 2>&1 | tee OUTPUT_8GB.txt
+                sed -i 's/sgx.enclave_size = "8G"/sgx.enclave_size = "16G"/g' sd-test.manifest.template
+                make clean && make
+                make start-sd-test-16G 2>&1 | tee OUTPUT_16GB.txt
+            '''
         } catch (Exception e) {
             env.build_ok = false
-            sh 'echo "Sandstone workload Failed"'
+            sh 'echo "sdtest workload Failed"'
         }
+        finally {
+                archiveArtifacts 'CI-Examples/sd-test/OUTPUT_8GB.txt'
+                archiveArtifacts 'CI-Examples/sd-test/OUTPUT_16GB.txt'
+            }
+
     }   
 }
 
 stage('verification') {            
     try {
         timeout(time: 2, unit: 'MINUTES') {
-            sh 'python3 -m pytest -v -m sandstone --junit-xml sandstone.xml test_workloads.py'
+            sh 'python3 -m pytest -v -m sdtest --junit-xml sdtest.xml test_workloads.py'
         }
     } catch (Exception e){
         env.build_ok = true
-        sh 'echo "Sandstone parser failed"'
+        sh 'echo "sdtest parser failed"'
     } finally {
-        junit 'sandstone.xml'
+        junit 'sdtest.xml'
     }
 }
