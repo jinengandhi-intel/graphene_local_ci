@@ -40,4 +40,5 @@ static void verify_getpid(void)
 static struct tst_test test = {
 	.forks_child = 1,
 	.test_all = verify_getpid,
+	.max_runtime = 300,
 };
