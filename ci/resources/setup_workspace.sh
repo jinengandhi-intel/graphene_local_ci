@@ -11,6 +11,7 @@ done;
 
 cd $WORKSPACE/gramine
 cp -rf $WORKSPACE/stress-ng CI-Examples/
+cp -rf $WORKSPACE/sd-test CI-Examples/
 cp -rf $WORKSPACE/go_helloworld CI-Examples/
 cp -rf $WORKSPACE/examples/* CI-Examples/
 cp -rf $WORKSPACE/test_workloads.py . 
@@ -18,7 +19,7 @@ cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/
 cp -rf $WORKSPACE/utils/tfserving CI-Examples/
 
 if [[ "$SGX" == 1 ]]; then
-  cp -rf ~/jenkins/sandstone-50-bin CI-Examples/
+  cp -rf ~/jenkins/sd-test/* CI-Examples/sd-test/
   cp -f $WORKSPACE/Patch/rename_protected_file.patch .
   git apply rename_protected_file.patch
 fi

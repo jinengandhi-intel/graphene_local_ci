@@ -98,13 +98,16 @@ class Test_Workload_Results():
         go_helloworld_contents = go_helloworld_result_file.read()
         assert("Hello, world" in go_helloworld_contents)                
     
-    @pytest.mark.sandstone
+    @pytest.mark.sdtest
     @pytest.mark.skipif((int(no_cores) < 16 or sgx_mode != '1'),
                     reason="Sandstone is enabled on servers with SGX")
-    def test_sandstone_workload(self):
-        sandstone_result_file = open("CI-Examples/sandstone-50-bin/OUTPUT.txt", "r")
-        sandstone_contents = sandstone_result_file.read()
-        assert(("Loop iteration 1 finished" in sandstone_contents) and ("exit: pass" in sandstone_contents))
+    def test_sdtest_workload(self):
+        sdtest_result_file = open("CI-Examples/sd-test/OUTPUT_8GB.txt", "r")
+        sdtest_contents = sdtest_result_file.read()
+        sdtest_result_file_16gb = open("CI-Examples/sd-test/OUTPUT_16GB.txt", "r")
+        sdtest_contents_16gb = sdtest_result_file_16gb.read()
+        assert(("Loop iteration 1 finished" in sdtest_contents) and ("exit: pass" in sdtest_contents))
+        assert(("Loop iteration 1 finished" in sdtest_contents) and ("exit: pass" in sdtest_contents_16gb))
 
     @pytest.mark.examples
     @pytest.mark.skipif(base_os == "debian11", reason='rust is not working on debian currently')
