@@ -1,5 +1,5 @@
 diff --git a/libos/test/fs/manifest.template b/libos/test/fs/manifest.template
-index 8eabe102..0e584615 100644
+index 3470be82..5c5c8150 100644
 --- a/libos/test/fs/manifest.template
 +++ b/libos/test/fs/manifest.template
 @@ -10,7 +10,7 @@ fs.mounts = [
@@ -12,20 +12,20 @@ index 8eabe102..0e584615 100644
    { type = "encrypted", path = "/tmp/enc_output", uri = "file:tmp/enc_output" },
    { type = "encrypted", path = "/mounted/enc_input", uri = "file:tmp/enc_input" },
 diff --git a/libos/test/fs/meson.build b/libos/test/fs/meson.build
-index e871dc6c..2c7d94a4 100644
+index ce3f8b2e..7d587dde 100644
 --- a/libos/test/fs/meson.build
 +++ b/libos/test/fs/meson.build
-@@ -42,6 +42,7 @@ tests = {
+@@ -43,6 +43,7 @@ tests = {
      'open_close': {},
      'open_flags': {},
      'read_write': {},
 +    'rename_pf': {},
+     'read_write_mmap': {},
      'seek_tell': {},
      'seek_tell_truncate': {},
-     'stat': {},
 diff --git a/libos/test/fs/rename_pf.c b/libos/test/fs/rename_pf.c
 new file mode 100644
-index 00000000..95e58076
+index 00000000..62e52f6f
 --- /dev/null
 +++ b/libos/test/fs/rename_pf.c
 @@ -0,0 +1,22 @@
@@ -51,14 +51,13 @@ index 00000000..95e58076
 +    printf("TEST OK\n");
 +    return 0;
 +}
-\ No newline at end of file
 diff --git a/libos/test/fs/test_enc.py b/libos/test/fs/test_enc.py
-index ea3bfdde..205f9489 100644
+index ee90890a..f53006cc 100644
 --- a/libos/test/fs/test_enc.py
 +++ b/libos/test/fs/test_enc.py
-@@ -91,6 +91,12 @@ class TC_50_EncryptedFiles(test_fs.TC_00_FileSystem):
-         self.verify_open_close(stdout, stderr, output_path, 'output')
-         self.assertTrue(os.path.isfile(output_path))
+@@ -81,6 +81,12 @@ class TC_50_EncryptedFiles(test_fs.TC_00_FileSystem):
+             self.__decrypt_file(self.OUTPUT_FILES[i], dec_path)
+             self.assertTrue(filecmp.cmp(self.INPUT_FILES[i], dec_path, shallow=False))
  
 +    @unittest.skipIf(os.environ.get('SGX') != '1', 'Checking renaming of protected files for SGX only')
 +    def test_099_rename_pf(self):
@@ -67,17 +66,17 @@ index ea3bfdde..205f9489 100644
 +        self.assertIn('TEST OK', stdout)
 +
      # overrides TC_00_FileSystem to change input dir (from plaintext to encrypted)
-     def test_115_seek_tell(self):
-         # the test binary expects a path to read-only (existing) file and two paths to files that
+     def test_100_open_close(self):
+         input_path = self.ENCRYPTED_FILES[-1] # existing file
 diff --git a/libos/test/fs/tests.toml b/libos/test/fs/tests.toml
-index e005bca2..a779776f 100644
+index 362b7373..cd6d5ee4 100644
 --- a/libos/test/fs/tests.toml
 +++ b/libos/test/fs/tests.toml
-@@ -13,6 +13,7 @@ manifests = [
+@@ -14,6 +14,7 @@ manifests = [
    "open_close",
    "open_flags",
    "read_write",
 +  "rename_pf",
+   "read_write_mmap",
    "seek_tell",
    "seek_tell_truncate",
-   "stat",

@@ -131,35 +131,35 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if (!["alpine"].contains(env.os_release_id) && (env.node_label != "graphene_22.04_5.19")) {
-        try {
-            timeout(time: 30, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/mongodb
-                    if [ "${base_os}" = 'debian11' ]
-                    then
-                        sed -i 's/.*loader\\.env\\.LD_LIBRARY_PATH.*/loader\\.env\\.LD_LIBRARY_PATH = "\\/gramine_lib:\\/usr\\/{{ arch_libdir }}:\\/lib\\/x86_64-linux-gnu"/' mongod.manifest.template
-                        sed -i 's/path = "\\/lib"/path = "\\/gramine_lib"/' mongod.manifest.template
-                        sed -i -e '/^fs.mounts = \\[.*/a\\{ path="\\/lib\\/x86_64-linux-gnu", uri="file:\\/lib\\/x86_64-linux-gnu" },' mongod.manifest.template
-                        sed -i -e '/^sgx.trusted_files = \\[.*/a \\"file:/lib/x86_64-linux-gnu\\/\\",' mongod.manifest.template
-                    fi
-                    export PID=$(lsof -t -i:27017)
-                    if [ "$PID" != "" ]
-                        then
-                        echo "Killing $PID"
-                        kill -9 $PID
-                    fi
-                    make
-                    gramine-${MODE} mongod &
-                    ../common_tools/wait_for_server 120 127.0.0.1 27017
-                    mongosh scripts/insert.js
-                    mongosh scripts/fetch.js | tee OUTPUT
-                '''
-            }
-        } catch (Exception e) { }
-    }
-
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
+        if (!["alpine"].contains(env.os_release_id)) {
+            try {
+                timeout(time: 30, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/mongodb
+                        if [ "${base_os}" = 'debian11' ]
+                        then
+                            sed -i 's/.*loader\\.env\\.LD_LIBRARY_PATH.*/loader\\.env\\.LD_LIBRARY_PATH = "\\/gramine_lib:\\/usr\\/{{ arch_libdir }}:\\/lib\\/x86_64-linux-gnu"/' mongod.manifest.template
+                            sed -i 's/path = "\\/lib"/path = "\\/gramine_lib"/' mongod.manifest.template
+                            sed -i -e '/^fs.mounts = \\[.*/a\\{ path="\\/lib\\/x86_64-linux-gnu", uri="file:\\/lib\\/x86_64-linux-gnu" },' mongod.manifest.template
+                            sed -i -e '/^sgx.trusted_files = \\[.*/a \\"file:/lib/x86_64-linux-gnu\\/\\",' mongod.manifest.template
+                        fi
+                        export PID=$(lsof -t -i:27017)
+                        if [ "$PID" != "" ]
+                            then
+                            echo "Killing $PID"
+                            kill -9 $PID
+                        fi
+                        make
+                        gramine-${MODE} mongod &
+                        ../common_tools/wait_for_server 120 127.0.0.1 27017
+                        mongosh scripts/insert.js
+                        mongosh scripts/fetch.js | tee OUTPUT
+                    '''
+                }
+            } catch (Exception e) { }
+        }
+
 
         try {
             timeout(time: 30, unit: 'MINUTES') {
