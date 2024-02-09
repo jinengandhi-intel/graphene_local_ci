@@ -267,7 +267,7 @@ class Test_Workload_Results():
         assert('"Hello World! Let\'s check escaped symbols: < & > "' in gsc_helloworld_log)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id in ['alpine'] or (node_label == "graphene_22.04_5.19")),
+    @pytest.mark.skipif((os_release_id in ['alpine'] or ((int(no_cores) < 16) and sgx_mode == '1')),
                     reason="MongoDB not enabled for alpine distribution")
     def test_mongodb_workload(self):
         mongodb_result = open("CI-Examples/mongodb/OUTPUT", "r")
