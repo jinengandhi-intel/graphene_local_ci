@@ -4,6 +4,7 @@ CURR_DIR =$(shell pwd)
 SERVING=serving
 
 SERVING_HASH=652d6e2caab2b0d8729fe92ed11134222a1ba886d315b113b979155250864950
+TFSERVING_HASH=4c0c2d7d2dfefb1881eba74694724e69f7c116bae9fe1d7648281d98d25ce413
 
 ifeq ($(DEBUG),1)
 GRAMINE_LOG_LEVEL = debug
@@ -24,7 +25,7 @@ GRAMINE = gramine-sgx
 endif
 
 $(SERVING):
-	../common_tools/download --output $(SERVING).tar.gz --sha256 $(SERVING_HASH)\
+	../common_tools/download --output $(SERVING).tar.gz --sha256 $(SERVING_HASH) \
      --url https://github.com/tensorflow/serving/archive/refs/tags/2.11.0.tar.gz
 	@mkdir $(SERVING)
 	tar -C $(SERVING) --strip-components=1 -xzf $(SERVING).tar.gz
@@ -65,10 +66,10 @@ run-native: all
 
 .PHONY: install-dependencies
 install-dependencies:
-	apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y gnupg2 binutils
-	curl -fsSLo /usr/share/keyrings/tensorflow-serving.gpg https://storage.googleapis.com/tensorflow-serving-apt/tensorflow-serving.release.pub.gpg
-	echo "deb [arch=amd64 signed-by=/usr/share/keyrings/tensorflow-serving.gpg] http://storage.googleapis.com/tensorflow-serving-apt stable tensorflow-model-server tensorflow-model-server-universal" | tee /etc/apt/sources.list.d/tensorflow-serving.list
-	apt-get update && apt-get install tensorflow-model-server
+	sudo apt-get update && DEBIAN_FRONTEND=noninteractive sudo apt-get install -y gnupg2 binutils
+	../common_tools/download --output tensorflow-model-server_2.14.1_all.deb --sha256 $(TFSERVING_HASH) \
+	--url https://storage.googleapis.com/tensorflow-serving-apt/pool/tensorflow-model-server/t/tensorflow-model-server/tensorflow-model-server_2.14.1_all.deb
+	sudo dpkg -i ./tensorflow-model-server_2.14.1_all.deb
 
 .PHONY: clean
 clean:
