@@ -66,7 +66,6 @@ run-native: all
 
 .PHONY: install-dependencies
 install-dependencies:
-	sudo apt-get update && DEBIAN_FRONTEND=noninteractive sudo apt-get install -y gnupg2 binutils
 	../common_tools/download --output tensorflow-model-server_2.14.1_all.deb --sha256 $(TFSERVING_HASH) \
 	--url https://storage.googleapis.com/tensorflow-serving-apt/pool/tensorflow-model-server/t/tensorflow-model-server/tensorflow-model-server_2.14.1_all.deb
 	sudo dpkg -i ./tensorflow-model-server_2.14.1_all.deb
