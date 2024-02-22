@@ -12,6 +12,7 @@ node (node_label) {
             env.WORKSPACE = env.WORKSPACE + "/gramine"
 
             load '../ci/config/config-docker.jenkinsfile'
+            load '../ci/config/config-debugoptimized.jenkinsfile'
 
             docker.build(
                 "local:${env.BUILD_TAG}",
@@ -31,7 +32,7 @@ node (node_label) {
                         break
                 }
 
-                load '.ci/lib/config-release.jenkinsfile'
+                // load '.ci/lib/config-release.jenkinsfile'
 
                 load '../ci/lib/stage-build-sgx.jenkinsfile'
                 if (env.stress_ng_run == "False") {
