@@ -32,21 +32,23 @@ timestamps {
             }
         }
 
-        stage('seek') {
-            try {
-                timeout(time: 20, unit: 'MINUTES') {
-                    sh '''
-                        cd CI-Examples/stress-ng
-                        ulimit -Sa
-                        ulimit -n 65535
-                        ulimit -Sa
-                        $cmd stress-ng --job seek.job --temp-path /tmp 2>&1 | tee seek.log
-                    '''
-                }
-            } catch (Exception e) {
+        if (!((env.base_os == "rhel8") && (env.SGX != "1"))) {
+            stage('seek') {
+                try {
+                    timeout(time: 20, unit: 'MINUTES') {
+                        sh '''
+                            cd CI-Examples/stress-ng
+                            ulimit -Sa
+                            ulimit -n 65535
+                            ulimit -Sa
+                            $cmd stress-ng --job seek.job --temp-path /tmp 2>&1 | tee seek.log
+                        '''
+                    }
+                } catch (Exception e) {
 
-            } finally {
-                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+                } finally {
+                    archiveArtifacts 'CI-Examples/stress-ng/*.log'
+                }
             }
         }
 

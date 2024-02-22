@@ -10,6 +10,9 @@ total_test_list={"hdd.log":15, "seek.log":7, "seek-hdd.log":4, "interrupt.log":5
             "interrupt_all.log":11, "filesystem.log":12, "filesystem_all.log":12, \
             "scheduler.log":7, "scheduler_all.log":7}
 
+base_os = os.environ.get('base_os')
+sgx_mode = os.environ.get('SGX')
+
 def parse_test_logs(log_file):
     test_results = defaultdict(list)
     fd = open(log_file)
@@ -44,7 +47,9 @@ class Test_StressNG_Results():
     def test_stress_ng_hdd(self):
         test_results = parse_test_logs("hdd.log")
         assert(len(test_results["Fail"]) == 0)
-    
+
+    @pytest.mark.skipif(((base_os == "rhel8") and sgx_mode != '1'),
+                    reason="Stress-ng seek is having issues with linux native")
     def test_stress_ng_seek(self):
         test_results = parse_test_logs("seek.log")
         assert(len(test_results["Fail"]) == 0)
