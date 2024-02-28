@@ -83,8 +83,11 @@ node (node_label) {
             analyze_results: {
                 dir ("graminer") {
                     try {
-                        env.counter = env.fuzz_timeout.toInteger()*60
-                        env.sleep_time = env.counter*0.1
+                        def counter = env.fuzz_timeout.toInteger()*60
+                        env.sleep_time = counter * 0.1
+                        if (env.sleep_time >= "60") {
+                            env.sleep_time = 60
+                        }
                         sh '''
                         hours_passed=0
                         sleep 10m
@@ -94,7 +97,7 @@ node (node_label) {
                             sudo python3 tools/gramine_crash_logs_parser.py $WORKSPACE/workdir/gramine-outputs/crashes
                             httrack http://127.0.0.1:56741 -r2 --path fuzz_reports --update
                             hours_passed=$((hours_passed+1))
-                            sleep ${sleep_time}m
+                            sleep "$sleep_time"m
                         done
                         '''
                     } catch (Exception e) {}
