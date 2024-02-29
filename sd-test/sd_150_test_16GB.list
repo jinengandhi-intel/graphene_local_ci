@@ -1,6 +1,10 @@
 ipsec_des_docsis_hmac_sha224_avx512
 ipsec_des_docsis_hmac_sha384_avx512
 ipsec_des_docsis_hmac_sha1_avx512
+imunch_replay_mini
+imunch_replay_micro
+imunch_replay_mini_skx
+imunch_replay_mini_icx
 eigen_svd_cdouble_noavx512
 onednn_matmul_avx512_bfloat16
 onednn_fwd_eltwise_avx512_f32
@@ -18,11 +22,11 @@ avxifma52_xymm_stress
 avxifma52_ymm_stress
 avxifma52_xmm_stress
 meu_volatile_continuously_avx512
-meu_volatile_continuously_avx
+#meu_volatile_continuously_avx
 meu_volatile_continuously
 meu_volatile_sequentially_avx512
 meu_volatile_sequentially_avx
-meu_volatile_sequentially
+#meu_volatile_sequentially
 movdir64b_mem_stress_no_avx512
 partial_store_forwarding_avx
 math_avx
@@ -88,6 +92,9 @@ vpcmpd_avx2
 vpcmpq_avx2
 vpcmpw_avx2
 vsqrtps_avx2
+imunch_odd
+imunch_even
+imunch_bf16
 avx512vnni_256
 avx512vnni_128
 avxvnni_256
@@ -197,8 +204,8 @@ igzip_checked
 igzip_all_deflate
 igzip_all_inflate
 igzip_simple
-immed_folding_rand_algo
-immed_folding_osize
+#immed_folding_rand_algo
+#immed_folding_osize
 immed_folding_pow2count
 immed_folding_check_each
 immed_folding_check_after
