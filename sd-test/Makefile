@@ -45,19 +45,6 @@ start-sd-test: all
 		--test-list-file sd_150_test.list 
 
 
-.PHONY: start-sd-test-16G
-start-sd-test-16G: all
-	gramine-sgx ./sd-test \
-                --on-crash=kill \
-                --no-memory-sampling \
-                --temperature-threshold=disable \
-                --test-delay=1000 \
-                -v \
-                -o stdout \
-                --disable mce_check \
-                --test-list-file sd_150_test_16GB.list
-
-
 .PHONY: clean
 clean:
 	$(RM) *.token *.sig *.manifest.sgx *.manifest pal_loader
