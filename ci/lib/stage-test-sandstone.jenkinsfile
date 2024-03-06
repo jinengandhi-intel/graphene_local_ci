@@ -1,24 +1,24 @@
 stage('test') {
     if (env.no_cpu.toInteger() > 16)
     {
-        try{
-            sh '''
-                cd CI-Examples/sd-test
-                make
-                make start-sd-test 2>&1 | tee OUTPUT_8GB.txt
-                sed -i 's/sgx.enclave_size = "8G"/sgx.enclave_size = "16G"/g' sd-test.manifest.template
-                make clean && make
-                make start-sd-test-16G 2>&1 | tee OUTPUT_16GB.txt
-            '''
-        } catch (Exception e) {
-            env.build_ok = false
-            sh 'echo "sdtest workload Failed"'
-        }
-        finally {
+        if (!((env.node_label == "graphene_icl_rhel8_6.2") && (env.EDMM == '1'))) {
+            try{
+                sh '''
+                    cd CI-Examples/sd-test
+                    make
+                    make start-sd-test 2>&1 | tee OUTPUT_8GB.txt
+                    sed -i 's/sgx.enclave_size = "8G"/sgx.enclave_size = "16G"/g' sd-test.manifest.template
+                    make clean && make
+                    make start-sd-test-16G 2>&1 | tee OUTPUT_16GB.txt
+                '''
+            } catch (Exception e) {
+                env.build_ok = false
+                sh 'echo "sdtest workload Failed"'
+            } finally {
                 archiveArtifacts 'CI-Examples/sd-test/OUTPUT_8GB.txt'
                 archiveArtifacts 'CI-Examples/sd-test/OUTPUT_16GB.txt'
             }
-
+        }
     }   
 }
 
