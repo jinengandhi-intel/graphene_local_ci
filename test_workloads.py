@@ -13,6 +13,7 @@ os_version = os.environ.get('os_version')
 base_os = os.environ.get('base_os')
 os_release_id = os.environ.get('os_release_id')
 node_label = os.environ.get('node_label')
+edmm_mode = os.environ.get('EDMM')
 
 class Test_Workload_Results():
     @pytest.mark.examples
@@ -99,8 +100,9 @@ class Test_Workload_Results():
         assert("Hello, world" in go_helloworld_contents)                
     
     @pytest.mark.sdtest
-    @pytest.mark.skipif((int(no_cores) < 16 or sgx_mode != '1'),
-                    reason="Sandstone is enabled on servers with SGX")
+    @pytest.mark.skipif(((node_label == "graphene_icl_rhel8_6.2") and (edmm_mode == '1')) or
+            (int(no_cores) < 16 or sgx_mode != '1'),
+            reason="Sandstone is enabled on servers with SGX and skip test on RHEL8 with EDMM")
     def test_sdtest_workload(self):
         sdtest_result_file = open("CI-Examples/sd-test/OUTPUT_8GB.txt", "r")
         sdtest_contents = sdtest_result_file.read()
