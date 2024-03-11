@@ -7,7 +7,6 @@ from common.config.constants import *
 @pytest.fixture(scope="session", autouse=True)
 def gramine_setup():
     print_env_variables()
-    print("\n###### In gramerf_setup #####\n")
 
     # Delete old logs if any and create new logs directory.
     if os.path.exists(LOGS_DIR):
@@ -16,11 +15,6 @@ def gramine_setup():
 
     os.makedirs(LOGS_DIR, exist_ok=True)
 
-    # Setting up the node environment and clearing cache.
-    utils.set_permissions()
-    utils.set_http_proxies()
-    utils.clean_up_system()
-    
     gramine_libs.install_gramine_binaries()
     
     utils.exec_shell_cmd(f"mkdir {BASH_LOGS_DIR}")
@@ -28,6 +22,8 @@ def gramine_setup():
 
 
 def print_env_variables():
+    if not (os.environ.get("gramine_repo",None) or os.environ.get("gramine_repo",None)):
+        pytest.exit("\n***** Either gramine_repo or gramine_repo variable is not defined*****")
     os.environ["gramine_repo"] = os.environ.get("gramine_repo", "")
     os.environ["gramine_commit"]  = os.environ.get("gramine_commit", "")
     print("\n\n############################################################################")
@@ -38,7 +34,7 @@ def print_env_variables():
 
 @pytest.fixture(scope="function", autouse=True)
 def setup_libfuzzer():
-    print("-------------------setup_libfuzzer------------------")
+    print("\n----------------------------------setup_libfuzzer----------------------------------\n")
     os.chdir(BASH_DIR)
     utils.exec_shell_cmd('rm -rf cipher_corpus/* files/*')
     os.chdir(LIBFUZZER_DIR)

@@ -2,19 +2,26 @@ import os
 from libs import utils
 from common.config.constants import *
 import subprocess
+import shlex
 
 
 def build_libfuzzer(filesize):
     with open(os.path.join(LIBFUZZER_CORPUS_DIR, str(filesize)), 'wb') as file:
         file.write(os.urandom(filesize))
-    print(utils.exec_shell_cmd('clang -g -fsanitize=fuzzer example.c -o example_fuzzer'))
-    print(utils.exec_shell_cmd('gramine-sgx-pf-crypt encrypt -w files/wrap_key -i corpus -o cipher_corpus'))
-    print(utils.exec_shell_cmd('make clean'))
-    print(utils.exec_shell_cmd('make SGX=1'))
+    print("\n----------------------------------build_libfuzzer----------------------------------\n")
+    utils.exec_shell_cmd('clang -g -fsanitize=fuzzer example.c -o example_fuzzer')
+    utils.exec_shell_cmd('gramine-sgx-pf-crypt encrypt -w files/wrap_key -i corpus -o cipher_corpus')
 
-def run_libfuzzer(testname):
-    for i in range(5):
-        output = utils.exec_shell_popen('gramine-sgx libfuzz cipher_corpus', testname, 120)
+def initialize_gramine_sgx():
+    print("\n----------------------------------initialize_gramine_sgx----------------------------------\n")
+    utils.exec_shell_cmd('make clean')
+    utils.exec_shell_cmd('make SGX=1')
+
+def run_libfuzzer(filesize, testname, iterations=1, timeout=0):
+    build_libfuzzer(filesize)
+    initialize_gramine_sgx()
+    for i in range(iterations):
+        output = utils.exec_shell_popen('gramine-sgx libfuzz cipher_corpus', testname, timeout)
         print('output of the libfuzzer ' + str(output))
         if output not in (0, -9):
             print("gramine libfuzzer execution is failed....")
@@ -52,22 +59,44 @@ def verify_libfuzzer(log_file):
     utils.exec_shell_cmd(f"sed -i 's/^fs.insecure__keys.wrap_key.*/fs.insecure__keys.wrap_key ={insecure_key_value}/' manifest.template")
     utils.exec_shell_cmd('chmod +x dir_loop.sh')
 
-    print(utils.exec_shell_cmd('make clean'))
-    print(utils.exec_shell_cmd('make SGX=1'))
-    print("verification process started.....")
+    initialize_gramine_sgx()
+    print("verification process started.....")                                                                                                                                          
     run_libfuzzer_verifier(log_file)
 
+def verify_process(process, expected_output, log_file):
+    result = False
+    process_output = ''
+    try:
+        while True:
+            output = process.stdout.readline()
+            print(output)
+            process_output += output
+            if expected_output in process_output:
+                result = True
+                break
+            if process.poll() is not None and output == '':
+                break
+    finally:
+        process.stdout.close()
+        utils.kill(process.pid)
+        utils.write_log(process_output, log_file)
+    return result
 
-def run_libfuzzer_corrupt():
-    with open(os.path.join(LIBFUZZER_CORPUS_DIR, str(filesize)), 'wb') as file:
-        file.write(os.urandom(filesize))
-    print(utils.exec_shell_cmd('clang -g -fsanitize=fuzzer example.c -o example_fuzzer'))
-    print(utils.exec_shell_cmd('gramine-sgx-pf-crypt encrypt -w files/wrap_key -i corpus -o cipher_corpus'))
-    print(utils.exec_shell_cmd('gramine-sgx-pf-tamper -w files/wrap_key -i cipher_corpus -o corrupt_file'))
-    print(utils.exec_shell_cmd('make clean'))
-    print(utils.exec_shell_cmd('make SGX=1'))
-    output = utils.exec_shell_popen('gramine-sgx libfuzz corrupt_file')
-    if output == 0:
-        return True
-    else:
-        return False
+
+def run_libfuzzer_corrupt(filesize, testname):
+    build_libfuzzer(filesize)
+    utils.exec_shell_cmd('mkdir corrupt_file')
+    utils.exec_shell_cmd(f"gramine-sgx-pf-tamper -w files/wrap_key -i cipher_corpus/{filesize} -o corrupt_file")
+    utils.exec_shell_cmd(f"sed -i 's/^loader.log_level.*/loader.log_level = \"debug\"/' libfuzz.manifest.template")
+    utils.exec_shell_cmd('rm -rf cipher_corpus && mv corrupt_file cipher_corpus')
+    initialize_gramine_sgx()
+    process = subprocess.Popen(shlex.split("gramine-sgx libfuzz cipher_corpus"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    return verify_process(process, "[P1:T1:example_fuzzer] warning: pf_open failed: Invalid header", testname)
+
+
+def run_libfuzzer_wrong_insecure_key(filesize, testname, insecure_key_value):
+    build_libfuzzer(filesize)
+    utils.exec_shell_cmd(f"sed -i 's/^fs.insecure__keys.wrap_key.*/fs.insecure__keys.wrap_key ={insecure_key_value}/' libfuzz.manifest.template")
+    initialize_gramine_sgx()
+    process = subprocess.Popen(shlex.split("gramine-sgx libfuzz cipher_corpus"), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    return verify_process(process, "Cannot parse hex key: 'F558C'", testname)

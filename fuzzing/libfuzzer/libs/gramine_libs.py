@@ -72,11 +72,6 @@ def install_gramine_dependencies():
         python_packages = utils.read_config_yaml(python_packages_path)
         python_packages_str = python_packages['Default']
 
-        if system_packages.get(distro_version) is not None:
-            system_packages_str = system_packages_str + ' ' + system_packages[distro_version]
-        if python_packages.get(distro_version) is not None:
-            python_packages_str = python_packages_str + ' ' + python_packages[distro_version]
-
     else:
         pytest.exit("\n***** Unknown / Unsupported Distro.. Exiting test session. *****")
 
