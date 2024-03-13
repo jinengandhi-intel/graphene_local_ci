@@ -55,7 +55,7 @@ fs.mounts = [
 #s.mount.sys.uri = "file:/sys"
 
 # Thiago 11/17 - Shama originally suggested 4 GB, Thiago 11 GB, SGX requires a power of 2, so...
-sgx.enclave_size = "8G"
+sgx.enclave_size = "16G"
 sgx.max_threads = 1024
 sgx.use_exinfo = true
 sgx.edmm_enable = {{ 'true' if env.get('EDMM', '0') == '1' else 'false' }}
@@ -86,10 +86,10 @@ sgx.trusted_files = [
   "file:{{ arch_libdir }}/libstdc++.so.6",
   "file:{{ arch_libdir }}/libgcc_s.so.1",
   "file:sd_150_test.list",
-  "file:sd_150_test_16GB.list",
   "file:sd-test",
   ]
 
+sys.enable_sigterm_injection = true
 # Thiago recommendation 10/28
 sys.stack.size = "8M"
 sgx.nonpie_binary = true
