@@ -1,103 +1,28 @@
 ---
 Default:
- apache2-utils
+ build-essential
  autoconf
  bison
- build-essential
- cmake
- cmake-curses-gui
  clang
- curl
- flex
  gawk
- gcc
- gdb
- gettext
- git
- google-perftools
- jq
- libaio1
- libapr1-dev
- libaprutil1-dev
- libcurl4-openssl-dev
- libelf-dev
- libevent-dev
- libexpat1
- libexpat1-dev
- libmemcached-tools
- libnss-mdns
- libnuma1
- libomp5
- libomp-dev
- libpcre2-dev
- libpcre3-dev
- libprotobuf-c-dev
- libssl-dev
- libunwind8
- libxfixes3
- libxi6
- libxml2-dev
- libxrender1
- libxxf86vm1
- libjudy-dev
- libpixman-1-dev
- libipsec-mb-dev
- musl
- musl-tools
  nasm
- net-tools
- netcat-openbsd
  ninja-build
  pkg-config
- protobuf-compiler
- protobuf-c-compiler
- pylint3
- python
- python3-apport
- python3-apt
- python3-breathe
- python3-click
- python3-cryptography
+ python3 python3-click
  python3-jinja2
- python3-lxml
- python3-numpy
+ python3-pip
+ python3-pyelftools
+ wget
+ libunwind8
+ musl-tools
+ python3-pytest
+ libgmp-dev
+ libmpfr-dev
+ libmpc-dev
+ libisl-dev
+ libprotobuf-c-dev
+ protobuf-c-compiler
+ protobuf-compiler
+ python3-cryptography
  python3-pip
  python3-protobuf
- python3-pyelftools
- python3-pytest
- python3-pytest-xdist
- python3-scipy
- python3-venv
- sqlite3
- shellcheck
- sshpass
- sudo
- texinfo
- uthash-dev
- vim
- wget
- zlib1g
- zlib1g-dev
- 
-"18.04":
- golang
- linux-headers-4.15.0-20-generic
-
-"20.04":
- clang
- golang
- libcjson-dev
- linux-headers-generic
- python3-recommonmark
- python3-sphinx-rtd-theme
- python3-toml
- sphinx-doc
- 
-"21.04":
- clang
- libcjson-dev
- linux-headers-generic
- python3-recommonmark
- python3-sphinx-rtd-theme
- python3-toml
- sphinx-doc

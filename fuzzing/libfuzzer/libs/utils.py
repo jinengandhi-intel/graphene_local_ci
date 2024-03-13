@@ -16,6 +16,9 @@ import re
 from common.config.constants import *
 from threading import Timer
 import shlex
+import pandas  as pd
+from pandas import ExcelWriter
+import os
 
 
 def kill(proc_pid):
@@ -158,3 +161,38 @@ def update_env_variables(build_prefix):
 	
     os.environ['ENV_USER_UID'] = exec_shell_cmd('id -u')
     os.environ['ENV_USER_GID'] = exec_shell_cmd('id -g')
+    
+def write_excel(data):
+    df = pd.DataFrame([data])
+    print(df)
+    filename = 'libfuzzer.xlsx'
+    path = f"{FRAMEWORK_HOME_DIR}/{filename}"
+    if os.path.isfile(path):
+        print('file exist')
+        with pd.ExcelWriter(path, mode="a", engine="openpyxl", if_sheet_exists="overlay") as writer:
+            df.to_excel(writer, sheet_name='Sheet1', startrow=writer.sheets['Sheet1'].max_row, index=False, header=False)
+    else:
+        print('creating new file')
+        df.to_excel(path,'Sheet1', index=False)        
+    
+    
+def generate_report(testname, filesize, timeout, iterations):
+    log_file = f"{LIBFUZZER_LOGS_DIR}/{testname}.log"
+    content = open(log_file).read()
+    initial_corpus = re.findall(r'INFO:\s*([\d]+)', content)[0]
+    final_corpus = re.findall(r'INFO:\s*([\d]+)', content)[-1]
+    mutation = re.findall(r'#([\d]+)', content)[-1]
+    print('initial_corpus : ' + initial_corpus)
+    print('final_corpus : ' + final_corpus)
+    print('mutation : ' + mutation)
+    
+    data = {'filesize(Bytes)' : filesize,
+        'initial_corpus' : initial_corpus,
+        'final_corpus' : final_corpus,
+        'mutation' : mutation,
+        'iterations' : iterations,
+        'timeout_per_iterations(sec)' : timeout,
+      }
+      
+    write_excel(data)
+    

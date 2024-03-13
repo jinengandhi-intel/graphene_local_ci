@@ -19,6 +19,10 @@ def gramine_setup():
     
     utils.exec_shell_cmd(f"mkdir {BASH_LOGS_DIR}")
     utils.exec_shell_cmd(f"mkdir {LIBFUZZER_LOGS_DIR}")
+    utils.exec_shell_cmd('cp -rf input_files/libfuzzer gramine/CI-Examples/')
+    utils.exec_shell_cmd('rm -rf gramine/CI-Examples/bash')
+    utils.exec_shell_cmd('cp -rf input_files/bash gramine/CI-Examples/')
+
 
 
 def print_env_variables():

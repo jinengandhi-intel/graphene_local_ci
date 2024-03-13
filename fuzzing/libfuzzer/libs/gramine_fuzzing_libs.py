@@ -51,6 +51,7 @@ def run_libfuzzer_verifier(log_file):
         print("decrypted contents of cipher_corpus directory is copied : " + log)
 
 def verify_libfuzzer(log_file):
+    print("verification process started.....")  
     os.chdir(BASH_DIR)
     utils.exec_shell_cmd(f"cp -rf {LIBFUZZER_DIR}/cipher_corpus/*  cipher_corpus/")
     utils.exec_shell_cmd(f"cp -rf {LIBFUZZER_DIR}/files/*  files/")
@@ -59,8 +60,7 @@ def verify_libfuzzer(log_file):
     utils.exec_shell_cmd(f"sed -i 's/^fs.insecure__keys.wrap_key.*/fs.insecure__keys.wrap_key ={insecure_key_value}/' manifest.template")
     utils.exec_shell_cmd('chmod +x dir_loop.sh')
 
-    initialize_gramine_sgx()
-    print("verification process started.....")                                                                                                                                          
+    initialize_gramine_sgx()                                                                                                                                  
     run_libfuzzer_verifier(log_file)
 
 def verify_process(process, expected_output, log_file):
