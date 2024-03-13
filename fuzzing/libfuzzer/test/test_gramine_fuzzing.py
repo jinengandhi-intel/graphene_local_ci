@@ -18,6 +18,7 @@ class TestClass:
             assert False
             return
         gramine_fuzzing_libs.verify_libfuzzer(testname)
+        utils.generate_report(testname, filesize, timeout, iterations)
         
     def test_fuzzing_with_corrupt_file(self):
         filesize = 1024

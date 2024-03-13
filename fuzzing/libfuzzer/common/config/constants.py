@@ -20,8 +20,6 @@ BUILD_PREFIX = FRAMEWORK_HOME_DIR + "/gramine_install/usr"
 
 # Commands constants
 GRAMINE_CLONE_CMD = "git clone https://github.com/gramineproject/gramine.git"
-GRAMINE_DEFAULT_REPO = "https://github.com/gramineproject/gramine.git"
-GRAMINE_CLONE = "RUN git clone --depth 1 --branch v1.6 https://github.com/gramineproject/gramine.git"
 
 
 BUILD_TYPE_PREFIX_STRING = "--prefix=" + BUILD_PREFIX + " --buildtype=" + BUILD_TYPE
