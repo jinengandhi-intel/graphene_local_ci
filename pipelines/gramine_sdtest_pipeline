@@ -1,0 +1,83 @@
+pipeline {
+    agent
+    {
+        node {
+                label 'master'
+                customWorkspace "${env.JobPath}"
+              }
+    }
+    stages
+    {
+        stage ('Parallel invocation of test jobs') {
+            parallel {
+                stage ('Invoke Ubuntu 20.04 with Kernel 6.7.0 Graphene SGX Suite') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu20.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Ubuntu 22.04 with Kernel 6.7.0 Graphene SGX Suite') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu22.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke CentOS 8 with Kernel 6.7.0 Graphene SGX Suite') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'centos8'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke CentOS 9 with Kernel 6.7.0 Graphene SGX Suite') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'centos9'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_almalinux9_server_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke Almalinux 9 with 6.7.0 Gramine SGX Suite ') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'almalinux9'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_almalinux9_server_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                
+                }
+
+                stage ('Invoke RHEL 8 with 6.7.0 Gramine SGX Suite ') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue',  name: 'base_os', value: 'rhel8'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                }
+                
+                stage ('Invoke RHEL 9 with 6.7.0 Gramine SGX Suite ') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue',  name: 'base_os', value: 'rhel9'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                }
+                
+                stage ('Invoke Rockylinux 9 with 6.7.0 Gramine Native Suite ') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue',  name: 'base_os', value: 'rockylinux9'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+               }
+                
+               stage ('Invoke Graphene SGX Suite with Debian 12 Kernel 6.7.0 ') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue',  name: 'base_os', value: 'debian12'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+               }
+
+               stage ('Invoke Ubuntu 22.04 with Kernel 6.7.0 Graphene SGX Suite') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu22.04'], [$class: 'StringParameterValue', name: 'EDMM', value: '1'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+
+               }
+               
+               stage ('Invoke RHEL 8 with 6.7.0 Gramine SGX Suite ') {
+                    steps {
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue',  name: 'base_os', value: 'rhel9'], [$class: 'StringParameterValue', name: 'EDMM', value: '1'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                }
+                
+    }
+  }
+}
