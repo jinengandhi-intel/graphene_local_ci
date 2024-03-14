@@ -2,8 +2,8 @@ import os
 
 FRAMEWORK_HOME_DIR = os.getcwd()
 GRAMINE_HOME_DIR = FRAMEWORK_HOME_DIR + "/gramine"
-LIBFUZZER_DIR = GRAMINE_HOME_DIR + "/CI-Examples/libfuzzer"
-BASH_DIR = GRAMINE_HOME_DIR + "/CI-Examples/bash"
+LIBFUZZER_DIR = FRAMEWORK_HOME_DIR + "/src"
+BASH_DIR = FRAMEWORK_HOME_DIR + "/src/bash"
 LIBFUZZER_CORPUS_DIR = os.path.join(LIBFUZZER_DIR, 'corpus')
 LOGS_DIR = FRAMEWORK_HOME_DIR + "/logs"
 LIBFUZZER_LOGS_DIR = os.path.join(LOGS_DIR, 'libfuzzer')

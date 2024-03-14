@@ -19,11 +19,6 @@ def gramine_setup():
     
     utils.exec_shell_cmd(f"mkdir {BASH_LOGS_DIR}")
     utils.exec_shell_cmd(f"mkdir {LIBFUZZER_LOGS_DIR}")
-    utils.exec_shell_cmd('cp -rf input_files/libfuzzer gramine/CI-Examples/')
-    utils.exec_shell_cmd('rm -rf gramine/CI-Examples/bash')
-    utils.exec_shell_cmd('cp -rf input_files/bash gramine/CI-Examples/')
-
-
 
 def print_env_variables():
     if not (os.environ.get("gramine_repo",None) or os.environ.get("gramine_repo",None)):
@@ -34,6 +29,8 @@ def print_env_variables():
     print("Printing the environment variables")
     print("Gramine Commit: ", os.environ["gramine_commit"])
     print("Gramine Repo:       ", os.environ["gramine_repo"])
+    print("Gramine Commit: ", os.environ["iterations"])
+    print("Gramine Repo:       ", os.environ["timeout"])
     print("############################################################################\n\n")
 
 @pytest.fixture(scope="function", autouse=True)
