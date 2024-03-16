@@ -42,7 +42,7 @@ def run_libfuzzer_verifier(log_file):
     try:
         result = subprocess.check_output('gramine-sgx ./bash -c "./dir_loop.sh"', shell=True)
     except subprocess.CalledProcessError as exc:
-        print("error code : ", grepexc.returncode, grepexc.output)
+        print("error code : ", exc.returncode, exc.output)
     finally:
         log = f"{BASH_LOGS_DIR}/{log_file}.log"
         file = open(log, "w+b")

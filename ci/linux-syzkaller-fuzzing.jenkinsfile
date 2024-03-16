@@ -84,9 +84,11 @@ node (node_label) {
                 dir ("graminer") {
                     try {
                         def counter = env.fuzz_timeout.toInteger()*60
-                        env.sleep_time = counter * 0.1
-                        if (env.sleep_time >= "60") {
+                        def sleep_time = counter * 0.1
+                        if (sleep_time >= 60.0) {
                             env.sleep_time = 60
+                        } else {
+                            env.sleep_time = sleep_time
                         }
                         sh '''
                         hours_passed=0
