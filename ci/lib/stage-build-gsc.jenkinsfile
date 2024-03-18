@@ -90,4 +90,28 @@ stage('Build Workloads') {
             ./gsc info-image gsc-build-gramine-bash-test
         '''
     } catch (Exception e) {}
+    
+    if (env.distro_ver == "debian:11") {
+        try {
+            sh '''
+                #Build java-simple Workload
+                cd Examples/java-simple
+                docker build -t openjdk-11-java-simple .
+                cd ../../
+                ./gsc build openjdk-11-java-simple Examples/java-simple/java-simple.manifest
+                ./gsc sign-image openjdk-11-java-simple enclave-key.pem 
+                ./gsc info-image gsc-openjdk-11-java-simple
+    
+                #Build java-spring-boot Workload
+                cd Examples/java-spring-boot
+                export PATH=$PATH:/opt/gradle/gradle-7.6.4/bin
+                cd spring-boot-web-service/ && gradle build -Dhttp.proxyHost=proxy-iind.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-iind.intel.com -Dhttps.proxyPort=912
+                cd ../ && docker build -t openjdk-11-java-spring-boot .
+                cd ../../
+                ./gsc build openjdk-11-java-spring-boot Examples/java-spring-boot/java-spring-boot.manifest
+                ./gsc sign-image openjdk-11-java-spring-boot enclave-key.pem
+                ./gsc info-image gsc-openjdk-11-java-spring-boot
+            '''
+    } catch (Exception e) {}
+  }
 }
