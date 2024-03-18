@@ -53,7 +53,7 @@ def write_log(content, log_file):
     print("logs contents are copied " + log)
 
 
-def exec_shell_popen(cmd, log_file, timeout=0):
+def exec_shell_popen(cmd, log_file, timeout):
     print(f"Process started by running this command : {cmd}")
     process = subprocess.Popen(shlex.split(cmd), stdout=subprocess.PIPE, encoding="utf-8")
     process_output = ''
@@ -196,3 +196,14 @@ def generate_report(testname, filesize, timeout, iterations):
       
     write_excel(data)
     
+
+def generate_pytorch_pre_trained_model():
+    os.chdir(FRAMEWORK_HOME_DIR)
+    print(f"\nexecuting {EXAMPLES_REPO_CLONE_CMD} ...")
+    exec_shell_cmd(EXAMPLES_REPO_CLONE_CMD, None)
+    os.chdir(PYTORCH_DIR)
+    print("\nexecuting 'python3 download-pretrained-model.py' ...")
+    exec_shell_cmd('python3 download-pretrained-model.py')
+    exec_shell_cmd(f"cp alexnet-pretrained.pt {LIBFUZZER_CORPUS_DIR}/")
+    os.chdir(LIBFUZZER_DIR)
+

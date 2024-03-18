@@ -8,6 +8,7 @@ LIBFUZZER_CORPUS_DIR = os.path.join(LIBFUZZER_DIR, 'corpus')
 LOGS_DIR = FRAMEWORK_HOME_DIR + "/logs"
 LIBFUZZER_LOGS_DIR = os.path.join(LOGS_DIR, 'libfuzzer')
 BASH_LOGS_DIR = os.path.join(LOGS_DIR, 'bash')
+PYTORCH_DIR = FRAMEWORK_HOME_DIR + "/examples/pytorch"
 HTTP_PROXY = "http://proxy-dmz.intel.com:911/"
 HTTPS_PROXY = "http://proxy-dmz.intel.com:912/"
 NO_PROXY = "intel.com,.intel.com,127.0.0.1,10.0.0.0/8,192.168.0.0./16,localhost,127.0.0.0/8,134.134.0.0/16"
@@ -17,10 +18,12 @@ PKG_INSTALL_WAIT_TIME = 25
 TEST_SLEEP_TIME_BW_ITERATIONS = 15
 BUILD_TYPE = "release"
 BUILD_PREFIX = FRAMEWORK_HOME_DIR + "/gramine_install/usr"
+ITERATIONS = int(os.environ.get('iterations', '5'))
+TIMEOUT = int(os.environ.get('timeout', '120'))
 
 # Commands constants
 GRAMINE_CLONE_CMD = "git clone https://github.com/gramineproject/gramine.git"
-
+EXAMPLES_REPO_CLONE_CMD = "git clone https://github.com/gramineproject/examples.git"
 
 BUILD_TYPE_PREFIX_STRING = "--prefix=" + BUILD_PREFIX + " --buildtype=" + BUILD_TYPE
 

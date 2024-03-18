@@ -5,9 +5,10 @@ import subprocess
 import shlex
 
 
-def build_libfuzzer(filesize):
-    with open(os.path.join(LIBFUZZER_CORPUS_DIR, str(filesize)), 'wb') as file:
-        file.write(os.urandom(filesize))
+def build_libfuzzer(filesize=''):
+    if filesize != '':
+        with open(os.path.join(LIBFUZZER_CORPUS_DIR, str(filesize)), 'wb') as file:
+            file.write(os.urandom(filesize))
     print("\n----------------------------------build_libfuzzer----------------------------------\n")
     utils.exec_shell_cmd('clang -g -fsanitize=fuzzer example.c -o example_fuzzer')
     utils.exec_shell_cmd('gramine-sgx-pf-crypt encrypt -w files/wrap_key -i corpus -o cipher_corpus')
@@ -17,7 +18,7 @@ def initialize_gramine_sgx():
     utils.exec_shell_cmd('make clean')
     utils.exec_shell_cmd('make SGX=1')
 
-def run_libfuzzer(filesize, testname, iterations=1, timeout=0):
+def run_libfuzzer(testname, iterations, timeout, filesize=''):
     build_libfuzzer(filesize)
     initialize_gramine_sgx()
     for i in range(iterations):
