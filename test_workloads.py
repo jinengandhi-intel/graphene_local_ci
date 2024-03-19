@@ -107,6 +107,10 @@ class Test_Workload_Results():
         sdtest_result_file = open("CI-Examples/sd-test/OUTPUT.txt", "r")
         sdtest_contents = sdtest_result_file.read()
         assert(("Loop iteration 1 finished" in sdtest_contents) and ("exit: pass" in sdtest_contents))
+        if edmm_mode != '1':
+            sdtest_result_file_32gb = open("CI-Examples/sd-test/OUTPUT_32GB.txt", "r")
+            sdtest_contents_32gb = sdtest_result_file_32gb.read()
+            assert(("Loop iteration 1 finished" in sdtest_contents_32gb) and ("exit: pass" in sdtest_contents_32gb))
 
     @pytest.mark.examples
     @pytest.mark.skipif(base_os == "debian11", reason='rust is not working on debian currently')
