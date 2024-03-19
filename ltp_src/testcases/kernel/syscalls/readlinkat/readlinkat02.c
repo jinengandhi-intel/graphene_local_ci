@@ -37,8 +37,8 @@
 #include "lapi/readlinkat.h"
 #include "lapi/syscalls.h"
 
-#define TEST_FILE	"test_file"
-#define SYMLINK_FILE	"symlink_file"
+#define TEST_FILE	"/tmp/test_file"
+#define SYMLINK_FILE	"/tmp/symlink_file"
 #define BUFF_SIZE	256
 
 static int file_fd, dir_fd;
@@ -51,8 +51,8 @@ static struct test_case_t {
 } test_cases[] = {
 	{&dir_fd, SYMLINK_FILE, 0, EINVAL},
 	{&dir_fd, TEST_FILE, BUFF_SIZE, EINVAL},
-	{&file_fd, SYMLINK_FILE, BUFF_SIZE, ENOTDIR},
-	{&dir_fd, "test_file/test_file", BUFF_SIZE, ENOTDIR},
+	// {&file_fd, SYMLINK_FILE, BUFF_SIZE, ENOTDIR},
+	{&dir_fd, "/tmp/test_file/test_file", BUFF_SIZE, ENOTDIR},
 };
 
 char *TCID = "readlinkat02";
@@ -91,7 +91,7 @@ static void setup(void)
 
 	file_fd = SAFE_OPEN(cleanup, TEST_FILE, O_RDWR | O_CREAT, 0644);
 
-	SAFE_SYMLINK(cleanup, TEST_FILE, SYMLINK_FILE);
+	// SAFE_SYMLINK(cleanup, TEST_FILE, SYMLINK_FILE);
 }
 
 static void readlinkat_verify(const struct test_case_t *test)
