@@ -85,7 +85,9 @@ sgx.trusted_files = [
   "file:{{ arch_libdir }}/libzstd.so.1",
   "file:{{ arch_libdir }}/libstdc++.so.6",
   "file:{{ arch_libdir }}/libgcc_s.so.1",
-  "file:sd_150_test.list",
+  "file:sd_150_test_16gb.list",
+  "file:sd_150_test_32gb.list",
+  "file:sd_150_test_edmm.list",
   "file:sd-test",
   ]
 

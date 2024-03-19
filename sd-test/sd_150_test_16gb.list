@@ -15,12 +15,6 @@ eigen_svd_cdouble_noavx512
 eigen_svd_double2
 eigen_svd_double
 eigen_svd_fvectors
-#zstd - passes with enclave_size set to 16GB
-zstd
-#zstd1 - passes with enclave_size set to 16GB
-zstd1
-#zstd_aaa - passes with enclave_size set to 16GB
-zstd_aaa
 zfuzz
 zlib9
 zlib
@@ -33,9 +27,6 @@ boost_lockfree_stack
 boost_odeint
 bp_rnd
 bp_rnd_stack
-#brotli_aaa - passes with enclave_size set to 16GB
-#brotli_text - passes with enclave_size set to 16GB
-#brotli - passes with enclave_size set to 16GB
 brotli_aaa
 brotli_text
 brotli
@@ -48,7 +39,6 @@ callrope
 callrope_bis
 cbc
 cbc_random
-#contextswitch  - passes with enclave_size set to 16GB
 contextswitch
 ctr
 deep_rand_callstack
@@ -92,17 +82,6 @@ onednn_matmul_avxvnni_u8_i8
 onednn_matmul_vnni_u8_i8
 pagefault
 pixboy
-prng
-#prng2_ranlux48 - passes with enclave_size set to 16GB
-#prng2_mt19937_64 - passes with enclave_size set to 16GB
-#prng2_pcg64 - passes with enclave_size set to 16GB
-#prng2_pcg32 - passes with enclave_size set to 16GB
-#prng2_lcg - passes with enclave_size set to 16GB
-prng2_ranlux48
-prng2_mt19937_64
-prng2_pcg64
-prng2_pcg32
-prng2_lcg
 qsort
 random_branches
 rdpid
@@ -133,25 +112,14 @@ text2
 mmap7
 tlbflush
 tlbflush_invlpg
-# uncore_power_v1 - passes with enclave_size set to 16GB
 uncore_power_v1
 xadd
 openssl_convert
 text
-imunch_odd
-imunch_even
-imunch_bf16
-#imunch_fmacvt - passes with enclave_size set to 16GB
-#imunch - passes with enclave_size set to 16GB
-#imunch_short - passes with enclave_size set to 16GB
-imunch_fmacvt
-imunch
-imunch_short
 svml_fp16
 svml
 all_gpr_using
 alternate
-#array_of_pointers - passes with enclave_size set to 16GB
 array_of_pointers
 atomic_simd_512
 atomic_simd_256_unaligned
@@ -187,7 +155,6 @@ branch_tree_random
 branches_ooo_jit
 cache_stress_aggressor
 cache_stress_clflush
-#l2_cache_eviction - passes with enclave_size set to 16GB
 l2_cache_eviction
 l3_execute
 cacheline_page_walk
@@ -204,17 +171,14 @@ cvt_packed
 cvt_single
 deepcall
 dsb2
-#dsb_combinedimmd - passes with enclave_size set to 16GB
 dsb_combinedimmd
 dsb_longimmd
-#dsb_32immd - passes with enclave_size set to 16GB
 dsb_32immd
 esp_folding_many_merges
 esp_folding_random
 esp_folding_shrink
 esp_folding_grow
 esp_folding_even
-#exceptions - passes with enclave_size set to 16GB
 exceptions
 f2xm1
 fast_short_repmov
@@ -243,16 +207,12 @@ avxifma52_xymm_stress
 avxifma52_ymm_stress
 avxifma52_xmm_stress
 igzip_checked
-#igzip_all_deflate - passes with enclave_size set to 16GB
 igzip_all_deflate
 igzip_all_inflate
 igzip_simple
-#immed_folding_rand_algo
-#immed_folding_osize
 immed_folding_pow2count
 immed_folding_check_each
 immed_folding_check_after
-#immed_folding_onereg - passes with enclave_size set to 16GB
 immed_folding_onereg
 immed_folding_cross
 immed_folding_mix
@@ -431,7 +391,6 @@ ipsec_des_docsis_hmac_sha224_avx2
 ipsec_des_docsis_hmac_sha224_avx512
 ipsec_des_docsis_hmac_sha224_x86_64
 ipsec_des_docsis_hmac_sha256_avx2
-#ipsec_des_docsis_hmac_sha256_avx512 - passes with enclave_size set to 16GB
 ipsec_des_docsis_hmac_sha256_avx512
 ipsec_des_docsis_hmac_sha256_x86_64
 ipsec_des_docsis_hmac_sha384_avx2
@@ -497,18 +456,6 @@ mesh_upi_sse_asymm_write_int
 mesh_upi_sse_asymm_int
 mesh_upi_sse_symm_int
 mesh_upi_sse_sym
-#meu_continuously_avx512
-#meu_continuously_avx
-meu_continuously
-#meu_sequentially_avx512
-#meu_sequentially_avx
-#meu_sequentially
-#meu_volatile_continuously_avx512
-#meu_volatile_continuously_avx
-#meu_volatile_continuously
-#meu_volatile_sequentially_avx512
-#meu_volatile_sequentially_avx
-#meu_volatile_sequentially
 atomic_seq_cst
 mfence
 mfence_pure
@@ -565,7 +512,7 @@ reg_conflicts_float_conflicts_ymm01
 reg_conflicts_float_conflicts_zmm01
 reg_conflicts_float_div_nans
 reg_conflicts_float_div_nans_avx2
-#repmov - passes with enclave_size set to 16GB
+repmov
 rotate
 rcr_average
 self_modify_macro_fusion2k
@@ -662,7 +609,6 @@ x87_trigonometric
 x87mmx_mix
 xadd_unlocked
 xlat
-#xlat_mrn_pressure - passes with enclave_size set to 16GB
 xlat_mrn_pressure
 zpclmul_rep
 zpclmul
@@ -867,7 +813,6 @@ kreg7
 kreg8
 kreg9
 libmvec_lowmem
-#libmvec - passes with enclave_size set to 16GB
 libmvec
 masked_vmovdqu
 masked_vmovdqu_array
@@ -885,13 +830,7 @@ vfmadd_f16c
 discr_f16c
 md5_parallel
 mesh_stress_05
-#mesh_stress_04 - passes with enclave_size set to 32GB
-#mesh_stress_04
 mesh_stress_03
-#mesh_stress_02 - passes with enclave_size set to 32GB
-#mesh_stress_02
-#mesh_stress_01 - passes with enclave_size set to 32GB
-#mesh_stress_01
 mesh_upi_avx512_asymm_read_L3_int
 mesh_upi_avx512_asymm_write_only_int
 mesh_upi_avx512_asymm_read_only_int
