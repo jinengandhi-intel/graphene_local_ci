@@ -1,3 +1,15 @@
+meu_volatile_sequentially
+meu_volatile_sequentially_avx512
+meu_volatile_sequentially_avx
+meu_volatile_continuously
+meu_volatile_continuously_avx
+meu_volatile_continuously_avx512
+#mesh_stress_02 - passes with enclave_size set to 32GB
+mesh_stress_02
+#mesh_stress_01 - passes with enclave_size set to 32GB
+mesh_stress_01
+#mesh_stress_04 - passes with enclave_size set to 32GB
+mesh_stress_04
 smi_count
 imunch_replay_mini
 imunch_replay_micro
@@ -15,12 +27,6 @@ eigen_svd_cdouble_noavx512
 eigen_svd_double2
 eigen_svd_double
 eigen_svd_fvectors
-#zstd - passes with enclave_size set to 16GB
-zstd
-#zstd1 - passes with enclave_size set to 16GB
-zstd1
-#zstd_aaa - passes with enclave_size set to 16GB
-zstd_aaa
 zfuzz
 zlib9
 zlib
@@ -92,17 +98,6 @@ onednn_matmul_avxvnni_u8_i8
 onednn_matmul_vnni_u8_i8
 pagefault
 pixboy
-prng
-#prng2_ranlux48 - passes with enclave_size set to 16GB
-#prng2_mt19937_64 - passes with enclave_size set to 16GB
-#prng2_pcg64 - passes with enclave_size set to 16GB
-#prng2_pcg32 - passes with enclave_size set to 16GB
-#prng2_lcg - passes with enclave_size set to 16GB
-prng2_ranlux48
-prng2_mt19937_64
-prng2_pcg64
-prng2_pcg32
-prng2_lcg
 qsort
 random_branches
 rdpid
@@ -138,15 +133,6 @@ uncore_power_v1
 xadd
 openssl_convert
 text
-imunch_odd
-imunch_even
-imunch_bf16
-#imunch_fmacvt - passes with enclave_size set to 16GB
-#imunch - passes with enclave_size set to 16GB
-#imunch_short - passes with enclave_size set to 16GB
-imunch_fmacvt
-imunch
-imunch_short
 svml_fp16
 svml
 all_gpr_using
@@ -247,8 +233,6 @@ igzip_checked
 igzip_all_deflate
 igzip_all_inflate
 igzip_simple
-#immed_folding_rand_algo
-#immed_folding_osize
 immed_folding_pow2count
 immed_folding_check_each
 immed_folding_check_after
@@ -497,18 +481,6 @@ mesh_upi_sse_asymm_write_int
 mesh_upi_sse_asymm_int
 mesh_upi_sse_symm_int
 mesh_upi_sse_sym
-#meu_continuously_avx512
-#meu_continuously_avx
-meu_continuously
-#meu_sequentially_avx512
-#meu_sequentially_avx
-#meu_sequentially
-#meu_volatile_continuously_avx512
-#meu_volatile_continuously_avx
-#meu_volatile_continuously
-#meu_volatile_sequentially_avx512
-#meu_volatile_sequentially_avx
-#meu_volatile_sequentially
 atomic_seq_cst
 mfence
 mfence_pure
@@ -566,6 +538,7 @@ reg_conflicts_float_conflicts_zmm01
 reg_conflicts_float_div_nans
 reg_conflicts_float_div_nans_avx2
 #repmov - passes with enclave_size set to 16GB
+repmov
 rotate
 rcr_average
 self_modify_macro_fusion2k
@@ -885,13 +858,7 @@ vfmadd_f16c
 discr_f16c
 md5_parallel
 mesh_stress_05
-#mesh_stress_04 - passes with enclave_size set to 32GB
-#mesh_stress_04
 mesh_stress_03
-#mesh_stress_02 - passes with enclave_size set to 32GB
-#mesh_stress_02
-#mesh_stress_01 - passes with enclave_size set to 32GB
-#mesh_stress_01
 mesh_upi_avx512_asymm_read_L3_int
 mesh_upi_avx512_asymm_write_only_int
 mesh_upi_avx512_asymm_read_only_int
@@ -1007,3 +974,36 @@ matrix_amx_mult_size1
 matrix_amx_random
 matrix_amx_predef
 tmul_vector_fp16
+#zstd - passes with enclave_size set to 16GB
+zstd
+#zstd1 - passes with enclave_size set to 16GB
+zstd1
+#zstd_aaa - passes with enclave_size set to 16GB
+zstd_aaa
+imunch_odd
+imunch_even
+imunch_bf16
+#imunch_fmacvt - passes with enclave_size set to 16GB
+#imunch - passes with enclave_size set to 16GB
+#imunch_short - passes with enclave_size set to 16GB
+imunch_fmacvt
+imunch
+imunch_short
+prng
+#prng2_ranlux48 - passes with enclave_size set to 16GB
+#prng2_mt19937_64 - passes with enclave_size set to 16GB
+#prng2_pcg32 - passes with enclave_size set to 16GB
+#prng2_lcg - passes with enclave_size set to 16GB
+prng2_ranlux48
+prng2_mt19937_64
+prng2_pcg64
+prng2_pcg32
+prng2_lcg
+#meu_continuously_avx
+#meu_continuously_avx512
+#meu_continuously
+#meu_sequentially_avx512
+#meu_sequentially_avx
+#meu_sequentially
+#immed_folding_rand_algo
+#immed_folding_osize

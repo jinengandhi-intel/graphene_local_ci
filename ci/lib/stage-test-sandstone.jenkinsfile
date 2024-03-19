@@ -4,16 +4,22 @@ stage('test') {
         try{
             sh '''
                 cd CI-Examples/sd-test
-                make
-                make start-sd-test 2>&1 | tee OUTPUT.txt
+                if [ "${EDMM}" ]
+                then
+                    sed -i 's/sgx.enclave_size = "16G"/#sgx.enclave_size = "16G"/g' sd-test.manifest.template
+                    sed -i 's/sd_150_test_16gb.list/sd_150_test_edmm.list/g' Makefile
+                    make && make start-sd-test 2>&1 | tee OUTPUT_EDMM.txt
+                else
+                    make && make start-sd-test 2>&1 | tee OUTPUT_16GB.txt
+                    sed -i 's/sd_150_test_16gb.list/sd_150_test_32gb.list/g' Makefile
+                    sed -i 's/sgx.enclave_size = "16G"/sgx.enclave_size = "32G"/g' sd-test.manifest.template
+                    make clean && make && make start-sd-test 2>&1 | tee OUTPUT_32GB.txt
+                fi
             '''
         } catch (Exception e) {
             env.build_ok = false
             sh 'echo "sdtest workload Failed"'
         }
-        finally {
-                archiveArtifacts 'CI-Examples/sd-test/OUTPUT.txt'
-            }
     }   
 }
 
