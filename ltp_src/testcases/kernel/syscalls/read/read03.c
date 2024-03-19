@@ -14,7 +14,7 @@
 #include <fcntl.h>
 #include "tst_test.h"
 
-static char fifo[100];
+static char fifo[] = "read03_fifo";
 static int rfd, wfd;
 
 static void verify_read(void)
@@ -29,7 +29,7 @@ static void setup(void)
 {
 	struct stat buf;
 
-	sprintf(fifo, "fifo.%d", getpid());
+	// sprintf(fifo, "fifo.%d", getpid());
 
 	SAFE_MKNOD(fifo, S_IFIFO | 0777, 0);
 	SAFE_STAT(fifo, &buf);
@@ -49,7 +49,7 @@ static void cleanup(void)
 }
 
 static struct tst_test test = {
-	.needs_tmpdir = 1,
+	// .needs_tmpdir = 1,
 	.setup = setup,
 	.cleanup = cleanup,
 	.test_all = verify_read,

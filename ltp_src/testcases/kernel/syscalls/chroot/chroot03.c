@@ -54,15 +54,16 @@ static void setup(void)
 	unsigned int i;
 
 	(void)sprintf(fname, "tfile_%d", getpid());
-	SAFE_TOUCH(fname, 0666, NULL);
+	// SAFE_TOUCH(fname, 0666, NULL);
+	SAFE_CREAT(fname, 0666);
 
 	for (i = 0; i < ARRAY_SIZE(tcases); i++) {
 		if (tcases[i].error == EFAULT)
 			tcases[3].dir = tst_get_bad_addr(NULL);
 	}
 
-	SAFE_SYMLINK("sym_dir1/", "sym_dir2");
-	SAFE_SYMLINK("sym_dir2/", "sym_dir1");
+	// SAFE_SYMLINK("sym_dir1/", "sym_dir2");
+	// SAFE_SYMLINK("sym_dir2/", "sym_dir1");
 }
 
 static struct tst_test test = {

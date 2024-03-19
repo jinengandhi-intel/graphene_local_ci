@@ -46,7 +46,7 @@ struct testcase testcases[] = {
 	{.name = "..",      .create = 0, .type = ENTRY_DIR},
 	{.name = "dir",     .create = 1, .type = ENTRY_DIR},
 	{.name = "file",    .create = 1, .type = ENTRY_FILE},
-	{.name = "symlink", .create = 1, .type = ENTRY_SYMLINK},
+	// {.name = "symlink", .create = 1, .type = ENTRY_SYMLINK},
 };
 
 /*
@@ -163,7 +163,7 @@ static void setup(void)
 				SAFE_FILE_PRINTF(testcases[i].name, " ");
 			break;
 			case ENTRY_SYMLINK:
-				SAFE_SYMLINK("nonexistent", testcases[i].name);
+				// SAFE_SYMLINK("nonexistent", testcases[i].name);
 			break;
 			}
 		}

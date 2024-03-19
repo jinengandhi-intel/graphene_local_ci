@@ -81,7 +81,8 @@ static void setup(void)
 
 	dir_fd = SAFE_OPEN(cleanup, "./", O_DIRECTORY);
 
-	SAFE_TOUCH(cleanup, TESTFILE, 0600, NULL);
+	// SAFE_TOUCH(cleanup, TESTFILE, 0600, NULL);
+	SAFE_CREAT(cleanup, TESTFILE, 0600);
 
 	SAFE_SYMLINK(cleanup, TESTFILE, TESTFILE_LINK);
 

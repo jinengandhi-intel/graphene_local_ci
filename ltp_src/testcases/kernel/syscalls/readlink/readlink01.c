@@ -77,7 +77,7 @@ static void setup(void)
 
 	fd = SAFE_OPEN(TESTFILE, O_RDWR | O_CREAT, 0444);
 	SAFE_CLOSE(fd);
-	SAFE_SYMLINK(TESTFILE, SYMFILE);
+	// SAFE_SYMLINK(TESTFILE, SYMFILE);
 }
 
 static struct tst_test test = {

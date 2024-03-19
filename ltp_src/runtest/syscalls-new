@@ -85,7 +85,7 @@ chown05_16 chown05_16
 
 chroot01 chroot01
 chroot02 chroot02
-chroot03_run chroot03_run
+chroot03 chroot03
 chroot04 chroot04
 
 clock_adjtime01 clock_adjtime01
@@ -266,7 +266,7 @@ fchown05_16 fchown05_16
 
 #fchownat test case
 fchownat01 fchownat01
-fchownat02_run fchownat02_run
+fchownat02 fchownat02
 
 fcntl01 fcntl01
 fcntl01_64 fcntl01_64
@@ -436,13 +436,13 @@ getcpu01 getcpu01
 
 getcwd01 getcwd01
 getcwd02 getcwd02
-getcwd03_run getcwd03_run
+getcwd03 getcwd03
 getcwd04 getcwd04
 
-#getdents01_run getdents01_run
+getdents01 getdents01
 getdents02 getdents02
 
-#getdents01_run_64 getdents01_run -l
+#getdents01_64 getdents01 -l
 #getdents02_64 getdents02 -l
 
 getdomainname01 getdomainname01
@@ -724,10 +724,10 @@ lseek02 lseek02
 lseek07 lseek07
 lseek11 lseek11
 
-lstat01A symlink01 -T lstat01_run
-lstat01A_64 symlink01 -T lstat01_run_64
-lstat01_run lstat01_run
-lstat01_run_64 lstat01_run_64
+lstat01A symlink01 -T lstat01
+lstat01A_64 symlink01 -T lstat01_64
+lstat01 lstat01
+lstat01_64 lstat01_64
 lstat02 lstat02
 lstat02_64 lstat02_64
 
@@ -928,7 +928,7 @@ open03 open03
 open04 open04
 open05 open05
 open06 open06
-open07_run open07_run
+open07 open07
 open08 open08
 open09 open09
 open10 open10
@@ -1116,7 +1116,7 @@ quotactl09 quotactl09
 
 read01 read01
 read02 read02
-read03_run read03_run
+read03 read03
 read04 read04
 
 readahead01 readahead01
@@ -1125,13 +1125,13 @@ readahead02 readahead02
 readdir01 readdir01
 readdir21 readdir21
 
-readlink01A symlink01 -T readlink01_run
-readlink01_run readlink01_run
+readlink01A symlink01 -T readlink01
+readlink01 readlink01
 readlink03 readlink03
 
 #readlinkat test cases
-readlinkat01_run readlinkat01_run
-readlinkat02_run readlinkat02_run
+readlinkat01 readlinkat01
+readlinkat02 readlinkat02
 
 readv01 readv01
 readv02 readv02
@@ -1171,7 +1171,7 @@ rename09 rename09
 rename10 rename10
 rename11 rename11
 rename12 rename12
-rename13_run rename13_run
+rename13 rename13
 rename14 rename14
 
 #renameat test cases
