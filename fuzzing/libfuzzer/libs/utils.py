@@ -7,7 +7,7 @@ import psutil
 import subprocess
 import lsb_release
 import csv
-from datetime import datetime as dt
+from datetime import datetime
 import collections
 import pkg_resources
 import socket
@@ -63,14 +63,18 @@ def exec_shell_popen(cmd, log_file, timeout):
             timer.start()
         while True:
             output = process.stdout.readline()
-            print(output)
+            current_time = datetime.now().strftime("%H:%M:%S")
+            output = f"{current_time} : {output}"
+            print(output.strip())
             process_output += output
-            if process.poll() is not None and output == '':
+            if process.poll() is not None:
                 break
     finally:
         if timeout!=0:
             timer.cancel()
         process.stdout.close()
+        current_time = datetime.now().strftime("%H:%M:%S")
+        process_output +=  f"\n the process got terminated at {current_time}\n"
         write_log(process_output, log_file)
     return process.returncode
 
