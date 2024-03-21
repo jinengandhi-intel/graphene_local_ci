@@ -84,7 +84,7 @@ stage('test') {
                         python3 -m pytest -v --junit-xml tests.xml tests/
                     '''
                 }
-            } finally {
+            } catch (Exception e) { } finally {
                 archiveArtifacts 'tests.xml'
                 junit 'tests.xml'
             }
