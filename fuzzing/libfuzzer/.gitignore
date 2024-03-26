@@ -1,0 +1,42 @@
+/build
+/install
+
+# No editor backup files.
+*.sw*
+*.backup
+*.orig
+\#*#
+*~
+
+.lib
+*.i
+*.s
+*.e
+*.d
+pal.map
+
+# Ignore all text files
+*.txt
+
+# object file/libraries
+*.a
+*.o
+*.so
+*.so.*
+
+# python
+*.py[co]
+__pycache__
+.pytest_cache
+
+# sgx
+*.manifest.sgx
+*.sig
+*.token
+*.cached
+.output.sgx_get_token.*
+.output.sgx_sign.*
+
+# tags/etags
+tags
+TAGS

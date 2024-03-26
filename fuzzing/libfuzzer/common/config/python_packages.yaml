@@ -1,0 +1,9 @@
+---
+# Need to enclose few of the below dependencies within quotes as the cmd string
+# will be formed with spaces and pip install will fail without the quotes.
+Default:
+ openpyxl
+ "meson >=0.56, <0.57"
+ "tomli>=1.1.0"
+ "tomli-w>=0.4.0"
+
