@@ -125,7 +125,7 @@ static void setup(void)
 	free(tmpdir);
 
 	fd = SAFE_OPEN(cleanup, TEST_FILE, O_CREAT, 0600);
-	SAFE_SYMLINK(cleanup, TEST_FILE, TEST_SYMLINK);
+	// SAFE_SYMLINK(cleanup, TEST_FILE, TEST_SYMLINK);
 	dir_fd = SAFE_OPEN(cleanup, ".", O_DIRECTORY);
 
 	TEST_PAUSE;

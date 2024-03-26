@@ -14,6 +14,7 @@ base_os = os.environ.get('base_os')
 os_release_id = os.environ.get('os_release_id')
 node_label = os.environ.get('node_label')
 edmm_mode = os.environ.get('EDMM')
+distro_ver = os.environ.get('distro_ver')
 
 class Test_Workload_Results():
     @pytest.mark.examples
@@ -266,6 +267,20 @@ class Test_Workload_Results():
         gsc_helloworld_result = open("helloworld_result", "r")
         gsc_helloworld_log = gsc_helloworld_result.read()
         assert('"Hello World! Let\'s check escaped symbols: < & > "' in gsc_helloworld_log)
+
+    @pytest.mark.gsc
+    @pytest.mark.skipif(distro_ver != "debian:11", reason='java-spring-boot is enabled only on debian11 currently')
+    def test_gsc_java_simple(self):
+        gsc_java_simple_result = open("openjdk-simple_result", "r")
+        gsc_java_simple_log = gsc_java_simple_result.read()
+        assert("Hello from Graminized Java application!" in gsc_java_simple_log)
+    
+    @pytest.mark.gsc
+    @pytest.mark.skipif(distro_ver != "debian:11", reason='java-spring-boot is enabled only on debian11 currently')
+    def test_gsc_java_spring_boot(self):
+        gsc_java_springboot_result = open("openjdk-spring-boot_result", "r")
+        gsc_java_springboot_log = gsc_java_springboot_result.read()
+        assert("Hello from Graminized Spring Boot Application." in gsc_java_springboot_log)
 
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id in ['alpine'] or ((int(no_cores) < 16) and sgx_mode == '1')),

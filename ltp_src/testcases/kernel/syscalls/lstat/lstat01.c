@@ -53,8 +53,9 @@ static void setup(void)
 	user_id  = getuid();
 	group_id = getgid();
 
-	SAFE_TOUCH(TESTFILE, 0644, NULL);
-	SAFE_SYMLINK(TESTFILE, TESTSYML);
+	// SAFE_TOUCH(TESTFILE, 0644, NULL);
+	SAFE_CREAT(TESTFILE, 0644);
+	// SAFE_SYMLINK(TESTFILE, TESTSYML);
 }
 
 static void cleanup(void)

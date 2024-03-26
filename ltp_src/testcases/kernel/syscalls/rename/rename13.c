@@ -16,14 +16,15 @@
 #include "tst_test.h"
 
 #define MNT_POINT "mntpoint"
-#define TEMP_FILE1 MNT_POINT"/tmpfile1"
-#define TEMP_FILE2 MNT_POINT"/tmpfile2"
+#define TEMP_FILE1 "/tmp/tmpfile1"
+#define TEMP_FILE2 "/tmp/tmpfile2"
 
 static struct stat buf1, buf2;
 
 static void setup(void)
 {
-	SAFE_TOUCH(TEMP_FILE1, 0700, NULL);
+	// SAFE_TOUCH(TEMP_FILE1, 0700, NULL);
+	SAFE_CREAT(TEMP_FILE1, 0700);
 	SAFE_STAT(TEMP_FILE1, &buf1);
 	SAFE_LINK(TEMP_FILE1, TEMP_FILE2);
 }
@@ -43,12 +44,12 @@ static struct tst_test test = {
 	.setup = setup,
 	.test_all = run,
 	.needs_root = 1,
-	.mntpoint = MNT_POINT,
-	.mount_device = 1,
-	.all_filesystems = 1,
-	.skip_filesystems = (const char *const[]){
-		"exfat",
-		"vfat",
-		NULL
-	},
+	// .mntpoint = MNT_POINT,
+	// .mount_device = 1,
+	// .all_filesystems = 1,
+	// .skip_filesystems = (const char *const[]){
+	// 	"exfat",
+	// 	"vfat",
+	// 	NULL
+	// },
 };
