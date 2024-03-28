@@ -42,8 +42,7 @@ start-sd-test: all
         	-v \
         	-o stdout \
         	--disable mce_check \
-		--test-list-file sd_150_test.list 
-
+		--test-list-file sd_150_test_16gb.list 
 
 .PHONY: clean
 clean:

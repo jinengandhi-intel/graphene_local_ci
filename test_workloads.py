@@ -104,9 +104,17 @@ class Test_Workload_Results():
     @pytest.mark.skipif((int(no_cores) < 16 or sgx_mode != '1'),
                     reason="Sandstone is enabled on servers with SGX")
     def test_sdtest_workload(self):
-        sdtest_result_file = open("CI-Examples/sd-test/OUTPUT.txt", "r")
-        sdtest_contents = sdtest_result_file.read()
-        assert(("Loop iteration 1 finished" in sdtest_contents) and ("exit: pass" in sdtest_contents))
+        if edmm_mode:
+            sdtest_result_file_edmm = open("CI-Examples/sd-test/OUTPUT_EDMM.txt", "r")
+            sdtest_contents_edmm = sdtest_result_file_edmm.read()
+            assert(("Loop iteration 1 finished" in sdtest_contents_edmm) and ("exit: pass" in sdtest_contents_edmm))
+        else:    
+            sdtest_result_file_16gb = open("CI-Examples/sd-test/OUTPUT_16GB.txt", "r")
+            sdtest_contents_16gb = sdtest_result_file_16gb.read()
+            sdtest_result_file_32gb = open("CI-Examples/sd-test/OUTPUT_32GB.txt", "r")
+            sdtest_contents_32gb = sdtest_result_file_32gb.read()
+            assert(("Loop iteration 1 finished" in sdtest_contents_16gb) and ("exit: pass" in sdtest_contents_16gb))
+            assert(("Loop iteration 1 finished" in sdtest_contents_32gb) and ("exit: pass" in sdtest_contents_32gb))
 
     @pytest.mark.examples
     @pytest.mark.skipif(base_os == "debian11", reason='rust is not working on debian currently')

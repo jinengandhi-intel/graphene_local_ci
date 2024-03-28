@@ -1,0 +1,47 @@
+#zstd - passes with enclave_size set to 16GB
+zstd
+#zstd1 - passes with enclave_size set to 16GB
+zstd1
+#zstd_aaa - passes with enclave_size set to 16GB
+zstd_aaa
+imunch_odd
+imunch_even
+imunch_bf16
+#imunch_fmacvt - passes with enclave_size set to 16GB
+#imunch - passes with enclave_size set to 16GB
+#imunch_short - passes with enclave_size set to 16GB
+imunch_fmacvt
+imunch
+imunch_short
+prng
+#prng2_ranlux48 - passes with enclave_size set to 16GB
+#prng2_mt19937_64 - passes with enclave_size set to 16GB
+#prng2_pcg64 - passes with enclave_size set to 16GB
+#prng2_pcg32 - passes with enclave_size set to 16GB
+#prng2_lcg - passes with enclave_size set to 16GB
+prng2_ranlux48
+prng2_mt19937_64
+prng2_pcg64
+prng2_pcg32
+prng2_lcg
+meu_continuously_avx512
+meu_continuously_avx
+meu_continuously
+meu_sequentially_avx512
+meu_sequentially_avx
+meu_sequentially
+meu_volatile_continuously_avx512
+meu_volatile_continuously_avx
+meu_volatile_continuously
+meu_volatile_sequentially_avx512
+meu_volatile_sequentially_avx
+meu_volatile_sequentially
+#mesh_stress_02 - passes with enclave_size set to 32GB
+mesh_stress_02
+#mesh_stress_01 - passes with enclave_size set to 32GB
+mesh_stress_01
+#mesh_stress_04 - passes with enclave_size set to 32GB
+mesh_stress_04
+immed_folding_rand_algo
+immed_folding_osize
+
