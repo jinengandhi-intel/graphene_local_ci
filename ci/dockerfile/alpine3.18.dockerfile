@@ -1,9 +1,5 @@
 FROM alpine:3.18
 
-RUN echo "https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories; \
-    echo "https://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories; \
-    echo "https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories
-
 RUN apk add doas; \
     adduser intel -SG wheel -h /intel -g "intel Jenkins" -u 1000; \
     echo 'permit nopass intel as root' >> /etc/doas.d/doas.conf
