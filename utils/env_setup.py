@@ -36,30 +36,43 @@ class TimeSyncCMD:
         return time_stamp
     
     def execute_time_cmd(self, time_stamp):
-        cmd = ' date --set "'+ str(time_stamp) + '"'
-        subprocess.run(f"{priviledge} {cmd}", shell=True)
+        try:
+            cmd = ' date --set "'+ str(time_stamp) + '"'
+            subprocess.run(f"{priviledge} {cmd}", timeout=5, shell=True)
+        except Exception as e:
+            print('Failed to set the time' + e)
+
 
     def set_timezone_cmd(self, time_zone):
         if node_name == "graphene_icl_alpine":
             cmd = " setup-timezone -z "
         else:
             cmd = " timedatectl set-timezone "
-        subprocess.run(f"{priviledge} {cmd} {time_zone}", shell=True)
-
+        try:
+            subprocess.run(f"{priviledge} {cmd} {time_zone}", timeout=5, shell=True)
+        except Exception as e:
+            print('Failed to set the timezone' + e)
+   
     def sync_hw_clock(self):
-        subprocess.run(f"{priviledge} hwclock --systohc", shell=True)
+        try:
+            subprocess.run(f"{priviledge} hwclock --systohc", timeout=5, shell=True)
+        except Exception as e:
+            print('Failed to set hwclock' + e)
 
 class HostSetup():
     def setup():
-        subprocess.run(f"{priviledge} service docker restart", shell=True)
-        subprocess.run("sleep 10s", shell=True)
-        subprocess.run(f"{priviledge} chown $USER /var/run/docker.sock", shell=True)
-        subprocess.run(f"{priviledge} chmod 777 /dev/cpu_dma_latency", shell=True)
-        subprocess.run(f"{priviledge} chown $USER /dev/cpu_dma_latency", shell=True)
-        if (os.path.exists("/dev/sgx_enclave")):
-            subprocess.run(f"{priviledge} chmod 777 /dev/sgx_enclave", shell=True)
-            subprocess.run(f"{priviledge} chmod 777 /dev/sgx_provision", shell=True)
-        print("System setup is done")
+        try:
+            subprocess.run(f"{priviledge} service docker restart", timeout=50, shell=True)
+            subprocess.run("sleep 10s", shell=True)
+            subprocess.run(f"{priviledge} chown $USER /var/run/docker.sock", timeout=5, shell=True)
+            subprocess.run(f"{priviledge} chmod 777 /dev/cpu_dma_latency", timeout=5, shell=True)
+            subprocess.run(f"{priviledge} chown $USER /dev/cpu_dma_latency", timeout=5, shell=True)
+            if (os.path.exists("/dev/sgx_enclave")):
+                subprocess.run(f"{priviledge} chmod 777 /dev/sgx_enclave", timeout=5, shell=True)
+                subprocess.run(f"{priviledge} chmod 777 /dev/sgx_provision", timeout=5, shell=True)
+            print("System setup is done")
+        except Exception as e:
+            print('Failed to update host system setup' + e)
 
 
 if __name__=='__main__':
