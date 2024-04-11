@@ -18,9 +18,9 @@ stage('test-examples') {
                     ./bazel-0.16.1-installer-linux-x86_64.sh --user
                     if [ "${os_release_id}" != 'ubuntu' ]
                     then
-                        make GRAMINE_LOG_LEVEL=all ${MAKEOPTS} tensorflow/configure
+                        make ${MAKEOPTS} tensorflow/configure
                         sed -i "s/\\/usr\\/bin\\/env python/\\/usr\\/bin\\/env python3/" tensorflow/tensorflow/tools/git/gen_git_source.py
-                        make GRAMINE_LOG_LEVEL=all PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
+                        make PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
                     fi
                     make all
                     make ${MAKEOPTS} run-gramine | tee OUTPUT
