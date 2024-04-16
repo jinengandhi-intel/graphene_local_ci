@@ -23,7 +23,6 @@ stage('checkout'){
     }
 
     dir ('examples') {
-        git url: 'https://github.com/gramineproject/examples.git',
-        branch: 'dimakuv/rm-insecure-eventfd'
+        git url: 'https://github.com/gramineproject/examples.git'
     }
 }
