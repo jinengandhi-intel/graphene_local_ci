@@ -1,6 +1,6 @@
 stage('coverity-scan') {
     env.COVERITY_INSTALL="/home/intel/opt/coverity/analysis/bin"
-    env.COVERITY_SERVER="https://coverityent.devtools.intel.com/prod5"
+    env.COVERITY_SERVER="https://coverity.devtools.intel.com/prod15"
     env.COVERITY_PROJECT_STREAM="Gramine-master"
     env.COVERITY_CHECKERS="--concurrency --security --rule --enable-constraint-fpp --enable-fnptr --enable-virtual --webapp-security --enable-audit-checkers --enable-default"
 
