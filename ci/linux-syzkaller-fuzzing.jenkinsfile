@@ -7,7 +7,7 @@ node (node_label) {
 
             dir ("graminer") {
                 git url: 'https://github.com/jinengandhi-intel/graminer.git',
-                branch: 'gramine-fuzzing'
+                branch: 'ssh_check_update'
             }
             env.WORKSPACE = env.WORKSPACE + "/graminer"
         }
