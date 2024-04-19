@@ -69,6 +69,8 @@ sgx.allowed_files = [
   "dev:/dev/shm/", # for tests that require POSIX shared memory support
 ]
 
+sys.insecure__allow_eventfd = true
+
 sgx.trusted_files = [
   "file:{{ gramine.libos }}",
   "file:{{ gramine.runtimedir() }}/ld-linux-x86-64.so.2",
