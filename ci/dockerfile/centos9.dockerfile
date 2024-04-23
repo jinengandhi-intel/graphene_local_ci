@@ -71,6 +71,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         python3-pyelftools \
         python3-pytest \
         python3-scipy \
+        python3-voluptuous \
         R-core \
         strace \
         stress-ng \

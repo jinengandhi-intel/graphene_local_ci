@@ -77,6 +77,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-scipy \
     python3-sphinx-rtd-theme \
     python3-torchvision \
+    python3-voluptuous \
     r-base \
     sqlite3 \
     shellcheck \

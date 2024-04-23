@@ -85,6 +85,7 @@ RUN dnf update -y \
         python3-pyelftools \
         python3-pytest \
         python3-scipy \
+        python3-voluptuous \
         R-core \
         strace \
         stress-ng \

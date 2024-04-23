@@ -81,6 +81,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-tomli \
     python3-tomli-w \
     python3-torchvision \
+    python3-voluptuous \
     r-base \
     sqlite3 \
     shellcheck \
