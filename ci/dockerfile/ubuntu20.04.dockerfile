@@ -77,6 +77,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-recommonmark \
     python3-sphinx-rtd-theme \
     python3-venv \
+    python3-voluptuous \
     r-base \
     sqlite3 \
     stress-ng \

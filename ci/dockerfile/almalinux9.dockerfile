@@ -78,6 +78,7 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     python3-pyelftools \
     python3-pytest \
     python3-scipy \
+    python3-voluptuous \
     R-core \
     strace \
     stress-ng \

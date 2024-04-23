@@ -73,6 +73,7 @@ RUN apk update && \
     py3-scipy \
     py3-tomli \
     py3-tomli-w \
+    py3-voluptuous \
     R \
     samurai \
     strace \
