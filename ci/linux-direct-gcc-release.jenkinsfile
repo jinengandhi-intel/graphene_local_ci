@@ -8,12 +8,19 @@ node(node_label) {
         dir ("gramine") {
             sh '../ci/resources/setup_workspace.sh'
             env.WORKSPACE = env.WORKSPACE + "/gramine"
+            build_str = " "
+            if (base_os == "rhel9") {
+                withCredentials([usernamePassword(credentialsId: 'rhel_dev', usernameVariable: 'USER', passwordVariable: 'PASSWD')]) {
+                    build_str = "--build-arg RHEL_USER=$USER \
+                                        --build-arg RHEL_PASSWD=$PASSWD"
+                }
+            }
 
             load '../ci/config/config-docker.jenkinsfile'
 
             docker.build(
                 "local:${env.BUILD_TAG}",
-                "-f ../ci/dockerfile/${base_os}.dockerfile ."
+                "${build_str} -f ../ci/dockerfile/${base_os}.dockerfile ."
             ).inside("${env.DOCKER_ARGS_COMMON}") {
                 load '.ci/lib/config.jenkinsfile'
 
