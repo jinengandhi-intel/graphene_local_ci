@@ -3,10 +3,13 @@ FROM redhat/ubi9:latest
 RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
     && dnf update -y
 
-RUN rpm --import https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official \
-    && dnf config-manager --disableplugin subscription-manager --add-repo http://mirror.stream.centos.org/9-stream/AppStream/x86_64/os \
-    && dnf config-manager --disableplugin subscription-manager --add-repo http://mirror.stream.centos.org/9-stream/BaseOS/x86_64/os \
-    && dnf config-manager --disableplugin subscription-manager --add-repo http://mirror.stream.centos.org/9-stream/CRB/x86_64/os
+ARG RHEL_USER
+
+ARG RHEL_PASSWD
+
+RUN subscription-manager register --username $RHEL_USER --password $RHEL_PASSWD
+
+RUN subscription-manager repos --enable codeready-builder-for-rhel-9-$(arch)-rpms
 
 RUN dnf update -y \
     &&  dnf install -y \
