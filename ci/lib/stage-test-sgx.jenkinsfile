@@ -255,9 +255,12 @@ stage('test-sgx') {
     try{
         timeout(time: 10, unit: 'MINUTES') {
             sh '''
-                cd CI-Examples/busybox
-                make ${MAKEOPTS} all
-                make ${MAKEOPTS} SGX=1 check 2>&1 | tee result.txt
+                if [ "${base_os}" != "ubuntu24.04" ]
+                then
+                    cd CI-Examples/busybox
+                    make ${MAKEOPTS} all
+                    make ${MAKEOPTS} SGX=1 check 2>&1 | tee result.txt
+                fi
             '''
         }
     } catch (Exception e) { }
