@@ -82,6 +82,10 @@ stage('test-examples') {
             timeout(time: (env.EDMM ? 60 : 10), unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/gcc
+                    if [ "${base_os}" = 'ubuntu24.04' ]
+                    then                   
+                        sed -i -e '/^sgx.trusted_files = \\[.*/a \\"file:/usr/libexec/gcc/x86_64-linux-gnu\\/\\",' gcc.manifest.template
+                    fi
                     if [ "${os_release_id}" == 'alpine' ]
                     then
                         sed -i "/file:\\/lib64/d" gcc.manifest.template
@@ -93,7 +97,7 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if ((os_release_id != "alpine") && (env.node_label != "graphene_22.04_5.19")) {
+    if ((!["ubuntu24.04", "alpine3.18"].contains(env.base_os)) && (env.node_label != "graphene_22.04_5.19")) {
         try {
             timeout(time: 30, unit: 'MINUTES') {
                 sh '''
@@ -132,7 +136,7 @@ stage('test-examples') {
     }
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
-        if (!["alpine"].contains(env.os_release_id)) {
+        if (!["ubuntu24.04", "alpine3.18"].contains(env.base_os)) {
             try {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''

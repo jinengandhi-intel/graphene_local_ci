@@ -93,7 +93,7 @@ class Test_Workload_Results():
         assert("Success 1/1" in busybox_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((int(no_cores) < 16),
+    @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Go_helloworld is enabled only on servers")
     def test_go_helloworld_workload(self):
         go_helloworld_result_file = open("CI-Examples/go_helloworld/OUTPUT", "r")
@@ -157,7 +157,7 @@ class Test_Workload_Results():
         assert("Success 1/1" in nodejs_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id in ["alpine"] or (node_label == "graphene_22.04_5.19")),
+    @pytest.mark.skipif(((base_os in ["ubuntu24.04", "alpine3.18"]) or (node_label == "graphene_22.04_5.19")),
                     reason="Pytorch not compatible for musl.")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
@@ -234,7 +234,8 @@ class Test_Workload_Results():
         assert("Hello, world" in helloworld_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((base_os not in ["ubuntu20.04", "ubuntu22.04", "debian11"]) or ((int(no_cores) < 16) and sgx_mode == '1'),
+    @pytest.mark.skipif((base_os not in ["ubuntu20.04", "ubuntu22.04", "debian11"])
+            or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Scikit-learn enabled for Ubuntu & Debian 11 Server Configurations.")
     def test_scikit_workload(self):
         sklearn_result_file = open("CI-Examples/scikit-learn-intelex/RESULT", "r")
@@ -287,7 +288,7 @@ class Test_Workload_Results():
         assert("Hello from Graminized Spring Boot Application." in gsc_java_springboot_log)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id in ['alpine'] or ((int(no_cores) < 16) and sgx_mode == '1')),
+    @pytest.mark.skipif(((base_os in ["ubuntu24.04", "alpine3.18"]) or ((int(no_cores) < 16) and sgx_mode == '1')),
                     reason="MongoDB not enabled for alpine distribution")
     def test_mongodb_workload(self):
         mongodb_result = open("CI-Examples/mongodb/OUTPUT", "r")

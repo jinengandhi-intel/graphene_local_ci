@@ -22,6 +22,12 @@ pipeline {
                     }
                 }
 
+                stage ('Invoke Ubuntu 24.04 with Kernel 6.8 Graphene SGX Suite') {
+                    steps {
+                        build job: 'local_ci_graphene_sgx_build_without_prefix', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu24.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                    }
+                }
+
                 stage ('Invoke CentOS 8 with Kernel 6.2 Graphene SGX Suite') {
                     steps {
                         build job: 'local_ci_graphene_sgx_build_without_prefix', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'centos8'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_18.04_6.0'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
