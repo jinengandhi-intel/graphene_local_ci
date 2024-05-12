@@ -1,4 +1,4 @@
-env.PREFIX = '/home/intel/gramine_install/usr'
+env.PREFIX = env.WORKSPACE + '/usr'
 
 env.PATH = env.PREFIX + '/bin:' + env.PATH
 
