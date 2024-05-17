@@ -12,7 +12,7 @@ pipeline {
             parallel {
                 stage ('Invoke Gramine Package Installation for Ubuntu 20.04') {
                     steps {
-                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu:20.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version], [$class: 'StringParameterValue', name: 'package_version', value: package_version]], propagate: true, wait: true
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu:20.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_version', value: gramine_version], [$class: 'StringParameterValue', name: 'package_version', value: package_version]], propagate: true, wait: true
                     }
                 }
 

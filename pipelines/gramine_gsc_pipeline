@@ -11,7 +11,7 @@ pipeline {
             parallel {
                 stage ('Invoke GSC with Ubuntu 20.04') {
                     steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:20.04"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:20.04"]], propagate: true, wait: true
                     }
                 }
 
@@ -47,7 +47,7 @@ pipeline {
 
                 stage ('Invoke GSC with Ubuntu 23.04') {
                     steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:23.04"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:23.04"]], propagate: true, wait: true
                     }
                 }
             }
