@@ -12,7 +12,7 @@ pipeline {
             parallel {
                 stage ('Invoke Ubuntu 20.04 with Kernel 6.7.0 Graphene SGX Suite') {
                     steps {
-                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu20.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu20.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
                     }
                 }
 
@@ -61,7 +61,7 @@ pipeline {
                 
                stage ('Invoke Graphene SGX Suite with Debian 12 Kernel 6.7.0 ') {
                     steps {
-                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue',  name: 'base_os', value: 'debian12'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.2_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_sdtest', parameters: [[$class: 'StringParameterValue',  name: 'base_os', value: 'debian12'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']]], propagate: true, wait: true
                     }
                }
 

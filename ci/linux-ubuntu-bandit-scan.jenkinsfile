@@ -3,7 +3,7 @@ pipeline{
     // ensure agent is installed with Bandit package
     // sudo apt install bandit
     agent {
-        label 'graphene_20.04_6.0_WilsonCity'
+        label 'graphene_24.04_6.8_WilsonCity'
     }
     options {
         skipDefaultCheckout()
