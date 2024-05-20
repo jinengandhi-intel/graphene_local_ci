@@ -57,13 +57,13 @@ stage('Build Workloads') {
             sh 'cp -rf test/centos8-helloworld.dockerfile test/helloworld.dockerfile'
         } else {
             sh '''
-                cp -rf test/ubuntu20.04-hello-world.dockerfile test/helloworld.dockerfile
-                sed -i -e "s/FROM ubuntu:20.04/FROM $distro_ver/g" test/helloworld.dockerfile
+                cp -rf test/ubuntu22.04-hello-world.dockerfile test/helloworld.dockerfile
+                sed -i -e "s/FROM ubuntu:22.04/FROM $distro_ver/g" test/helloworld.dockerfile
             '''
         }
         sh '''
             docker build --tag helloworld-test --build-arg BUILD_OS=${distro_ver} --file test/helloworld.dockerfile .
-            ./gsc build -nc --insecure-args helloworld-test test/ubuntu20.04-hello-world.manifest
+            ./gsc build -nc --insecure-args helloworld-test test/ubuntu22.04-hello-world.manifest
             ./gsc sign-image --remove-gramine-deps helloworld-test enclave-key.pem
             ./gsc info-image gsc-helloworld-test
         '''
