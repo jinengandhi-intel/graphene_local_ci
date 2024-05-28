@@ -14,9 +14,18 @@ class TestClass:
         if not output:
             print("Libfuzzer execution failure!!!")
             assert False
-            return
         gramine_fuzzing_libs.verify_libfuzzer(testname)
         utils.generate_report(testname, filesize, TIMEOUT, ITERATIONS)
+
+    def test_fuzzing_with_pytorch_model(self):
+        testname = os.environ.get('PYTEST_CURRENT_TEST').split(':')[-1].split(' ')[0]
+        utils.generate_pytorch_pre_trained_model()
+        output = gramine_fuzzing_libs.run_libfuzzer(testname, ITERATIONS, TIMEOUT)
+        if not output:
+            print("Libfuzzer execution failure!!!")
+            assert False
+        gramine_fuzzing_libs.verify_libfuzzer(testname)
+        utils.generate_report(testname, 'pytorch_model', TIMEOUT, ITERATIONS)
         
     def test_fuzzing_with_corrupt_file(self):
         filesize = 1024
@@ -32,15 +41,3 @@ class TestClass:
         output = gramine_fuzzing_libs.run_libfuzzer_wrong_insecure_key(filesize, testname, insecure_key_value)
         print('output of the libfuzzer with wrong insecure key ' + str(output))
         assert output
-
-    def test_fuzzing_with_pytorch_model(self):
-        testname = os.environ.get('PYTEST_CURRENT_TEST').split(':')[-1].split(' ')[0]
-        utils.generate_pytorch_pre_trained_model()
-        output = gramine_fuzzing_libs.run_libfuzzer(testname, ITERATIONS, TIMEOUT)
-        if not output:
-            print("Libfuzzer execution failure!!!")
-            assert False
-            return
-        gramine_fuzzing_libs.verify_libfuzzer(testname)
-        utils.generate_report(testname, 'pytorch_model', TIMEOUT, ITERATIONS)
-

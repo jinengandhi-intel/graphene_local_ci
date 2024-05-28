@@ -49,7 +49,7 @@ APT_FIX_BROKEN_CMD = "sudo apt --fix-broken install -y"
 SYS_PACKAGES_CMD = "sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y "
 
 # -U option is to install the latest package (if upgrade is available).
-PYTHON_PACKAGES_CMD = "python3 -m pip install -U "
+PYTHON_PACKAGES_CMD = "sudo apt-get satisfy -y "
 
 PIP_UPGRADE_CMD = "python3 -m pip install --upgrade pip"
 

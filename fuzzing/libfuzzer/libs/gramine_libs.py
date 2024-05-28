@@ -56,24 +56,16 @@ def setup_gramine_environment():
 def install_gramine_dependencies():
     print("\n###### In install_gramine_dependencies #####\n")
 
-    # Determine the distro and the corresponding version.
-    # Choose the respective packages.txt based on the distro version.
-    distro, distro_version = utils.get_distro_and_version()
-    print(f"\n-- Installing gramine dependencies for Distro: {distro}  Version: {distro_version}\n")
-    
-    if distro == 'ubuntu':
-        # Read the system packages yaml file and update the actual system_packages string
-        system_packages_path = os.path.join(FRAMEWORK_HOME_DIR, 'common/config', SYSTEM_PACKAGES_FILE)
-        system_packages = utils.read_config_yaml(system_packages_path)
-        system_packages_str = system_packages['Default']
+    # Read the system packages yaml file and update the actual system_packages string
+    system_packages_path = os.path.join(FRAMEWORK_HOME_DIR, 'common/config', SYSTEM_PACKAGES_FILE)
+    system_packages = utils.read_config_yaml(system_packages_path)
+    system_packages_str = system_packages['Default']
 
-        # Read the python packages yaml file and update the actual python_packages string
-        python_packages_path = os.path.join(FRAMEWORK_HOME_DIR, 'common/config', PYTHON_PACKAGES_FILE)
-        python_packages = utils.read_config_yaml(python_packages_path)
-        python_packages_str = python_packages['Default']
+    # Read the python packages yaml file and update the actual python_packages string
+    python_packages_path = os.path.join(FRAMEWORK_HOME_DIR, 'common/config', PYTHON_PACKAGES_FILE)
+    python_packages = utils.read_config_yaml(python_packages_path)
+    python_packages_str = python_packages['Default']
 
-    else:
-        pytest.exit("\n***** Unknown / Unsupported Distro.. Exiting test session. *****")
 
     print("\n-- Executing below mentioned system update cmd..\n", APT_UPDATE_CMD)
     utils.exec_shell_cmd(APT_UPDATE_CMD)
