@@ -5,7 +5,6 @@ import shutil
 import socket
 import psutil
 import subprocess
-import lsb_release
 import csv
 from datetime import datetime
 import collections
@@ -86,13 +85,6 @@ def read_config_yaml(config_file_path):
         except yaml.YAMLError as exc:
             raise Exception(exc)
     return config_dict
-
-
-def get_distro_and_version():
-    distro = lsb_release.get_distro_information().get('ID').lower()
-    distro_version = lsb_release.get_distro_information().get('RELEASE')
-    return distro, distro_version
-
 
 def cleanup_gramine_binaries(build_prefix):
     """
