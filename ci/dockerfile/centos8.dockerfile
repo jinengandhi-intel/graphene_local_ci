@@ -1,5 +1,8 @@
 FROM quay.io/centos/centos:stream8
 
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-*
+RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*
+
 RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
 
 RUN dnf copr enable -y ngompa/musl-libc
