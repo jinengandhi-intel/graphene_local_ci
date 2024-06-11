@@ -22,6 +22,7 @@ timestamps {
                         ulimit -Sa
                         ulimit -n 65535
                         ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
                         $cmd stress-ng --job hdd.job --temp-path /tmp 2>&1 | tee hdd.log
                     '''
                 }
@@ -41,6 +42,7 @@ timestamps {
                             ulimit -Sa
                             ulimit -n 65535
                             ulimit -Sa
+                            rm -rf /tmp/* 2>&1 | tee error.log
                             $cmd stress-ng --job seek.job --temp-path /tmp 2>&1 | tee seek.log
                         '''
                     }
@@ -60,6 +62,7 @@ timestamps {
                         ulimit -Sa
                         ulimit -n 65535
                         ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
                         $cmd stress-ng --job seek-hdd.job --temp-path /tmp 2>&1 | tee seek-hdd.log
                     '''
                 }
@@ -78,6 +81,7 @@ timestamps {
                         ulimit -Sa
                         ulimit -n 65535
                         ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
                         $cmd stress-ng --job filesystem.job --temp-path /tmp 2>&1 | tee filesystem.log
                     '''
                 }
@@ -96,6 +100,7 @@ timestamps {
                         ulimit -Sa
                         ulimit -n 65535
                         ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
                         $cmd stress-ng --job filesystem_all.job --temp-path /tmp 2>&1 | tee filesystem_all.log
                     '''
                 }
@@ -114,6 +119,7 @@ timestamps {
                         ulimit -Sa
                         ulimit -n 65535
                         ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
                         $cmd stress-ng --job scheduler.job --temp-path /tmp 2>&1 | tee scheduler.log
                     '''
                 }
@@ -132,6 +138,7 @@ timestamps {
                         ulimit -Sa
                         ulimit -n 65535
                         ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
                         $cmd stress-ng --job scheduler_all.job --temp-path /tmp 2>&1 | tee scheduler_all.log
                     '''
                 }
@@ -150,6 +157,7 @@ timestamps {
                         ulimit -Sa
                         ulimit -n 65535
                         ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
                         $cmd stress-ng --job interrupt.job --temp-path /tmp 2>&1 | tee interrupt.log
                     '''
                 }
@@ -168,6 +176,7 @@ timestamps {
                         ulimit -Sa
                         ulimit -n 65535
                         ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
                         $cmd stress-ng --job interrupt_all.job --temp-path /tmp 2>&1 | tee interrupt_all.log
                     '''
                 }
