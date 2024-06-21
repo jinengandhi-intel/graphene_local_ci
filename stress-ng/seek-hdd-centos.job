@@ -23,6 +23,6 @@ verbose
 #
 
 seek 8 --hdd 8 --timeout 90s
-seek 0 --hdd 0 --timeout 90s
+seek 60 --hdd 60 --timeout 90s
 # seek 8 --hdd 8 --aggressive --timeout 90s
 # seek 0 --hdd 0 --aggressive --timeout 120s
