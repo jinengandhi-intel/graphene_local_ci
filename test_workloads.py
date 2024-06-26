@@ -113,7 +113,6 @@ class Test_Workload_Results():
             assert(("Loop iteration 1 finished" in sdtest_contents_32gb) and ("exit: pass" in sdtest_contents_32gb))
 
     @pytest.mark.examples
-    @pytest.mark.skipif(base_os == "debian11", reason='rust is not working on debian currently')
     def test_rust_workload(self):
         data = open("CI-Examples/rust/RESULT", "r")
         result_file = data.read().split("Result file: ")[1].strip()
@@ -131,7 +130,7 @@ class Test_Workload_Results():
         assert("Final Count is:" in jdk_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((base_os not in ["ubuntu20.04", "centos8", "rhel8"]) \
+    @pytest.mark.skipif((base_os not in ["ubuntu20.04"]) \
                 or (("dcap" in node_label) and sgx_mode == '1'), \
                     reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
     def test_tensorflow_workload(self):
@@ -234,7 +233,7 @@ class Test_Workload_Results():
         assert("Hello, world" in helloworld_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((base_os not in ["ubuntu20.04", "ubuntu22.04", "debian11"])
+    @pytest.mark.skipif((base_os not in ["ubuntu20.04", "ubuntu22.04"])
             or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Scikit-learn enabled for Ubuntu & Debian 11 Server Configurations.")
     def test_scikit_workload(self):
@@ -274,7 +273,7 @@ class Test_Workload_Results():
         assert('"Hello World! Let\'s check escaped symbols: < & > "' in gsc_helloworld_log)
 
     @pytest.mark.gsc
-    @pytest.mark.skipif(distro_ver != "debian:11", reason='java-spring-boot is enabled only on debian11 currently')
+    @pytest.mark.skipif(distro_ver != "debian:11", reason='java-simple is enabled only on debian11 currently')
     def test_gsc_java_simple(self):
         gsc_java_simple_result = open("openjdk-simple_result", "r")
         gsc_java_simple_log = gsc_java_simple_result.read()
