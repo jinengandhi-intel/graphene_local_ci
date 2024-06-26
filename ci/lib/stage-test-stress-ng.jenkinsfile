@@ -33,7 +33,7 @@ timestamps {
             }
         }
 
-        if (!((env.base_os == "rhel8") && (env.SGX != "1"))) {
+        if (!((env.base_os == "rhel9") && (env.SGX != "1"))) {
             stage('seek') {
                 try {
                     timeout(time: 20, unit: 'MINUTES') {
