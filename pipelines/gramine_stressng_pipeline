@@ -69,12 +69,6 @@ pipeline {
                     }
                 }
 
-                stage ('Invoke Gramine Native Suite with Debian 11 Kernel 6.1') {
-                    steps {
-                        build job: 'local_ci_graphene_native_debian_11_6.1', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_non_sgx_20.04_5.15'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "debian11"]], propagate: true, wait: true
-                    }
-                }
-
                 stage ('Invoke Graphene Native Suite with Debian 12 Kernel 6.1') {
                     steps {
                         build job: 'local_ci_graphene_native_debian_12_6.1', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_non_sgx_20.04_5.15'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "debian12"]], propagate: true, wait: true
@@ -89,13 +83,13 @@ pipeline {
               
                 stage ('Invoke RHEL9 with 6.7 Gramine SGX Suite ') {
                     steps {
-                        build job: 'local_ci_graphene_sgx_rhel_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel9_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_sgx_rhel9_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel9_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"]], propagate: true, wait: true
                     }
                 }
 
                 stage ('Invoke RHEL9 with 6.7 Gramine Native Suite ') {
                     steps {
-                        build job: 'local_ci_graphene_native_rhel_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel8_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_rhel9_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel9_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'True'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"]], propagate: true, wait: true
                     }
                 }
 
