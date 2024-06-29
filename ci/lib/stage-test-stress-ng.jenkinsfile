@@ -28,6 +28,7 @@ timestamps {
                             $cmd stress-ng --job hdd_centos.job --temp-path /tmp 2>&1 | tee hdd.log
                         else
                             $cmd stress-ng --job hdd.job --temp-path /tmp 2>&1 | tee hdd.log
+                        fi
                     '''
                 }
             } catch (Exception e) {
@@ -52,6 +53,7 @@ timestamps {
                                $cmd stress-ng --job seek_centos.job --temp-path /tmp 2>&1 | tee seek.log
                             else
                                $cmd stress-ng --job seek.job --temp-path /tmp 2>&1 | tee seek.log
+                            fi
                         '''
                     }
                 } catch (Exception e) {
@@ -76,7 +78,7 @@ timestamps {
                             $cmd stress-ng --job seek-hdd-centos.job --temp-path /tmp 2>&1 | tee seek-hdd.log
                         else
                             $cmd stress-ng --job seek-hdd.job --temp-path /tmp 2>&1 | tee seek-hdd.log
-
+                        fi
                     '''
                 }
             } catch (Exception e) {
@@ -100,6 +102,7 @@ timestamps {
                             $cmd stress-ng --job filesystem_centos.job --temp-path /tmp 2>&1 | tee filesystem.log
                         else
                             $cmd stress-ng --job filesystem.job --temp-path /tmp 2>&1 | tee filesystem.log
+                        fi
                     '''
                 }
             } catch (Exception e) {
@@ -123,6 +126,7 @@ timestamps {
                             $cmd stress-ng --job filesystem_all_centos.job --temp-path /tmp 2>&1 | tee filesystem_all.log
                         else
                             $cmd stress-ng --job filesystem_all.job --temp-path /tmp 2>&1 | tee filesystem_all.log
+                        fi
                     '''
                 }
             } catch (Exception e) {
