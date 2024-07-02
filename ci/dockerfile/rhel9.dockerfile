@@ -71,11 +71,9 @@ RUN dnf update -y \
         python3-devel \
         python3-jinja2 \
         python3-lxml \
-        python3-numpy \
         python3-pkg-resources \
         python3-pyelftools \
         python3-pytest \
-        python3-scipy \
         python3-voluptuous \
         R-core \
         strace \
@@ -96,7 +94,9 @@ RUN python3 -B -m pip install -U \
     'meson>=0.56,!=1.2.*' \
     six \
     torchvision \
-    pillow
+    pillow \
+    numpy \
+    scipy 
 
 # Install wrk2 benchmark. This benchmark is used in `benchmark-http.sh`.
 RUN git clone https://github.com/giltene/wrk2.git \

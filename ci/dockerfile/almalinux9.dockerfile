@@ -71,13 +71,11 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     python3-devel \
     python3-jinja2 \
     python3-lxml \
-    python3-numpy \
     python3-pkg-resources \
     python3-pip \
     python3-protobuf \
     python3-pyelftools \
     python3-pytest \
-    python3-scipy \
     python3-voluptuous \
     R-core \
     strace \
@@ -105,6 +103,8 @@ RUN python3 -m pip install -U \
     six \
     torchvision \
     pillow \
+    numpy \
+    scipy \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \
     'meson>=0.56,<0.57'
