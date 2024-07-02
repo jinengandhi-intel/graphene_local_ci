@@ -64,13 +64,11 @@ RUN dnf config-manager --set-enabled -y crb && \
         python3-devel \
         python3-jinja2 \
         python3-lxml \
-        python3-numpy \
         python3-pkg-resources \
         python3-pip \
         python3-protobuf \
         python3-pyelftools \
         python3-pytest \
-        python3-scipy \
         python3-voluptuous \
         R-core \
         strace \
@@ -97,6 +95,8 @@ RUN git clone https://github.com/giltene/wrk2.git \
 
 RUN python3 -m pip install -U \
     six \
+    numpy \
+    scipy \
     torchvision \
     pillow \
     'tomli>=1.1.0' \
