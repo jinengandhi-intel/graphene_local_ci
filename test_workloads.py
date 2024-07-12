@@ -255,7 +255,7 @@ class Test_Workload_Results():
     def test_gsc_bash_workload(self):
         gsc_bash_result = open("bash_result", "r")
         gsc_bash_log = gsc_bash_result.read()
-        if (os_release_id == "debian") or ("redhat" in os_release_id):
+        if (os_release_id == "debian") or ("redhat" in os_release_id) or (os_release_id == "quay.io/centos/centos"):
             assert(re.search('boot(.*)home(.*)proc', gsc_bash_log, re.DOTALL))
         else:
             assert(re.search('Mem:(.*)Swap:', gsc_bash_log, re.DOTALL))
@@ -300,7 +300,7 @@ class Test_Workload_Results():
     def test_gsc_gramine_build_bash_workload(self):
         gsc_bash_result = open("build_gramine_bash_result", "r")
         gsc_bash_log = gsc_bash_result.read()
-        if (os_release_id == "debian") or ("redhat" in os_release_id):
+        if (os_release_id == "debian") or ("redhat" in os_release_id) or (os_release_id == "quay.io/centos/centos"):
             assert(re.search('boot(.*)home(.*)proc', gsc_bash_log, re.DOTALL))
         else:
             assert(re.search('Mem:(.*)Swap:', gsc_bash_log, re.DOTALL))
