@@ -1,6 +1,6 @@
 stage('Test') {
     try {
-        if ((env.os_release_id == "debian") || env.os_release_id.contains("redhat")) {
+        if ((env.os_release_id == "debian") || env.os_release_id.contains("redhat") || (env.os_release_id == "quay.io/centos/centos")) {
             env.runtime_args = "-c ls"
         } else {
             env.runtime_args = "-c free"
@@ -29,7 +29,7 @@ stage('Test') {
     } catch (Exception e) {}
 
     try {
-        if ((env.os_release_id == "debian") || env.os_release_id.contains("redhat")) {
+        if ((env.os_release_id == "debian") || env.os_release_id.contains("redhat") || (env.os_release_id == "quay.io/centos/centos")) {
             env.runtime_args = "-c ls"
         } else {
             env.runtime_args = "-c free"
