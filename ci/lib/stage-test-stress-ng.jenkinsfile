@@ -8,9 +8,9 @@ timestamps {
             env.cmd = "gramine-direct"
         }
     
-        stage('hdd') {
+        stage('filesystem') {
             try {
-                timeout(time: 90, unit: 'MINUTES') {
+                timeout(time: 45, unit: 'MINUTES') {
                     sh '''
                         cd CI-Examples/stress-ng
                         if test -n "$SGX"
@@ -25,9 +25,33 @@ timestamps {
                         rm -rf /tmp/* 2>&1 | tee error.log
                         if [ "${base_os}" = 'centos9' ]
                         then
-                            $cmd stress-ng --job hdd_centos.job --temp-path /tmp 2>&1 | tee hdd.log
+                            $cmd stress-ng --job filesystem_centos.job --temp-path /tmp 2>&1 | tee filesystem.log
                         else
-                            $cmd stress-ng --job hdd.job --temp-path /tmp 2>&1 | tee hdd.log
+                            $cmd stress-ng --job filesystem.job --temp-path /tmp 2>&1 | tee filesystem.log
+                        fi
+                    '''
+                }
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+            }
+        }                   
+
+        stage('filesystem_all') {
+            try {
+                timeout(time: 45, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
+                        if [ "${base_os}" = 'centos9' ]
+                        then
+                            $cmd stress-ng --job filesystem_all_centos.job --temp-path /tmp 2>&1 | tee filesystem_all.log
+                        else
+                            $cmd stress-ng --job filesystem_all.job --temp-path /tmp 2>&1 | tee filesystem_all.log
                         fi
                     '''
                 }
@@ -61,78 +85,6 @@ timestamps {
                 } finally {
                     archiveArtifacts 'CI-Examples/stress-ng/*.log'
                 }
-            }
-        }
-
-        stage('seek-hdd') {
-            try {
-                timeout(time: 20, unit: 'MINUTES') {
-                    sh '''
-                        cd CI-Examples/stress-ng
-                        ulimit -Sa
-                        ulimit -n 65535
-                        ulimit -Sa
-                        rm -rf /tmp/* 2>&1 | tee error.log
-                        if [ "${base_os}" = 'centos9' ]
-                        then
-                            $cmd stress-ng --job seek-hdd-centos.job --temp-path /tmp 2>&1 | tee seek-hdd.log
-                        else
-                            $cmd stress-ng --job seek-hdd.job --temp-path /tmp 2>&1 | tee seek-hdd.log
-                        fi
-                    '''
-                }
-            } catch (Exception e) {
-
-            } finally {
-                archiveArtifacts 'CI-Examples/stress-ng/*.log'
-            }
-        }
-
-        stage('filesystem') {
-            try {
-                timeout(time: 90, unit: 'MINUTES') {
-                    sh '''
-                        cd CI-Examples/stress-ng
-                        ulimit -Sa
-                        ulimit -n 65535
-                        ulimit -Sa
-                        rm -rf /tmp/* 2>&1 | tee error.log
-                        if [ "${base_os}" = 'centos9' ]
-                        then
-                            $cmd stress-ng --job filesystem_centos.job --temp-path /tmp 2>&1 | tee filesystem.log
-                        else
-                            $cmd stress-ng --job filesystem.job --temp-path /tmp 2>&1 | tee filesystem.log
-                        fi
-                    '''
-                }
-            } catch (Exception e) {
-
-            } finally {
-                archiveArtifacts 'CI-Examples/stress-ng/*.log'
-            }
-        }                   
-
-        stage('filesystem_all') {
-            try {
-                timeout(time: 90, unit: 'MINUTES') {
-                    sh '''
-                        cd CI-Examples/stress-ng
-                        ulimit -Sa
-                        ulimit -n 65535
-                        ulimit -Sa
-                        rm -rf /tmp/* 2>&1 | tee error.log
-                        if [ "${base_os}" = 'centos9' ]
-                        then
-                            $cmd stress-ng --job filesystem_all_centos.job --temp-path /tmp 2>&1 | tee filesystem_all.log
-                        else
-                            $cmd stress-ng --job filesystem_all.job --temp-path /tmp 2>&1 | tee filesystem_all.log
-                        fi
-                    '''
-                }
-            } catch (Exception e) {
-
-            } finally {
-                archiveArtifacts 'CI-Examples/stress-ng/*.log'
             }
         }
 
@@ -203,6 +155,54 @@ timestamps {
                         ulimit -Sa
                         rm -rf /tmp/* 2>&1 | tee error.log
                         $cmd stress-ng --job interrupt_all.job --temp-path /tmp 2>&1 | tee interrupt_all.log
+                    '''
+                }
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+            }
+        }
+
+        stage('seek-hdd') {
+            try {
+                timeout(time: 45, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
+                        if [ "${base_os}" = 'centos9' ]
+                        then
+                            $cmd stress-ng --job seek-hdd-centos.job --temp-path /tmp 2>&1 | tee seek-hdd.log
+                        else
+                            $cmd stress-ng --job seek-hdd.job --temp-path /tmp 2>&1 | tee seek-hdd.log
+                        fi
+                    '''
+                }
+            } catch (Exception e) {
+
+            } finally {
+                archiveArtifacts 'CI-Examples/stress-ng/*.log'
+            }
+        }
+
+        stage('hdd') {
+            try {
+                timeout(time: 45, unit: 'MINUTES') {
+                    sh '''
+                        cd CI-Examples/stress-ng
+                        ulimit -Sa
+                        ulimit -n 65535
+                        ulimit -Sa
+                        rm -rf /tmp/* 2>&1 | tee error.log
+                        if [ "${base_os}" = 'centos9' ]
+                        then
+                            $cmd stress-ng --job hdd_centos.job --temp-path /tmp 2>&1 | tee hdd.log
+                        else
+                            $cmd stress-ng --job hdd.job --temp-path /tmp 2>&1 | tee hdd.log
+                        fi
                     '''
                 }
             } catch (Exception e) {
