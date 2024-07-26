@@ -1,9 +1,9 @@
 stage('checkout'){
-    if (env.gramine_version != null) {
-        if ((env.gramine_repo == "unstable") || (env.gramine_version.contains("update"))) {
+    if (env.gramine_branch != null) {
+        if ((env.gramine_repo == "unstable") || (env.gramine_version == "update")) {
             sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git """
         } else {
-            sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git -b ${env.gramine_version}"""
+            sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git -b ${env.gramine_branch}"""
         }
     } else {
         if (["stable", "unstable", "", null].contains(env.gramine_repo)) {
@@ -16,10 +16,8 @@ stage('checkout'){
             env.gramine_branch = "master"
         }
 
-        dir ("gramine") {
-            git url: gramine_git,
-            branch: gramine_branch
-        }
+	sh """ git clone --depth 1 https://github.com/gramineproject/gramine.git -b ${env.gramine_branch}"""
+
     }
 
     dir ('examples') {
