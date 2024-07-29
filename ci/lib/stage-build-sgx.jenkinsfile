@@ -92,26 +92,26 @@ stage('build') {
             if (env.build_type == "package-local") {
                 sh "sudo dnf install ./packages/${env.package_version} -y"
             } else {
-                if (env.gramine_repo == "unstable") {
+                if (env.gramine_release == "unstable") {
                     sh 'sudo yum install -y gramine --enablerepo=gramine-unstable'
                 } else {
                     sh 'sudo yum install -y gramine'
                 }
             }
-            if (env.gramine_version.contains("update")) {
+            if (env.gramine_branch.contains("_update")) {
                 sh 'sudo yum update -y && sudo yum upgrade -y --enablerepo=gramine-unstable'
             }
         } else {
             env.ubuntu_repo = sh(returnStdout: true, script: 'lsb_release -sc').trim()
 
-            if (env.gramine_repo == "unstable") {
-                env.gramine_branch = "unstable-${ubuntu_repo}"
+            if (env.gramine_release == "unstable") {
+                env.package_repo = "unstable-${ubuntu_repo}"
             } else {
-                env.gramine_branch = "${ubuntu_repo}"
+                env.package_repo = "${ubuntu_repo}"
             }
 
             sh '''
-                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ ${gramine_branch} main" | sudo tee /etc/apt/sources.list.d/gramine.list
+                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ ${package_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
                 sudo apt-get update -y
             '''
 
@@ -125,7 +125,7 @@ stage('build') {
             }
 
             sh 'sudo apt-get update'
-            if (env.gramine_version.contains("update")) {
+            if (env.gramine_branch.contains("_update")) {
                 sh '''
                     echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ unstable-${ubuntu_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
                     sudo apt-get update -y && sudo apt-get --with-new-pkgs -y upgrade
