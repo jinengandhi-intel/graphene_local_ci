@@ -1,0 +1,79 @@
+properties([
+    parameters([
+        string(defaultValue: '14400', name: 'timeout')
+    ])
+])
+
+pipeline{
+    agent{
+        label 'graphene_spec'
+    }
+
+    stages{
+        stage('checkout scm'){
+            steps{
+                cleanWs()
+                checkout scm
+            }
+        }
+
+        stage('create sanize_cpuid file'){
+            steps{
+                dir('fuzzing/cpuid/gramine'){
+                    git branch: 'master', url: 'https://github.com/gramineproject/gramine.git'
+                }
+                sh '''
+                    cd fuzzing/cpuid
+                    cp -f gramine/common/include/arch/x86_64/cpu.h cpu.h
+                    chmod +x create_sanize_cpuid.sh
+                    ./create_sanize_cpuid.sh gramine get_cpuid_from_cache add_cpuid_to_cache sanitize_cpuid sanize_cpuid.c
+                '''
+            }
+        }
+
+        stage("run address sanitizer"){
+            steps{
+                dir('fuzzing/cpuid'){
+                    sh '''
+                        clang -fsanitize=fuzzer,address -fprofile-instr-generate -fcoverage-mapping -mllvm -runtime-counter-relocation sanize_cpuid.c -o santize_cpuid
+                        LLVM_PROFILE_FILE="santize_cpuid.profraw" ./santize_cpuid values_corpus -max_total_time=${timeout} 2>&1 | tee address_santize.log
+                        llvm-profdata merge -sparse santize_cpuid.profraw -o santize_cpuid.profdata
+                        llvm-cov report ./santize_cpuid -instr-profile=santize_cpuid.profdata | tee address_santize.report
+                        llvm-cov show ./santize_cpuid -instr-profile=santize_cpuid.profdata | tee address_santize.functioncalls
+                        chmod +x generate_cpuid_reports.sh
+                        ./generate_cpuid_reports.sh address_santize.log address
+                    '''
+                }
+            }
+            post {
+                always {
+                    dir('fuzzing/cpuid/'){
+                        archiveArtifacts 'address_santize*, cpuid_libfuzzer_address*.csv'
+                    }
+                }
+            }
+        }
+        stage("run memory sanitizer"){
+            steps{
+                dir('fuzzing/cpuid'){
+                    sh """
+                        find values_corpus/ -type f ! -name "*.txt" -print0 | xargs -0 rm -rf
+                        clang -fsanitize=fuzzer,memory -fprofile-instr-generate -fcoverage-mapping -mllvm -runtime-counter-relocation sanize_cpuid.c -o santize_cpuid_mem
+                        LLVM_PROFILE_FILE="santize_cpuid_mem.profraw" ./santize_cpuid_mem values_corpus -max_total_time=${timeout} 2>&1 | tee memory_santize.log
+                        llvm-profdata merge -sparse santize_cpuid_mem.profraw -o santize_cpuid_mem.profdata
+                        llvm-cov report ./santize_cpuid_mem -instr-profile=santize_cpuid_mem.profdata | tee memory_santize.report
+                        llvm-cov show ./santize_cpuid_mem -instr-profile=santize_cpuid_mem.profdata | tee memory_santize.functioncalls
+                        ./generate_cpuid_reports.sh memory_santize.log memory
+                    """
+                }
+            }
+            post {
+                always {
+                    dir('fuzzing/cpuid/'){
+                        archiveArtifacts 'memory_santize*, cpuid_libfuzzer_memory*.csv'
+                    }
+                }
+            }
+        }
+    }
+}
