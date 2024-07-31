@@ -12,7 +12,7 @@ pipeline {
                 stage ('Invoke Ubuntu 20.04 with 6.2 Gramine native Jobs') {
                     steps {
                         sleep(time: 20, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_20.04_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_non_sgx_20.04_5.15'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_20.04_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
                     }
                 }
 
@@ -25,7 +25,7 @@ pipeline {
                 stage ('Invoke Ubuntu 22.04 with 5.19 Gramine native Suite') {
                     steps {
                         sleep(time: 60, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_22.04_5.19', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_non_sgx_20.04_5.15'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu22.04"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_22.04_5.19', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu22.04"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
                     }
                 }
 
@@ -82,19 +82,6 @@ pipeline {
                     }
                 }
 
-                stage ('Invoke CentOS 8 with 6.2 Gramine Native Suite ') {
-                    steps {
-                        sleep(time: 30, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_centos_8_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "centos8"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
-                    }
-                }
-
-                stage ('Invoke CentOS 8 with 6.2 Gramine SGX Suite ') {
-                    steps {
-                        build job: 'local_ci_graphene_sgx_centos_8_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_centos_8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "centos8"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
-                    }
-                }
-
                 stage ('Invoke CentOS Stream 9 with 6.2 Gramine Native Suite ') {
                     steps {
                         sleep(time: 30, unit: "MINUTES")
@@ -123,20 +110,6 @@ pipeline {
                     }
                 }
 
-                stage ('Invoke Gramine Native Suite with Debian 11 Kernel 6.1') {
-                    steps {
-                        sleep(time: 30, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_debian_11_6.1', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_non_sgx_20.04_5.15'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "debian11"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
-                    }
-                }
-
-                stage ('Invoke Gramine SGX Suite with Debian 11 Kernel 6.1') {
-                    steps {
-                        sleep(time: 30, unit: "MINUTES")
-                        build job: 'local_ci_graphene_sgx_debian_11_6.1', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "debian11"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
-                    }
-                }
-
                 stage ('Invoke OOT with 5.15 Gramine Native Suite') {
                     steps {
                         sleep(time: 45, unit: "MINUTES")
@@ -151,29 +124,16 @@ pipeline {
                     }
                 }
 
-                stage ('Invoke RHEL 8 with 6.2 Gramine Native Suite ') {
+                stage ('Invoke RHEL 9 with 6.7 Gramine Native Suite ') {
                     steps {
                         sleep(time: 45, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_rhel_server_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel8"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_rhel9_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
                     }
                 }
 
-                stage ('Invoke RHEL 8 with 6.2 Gramine SGX Suite ') {
+                stage ('Invoke RHEL 9 with 6.7 Gramine SGX Suite ') {
                     steps {
-                        build job: 'local_ci_graphene_sgx_rhel_server_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel8"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
-                    }
-                }
-
-                stage ('Invoke RHEL 9 with 6.2 Gramine Native Suite ') {
-                    steps {
-                        sleep(time: 45, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_rhel9_server_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
-                    }
-                }
-
-                stage ('Invoke RHEL 9 with 6.2 Gramine SGX Suite ') {
-                    steps {
-                        build job: 'local_ci_graphene_sgx_rhel9_server_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_sgx_rhel9_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
                     }
                 }
 

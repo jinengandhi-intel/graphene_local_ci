@@ -48,7 +48,7 @@ class Test_StressNG_Results():
         test_results = parse_test_logs("hdd.log")
         assert(len(test_results["Fail"]) == 0)
 
-    @pytest.mark.skipif(((base_os == "rhel8") and sgx_mode != '1'),
+    @pytest.mark.skipif(((base_os == "rhel9") and sgx_mode != '1'),
                     reason="Stress-ng seek is having issues with linux native")
     def test_stress_ng_seek(self):
         test_results = parse_test_logs("seek.log")

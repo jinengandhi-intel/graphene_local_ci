@@ -6,7 +6,7 @@ stage('test-examples') {
         env.MODE = "direct"
     }
 
-    if (["ubuntu20.04", "rhel8", "centos8"].contains(env.base_os)) {
+    if (["ubuntu20.04"].contains(env.base_os)) {
         try {
             timeout(time: 60, unit: 'MINUTES') {
                 sh '''
@@ -110,30 +110,28 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if (env.base_os != "debian11") {
-        try {
-            timeout(time: 30, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/rust
-                    export PID=$(lsof -t -i:3000)
-                    if [ "$PID" != "" ]
-                    then
-                        echo "Killing $PID"
-                        kill -9 $PID
-                    fi
-                    if [ "${os_release_id}" = "alpine" ]
-                    then
-                        sed -i -e '/^fs.mounts = \\[.*/a \\{ path = "\\/usr\\/{{ arch_libdir }}", uri="file:\\/usr\\/{{ arch_libdir }}" },' rust-hyper-http-server.manifest.template
-                        sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/{{ arch_libdir }}\\/\\"," rust-hyper-http-server.manifest.template
-                    fi
-                    make ${MAKEOPTS}
-                    make ${MAKEOPTS} start-gramine-server &
-                    ../../scripts/wait_for_server 300 127.0.0.1 3000
-                    LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:3000 | tee RESULT
-                '''
-            }
-        } catch (Exception e) { }
-    }
+    try {
+        timeout(time: 30, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/rust
+                export PID=$(lsof -t -i:3000)
+                if [ "$PID" != "" ]
+                then
+                    echo "Killing $PID"
+                    kill -9 $PID
+                fi
+                if [ "${os_release_id}" = "alpine" ]
+                then
+                    sed -i -e '/^fs.mounts = \\[.*/a \\{ path = "\\/usr\\/{{ arch_libdir }}", uri="file:\\/usr\\/{{ arch_libdir }}" },' rust-hyper-http-server.manifest.template
+                    sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/{{ arch_libdir }}\\/\\"," rust-hyper-http-server.manifest.template
+                fi
+                make ${MAKEOPTS}
+                make ${MAKEOPTS} start-gramine-server &
+                ../../scripts/wait_for_server 300 127.0.0.1 3000
+                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:3000 | tee RESULT
+            '''
+        }
+    } catch (Exception e) { }
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
         if (!["ubuntu24.04", "alpine3.18"].contains(env.base_os)) {
@@ -199,7 +197,7 @@ stage('test-examples') {
             } catch (Exception e) { }
         }
 
-        if (["ubuntu20.04", "ubuntu22.04", "debian11"].contains(env.base_os)) {
+        if (["ubuntu20.04", "ubuntu22.04"].contains(env.base_os)) {
             try {
                 timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
                     sh '''

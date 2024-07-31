@@ -8,8 +8,8 @@ stage('Build Workloads') {
 
     // Build Bash Workload
     try {
-        if ((env.os_release_id == "centos") || env.os_release_id.contains("redhat")) {
-            sh 'cp -rf test/centos8-bash.dockerfile test/bash.dockerfile'
+        if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
+            sh 'cp -rf test/centos-bash.dockerfile test/bash.dockerfile'
         } else {
             sh '''
                 cp -rf test/ubuntu20.04-bash.dockerfile test/bash.dockerfile
@@ -53,8 +53,8 @@ stage('Build Workloads') {
 
     // Build Bash HelloWorld Workload
     try {
-        if ((env.os_release_id == "centos") || env.os_release_id.contains("redhat")) {
-            sh 'cp -rf test/centos8-helloworld.dockerfile test/helloworld.dockerfile'
+        if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
+            sh 'cp -rf test/centos-helloworld.dockerfile test/helloworld.dockerfile'
         } else {
             sh '''
                 cp -rf test/ubuntu22.04-hello-world.dockerfile test/helloworld.dockerfile
@@ -71,8 +71,8 @@ stage('Build Workloads') {
 
     // GSC build-gramine Bash Workload
     try {
-        if ((env.os_release_id == "centos") || env.os_release_id.contains("redhat")) {
-            sh 'cp -rf test/centos8-bash.dockerfile test/bash.dockerfile'
+        if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
+            sh 'cp -rf test/centos-bash.dockerfile test/bash.dockerfile'
         } else {
             sh '''
                 cp -rf test/ubuntu20.04-bash.dockerfile test/bash.dockerfile

@@ -11,13 +11,19 @@ pipeline {
             parallel {
                 stage ('Invoke GSC with Ubuntu 20.04') {
                     steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:20.04"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:20.04"]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke GSC with Ubuntu 22.04') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:22.04"]], propagate: true, wait: true
                     }
                 }
 
                 stage ('Invoke GSC with CentOS 8') {
                     steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_centos_8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "centos:8"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "centos:8"]], propagate: true, wait: true
                     }
                 }
 
@@ -33,15 +39,15 @@ pipeline {
                     }
                 }
 
-                stage ('Invoke GSC with Redhat UBI 8') {
+                stage ('Invoke GSC with Redhat UBI9-Minimal') {
                     steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "redhat/ubi8:8.8"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel9_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "redhat/ubi9-minimal:9.4"]], propagate: true, wait: true
                     }
                 }
 
-                stage ('Invoke GSC with Redhat UBI8-Minimal') {
+                stage ('Invoke GSC with Redhat UBI9') {
                     steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel8_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "redhat/ubi8-minimal:8.8"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel9_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "redhat/ubi9:9.4"]], propagate: true, wait: true
                     }
                 }
 

@@ -51,9 +51,3 @@ if [[ "$node_label" == "graphene_oot" ]]; then
     sed -i 's/sgx.use_exinfo/sgx.insecure__allow_memfaults_without_exinfo/' $i;
   done;
 fi
-
-if [[ "$base_os" == *"rhel8"* ]]; then
-    cp -rf /etc/yum.repos.d/redhat.repo $WORKSPACE/gramine
-    cp -rf /etc/rhsm/ca/redhat-uep.pem $WORKSPACE/gramine
-    cp -rf /etc/pki/entitlement/ $WORKSPACE/gramine
-fi
