@@ -27,6 +27,12 @@ pipeline {
                     }
                 }
 
+                stage ('Invoke GSC with CentOS Stream 9') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_almalinux9_server_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "quay.io/centos/centos:stream9"]], propagate: true, wait: true
+                    }
+                }
+
                 stage ('Invoke GSC with Debian 11') {
                     steps {
                         build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "debian:11"]], propagate: true, wait: true
