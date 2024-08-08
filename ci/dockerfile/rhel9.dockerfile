@@ -91,7 +91,7 @@ RUN dnf update -y \
 RUN python3 -B -m pip install -U \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \
-    'meson>=0.56,!=1.2.*' \
+    'meson>=0.56' \
     six \
     torchvision \
     pillow \

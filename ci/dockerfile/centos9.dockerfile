@@ -101,7 +101,7 @@ RUN python3 -m pip install -U \
     pillow \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \
-    'meson>=0.56,<0.57' \
+    'meson>=0.56' \
     dataclasses
 
 # Add mongodb workload
