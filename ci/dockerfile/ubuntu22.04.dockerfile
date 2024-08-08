@@ -9,6 +9,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     bison \
     build-essential \
     cargo \
+    cmake \
     clang \
     curl \
     flex \

@@ -15,6 +15,7 @@ RUN apk update && \
     bsd-compat-headers \
     build-base \
     cargo \
+    cmake \
     coreutils \
     curl \
     elfutils-dev \

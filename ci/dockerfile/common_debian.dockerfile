@@ -4,6 +4,7 @@ FROM $BUILD_OS
 
 # Add steps here to set up dependencies
 RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y \
+    cmake \
     curl \
     gcc\
     git \

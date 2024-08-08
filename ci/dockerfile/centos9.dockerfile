@@ -11,6 +11,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         bc \
         bison \
         cargo \
+        cmake \
         flex \
         make \
         elfutils-libelf-devel \
