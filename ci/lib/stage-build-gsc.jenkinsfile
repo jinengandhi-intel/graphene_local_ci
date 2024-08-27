@@ -80,14 +80,14 @@ stage('Build Workloads') {
             '''
         }
         sh '''
-            docker build --tag build-gramine-bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
+            docker build --tag gramine-build-bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build-gramine bash20.04
             sed -i 's|Repository: "https://github.com/gramineproject/gramine.git"|#Repository: "https://github.com/gramineproject/gramine.git"|g' config.yaml
             sed -i 's|Branch:     "master"|#Branch:     "master"|g' config.yaml
             sed -i 's|Gramine:|Gramine:\\n    Image: "bash20.04"|g' config.yaml
-            ./gsc build -nc --insecure-args build-gramine-bash-test test/ubuntu20.04-bash.manifest
-            ./gsc sign-image --remove-gramine-deps build-gramine-bash-test enclave-key.pem
-            ./gsc info-image gsc-build-gramine-bash-test
+            ./gsc build -nc --insecure-args gramine-build-bash-test test/ubuntu20.04-bash.manifest
+            ./gsc sign-image --remove-gramine-deps gramine-build-bash-test enclave-key.pem
+            ./gsc info-image gsc-gramine-build-bash-test
         '''
     } catch (Exception e) {}
     
@@ -96,7 +96,7 @@ stage('Build Workloads') {
             sh '''
                 #Build java-simple Workload
                 cd Examples/java-simple
-                docker build -t openjdk-11-java-simple .
+                docker build --tag openjdk-11-java-simple .
                 cd ../../
                 ./gsc build openjdk-11-java-simple Examples/java-simple/java-simple.manifest
                 ./gsc sign-image openjdk-11-java-simple enclave-key.pem 
@@ -106,7 +106,7 @@ stage('Build Workloads') {
                 cd Examples/java-spring-boot
                 export PATH=$PATH:/opt/gradle/gradle-7.6.4/bin
                 cd spring-boot-web-service/ && gradle build -Dhttp.proxyHost=proxy-iind.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-iind.intel.com -Dhttps.proxyPort=912
-                cd ../ && docker build -t openjdk-11-java-spring-boot .
+                cd ../ && docker build --tag openjdk-11-java-spring-boot .
                 cd ../../
                 ./gsc build openjdk-11-java-spring-boot Examples/java-spring-boot/java-spring-boot.manifest
                 ./gsc sign-image openjdk-11-java-spring-boot enclave-key.pem
