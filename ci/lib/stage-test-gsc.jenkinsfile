@@ -16,7 +16,7 @@ stage('Test') {
         sh '''
             docker run --device=/dev/sgx_enclave \
                 -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-                gsc-gramine_python -c 'print("HelloWorld!")' 2>&1 | tee python_result
+                gsc-python-test -c 'print("HelloWorld!")' 2>&1 | tee python_result
         '''
     } catch (Exception e) {}
 
@@ -46,7 +46,7 @@ stage('Test') {
             sh '''
                 docker run --device=/dev/sgx_enclave \
                     -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-                    gsc-openjdk-11-java-simple 2>&1 | tee openjdk-simple_result
+                    gsc-java-simple-test 2>&1 | tee openjdk-simple_result
             '''
         } catch (Exception e) {}
 
@@ -55,7 +55,7 @@ stage('Test') {
                 docker run --device=/dev/sgx_enclave \
                     -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
                     -p 8080:8080 \
-                    -d gsc-openjdk-11-java-spring-boot 2>&1 | tee openjdk-spring-boot_result
+                    -d gsc-java-spring-boot-test 2>&1 | tee openjdk-spring-boot_result
                 wget -O- localhost:8080 | tee openjdk-spring-boot_result
             '''
         } catch (Exception e) {}

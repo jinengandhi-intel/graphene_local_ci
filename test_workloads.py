@@ -50,7 +50,7 @@ class Test_Workload_Results():
         assert(any(n in memcached_contents for n in expected_output))
         
     @pytest.mark.examples
-    def test_lightppd_workload(self):
+    def test_lighttpd_workload(self):
         for filename in glob.glob("CI-Examples/lighttpd/result-*"):
             lightppd_result_file = open(filename,"r")
         lightppd_contents = lightppd_result_file.read()

@@ -29,21 +29,21 @@ stage('Build Workloads') {
         sh '''
             if [ "${os_release_id}" != "debian" ]
             then
-                docker build --tag gramine_python --build-arg BUILD_OS=${distro_ver} --file test/python.dockerfile .
+                docker build --tag python-test --build-arg BUILD_OS=${distro_ver} --file test/python.dockerfile .
             fi
             if [ "${distro_ver}" = "debian:11" ]
             then
                 docker pull python:bullseye
-                docker image tag python:bullseye gramine_python
+                docker image tag python:bullseye python-test
             fi
             if [ "${distro_ver}" = "debian:12" ]
             then
                 docker pull python:bookworm
-                docker image tag python:bookworm gramine_python
+                docker image tag python:bookworm python-test
             fi
-            ./gsc build -nc --insecure-args gramine_python test/generic.manifest
-            ./gsc sign-image --remove-gramine-deps gramine_python enclave-key.pem
-            ./gsc info-image gsc-gramine_python
+            ./gsc build -nc --insecure-args python-test test/generic.manifest
+            ./gsc sign-image --remove-gramine-deps python-test enclave-key.pem
+            ./gsc info-image gsc-python-test
         '''
     } catch (Exception e) {}
 
@@ -94,24 +94,26 @@ stage('Build Workloads') {
     if (env.distro_ver == "debian:11") {
         try {
             sh '''
-                #Build java-simple Workload
                 cd Examples/java-simple
-                docker build --tag openjdk-11-java-simple .
+                docker build --tag java-simple-test .
                 cd ../../
-                ./gsc build openjdk-11-java-simple Examples/java-simple/java-simple.manifest
-                ./gsc sign-image openjdk-11-java-simple enclave-key.pem 
-                ./gsc info-image gsc-openjdk-11-java-simple
-    
-                #Build java-spring-boot Workload
+                ./gsc build java-simple-test Examples/java-simple/java-simple.manifest
+                ./gsc sign-image java-simple-test enclave-key.pem
+                ./gsc info-image gsc-java-simple-test
+            '''
+        } catch (Exception e) {}
+
+        try {
+            sh '''
                 cd Examples/java-spring-boot
                 export PATH=$PATH:/opt/gradle/gradle-7.6.4/bin
                 cd spring-boot-web-service/ && gradle build -Dhttp.proxyHost=proxy-iind.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-iind.intel.com -Dhttps.proxyPort=912
-                cd ../ && docker build --tag openjdk-11-java-spring-boot .
+                cd ../ && docker build --tag java-spring-boot-test .
                 cd ../../
-                ./gsc build openjdk-11-java-spring-boot Examples/java-spring-boot/java-spring-boot.manifest
-                ./gsc sign-image openjdk-11-java-spring-boot enclave-key.pem
-                ./gsc info-image gsc-openjdk-11-java-spring-boot
+                ./gsc build java-spring-boot-test Examples/java-spring-boot/java-spring-boot.manifest
+                ./gsc sign-image java-spring-boot-test enclave-key.pem
+                ./gsc info-image gsc-java-spring-boot-test
             '''
-    } catch (Exception e) {}
-  }
+        } catch (Exception e) {}
+    }
 }
