@@ -133,7 +133,7 @@ class Test_Workload_Results():
     @pytest.mark.skipif((base_os not in ["ubuntu20.04"]) \
                 or (("dcap" in node_label) and sgx_mode == '1'), \
                     reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
-    def test_tensorflow_workload(self):
+    def test_tensorflow_lite_workload(self):
         tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
         tensorflow_contents = tensorflow_result_file.read()
         assert((re.search("average time: \d+", tensorflow_contents)) \
