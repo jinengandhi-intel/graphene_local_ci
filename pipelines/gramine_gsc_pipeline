@@ -68,6 +68,12 @@ pipeline {
                         build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:24.04"]], propagate: true, wait: true
                     }
                 }
+
+                stage ('Invoke GSC with SUSE Linux Enterprise Server 15.4') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_suse_15.4'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "registry.suse.com/suse/sle15:15.4"]], propagate: true, wait: true
+                    }
+                }
             }
         }
     }
