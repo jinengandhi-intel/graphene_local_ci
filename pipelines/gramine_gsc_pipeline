@@ -62,6 +62,12 @@ pipeline {
                         build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:23.04"]], propagate: true, wait: true
                     }
                 }
+                
+                stage ('Invoke GSC with Ubuntu 24.04') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:24.04"]], propagate: true, wait: true
+                    }
+                }
             }
         }
     }
