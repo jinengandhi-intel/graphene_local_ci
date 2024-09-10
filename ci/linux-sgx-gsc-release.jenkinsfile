@@ -3,6 +3,7 @@ node(node_label) {
     env.build_ok = true
     env.DOCKER_BUILDKIT=0
     env.COMPOSE_DOCKER_CLI_BUILD=0
+    currentBuild.description = "distro : " + distro_ver
     try {
         stage('checkout'){
             checkout scm
