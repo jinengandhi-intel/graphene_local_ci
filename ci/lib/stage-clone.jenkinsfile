@@ -11,7 +11,15 @@ stage('checkout'){
         env.git_branch = env.gramine_branch
     }
 
-	sh """ git clone ${env.gramine_git} -b ${env.git_branch}"""
+    dir ('gramine') {
+        checkout([
+            $class: 'GitSCM',
+            branches: [[name: "${git_branch}"]],
+            userRemoteConfigs: [[
+                url: env.gramine_git
+            ]]
+        ])
+    }
 
     dir ('examples') {
         git url: 'https://github.com/gramineproject/examples.git'

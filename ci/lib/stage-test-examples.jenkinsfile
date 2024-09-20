@@ -125,6 +125,10 @@ stage('test-examples') {
                     sed -i -e '/^fs.mounts = \\[.*/a \\{ path = "\\/usr\\/{{ arch_libdir }}", uri="file:\\/usr\\/{{ arch_libdir }}" },' rust-hyper-http-server.manifest.template
                     sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/{{ arch_libdir }}\\/\\"," rust-hyper-http-server.manifest.template
                 fi
+                if [ "${base_os}" = 'debian12' ]
+                then
+                    rustup default stable
+                fi
                 make ${MAKEOPTS}
                 make ${MAKEOPTS} start-gramine-server &
                 ../../scripts/wait_for_server 300 127.0.0.1 3000
@@ -139,13 +143,6 @@ stage('test-examples') {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''
                         cd CI-Examples/mongodb
-                        if [ "${base_os}" = 'debian11' ]
-                        then
-                            sed -i 's/.*loader\\.env\\.LD_LIBRARY_PATH.*/loader\\.env\\.LD_LIBRARY_PATH = "\\/gramine_lib:\\/usr\\/{{ arch_libdir }}:\\/lib\\/x86_64-linux-gnu"/' mongod.manifest.template
-                            sed -i 's/path = "\\/lib"/path = "\\/gramine_lib"/' mongod.manifest.template
-                            sed -i -e '/^fs.mounts = \\[.*/a\\{ path="\\/lib\\/x86_64-linux-gnu", uri="file:\\/lib\\/x86_64-linux-gnu" },' mongod.manifest.template
-                            sed -i -e '/^sgx.trusted_files = \\[.*/a \\"file:/lib/x86_64-linux-gnu\\/\\",' mongod.manifest.template
-                        fi
                         export PID=$(lsof -t -i:27017)
                         if [ "$PID" != "" ]
                             then

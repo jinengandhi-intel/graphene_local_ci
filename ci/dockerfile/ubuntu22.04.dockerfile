@@ -9,6 +9,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     bison \
     build-essential \
     cargo \
+    cmake \
     clang \
     curl \
     flex \
@@ -113,7 +114,7 @@ RUN python3 -m pip install --upgrade pip --user
 
 RUN python3 -m pip install -U \
     'docutils>=0.17,<0.18' \
-    'meson>=0.56,<0.57'  \
+    'meson>=0.56'  \
     'recommonmark>=0.5.0,<=0.7.1' \
     'scikit-learn-intelex==2023.0.1' \
     'tomli>=1.1.0' \

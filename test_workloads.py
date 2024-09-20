@@ -50,7 +50,7 @@ class Test_Workload_Results():
         assert(any(n in memcached_contents for n in expected_output))
         
     @pytest.mark.examples
-    def test_lightppd_workload(self):
+    def test_lighttpd_workload(self):
         for filename in glob.glob("CI-Examples/lighttpd/result-*"):
             lightppd_result_file = open(filename,"r")
         lightppd_contents = lightppd_result_file.read()
@@ -133,7 +133,7 @@ class Test_Workload_Results():
     @pytest.mark.skipif((base_os not in ["ubuntu20.04"]) \
                 or (("dcap" in node_label) and sgx_mode == '1'), \
                     reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
-    def test_tensorflow_workload(self):
+    def test_tensorflow_lite_workload(self):
         tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
         tensorflow_contents = tensorflow_result_file.read()
         assert((re.search("average time: \d+", tensorflow_contents)) \
@@ -274,14 +274,14 @@ class Test_Workload_Results():
 
     @pytest.mark.gsc
     @pytest.mark.skipif(distro_ver != "debian:11", reason='java-simple is enabled only on debian11 currently')
-    def test_gsc_java_simple(self):
+    def test_gsc_java_simple_workload(self):
         gsc_java_simple_result = open("openjdk-simple_result", "r")
         gsc_java_simple_log = gsc_java_simple_result.read()
         assert("Hello from Graminized Java application!" in gsc_java_simple_log)
     
     @pytest.mark.gsc
     @pytest.mark.skipif(distro_ver != "debian:11", reason='java-spring-boot is enabled only on debian11 currently')
-    def test_gsc_java_spring_boot(self):
+    def test_gsc_java_spring_boot_workload(self):
         gsc_java_springboot_result = open("openjdk-spring-boot_result", "r")
         gsc_java_springboot_log = gsc_java_springboot_result.read()
         assert("Hello from Graminized Spring Boot Application." in gsc_java_springboot_log)
@@ -298,7 +298,7 @@ class Test_Workload_Results():
 
     @pytest.mark.gsc
     def test_gsc_gramine_build_bash_workload(self):
-        gsc_bash_result = open("build_gramine_bash_result", "r")
+        gsc_bash_result = open("gramine_build_bash_result", "r")
         gsc_bash_log = gsc_bash_result.read()
         if (os_release_id == "debian") or ("redhat" in os_release_id) or (os_release_id == "quay.io/centos/centos"):
             assert(re.search('boot(.*)home(.*)proc', gsc_bash_log, re.DOTALL))

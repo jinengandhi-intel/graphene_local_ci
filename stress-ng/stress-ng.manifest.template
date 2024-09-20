@@ -12,7 +12,6 @@ loader.insecure__disable_aslr = true
 loader.env.PATH = "/usr/bin:/bin"
 loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/lib/x86_64-linux-gnu"
 
-fs.experimental__enable_sysfs_topology = true
 
 fs.mounts = [  
   { path = "/bin", uri = "file:/bin" },

@@ -1,6 +1,7 @@
 node (node_label) {
     env.ORIG_WKSP = env.WORKSPACE
     env.build_ok = true
+    currentBuild.description = "distro : " + base_os
     try {
         checkout scm
         load 'ci/lib/stage-clone.jenkinsfile'

@@ -4,12 +4,21 @@ stage('Build Workloads') {
         docker system prune -af
         openssl genrsa -3 -out enclave-key.pem 3072
         cp -f config.yaml.template config.yaml
+        if [ "${distro_ver}" = "ubuntu:24.04" ]
+        then
+            python3 -m venv my_venv
+            . my_venv/bin/activate
+            pip3 install 'docker>=6.1.0' jinja2 tomli tomli-w pyyaml
+        fi
+
     '''
 
     // Build Bash Workload
     try {
         if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
             sh 'cp -rf test/centos-bash.dockerfile test/bash.dockerfile'
+        } else if (env.os_release_id.contains("suse")) {
+            sh 'cp -rf test/suse-bash.dockerfile test/bash.dockerfile'
         } else {
             sh '''
                 cp -rf test/ubuntu20.04-bash.dockerfile test/bash.dockerfile
@@ -17,6 +26,10 @@ stage('Build Workloads') {
             '''
         }
         sh '''
+            if [ "${distro_ver}" = "ubuntu:24.04" ]
+            then
+                . my_venv/bin/activate
+            fi
             docker build --tag bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build -nc --insecure-args bash-test test/ubuntu20.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps bash-test enclave-key.pem
@@ -27,23 +40,27 @@ stage('Build Workloads') {
     // Build Python Latest Workload
     try {
         sh '''
+            if [ "${distro_ver}" = "ubuntu:24.04" ]
+            then
+                . my_venv/bin/activate
+            fi
             if [ "${os_release_id}" != "debian" ]
             then
-                docker build --tag gramine_python --build-arg BUILD_OS=${distro_ver} --file test/python.dockerfile .
+                docker build --tag python-test --build-arg BUILD_OS=${distro_ver} --file test/python.dockerfile .
             fi
             if [ "${distro_ver}" = "debian:11" ]
             then
                 docker pull python:bullseye
-                docker image tag python:bullseye gramine_python
+                docker image tag python:bullseye python-test
             fi
             if [ "${distro_ver}" = "debian:12" ]
             then
                 docker pull python:bookworm
-                docker image tag python:bookworm gramine_python
+                docker image tag python:bookworm python-test
             fi
-            ./gsc build -nc --insecure-args gramine_python test/generic.manifest
-            ./gsc sign-image --remove-gramine-deps gramine_python enclave-key.pem
-            ./gsc info-image gsc-gramine_python
+            ./gsc build -nc --insecure-args python-test test/generic.manifest
+            ./gsc sign-image --remove-gramine-deps python-test enclave-key.pem
+            ./gsc info-image gsc-python-test
         '''
     } catch (Exception e) {}
 
@@ -55,6 +72,8 @@ stage('Build Workloads') {
     try {
         if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
             sh 'cp -rf test/centos-helloworld.dockerfile test/helloworld.dockerfile'
+        } else if (env.os_release_id.contains("suse")) {
+            sh 'cp -rf test/suse-helloworld.dockerfile test/helloworld.dockerfile'
         } else {
             sh '''
                 cp -rf test/ubuntu22.04-hello-world.dockerfile test/helloworld.dockerfile
@@ -62,6 +81,10 @@ stage('Build Workloads') {
             '''
         }
         sh '''
+            if [ "${distro_ver}" = "ubuntu:24.04" ]
+            then
+                . my_venv/bin/activate
+            fi
             docker build --tag helloworld-test --build-arg BUILD_OS=${distro_ver} --file test/helloworld.dockerfile .
             ./gsc build -nc --insecure-args helloworld-test test/ubuntu22.04-hello-world.manifest
             ./gsc sign-image --remove-gramine-deps helloworld-test enclave-key.pem
@@ -73,6 +96,8 @@ stage('Build Workloads') {
     try {
         if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
             sh 'cp -rf test/centos-bash.dockerfile test/bash.dockerfile'
+        } else if (env.os_release_id.contains("suse")) {
+            sh 'cp -rf test/suse-bash.dockerfile test/bash.dockerfile'
         } else {
             sh '''
                 cp -rf test/ubuntu20.04-bash.dockerfile test/bash.dockerfile
@@ -80,38 +105,48 @@ stage('Build Workloads') {
             '''
         }
         sh '''
-            docker build --tag build-gramine-bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
+            if [ "${distro_ver}" = "ubuntu:24.04" ]
+            then
+                . my_venv/bin/activate
+            fi
+            docker build --tag gramine-build-bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build-gramine bash20.04
             sed -i 's|Repository: "https://github.com/gramineproject/gramine.git"|#Repository: "https://github.com/gramineproject/gramine.git"|g' config.yaml
             sed -i 's|Branch:     "master"|#Branch:     "master"|g' config.yaml
             sed -i 's|Gramine:|Gramine:\\n    Image: "bash20.04"|g' config.yaml
-            ./gsc build -nc --insecure-args build-gramine-bash-test test/ubuntu20.04-bash.manifest
-            ./gsc sign-image --remove-gramine-deps build-gramine-bash-test enclave-key.pem
-            ./gsc info-image gsc-build-gramine-bash-test
+            ./gsc build -nc --insecure-args gramine-build-bash-test test/ubuntu20.04-bash.manifest
+            ./gsc sign-image --remove-gramine-deps gramine-build-bash-test enclave-key.pem
+            ./gsc info-image gsc-gramine-build-bash-test
+            if [ "${distro_ver}" = "ubuntu:24.04" ]
+            then
+                . my_venv/bin/deactivate
+            fi
         '''
     } catch (Exception e) {}
     
     if (env.distro_ver == "debian:11") {
         try {
             sh '''
-                #Build java-simple Workload
                 cd Examples/java-simple
-                docker build -t openjdk-11-java-simple .
+                docker build --tag java-simple-test .
                 cd ../../
-                ./gsc build openjdk-11-java-simple Examples/java-simple/java-simple.manifest
-                ./gsc sign-image openjdk-11-java-simple enclave-key.pem 
-                ./gsc info-image gsc-openjdk-11-java-simple
-    
-                #Build java-spring-boot Workload
+                ./gsc build java-simple-test Examples/java-simple/java-simple.manifest
+                ./gsc sign-image java-simple-test enclave-key.pem
+                ./gsc info-image gsc-java-simple-test
+            '''
+        } catch (Exception e) {}
+
+        try {
+            sh '''
                 cd Examples/java-spring-boot
                 export PATH=$PATH:/opt/gradle/gradle-7.6.4/bin
                 cd spring-boot-web-service/ && gradle build -Dhttp.proxyHost=proxy-iind.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-iind.intel.com -Dhttps.proxyPort=912
-                cd ../ && docker build -t openjdk-11-java-spring-boot .
+                cd ../ && docker build --tag java-spring-boot-test .
                 cd ../../
-                ./gsc build openjdk-11-java-spring-boot Examples/java-spring-boot/java-spring-boot.manifest
-                ./gsc sign-image openjdk-11-java-spring-boot enclave-key.pem
-                ./gsc info-image gsc-openjdk-11-java-spring-boot
+                ./gsc build java-spring-boot-test Examples/java-spring-boot/java-spring-boot.manifest
+                ./gsc sign-image java-spring-boot-test enclave-key.pem
+                ./gsc info-image gsc-java-spring-boot-test
             '''
-    } catch (Exception e) {}
-  }
+        } catch (Exception e) {}
+    }
 }

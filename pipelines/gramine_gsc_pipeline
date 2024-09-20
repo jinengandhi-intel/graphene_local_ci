@@ -27,6 +27,12 @@ pipeline {
                     }
                 }
 
+                stage ('Invoke GSC with CentOS Stream 9') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_almalinux9_server_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "quay.io/centos/centos:stream9"]], propagate: true, wait: true
+                    }
+                }
+
                 stage ('Invoke GSC with Debian 11') {
                     steps {
                         build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "debian:11"]], propagate: true, wait: true
@@ -54,6 +60,18 @@ pipeline {
                 stage ('Invoke GSC with Ubuntu 23.04') {
                     steps {
                         build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:23.04"]], propagate: true, wait: true
+                    }
+                }
+                
+                stage ('Invoke GSC with Ubuntu 24.04') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:24.04"]], propagate: true, wait: true
+                    }
+                }
+
+                stage ('Invoke GSC with SUSE Linux Enterprise Server 15.4') {
+                    steps {
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_suse_15.4'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'distro_ver', value: "registry.suse.com/suse/sle15:15.4"]], propagate: true, wait: true
                     }
                 }
             }

@@ -6,7 +6,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     bc \
     bison \
     build-essential \
-    cargo \
+    cmake \
     clang \
     curl \
     default-jdk \
@@ -96,6 +96,10 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     zlib1g-dev \
     gnupg2 \
     binutils
+
+# Install latest Rust and cargo
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+RUN cp -rf $HOME/.cargo/bin/* /usr/bin/
 
 # Install wrk2 benchmark. This benchmark is used in `benchmark-http.sh`.
 RUN git clone https://github.com/giltene/wrk2.git \

@@ -11,6 +11,7 @@ RUN yum install -y yum-utils epel-release
 RUN yum update -y --exclude=texlive-context && env yum install -y \
     libunwind \
     cargo \
+    cmake \
     ncurses-devel \
     bc \
     bison \

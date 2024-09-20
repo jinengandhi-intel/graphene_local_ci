@@ -18,6 +18,7 @@ RUN yum-config-manager --add-repo https://packages.gramineproject.io/rpm/gramine
 
 # Add steps here to set up dependencies
 RUN yum update -y && yum install -y \
+    cmake \
     diffutils \
     gcc\
     git \

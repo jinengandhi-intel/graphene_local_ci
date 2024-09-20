@@ -32,6 +32,7 @@ RUN if [[ "$BUILD_OS" == "ubi8" ]]; then \
 
 # Add steps here to set up dependencies
 RUN yum update -y && yum install -y \
+    cmake \
     diffutils \
     gcc\
     git \

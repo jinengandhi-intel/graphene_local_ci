@@ -8,6 +8,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     binutils \
     build-essential \
     cargo \
+    cmake \
     clang \
     curl \
     flex \
