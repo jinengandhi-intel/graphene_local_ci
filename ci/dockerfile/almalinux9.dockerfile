@@ -15,6 +15,7 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     ncurses-devel \
     bc \
     bison \
+    busybox \
     flex \
     make \
     elfutils-libelf-devel \

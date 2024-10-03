@@ -17,6 +17,7 @@ RUN dnf update -y \
         automake \
         bison \
         binutils \
+        busybox \
         cargo \
         cmake \
         elfutils-libelf-devel \
