@@ -1,6 +1,7 @@
 node (node_label) {
     env.ORIG_WKSP = env.WORKSPACE
     env.build_ok = true
+    env.AVX = '1'
     currentBuild.description = "distro : " + base_os
     try {
         checkout scm

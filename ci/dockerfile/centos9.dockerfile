@@ -10,6 +10,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         ncurses-devel \
         bc \
         bison \
+        busybox \
         cargo \
         cmake \
         flex \
