@@ -176,7 +176,7 @@ stage('test-direct') {
     try{
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd CI-Examples/go_helloworld
+                cd CI-Examples/go-helloworld
                 make check
             '''
         }

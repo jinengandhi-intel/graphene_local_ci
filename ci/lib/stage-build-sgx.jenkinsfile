@@ -1,6 +1,12 @@
 stage('build') {
     env.MESON_OPTIONS = ''
 
+    if (env.node_label.contains("dcap")) {
+        env.RA_TYPE = "dcap"
+    } else {
+        env.RA_TYPE = "none"
+    }
+
     if (env.build_type == "manual") {
         if (env.build_prefix != "0") {
             env.MESON_OPTIONS += ' --prefix=' + env.PREFIX
@@ -72,6 +78,7 @@ stage('build') {
 
             // In CI we install to non-standard --prefix (see above). This makes sure the libraries are
             // available anyway
+            env.LD_LIBRARY_PATH = libdir
             env.PKG_CONFIG_PATH = libdir + '/pkgconfig'
         }
 

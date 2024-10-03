@@ -14,6 +14,7 @@ RUN apk update && \
     binutils-dev \
     bsd-compat-headers \
     build-base \
+    busybox \
     cargo \
     cmake \
     coreutils \

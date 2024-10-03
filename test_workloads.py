@@ -96,7 +96,7 @@ class Test_Workload_Results():
     @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Go_helloworld is enabled only on servers")
     def test_go_helloworld_workload(self):
-        go_helloworld_result_file = open("CI-Examples/go_helloworld/OUTPUT", "r")
+        go_helloworld_result_file = open("CI-Examples/go-helloworld/OUTPUT", "r")
         go_helloworld_contents = go_helloworld_result_file.read()
         assert("Hello, world" in go_helloworld_contents)                
     
@@ -236,7 +236,7 @@ class Test_Workload_Results():
     @pytest.mark.skipif((base_os not in ["ubuntu20.04", "ubuntu22.04"])
             or ((int(no_cores) < 16) and sgx_mode == '1'),
                     reason="Scikit-learn enabled for Ubuntu & Debian 11 Server Configurations.")
-    def test_scikit_workload(self):
+    def test_scikit_learn_intelex_workload(self):
         sklearn_result_file = open("CI-Examples/scikit-learn-intelex/RESULT", "r")
         sklearn_contents = sklearn_result_file.read()
         assert(("Success 1/2" in sklearn_contents) \
