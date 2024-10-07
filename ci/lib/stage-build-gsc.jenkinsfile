@@ -4,13 +4,6 @@ stage('Build Workloads') {
         docker system prune -af
         openssl genrsa -3 -out enclave-key.pem 3072
         cp -f config.yaml.template config.yaml
-        if [ "${distro_ver}" = "ubuntu:24.04" ]
-        then
-            python3 -m venv my_venv
-            . my_venv/bin/activate
-            pip3 install 'docker>=6.1.0' jinja2 tomli tomli-w pyyaml
-        fi
-
     '''
 
     // Build Bash Workload
@@ -26,10 +19,6 @@ stage('Build Workloads') {
             '''
         }
         sh '''
-            if [ "${distro_ver}" = "ubuntu:24.04" ]
-            then
-                . my_venv/bin/activate
-            fi
             docker build --tag bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build -nc --insecure-args bash-test test/ubuntu20.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps bash-test enclave-key.pem
@@ -40,10 +29,6 @@ stage('Build Workloads') {
     // Build Python Latest Workload
     try {
         sh '''
-            if [ "${distro_ver}" = "ubuntu:24.04" ]
-            then
-                . my_venv/bin/activate
-            fi
             if [ "${os_release_id}" != "debian" ]
             then
                 docker build --tag python-test --build-arg BUILD_OS=${distro_ver} --file test/python.dockerfile .
@@ -81,10 +66,6 @@ stage('Build Workloads') {
             '''
         }
         sh '''
-            if [ "${distro_ver}" = "ubuntu:24.04" ]
-            then
-                . my_venv/bin/activate
-            fi
             docker build --tag helloworld-test --build-arg BUILD_OS=${distro_ver} --file test/helloworld.dockerfile .
             ./gsc build -nc --insecure-args helloworld-test test/ubuntu22.04-hello-world.manifest
             ./gsc sign-image --remove-gramine-deps helloworld-test enclave-key.pem
@@ -105,10 +86,6 @@ stage('Build Workloads') {
             '''
         }
         sh '''
-            if [ "${distro_ver}" = "ubuntu:24.04" ]
-            then
-                . my_venv/bin/activate
-            fi
             docker build --tag gramine-build-bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build-gramine bash20.04
             sed -i 's|Repository: "https://github.com/gramineproject/gramine.git"|#Repository: "https://github.com/gramineproject/gramine.git"|g' config.yaml
@@ -117,10 +94,6 @@ stage('Build Workloads') {
             ./gsc build -nc --insecure-args gramine-build-bash-test test/ubuntu20.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps gramine-build-bash-test enclave-key.pem
             ./gsc info-image gsc-gramine-build-bash-test
-            if [ "${distro_ver}" = "ubuntu:24.04" ]
-            then
-                . my_venv/bin/deactivate
-            fi
         '''
     } catch (Exception e) {}
     
