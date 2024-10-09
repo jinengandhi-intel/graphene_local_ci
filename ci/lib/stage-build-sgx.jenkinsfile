@@ -118,7 +118,7 @@ stage('build') {
             }
 
             sh '''
-                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ ${package_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
+                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring-$(lsb_release -sc).gpg] https://packages.gramineproject.io/ ${package_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
                 sudo apt-get update -y
             '''
 
@@ -134,7 +134,7 @@ stage('build') {
             sh 'sudo apt-get update'
             if (env.gramine_branch.contains("_update")) {
                 sh '''
-                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ unstable-${ubuntu_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
+                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring-$(lsb_release -sc).gpg] https://packages.gramineproject.io/ unstable-${ubuntu_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
                     sudo apt-get update -y && sudo apt-get --with-new-pkgs -y upgrade
                 '''
             }
