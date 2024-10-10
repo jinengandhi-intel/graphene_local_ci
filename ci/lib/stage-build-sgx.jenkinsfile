@@ -109,19 +109,33 @@ stage('build') {
                 sh 'sudo yum update -y && sudo yum upgrade -y --enablerepo=gramine-unstable'
             }
         } else {
-            env.ubuntu_repo = sh(returnStdout: true, script: 'lsb_release -sc').trim()
+            env.os_codename = sh(returnStdout: true, script: 'lsb_release -sc').trim()
 
             if (env.gramine_release == "unstable") {
-                env.package_repo = "unstable-${ubuntu_repo}"
+                env.package_repo = "unstable-${os_codename}"
             } else {
-                env.package_repo = "${ubuntu_repo}"
+                env.package_repo = "${os_codename}"
+            }
+
+            if (env.os_codename == "bullseye") {
+                env.sgx_repo = "focal"
+            } else if (env.os_codename == "bookworm") {
+                env.sgx_repo = "jammy"
+            } else {
+                env.sgx_repo = "${os_codename}"
             }
 
             sh '''
-                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring-$(lsb_release -sc).gpg] https://packages.gramineproject.io/ ${package_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
-                sudo apt-get update -y
+                curl -fsSLo /etc/apt/keyrings/intel-sgx-deb.asc https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
+                echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu $(os_codename) main'| sudo tee /etc/apt/sources.list.d/intel-sgx.list
             '''
 
+            sh '''
+                curl -fsSLo /etc/apt/keyrings/gramine-keyring-$(lsb_release -sc).gpg https://packages.gramineproject.io/gramine-keyring-$(lsb_release -sc).gpg
+                echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/gramine-keyring-$(os_codename).gpg] https://packages.gramineproject.io/ $(os_codename) main" | sudo tee /etc/apt/sources.list.d/gramine.list
+            '''
+
+            sh 'sudo apt-get update -y'
             if (env.build_type == "package-in-kernel") {
                 sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y gramine'
             } else if (env.build_type == "package-dcap") {
@@ -134,7 +148,7 @@ stage('build') {
             sh 'sudo apt-get update'
             if (env.gramine_branch.contains("_update")) {
                 sh '''
-                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring-$(lsb_release -sc).gpg] https://packages.gramineproject.io/ unstable-${ubuntu_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
+                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring-$(os_codename).gpg] https://packages.gramineproject.io/ unstable-$(os_codename) main" | sudo tee /etc/apt/sources.list.d/gramine.list
                     sudo apt-get update -y && sudo apt-get --with-new-pkgs -y upgrade
                 '''
             }

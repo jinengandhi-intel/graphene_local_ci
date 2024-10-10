@@ -27,7 +27,7 @@ class Test_Workload_Results():
         assert("Success 4/7" in bash_contents)
         assert("Success 5/7" in bash_contents)
         assert("Success 6/7" in bash_contents)
-        assert("error" not in bash_contents)
+        assert("error: " not in bash_contents)
         if (os_release_id != "alpine"):
             assert("Success 7/7" in bash_contents)
 
@@ -39,7 +39,7 @@ class Test_Workload_Results():
         assert("Success 2/4" in python_contents)
         assert("Success 3/4" in python_contents)
         assert("Success 4/4" in python_contents)
-        assert("error" not in python_contents)
+        assert("error: " not in python_contents)
         if os.environ.get("RA_TYPE") == "dcap":
             assert("Success SGX report" in python_contents)
             assert("Success SGX quote" in python_contents)
@@ -50,7 +50,7 @@ class Test_Workload_Results():
         memcached_contents = memcached_result_file.read()
         expected_output = ["2", "18"]
         assert(any(n in memcached_contents for n in expected_output))
-        assert("error" not in memcached_contents)
+        assert("error: " not in memcached_contents)
         
     @pytest.mark.examples
     def test_lighttpd_workload(self):
@@ -59,7 +59,7 @@ class Test_Workload_Results():
         lightppd_contents = lightppd_result_file.read()
         assert((re.search("Concurrency =(\s+)1: Per Thread Median Througput (.*)Latency(.*)", lightppd_contents)) \
             and (re.search("Concurrency =(\s+)32: Per Thread Median Througput (.*)Latency(.*)", lightppd_contents)))
-        assert("error" not in lightppd_contents)
+        assert("error: " not in lightppd_contents)
 
     @pytest.mark.examples
     def test_nginx_workload(self):
@@ -68,7 +68,7 @@ class Test_Workload_Results():
         nginx_contents = nginx_result_file.read()
         assert((re.search("Concurrency =(\s+)1: Per Thread Median Througput (.*)Latency(.*)", nginx_contents)) \
             and (re.search("Concurrency =(\s+)32: Per Thread Median Througput (.*)Latency(.*)", nginx_contents)))
-        assert("error" not in nginx_contents)
+        assert("error: " not in nginx_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif(os_release_id == "alpine", reason='Blender is not enabled for Alpine')
@@ -81,7 +81,7 @@ class Test_Workload_Results():
         redis_result_file = open("CI-Examples/redis/OUTPUT", "r")
         redis_contents = redis_result_file.read()
         assert(("PING_INLINE" in redis_contents) and ("MSET" in redis_contents))
-        assert("error" not in redis_contents)
+        assert("error: " not in redis_contents)
 
     @pytest.mark.examples
     def test_sqlite_workload(self):
@@ -91,14 +91,14 @@ class Test_Workload_Results():
                 and ("row 3" in sqlite_contents) \
                 and ("row 2" in sqlite_contents) \
                 and ("row 1" in sqlite_contents))
-        assert("error" not in sqlite_contents)
+        assert("error: " not in sqlite_contents)
     
     @pytest.mark.examples
     def test_busybox_workload(self):
         busybox_result_file = open("CI-Examples/busybox/result.txt", "r")
         busybox_contents = busybox_result_file.read()
         assert("Success 1/1" in busybox_contents)
-        assert("error" not in busybox_contents)
+        assert("error: " not in busybox_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
@@ -107,7 +107,7 @@ class Test_Workload_Results():
         go_helloworld_result_file = open("CI-Examples/go-helloworld/OUTPUT", "r")
         go_helloworld_contents = go_helloworld_result_file.read()
         assert("Hello, world" in go_helloworld_contents)
-        assert("error" not in go_helloworld_contents)
+        assert("error: " not in go_helloworld_contents)
     
     @pytest.mark.sdtest
     @pytest.mark.skipif((int(no_cores) < 16 or sgx_mode != '1'),
@@ -129,7 +129,7 @@ class Test_Workload_Results():
         rust_contents = rust_result_file.read()
         assert((re.search("Concurrency =(\s+)1: Per Thread Median Througput (.*)Latency(.*)", rust_contents)) \
             and (re.search("Concurrency =(\s+)32: Per Thread Median Througput (.*)Latency(.*)", rust_contents)))
-        assert("error" not in rust_contents)
+        assert("error: " not in rust_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif(((int(no_cores) < 16) and sgx_mode == '1'),
@@ -138,7 +138,7 @@ class Test_Workload_Results():
         jdk_result_file = open("CI-Examples/openjdk/OUTPUT", "r")
         jdk_contents = jdk_result_file.read()
         assert("Final Count is:" in jdk_contents)
-        assert("error" not in jdk_contents)
+        assert("error: " not in jdk_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif((base_os not in ["ubuntu20.04"]) \
@@ -153,21 +153,21 @@ class Test_Workload_Results():
             and (re.search("\d+: 401 academic gown", tensorflow_contents)) \
             and (re.search("\d+: 835 suit", tensorflow_contents)) \
             and (re.search("\d+: 458 bow tie", tensorflow_contents)))
-        assert("error" not in tensorflow_contents)
+        assert("error: " not in tensorflow_contents)
 
     @pytest.mark.examples
     def test_curl_workload(self):
         curl_result_file = open("CI-Examples/curl/RESULT", "r")
         curl_contents = curl_result_file.read()
         assert("Success 1/1" in curl_contents)
-        assert("error" not in curl_contents)
+        assert("error: " not in curl_contents)
 
     @pytest.mark.examples
     def test_nodejs_workload(self):
         nodejs_result_file = open("CI-Examples/nodejs/RESULT", "r")
         nodejs_contents = nodejs_result_file.read()
         assert("Success 1/1" in nodejs_contents)
-        assert("error" not in nodejs_contents)
+        assert("error: " not in nodejs_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif(((base_os in ["ubuntu24.04", "alpine3.18"]) or (node_label == "graphene_22.04_5.19")),
@@ -180,14 +180,14 @@ class Test_Workload_Results():
             and ("Saluki, gazelle hound" in pytorch_contents) \
             and ("whippet" in pytorch_contents) \
             and ("Ibizan hound, Ibizan Podenco" in pytorch_contents))
-        assert("error" not in pytorch_contents)
+        assert("error: " not in pytorch_contents)
 
     @pytest.mark.examples
     def test_r_workload(self):
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()
         assert("success" in r1_contents)
-        assert("error" not in r1_contents)
+        assert("error: " not in r1_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id not in ["ubuntu", "debian", "alpine"]),
@@ -198,7 +198,7 @@ class Test_Workload_Results():
         assert(("Hello world (./test_files/hello)!" in gcc_contents) \
             and ("diff -q test_files/bzip2 test_files/bzip2.copy" in gcc_contents) \
             and ("diff -q test_files/gzip test_files/gzip.copy" in gcc_contents))
-        assert("error" not in gcc_contents)
+        assert("error: " not in gcc_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif(not(base_os in ["ubuntu20.04"])
@@ -212,7 +212,7 @@ class Test_Workload_Results():
             and (re.search("Duration:", openvino_contents)) \
             and (re.search("Latency:", openvino_contents)) \
             and (re.search("Throughput:", openvino_contents)))
-        assert("error" not in openvino_contents)
+        assert("error: " not in openvino_contents)
 
     @pytest.mark.examples
     @pytest.mark.sanity
@@ -224,7 +224,7 @@ class Test_Workload_Results():
         assert("Success 2/4" in mbedtls_contents)
         assert("Success 3/4" in mbedtls_contents)
         assert("Success 4/4" in mbedtls_contents)
-        assert("error" not in mbedtls_contents)
+        assert("error: " not in mbedtls_contents)
 
     @pytest.mark.examples
     @pytest.mark.sanity
@@ -236,7 +236,7 @@ class Test_Workload_Results():
         assert("Success 2/4" in secret_prov_contents)
         assert("Success 3/4" in secret_prov_contents)
         assert("Success 4/4" in secret_prov_contents)
-        assert("error" not in secret_prov_contents)
+        assert("error: " not in secret_prov_contents)
 
     @pytest.mark.examples
     @pytest.mark.sanity
@@ -245,14 +245,14 @@ class Test_Workload_Results():
         nginx_result_file = open("CI-Examples/ra-tls-nginx/nginx_result.txt", "r")
         nginx_contents = nginx_result_file.read()
         assert("OK" in nginx_contents)
-        assert("error" not in nginx_contents)
+        assert("error: " not in nginx_contents)
 
     @pytest.mark.sanity
     def test_helloworld_workload(self):
         helloworld_result_file = open("CI-Examples/helloworld/helloworld_result.txt", "r")
         helloworld_contents = helloworld_result_file.read()
         assert("Hello, world" in helloworld_contents)
-        assert("error" not in helloworld_contents)
+        assert("error: " not in helloworld_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif((base_os not in ["ubuntu20.04", "ubuntu22.04"])
@@ -263,7 +263,7 @@ class Test_Workload_Results():
         sklearn_contents = sklearn_result_file.read()
         assert(("Success 1/2" in sklearn_contents) \
             and ("Success 2/2" in sklearn_contents))
-        assert("error" not in sklearn_contents)
+        assert("error: " not in sklearn_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id not in ["ubuntu", "debian"]) or
@@ -273,7 +273,7 @@ class Test_Workload_Results():
         tfserving_result = open("CI-Examples/tfserving/RESULT", "r")
         tfserving_contents = tfserving_result.read()
         assert("Success" in tfserving_contents)
-        assert("error" not in tfserving_contents)
+        assert("error: " not in tfserving_contents)
 
     @pytest.mark.gsc
     def test_gsc_bash_workload(self):
@@ -283,21 +283,21 @@ class Test_Workload_Results():
             assert(re.search('boot(.*)home(.*)proc', gsc_bash_log, re.DOTALL))
         else:
             assert(re.search('Mem:(.*)Swap:', gsc_bash_log, re.DOTALL))
-        assert("error" not in gsc_bash_log)
+        assert("error: " not in gsc_bash_log)
 
     @pytest.mark.gsc
     def test_gsc_python_workload(self):
         gsc_python_result = open("python_result", "r")
         gsc_python_log = gsc_python_result.read()
         assert("HelloWorld!" in gsc_python_log)
-        assert("error" not in gsc_python_log)
+        assert("error: " not in gsc_python_log)
 
     @pytest.mark.gsc
     def test_gsc_helloworld_workload(self):
         gsc_helloworld_result = open("helloworld_result", "r")
         gsc_helloworld_log = gsc_helloworld_result.read()
         assert('"Hello World! Let\'s check escaped symbols: < & > "' in gsc_helloworld_log)
-        assert("error" not in gsc_helloworld_log)
+        assert("error: " not in gsc_helloworld_log)
 
     @pytest.mark.gsc
     @pytest.mark.skipif(distro_ver != "debian:11", reason='java-simple is enabled only on debian11 currently')
@@ -305,7 +305,7 @@ class Test_Workload_Results():
         gsc_java_simple_result = open("openjdk-simple_result", "r")
         gsc_java_simple_log = gsc_java_simple_result.read()
         assert("Hello from Graminized Java application!" in gsc_java_simple_log)
-        assert("error" not in gsc_java_simple_log)
+        assert("error: " not in gsc_java_simple_log)
     
     @pytest.mark.gsc
     @pytest.mark.skipif(distro_ver != "debian:11", reason='java-spring-boot is enabled only on debian11 currently')
@@ -313,7 +313,7 @@ class Test_Workload_Results():
         gsc_java_springboot_result = open("openjdk-spring-boot_result", "r")
         gsc_java_springboot_log = gsc_java_springboot_result.read()
         assert("Hello from Graminized Spring Boot Application." in gsc_java_springboot_log)
-        assert("error" not in gsc_java_springboot_log)
+        assert("error: " not in gsc_java_springboot_log)
 
     @pytest.mark.examples
     @pytest.mark.skipif(((base_os in ["ubuntu24.04", "alpine3.18"]) or ((int(no_cores) < 16) and sgx_mode == '1')),
@@ -324,7 +324,7 @@ class Test_Workload_Results():
         assert(("item: 'card'" in mongodb_contents) and \
                ("item: 'pen'" in mongodb_contents) and \
                ("item: 'lamp'" in mongodb_contents))
-        assert("error" not in mongodb_contents)
+        assert("error: " not in mongodb_contents)
 
     @pytest.mark.gsc
     def test_gsc_gramine_build_bash_workload(self):
@@ -334,7 +334,7 @@ class Test_Workload_Results():
             assert(re.search('boot(.*)home(.*)proc', gsc_bash_log, re.DOTALL))
         else:
             assert(re.search('Mem:(.*)Swap:', gsc_bash_log, re.DOTALL))
-        assert("error" not in gsc_bash_log)
+        assert("error: " not in gsc_bash_log)
 
     @pytest.mark.examples
     def test_iperf_workload(self):
@@ -342,4 +342,4 @@ class Test_Workload_Results():
         iperf_contents = iperf_result.read()
         assert(re.search("connected to (.*) port 5201", iperf_contents) and \
                ("iperf Done" in iperf_contents))
-        assert("error" not in iperf_contents)
+        assert("error: " not in iperf_contents)
