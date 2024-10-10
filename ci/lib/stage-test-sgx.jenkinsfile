@@ -207,7 +207,7 @@ stage('test-sgx') {
                     export RA_TLS_ISV_PROD_ID=any
                     export RA_TLS_ISV_SVN=any
                     RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
-                    make check_dcap | tee mbedtls_result.txt
+                    make check_dcap 2>&1 | tee mbedtls_result.txt
                 '''
             }
         } catch (Exception e) { }
@@ -227,7 +227,7 @@ stage('test-sgx') {
                     export RA_TLS_ISV_PROD_ID=any
                     export RA_TLS_ISV_SVN=any
                     RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
-                    make check_dcap | tee secret_prov_result.txt
+                    make check_dcap 2>&1 | tee secret_prov_result.txt
                 '''
             }
         } catch (Exception e) { }

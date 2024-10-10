@@ -2,12 +2,21 @@ ARG BUILD_OS
 
 FROM $BUILD_OS
 
+ARG BUILD_OS
+
 RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
+
+RUN if [[ $BUILD_OS = *"stream8"* ]]; then \
+        sed -i 's|^mirrorlist=|#mirrorlist=|g' /etc/yum.repos.d/CentOS-* && \
+        sed -i 's|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*; \
+    fi
+
+RUN dnf update -y
 
 RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
 
-RUN if [[ $BUILD_OS = "stream8" ]]; then \
-        dnf config-manager --set-enabled -y powertools \
+RUN if [[ $BUILD_OS = *"stream8"* ]]; then \
+        dnf config-manager --set-enabled -y powertools; \
     else \
         dnf config-manager --set-enabled -y crb; \
     fi
