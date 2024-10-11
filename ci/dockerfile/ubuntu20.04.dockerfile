@@ -68,6 +68,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-click \
     python3-cryptography \
     python3-jinja2 \
+    python3-jsonschema \
     python3-lxml \
     python3-pip \
     python3-pkg-resources \
