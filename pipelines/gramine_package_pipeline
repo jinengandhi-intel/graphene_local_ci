@@ -88,12 +88,6 @@ pipeline {
                     }
                 }
 
-                stage ('Invoke Gramine Package Installation for Ubuntu 24.04 DCAP') {
-                    steps {
-                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu:24.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_dcap'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-dcap'], [$class: 'StringParameterValue', name: 'gramine_release', value: gramine_release], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'package_version', value: package_version]], propagate: true, wait: true
-                    }
-                }
-
                 stage ('Invoke Gramine Package Installation for Debian 11 DCAP') {
                     steps {
                         build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'debian:11'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_dcap'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-dcap'], [$class: 'StringParameterValue', name: 'gramine_release', value: gramine_release], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'package_version', value: package_version]], propagate: true, wait: true
