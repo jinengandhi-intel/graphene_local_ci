@@ -39,7 +39,7 @@ stage('test-direct') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/python
-                make ${MAKEOPTS} DEBUG=1 all
+                make ${MAKEOPTS} all
                 make check
             '''
         }

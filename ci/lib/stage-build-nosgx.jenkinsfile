@@ -4,6 +4,8 @@ stage('build') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
 
+    env.RA_TYPE = "none"
+
     if (env.build_type == "manual") {
         try {
             if (env.base_os == "alpine3.18") {
