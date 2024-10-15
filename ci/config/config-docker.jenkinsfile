@@ -91,3 +91,6 @@ if (env.IS_VM == "1") {
 // Docker Build environment
 env.DOCKER_BUILDKIT=0
 env.COMPOSE_DOCKER_CLI_BUILD=0
+
+// CleanUp Docker Environment
+sh 'docker system prune -af'

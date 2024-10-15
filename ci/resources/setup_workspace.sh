@@ -1,8 +1,6 @@
 #!/bin/bash
 set -x
 
-docker system prune -af
-
 python3 $WORKSPACE/utils/env_setup.py
 
 cd $WORKSPACE/examples
@@ -51,3 +49,6 @@ if [[ "$node_label" == "graphene_oot" ]]; then
     sed -i 's/sgx.use_exinfo/sgx.insecure__allow_memfaults_without_exinfo/' $i;
   done;
 fi
+
+# Temporary fix
+sed -i 's/wrk -c /wrk -R 10000 -c /' CI-Examples/common_tools/benchmark-http.sh
