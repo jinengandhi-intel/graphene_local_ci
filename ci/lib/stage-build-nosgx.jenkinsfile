@@ -4,6 +4,12 @@ stage('build') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
 
+    if (env.node_label.contains("dcap")) {
+        env.RA_TYPE = "dcap"
+    } else {
+        env.RA_TYPE = "none"
+    }
+
     if (env.build_type == "manual") {
         try {
             if (env.base_os == "alpine3.18") {

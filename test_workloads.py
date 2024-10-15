@@ -15,6 +15,7 @@ os_release_id = os.environ.get('os_release_id')
 node_label = os.environ.get('node_label')
 edmm_mode = os.environ.get('EDMM')
 distro_ver = os.environ.get('distro_ver')
+ra_type = os.environ.get("RA_TYPE", "none")
 
 class Test_Workload_Results():
     @pytest.mark.examples
@@ -40,7 +41,7 @@ class Test_Workload_Results():
         assert("Success 3/4" in python_contents)
         assert("Success 4/4" in python_contents)
         assert("error: " not in python_contents)
-        if os.environ.get("RA_TYPE") == "dcap":
+        if ra_type == "dcap":
             assert("Success SGX report" in python_contents)
             assert("Success SGX quote" in python_contents)
 
@@ -217,7 +218,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not(("dcap" in node_label) and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif(not((ra_type == "dcap") and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_mbedtls_workload(self):
         mbedtls_result_file = open("CI-Examples/ra-tls-mbedtls/mbedtls_result.txt", "r")
         mbedtls_contents = mbedtls_result_file.read()
@@ -229,7 +230,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not(("dcap" in node_label) and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif(not((ra_type == "dcap") and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_secret_prov_workload(self):
         secret_prov_result_file = open("CI-Examples/ra-tls-secret-prov/secret_prov_result.txt", "r")
         secret_prov_contents = secret_prov_result_file.read()
@@ -241,7 +242,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not(("dcap" in node_label) and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif(not((ra_type == "dcap") and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_nginx_workload(self):
         nginx_result_file = open("CI-Examples/ra-tls-nginx/nginx_result.txt", "r")
         nginx_contents = nginx_result_file.read()
