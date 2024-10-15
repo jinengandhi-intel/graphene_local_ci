@@ -57,7 +57,7 @@ stage('test-examples') {
 
     try {
         timeout(time: (env.EDMM ? 45 : 20), unit: 'MINUTES') {
-            if (env.SGX !=1) {
+            if (env.SGX !=1 && os_release_id == "ubuntu") {
                sh 'sudo sysctl -w vm.max_map_count=1310720'
             }
             sh '''
@@ -81,7 +81,7 @@ stage('test-examples') {
             '''
         }
     } catch (Exception e) { } finally {
-        if (env.SGX !=1) {
+        if (env.SGX !=1 && os_release_id == "ubuntu") {
             sh "sudo sysctl -w vm.max_map_count=${env.map_count}"
         }
     }
@@ -206,7 +206,7 @@ stage('test-examples') {
         if (["ubuntu20.04", "ubuntu22.04"].contains(env.base_os)) {
             try {
                 timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
-                    if (env.SGX !=1) {
+                    if (env.SGX !=1 && os_release_id == "ubuntu") {
                         sh 'sudo sysctl -w vm.max_map_count=1310720'
                     }
                     sh '''
@@ -219,7 +219,7 @@ stage('test-examples') {
                     '''
                 }
             } catch (Exception e) { } finally {
-                if (env.SGX !=1) {
+                if (env.SGX !=1 && os_release_id == "ubuntu") {
                     sh "sudo sysctl -w vm.max_map_count=${env.map_count}"
                 }
             }
