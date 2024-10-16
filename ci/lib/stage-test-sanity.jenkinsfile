@@ -1,14 +1,4 @@
 stage('test') {
-    env.RA_TYPE='dcap'
-    env.RA_TLS_MRSIGNER='any'
-    env.RA_TLS_MRENCLAVE='any'
-    env.RA_TLS_ISV_PROD_ID='any'
-    env.RA_TLS_ISV_SVN='any'
-    env.RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE='1'
-    env.RA_TLS_ALLOW_OUTDATED_TCB_INSECURE='1'
-    env.RA_TLS_ALLOW_SW_HARDENING_NEEDED='1'
-    env.RA_TLS_ALLOW_HW_CONFIG_NEEDED='1'
-
     try {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
@@ -25,6 +15,16 @@ stage('test') {
     } catch (Exception e) {}
 
     if (env.node_label.contains("dcap")) {
+        env.RA_TYPE='dcap'
+        env.RA_TLS_MRSIGNER='any'
+        env.RA_TLS_MRENCLAVE='any'
+        env.RA_TLS_ISV_PROD_ID='any'
+        env.RA_TLS_ISV_SVN='any'
+        env.RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE='1'
+        env.RA_TLS_ALLOW_OUTDATED_TCB_INSECURE='1'
+        env.RA_TLS_ALLOW_SW_HARDENING_NEEDED='1'
+        env.RA_TLS_ALLOW_HW_CONFIG_NEEDED='1'
+
         try {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''

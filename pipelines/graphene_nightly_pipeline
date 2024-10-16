@@ -18,7 +18,7 @@ pipeline {
 
                 stage ('Invoke Ubuntu 20.04 with 6.2 Gramine SGX Regression Suite') {
                     steps {
-                        build job: 'local_ci_graphene_sgx_20.04_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_sgx_20.04_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_20.04_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu20.04"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
                     }
                 }
 
@@ -127,13 +127,13 @@ pipeline {
                 stage ('Invoke RHEL 9 with 6.7 Gramine Native Suite ') {
                     steps {
                         sleep(time: 45, unit: "MINUTES")
-                        build job: 'local_ci_graphene_native_rhel9_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_rhel9_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
                     }
                 }
 
                 stage ('Invoke RHEL 9 with 6.7 Gramine SGX Suite ') {
                     steps {
-                        build job: 'local_ci_graphene_sgx_rhel9_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.7_rasp'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_sgx_rhel9_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel9_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
                     }
                 }
 

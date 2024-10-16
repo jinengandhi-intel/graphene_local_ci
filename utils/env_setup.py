@@ -67,6 +67,7 @@ class HostSetup():
             subprocess.run(f"{priviledge} chown $USER /var/run/docker.sock", timeout=5, shell=True)
             subprocess.run(f"{priviledge} chmod 777 /dev/cpu_dma_latency", timeout=5, shell=True)
             subprocess.run(f"{priviledge} chown $USER /dev/cpu_dma_latency", timeout=5, shell=True)
+            subprocess.run(f"{priviledge} sysctl -w vm.max_map_count=1310720", timeout=10, shell=True)
             if (os.path.exists("/dev/sgx_enclave")):
                 subprocess.run(f"{priviledge} chmod 777 /dev/sgx_enclave", timeout=5, shell=True)
                 subprocess.run(f"{priviledge} chmod 777 /dev/sgx_provision", timeout=5, shell=True)

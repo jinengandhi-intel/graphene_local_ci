@@ -55,6 +55,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         nss-mdns \
         nss-myhostname \
         openssl-devel \
+        procps-ng \
         protobuf-devel \
         protobuf-c-devel \
         patch \

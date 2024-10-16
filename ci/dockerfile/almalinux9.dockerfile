@@ -66,6 +66,7 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
 #   libprotobuf-c-dev \
 #   linux-headers-generic \
     pkg-config \
+    procps-ng \
     protobuf-c-compiler \
     python3 \
     python3-click \

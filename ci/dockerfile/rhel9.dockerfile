@@ -61,6 +61,7 @@ RUN dnf update -y \
         openssl-devel \
         patch \
         pkg-config \
+        procps-ng \
         protobuf-c-compiler \
         protobuf-c-devel \
         protobuf-compiler \

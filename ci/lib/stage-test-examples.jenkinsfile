@@ -1,5 +1,4 @@
 stage('test-examples') {
-    env.map_count=sh(returnStdout: true, script: '''cat /proc/sys/vm/max_map_count''').trim()
 
     if (env.SGX == "1") {
         env.MODE = "sgx"
@@ -57,9 +56,6 @@ stage('test-examples') {
 
     try {
         timeout(time: (env.EDMM ? 45 : 20), unit: 'MINUTES') {
-            if (env.SGX !=1 && os_release_id == "ubuntu") {
-               sh 'sudo sysctl -w vm.max_map_count=1310720'
-            }
             sh '''
                 cd CI-Examples/r
                 if [ "${os_release_id}" != 'ubuntu' ] && [ "${os_release_id}" != 'debian' ]  && \
@@ -80,11 +76,7 @@ stage('test-examples') {
                 gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r 2>&1 | tee RESULT_1
             '''
         }
-    } catch (Exception e) { } finally {
-        if (env.SGX !=1 && os_release_id == "ubuntu") {
-            sh "sudo sysctl -w vm.max_map_count=${env.map_count}"
-        }
-    }
+    } catch (Exception e) { }
 
     if (["ubuntu", "debian", "alpine"].contains(os_release_id)) {
         try {
@@ -206,9 +198,6 @@ stage('test-examples') {
         if (["ubuntu20.04", "ubuntu22.04"].contains(env.base_os)) {
             try {
                 timeout(time: (env.EDMM ? 60 : 30), unit: 'MINUTES') {
-                    if (env.SGX !=1 && os_release_id == "ubuntu") {
-                        sh 'sudo sysctl -w vm.max_map_count=1310720'
-                    }
                     sh '''
                         cd CI-Examples/scikit-learn-intelex
                         sed -i "s/\\/home\\/user\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
@@ -218,11 +207,7 @@ stage('test-examples') {
                         ./run_tests.sh 2>&1 | tee RESULT
                     '''
                 }
-            } catch (Exception e) { } finally {
-                if (env.SGX !=1 && os_release_id == "ubuntu") {
-                    sh "sudo sysctl -w vm.max_map_count=${env.map_count}"
-                }
-            }
+            } catch (Exception e) { }
         }
 
         if (["ubuntu", "debian"].contains(env.os_release_id)) {
