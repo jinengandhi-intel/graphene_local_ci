@@ -188,8 +188,7 @@ class Test_Workload_Results():
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()
         assert("success" in r1_contents)
-        if os_release_id == "ubuntu":
-            assert("error: " not in r1_contents)
+        assert("error: " not in r1_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id not in ["ubuntu", "debian", "alpine"]),
@@ -265,8 +264,7 @@ class Test_Workload_Results():
         sklearn_contents = sklearn_result_file.read()
         assert(("Success 1/2" in sklearn_contents) \
             and ("Success 2/2" in sklearn_contents))
-        if os_release_id == "ubuntu":
-            assert("error: " not in sklearn_contents)
+        assert("error: " not in sklearn_contents)
 
     @pytest.mark.examples
     @pytest.mark.skipif((os_release_id not in ["ubuntu", "debian"]) or
