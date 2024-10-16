@@ -19,7 +19,9 @@ cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/
 cp -rf $WORKSPACE/utils/tfserving CI-Examples/
 
 if [[ "$SGX" == 1 ]]; then
-  cp -rf ~/jenkins/sd-test/* CI-Examples/sd-test/
+  if [[ -d ~/jenkins/sd-test ]]; then
+    cp -rf ~/jenkins/sd-test/* CI-Examples/sd-test/
+  fi
   cp -f $WORKSPACE/Patch/rename_protected_file.patch .
   git apply rename_protected_file.patch
 fi
@@ -51,4 +53,5 @@ if [[ "$node_label" == "graphene_oot" ]]; then
 fi
 
 # Temporary fix
+cd $WORKSPACE/gramine
 sed -i 's/wrk -c /wrk -R 10000 -c /' CI-Examples/common_tools/benchmark-http.sh
