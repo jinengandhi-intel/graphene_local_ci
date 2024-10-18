@@ -96,7 +96,7 @@ RUN python3 -B -m pip install -U \
     'tomli-w>=0.4.0' \
     'meson>=0.56' \
     six \
-    torchvision \
+    torchvision==0.19.1 \
     pillow \
     numpy \
     scipy 

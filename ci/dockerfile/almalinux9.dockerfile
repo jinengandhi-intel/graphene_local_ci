@@ -104,7 +104,7 @@ RUN git clone https://github.com/giltene/wrk2.git \
 RUN python3 -m pip install -U \
     dataclasses \
     six \
-    torchvision \
+    torchvision==0.19.1 \
     pillow \
     numpy \
     scipy \

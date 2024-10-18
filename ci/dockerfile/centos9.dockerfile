@@ -100,7 +100,7 @@ RUN python3 -m pip install -U \
     six \
     numpy \
     scipy \
-    torchvision \
+    torchvision==0.19.1 \
     pillow \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \
