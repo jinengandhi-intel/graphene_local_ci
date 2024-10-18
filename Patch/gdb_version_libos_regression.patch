@@ -1,0 +1,27 @@
+diff --git a/libos/test/regression/test_libos.py b/libos/test/regression/test_libos.py
+index 54ed0905..0c9fdd66 100644
+--- a/libos/test/regression/test_libos.py
++++ b/libos/test/regression/test_libos.py
+@@ -1467,7 +1467,7 @@ class TC_50_GDB(RegressionTestCase):
+     # uses) non-main threads in the parent process get stuck in "tracing stop"
+     # state after vfork+execve. This test uses gdb and unfortunately triggers
+     # the bug.
+-    @unittest.skipUnless(GDB_VERSION is not None and GDB_VERSION < (13,),
++    @unittest.skipUnless(GDB_VERSION is not None and tuple(int(s) for s in GDB_VERSION[0].split() if s.isdigit()) < (13,),
+         f'missing or known buggy GDB ({GDB_VERSION=})')
+     def test_020_gdb_fork_and_access_file_bug(self):
+         # To run this test manually, use:
+diff --git a/python/graminelibos/regression.py b/python/graminelibos/regression.py
+index 65b3c832..e8831772 100644
+--- a/python/graminelibos/regression.py
++++ b/python/graminelibos/regression.py
+@@ -23,7 +23,7 @@ IS_VM = os.environ.get('IS_VM') == '1'
+ ON_X86 = os.uname().machine in ['x86_64']
+ USES_MUSL = os.environ.get('GRAMINE_MUSL') == '1'
+ try:
+-    GDB_VERSION = tuple(int(i) if i.isdigit() else i for i in subprocess.check_output(
++    GDB_VERSION = tuple(i for i in subprocess.check_output(
+         ['gdb', '-q', '-ex', 'python print(gdb.VERSION)', '-ex', 'q']
+     ).strip().decode('ascii').split('.'))
+ except (subprocess.SubprocessError, OSError):
+
