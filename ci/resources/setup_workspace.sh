@@ -26,10 +26,6 @@ if [[ "$SGX" == 1 ]]; then
   git apply rename_protected_file.patch
 fi
 
-# To fix the GDB version issue for LibOS regression, apply the patch.
-cp -f $WORKSPACE/Patch/gdb_version_libos_regression.patch .
-git apply gdb_version_libos_regression.patch
-
 sed -i 's/.release  = "3.10.0"/.release  = "5.10.0"/' libos/src/sys/libos_uname.c
 
 if [[ "$base_os" == *"centos"* ]]; then
