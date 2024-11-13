@@ -1,6 +1,5 @@
 # From Jinen Gandhi 10/28
 #loader.pal_internal_mem_size = "256M"
-loader.entrypoint = "file:{{ gramine.libos }}"
 libos.entrypoint = "/sd-test"
 # use `inline` for gramine debug messages
 loader.log_level = "error"
@@ -44,7 +43,6 @@ sgx.allowed_files = [
 sys.insecure__allow_eventfd = true
 
 sgx.trusted_files = [
-  "file:{{ gramine.libos }}",
   "file:{{ gramine.runtimedir() }}/ld-linux-x86-64.so.2",
   "file:{{ gramine.runtimedir() }}/libc.so.6",
   "file:{{ gramine.runtimedir() }}/libm.so.6",

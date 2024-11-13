@@ -1,6 +1,5 @@
 # Python3 manifest example
 
-loader.entrypoint = "file:{{ gramine.libos }}"
 libos.entrypoint = "{{ entrypoint }}"
 
 loader.log_level = "{{ log_level }}"
@@ -32,7 +31,6 @@ sgx.enclave_size = "64G"
 sgx.max_threads = 1024
 
 sgx.trusted_files = [
-  "file:{{ gramine.libos }}",
   "file:{{ entrypoint }}",
   "file:{{ gramine.runtimedir() }}/",
   "file:{{ arch_libdir }}/",
