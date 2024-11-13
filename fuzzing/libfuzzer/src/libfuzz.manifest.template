@@ -1,6 +1,5 @@
 # lib-fuzz manifest example
 sgx.nonpie_binary = true
-loader.entrypoint = "file:{{ gramine.libos }}"
 libos.entrypoint = "/example_fuzzer"
 
 loader.log_level = "error"
@@ -39,7 +38,6 @@ sgx.max_threads = 32
 
 
 sgx.trusted_files = [
-  "file:{{ gramine.libos }}",
   "file:{{ gramine.runtimedir() }}/",
   "file:{{ arch_libdir }}/",
   "file:/usr/{{ arch_libdir }}/",
