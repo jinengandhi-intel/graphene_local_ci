@@ -67,7 +67,6 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-apt \
     python3-breathe \
     python3-click \
-    python3-cryptography \
     python3-jinja2 \
     python3-lxml \
     python3-numpy \
@@ -98,6 +97,9 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     zlib1g-dev \
     gnupg2 \
     binutils
+
+RUN apt-get update && apt-get satisfy -y \
+    'python3-cryptography (>=3.1)'
 
 # Install wrk2 benchmark. This benchmark is used in `benchmark-http.sh`.
 RUN git clone https://github.com/giltene/wrk2.git \

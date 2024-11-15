@@ -70,7 +70,6 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     protobuf-c-compiler \
     python3 \
     python3-click \
-    python3-cryptography \
     python3-devel \
     python3-jinja2 \
     python3-lxml \
@@ -102,6 +101,7 @@ RUN git clone https://github.com/giltene/wrk2.git \
     && rm -rf wrk2
 
 RUN python3 -m pip install -U \
+    python3-cryptography>=3.1 \
     dataclasses \
     six \
     torchvision==0.19.1 \
