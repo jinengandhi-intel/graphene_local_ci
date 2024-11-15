@@ -15,6 +15,7 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
     ncurses-devel \
     bc \
     bison \
+    busybox \
     flex \
     make \
     elfutils-libelf-devel \
@@ -65,6 +66,7 @@ RUN yum update -y --exclude=texlive-context && env yum install -y \
 #   libprotobuf-c-dev \
 #   linux-headers-generic \
     pkg-config \
+    procps-ng \
     protobuf-c-compiler \
     python3 \
     python3-click \
@@ -102,7 +104,7 @@ RUN git clone https://github.com/giltene/wrk2.git \
 RUN python3 -m pip install -U \
     dataclasses \
     six \
-    torchvision \
+    torchvision==0.19.1 \
     pillow \
     numpy \
     scipy \

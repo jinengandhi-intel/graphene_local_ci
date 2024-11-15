@@ -12,7 +12,6 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get i
     lsb-release \
     lsof \
     make \
-    netcat \
     nginx \
     pkg-config \
     python3-pip \
@@ -22,16 +21,23 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get i
     sshpass \
     wget
 
-RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
-    > /etc/apt/sources.list.d/intel-sgx.list \
-    && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
-    && apt-key add intel-sgx-deb.key
+RUN if [ "$(lsb_release -sc)" = "noble" ]; then \
+        apt install -y netcat-openbsd meson && \
+        userdel -r ubuntu; \
+    else \
+        python3 -m pip install -U 'meson>=0.56,<0.57' && \
+        apt install -y netcat; \
+    fi
 
-RUN curl -fsSLo /usr/share/keyrings/gramine-keyring.gpg https://packages.gramineproject.io/gramine-keyring.gpg
+RUN mkdir -p /etc/apt/keyrings
 
-RUN apt-get update -y && python3 -m pip install -U 'meson>=0.56,<0.57'
+RUN curl -fsSLo /etc/apt/keyrings/intel-sgx-deb.asc https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
 
-RUN apt install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev
+RUN echo "deb [arch=amd64  signed-by=/etc/apt/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/intel-sgx.list
+
+RUN curl -fsSLo /etc/apt/keyrings/gramine-keyring-$(lsb_release -sc).gpg https://packages.gramineproject.io/gramine-keyring-`lsb_release -sc`.gpg
+
+RUN apt update -y && apt install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev
 
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G sudo -m -d /intel -c "intel Jenkins" intel && \

@@ -4,6 +4,8 @@ stage('build') {
         env.MESON_OPTIONS += ' -Dmusl=disabled'
     }
 
+    env.RA_TYPE = "none"
+
     if (env.build_type == "manual") {
         try {
             if (env.base_os == "alpine3.18") {
@@ -44,6 +46,7 @@ stage('build') {
 
         // In CI we install to non-standard --prefix (see above). This makes sure the libraries are
         // available anyway
+        env.LD_LIBRARY_PATH = libdir
         env.PKG_CONFIG_PATH = libdir + '/pkgconfig'
 
         // prevent cheating and testing from repo

@@ -1,4 +1,5 @@
-stage('test-examples') {              
+stage('test-examples') {
+
     if (env.SGX == "1") {
         env.MODE = "sgx"
     }
@@ -23,7 +24,7 @@ stage('test-examples') {
                         make PYTHON_BIN_PATH=${PYTHON_BIN_PATH}
                     fi
                     make all
-                    make ${MAKEOPTS} run-gramine | tee OUTPUT
+                    make ${MAKEOPTS} run-gramine 2>&1 | tee OUTPUT
                 '''
             }
         } catch (Exception e) { }
@@ -34,7 +35,7 @@ stage('test-examples') {
             sh '''
                 cd CI-Examples/curl
                 make ${MAKEOPTS} all
-                make ${MAKEOPTS} check | tee RESULT
+                make ${MAKEOPTS} check 2>&1 | tee RESULT
             '''
         }
     } catch (Exception e) { }
@@ -48,7 +49,7 @@ stage('test-examples') {
                     sed -i "s/{{ nodejs_dir }}\\/nodejs/{{ nodejs_dir }}\\/node/g" nodejs.manifest.template
                 fi
                 make ${MAKEOPTS} all
-                make ${MAKEOPTS} check | tee RESULT
+                make ${MAKEOPTS} check 2>&1 | tee RESULT
             '''
         }
     } catch (Exception e) { }
@@ -72,7 +73,7 @@ stage('test-examples') {
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/lib64/libcap.so.2",\' R.manifest.template
                 fi
                 make ${MAKEOPTS} all
-                gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r | tee RESULT_1
+                gramine-${MODE} ./R --slave --vanilla -f scripts/sample.r 2>&1 | tee RESULT_1
             '''
         }
     } catch (Exception e) { }
@@ -91,7 +92,7 @@ stage('test-examples') {
                         sed -i "/file:\\/lib64/d" gcc.manifest.template
                     fi
                     make ${MAKEOPTS} all
-                    make ${MAKEOPTS} check | tee OUTPUT
+                    make ${MAKEOPTS} check 2>&1 | tee OUTPUT
                 '''
             }
         } catch (Exception e) { }
@@ -132,7 +133,7 @@ stage('test-examples') {
                 make ${MAKEOPTS}
                 make ${MAKEOPTS} start-gramine-server &
                 ../../scripts/wait_for_server 300 127.0.0.1 3000
-                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:3000 | tee RESULT
+                LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:3000 2>&1 | tee RESULT
             '''
         }
     } catch (Exception e) { }
@@ -153,7 +154,7 @@ stage('test-examples') {
                         gramine-${MODE} mongod &
                         ../common_tools/wait_for_server 120 127.0.0.1 27017
                         mongosh scripts/insert.js
-                        mongosh scripts/fetch.js | tee OUTPUT
+                        mongosh scripts/fetch.js 2>&1 | tee OUTPUT
                     '''
                 }
             } catch (Exception e) { }
@@ -170,7 +171,7 @@ stage('test-examples') {
                         sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:$JAVAHOME\\/lib\\/\\"," java.manifest.template
                     fi
                     make ${MAKEOPTS} all
-                    gramine-${MODE} java MultiThreadMain | tee OUTPUT
+                    gramine-${MODE} java MultiThreadMain 2>&1 | tee OUTPUT
                 '''
             }
         } catch (Exception e) { }
@@ -188,7 +189,7 @@ stage('test-examples') {
                         make ${MAKEOPTS} intel_models
                         model_name="bert-large-uncased-whole-word-masking-squad-0001"
                         make ${MAKEOPTS} all
-                        gramine-${MODE} benchmark_app -m model/intel/${model_name}/FP32/${model_name}.xml | tee OUTPUT
+                        gramine-${MODE} benchmark_app -m model/intel/${model_name}/FP32/${model_name}.xml 2>&1 | tee OUTPUT
                     '''
                 }
             } catch (Exception e) { }
@@ -203,7 +204,7 @@ stage('test-examples') {
                         sed -i "s/{{ env.HOME }}\\/.local\\/lib/\\/usr\\/local\\/lib/" sklearnex.manifest.template
                         python3 scripts/download_dataset.py
                         make ${MAKEOPTS} all
-                        ./run_tests.sh | tee RESULT
+                        ./run_tests.sh 2>&1 | tee RESULT
                     '''
                 }
             } catch (Exception e) { }

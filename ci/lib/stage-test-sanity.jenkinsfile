@@ -9,18 +9,27 @@ stage('test') {
                 else
                     make ${MAKEOPTS} all
                 fi
-                make check | tee helloworld_result.txt
+                make check 2>&1 | tee helloworld_result.txt
             '''
         }
     } catch (Exception e) {}
 
     if (env.node_label.contains("dcap")) {
+        env.RA_TYPE='dcap'
+        env.RA_TLS_MRSIGNER='any'
+        env.RA_TLS_MRENCLAVE='any'
+        env.RA_TLS_ISV_PROD_ID='any'
+        env.RA_TLS_ISV_SVN='any'
+        env.RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE='1'
+        env.RA_TLS_ALLOW_OUTDATED_TCB_INSECURE='1'
+        env.RA_TLS_ALLOW_SW_HARDENING_NEEDED='1'
+        env.RA_TLS_ALLOW_HW_CONFIG_NEEDED='1'
+
         try {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/ra-tls-mbedtls
-                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1  RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 RA_TYPE=dcap \
-                    RA_TLS_ALLOW_HW_CONFIG_NEEDED=1 make check_dcap | tee mbedtls_result.txt
+                    make check_dcap 2>&1 | tee mbedtls_result.txt
                 '''
             }
         } catch (Exception e) {}
@@ -29,8 +38,7 @@ stage('test') {
             timeout(time: 5, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/ra-tls-secret-prov
-                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 RA_TYPE=dcap \
-                    RA_TLS_ALLOW_HW_CONFIG_NEEDED=1 make check_dcap | tee secret_prov_result.txt
+                    make check_dcap 2>&1 | tee secret_prov_result.txt
                 '''
             }
         } catch (Exception e) {}
@@ -45,8 +53,7 @@ stage('test') {
                         kill -9 $PID
                     fi
                     cd CI-Examples/ra-tls-nginx
-                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 RA_TYPE=dcap \
-                    RA_TLS_ALLOW_HW_CONFIG_NEEDED=1 make check 2>&1 | tee nginx_result.txt
+                    make check 2>&1 | tee nginx_result.txt
                 '''
             }
         } catch (Exception e) { }

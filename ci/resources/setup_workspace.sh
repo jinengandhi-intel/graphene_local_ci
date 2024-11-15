@@ -1,8 +1,6 @@
 #!/bin/bash
 set -x
 
-docker system prune -af
-
 python3 $WORKSPACE/utils/env_setup.py
 
 cd $WORKSPACE/examples
@@ -14,14 +12,16 @@ done;
 cd $WORKSPACE/gramine
 cp -rf $WORKSPACE/stress-ng CI-Examples/
 cp -rf $WORKSPACE/sd-test CI-Examples/
-cp -rf $WORKSPACE/go_helloworld CI-Examples/
+cp -rf $WORKSPACE/go-helloworld CI-Examples/
 cp -rf $WORKSPACE/examples/* CI-Examples/
 cp -rf $WORKSPACE/test_workloads.py . 
 cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/
 cp -rf $WORKSPACE/utils/tfserving CI-Examples/
 
 if [[ "$SGX" == 1 ]]; then
-  cp -rf ~/jenkins/sd-test/* CI-Examples/sd-test/
+  if [[ -d ~/jenkins/sd-test ]]; then
+    cp -rf ~/jenkins/sd-test/* CI-Examples/sd-test/
+  fi
   cp -f $WORKSPACE/Patch/rename_protected_file.patch .
   git apply rename_protected_file.patch
 fi
@@ -51,3 +51,7 @@ if [[ "$node_label" == "graphene_oot" ]]; then
     sed -i 's/sgx.use_exinfo/sgx.insecure__allow_memfaults_without_exinfo/' $i;
   done;
 fi
+
+# Temporary fix
+cd $WORKSPACE/gramine
+sed -i 's/wrk -c /wrk -R 10000 -c /' CI-Examples/common_tools/benchmark-http.sh

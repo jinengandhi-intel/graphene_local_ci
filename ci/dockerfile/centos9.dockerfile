@@ -10,6 +10,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         ncurses-devel \
         bc \
         bison \
+        busybox \
         cargo \
         cmake \
         flex \
@@ -54,6 +55,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         nss-mdns \
         nss-myhostname \
         openssl-devel \
+        procps-ng \
         protobuf-devel \
         protobuf-c-devel \
         patch \
@@ -98,7 +100,7 @@ RUN python3 -m pip install -U \
     six \
     numpy \
     scipy \
-    torchvision \
+    torchvision==0.19.1 \
     pillow \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \

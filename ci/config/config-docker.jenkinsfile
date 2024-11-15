@@ -65,10 +65,6 @@ if (env.base_os) {
 echo 'OS name : ' + os_release_id
 echo 'OS version : ' + os_version
 
-if (env.node_label.contains("dcap") && (env.SGX == "1")) {
-    env.RA_TYPE = "dcap"
-}
-
 if (env.IS_VM == "1") {
     // only root and `kvm` group can access /dev/kvm, so add `kvm` GID to the in-Docker user
     kvm_gid = sh(returnStdout: true, script: 'getent group kvm | cut -d: -f3').trim()
@@ -95,3 +91,6 @@ if (env.IS_VM == "1") {
 // Docker Build environment
 env.DOCKER_BUILDKIT=0
 env.COMPOSE_DOCKER_CLI_BUILD=0
+
+// CleanUp Docker Environment
+sh 'docker system prune -af'

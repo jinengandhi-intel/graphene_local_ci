@@ -17,6 +17,7 @@ RUN dnf update -y \
         automake \
         bison \
         binutils \
+        busybox \
         cargo \
         cmake \
         elfutils-libelf-devel \
@@ -60,6 +61,7 @@ RUN dnf update -y \
         openssl-devel \
         patch \
         pkg-config \
+        procps-ng \
         protobuf-c-compiler \
         protobuf-c-devel \
         protobuf-compiler \
@@ -94,7 +96,7 @@ RUN python3 -B -m pip install -U \
     'tomli-w>=0.4.0' \
     'meson>=0.56' \
     six \
-    torchvision \
+    torchvision==0.19.1 \
     pillow \
     numpy \
     scipy 

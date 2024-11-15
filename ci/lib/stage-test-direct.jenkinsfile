@@ -39,7 +39,7 @@ stage('test-direct') {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/python
-                make ${MAKEOPTS} DEBUG=1 all
+                make ${MAKEOPTS} all
                 make check
             '''
         }
@@ -130,7 +130,7 @@ stage('test-direct') {
                 fi    
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} start-gramine-server &
-                ../../scripts/wait_for_server 5 127.0.0.1 8002
+                ../../scripts/wait_for_server 360 127.0.0.1 8002
                 LOOP=1 CONCURRENCY_LIST="1 32" ../common_tools/benchmark-http.sh http://127.0.0.1:8002
             '''
         }
@@ -155,6 +155,7 @@ stage('test-direct') {
                 if [ "${os_release_id}" = "alpine" ]
                 then
                     sed -i -e '/^fs.mounts = \\[.*/a \\{ path = "\\/usr\\/{{ arch_libdir }}", uri="file:\\/usr\\/{{ arch_libdir }}" },' manifest.template
+                    sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/{{ arch_libdir }}\\/\\"," manifest.template
                 fi
                 make ${MAKEOPTS} all
                 make ${MAKEOPTS} regression
@@ -175,7 +176,7 @@ stage('test-direct') {
     try{
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
-                cd CI-Examples/go_helloworld
+                cd CI-Examples/go-helloworld
                 make check
             '''
         }

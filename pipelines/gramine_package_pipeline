@@ -22,6 +22,12 @@ pipeline {
                     }
                 }
 
+                stage ('Invoke Gramine Package Installation for Ubuntu 24.04') {
+                    steps {
+                        build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'ubuntu:24.04'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_release', value: gramine_release], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'package_version', value: package_version]], propagate: true, wait: true
+                    }
+                }
+
                 stage ('Invoke Gramine Package Installation for Rockylinux 9') {
                     steps {
                         build job: 'local_ci_gsgx_package', parameters: [[$class: 'StringParameterValue', name: 'base_os', value: 'rockylinux:9'], [$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_rockylinux9_client_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'build_type', value: 'package-in-kernel'], [$class: 'StringParameterValue', name: 'gramine_release', value: gramine_release], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'package_version', value: package_version]], propagate: true, wait: true

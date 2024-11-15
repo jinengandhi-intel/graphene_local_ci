@@ -1,6 +1,12 @@
 stage('build') {
     env.MESON_OPTIONS = ''
 
+    if (env.node_label.contains("dcap")) {
+        env.RA_TYPE = "dcap"
+    } else {
+        env.RA_TYPE = "none"
+    }
+
     if (env.build_type == "manual") {
         if (env.build_prefix != "0") {
             env.MESON_OPTIONS += ' --prefix=' + env.PREFIX
@@ -72,6 +78,7 @@ stage('build') {
 
             // In CI we install to non-standard --prefix (see above). This makes sure the libraries are
             // available anyway
+            env.LD_LIBRARY_PATH = libdir
             env.PKG_CONFIG_PATH = libdir + '/pkgconfig'
         }
 
@@ -86,7 +93,7 @@ stage('build') {
             sh 'sshpass -p intel@123 scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -r intel@${local_machine}:${package_path} packages'
         }
 
-        if (!(["ubuntu:20.04", "ubuntu:22.04", "debian:11", "debian:12"].contains(env.base_os))) {
+        if (!(env.base_os.contains("ubuntu") || env.base_os.contains("debian"))) {
             env.ARCH_LIBDIR="/lib64"
 
             if (env.build_type == "package-local") {
@@ -102,19 +109,19 @@ stage('build') {
                 sh 'sudo yum update -y && sudo yum upgrade -y --enablerepo=gramine-unstable'
             }
         } else {
-            env.ubuntu_repo = sh(returnStdout: true, script: 'lsb_release -sc').trim()
+            env.os_codename = sh(returnStdout: true, script: 'lsb_release -sc').trim()
 
             if (env.gramine_release == "unstable") {
-                env.package_repo = "unstable-${ubuntu_repo}"
+                env.package_repo = "unstable-${os_codename}"
             } else {
-                env.package_repo = "${ubuntu_repo}"
+                env.package_repo = "${os_codename}"
             }
 
             sh '''
-                echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ ${package_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
-                sudo apt-get update -y
+                echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/gramine-keyring-${os_codename}.gpg] https://packages.gramineproject.io/ ${package_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
             '''
 
+            sh 'sudo apt-get update -y'
             if (env.build_type == "package-in-kernel") {
                 sh 'sudo DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install -y gramine'
             } else if (env.build_type == "package-dcap") {
@@ -127,7 +134,7 @@ stage('build') {
             sh 'sudo apt-get update'
             if (env.gramine_branch.contains("_update")) {
                 sh '''
-                    echo "deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ unstable-${ubuntu_repo} main" | sudo tee /etc/apt/sources.list.d/gramine.list
+                    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/gramine-keyring-${os_codename}.gpg] https://packages.gramineproject.io/ unstable-${os_codename} main" | sudo tee /etc/apt/sources.list.d/gramine.list
                     sudo apt-get update -y && sudo apt-get --with-new-pkgs -y upgrade
                 '''
             }

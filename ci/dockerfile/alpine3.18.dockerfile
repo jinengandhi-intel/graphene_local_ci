@@ -1,8 +1,10 @@
 FROM alpine:3.18
 
-RUN apk add doas; \
+RUN apk add doas sudo; \
     adduser intel -SG wheel -h /intel -g "intel Jenkins" -u 1000; \
     echo 'permit nopass intel as root' >> /etc/doas.d/doas.conf
+
+RUN echo "%wheel ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 RUN apk update && \
     apk add automake \
@@ -14,6 +16,7 @@ RUN apk update && \
     binutils-dev \
     bsd-compat-headers \
     build-base \
+    busybox \
     cargo \
     cmake \
     coreutils \

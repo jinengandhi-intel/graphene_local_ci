@@ -1,4 +1,3 @@
-loader.entrypoint = "file:{{ gramine.libos }}"
 libos.entrypoint = "/usr/bin/stress-ng" 
 
 loader.log_level = "error"
@@ -33,7 +32,6 @@ sgx.allowed_files = [
 
 sgx.trusted_files = [
     "file:/usr/{{ arch_libdir }}/",
-    "file:{{ gramine.libos }}",
     "file:{{ arch_libdir }}/",
     "file:/usr/bin/stress-ng",
     "file:{{ gramine.runtimedir() }}/ld-linux-x86-64.so.2",
