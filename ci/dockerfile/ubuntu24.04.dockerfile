@@ -66,7 +66,6 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-apt \
     python3-breathe \
     python3-click \
-    python3-cryptography \
     python3-jinja2 \
     python3-lxml \
     python3-numpy \
@@ -102,6 +101,7 @@ RUN apt-get update && apt-get satisfy -y \
     'python3-pyelftools' \
     'python3-tomli (>= 1.1.0)' \
     'python3-tomli-w (>= 0.4.0)' \
+    'python3-cryptography (>=3.1)' \
     'docutils' \
     'meson'  
 
