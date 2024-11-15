@@ -33,11 +33,6 @@ stage('Build Workloads') {
             then
                 docker build --tag python-test --build-arg BUILD_OS=${distro_ver} --file test/python.dockerfile .
             fi
-            if [ "${distro_ver}" = "debian:11" ]
-            then
-                docker pull python:bullseye
-                docker image tag python:bullseye python-test
-            fi
             if [ "${distro_ver}" = "debian:12" ]
             then
                 docker pull python:bookworm
