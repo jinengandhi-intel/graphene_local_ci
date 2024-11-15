@@ -44,14 +44,6 @@ if [[ "$base_os" != *"alpine"* ]]; then
   bash $WORKSPACE/ci/resources/setup_ltp.sh
 fi
 
-if [[ "$node_label" == "graphene_oot" ]]; then
-  cd $WORKSPACE
-  for i in $(find -name '*manifest.template');
-  do
-    sed -i 's/sgx.use_exinfo/sgx.insecure__allow_memfaults_without_exinfo/' $i;
-  done;
-fi
-
 # Temporary fix
 cd $WORKSPACE/gramine
 sed -i 's/wrk -c /wrk -R 10000 -c /' CI-Examples/common_tools/benchmark-http.sh
