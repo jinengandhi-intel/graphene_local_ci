@@ -8,8 +8,26 @@ node(node_label) {
         stage('checkout'){
             checkout scm
 
+            if (["", null].contains(env.gsc_repo)) {
+                env.git_repo = 'https://github.com/gramineproject/gsc.git'
+            } else {
+                env.git_repo = env.gsc_repo
+            }
+
+            if (["", null].contains(env.gsc_branch)) {
+                env.git_branch = 'https://github.com/gramineproject/gsc.git'
+            } else {
+                env.git_branch = env.gsc_branch
+            }
+
             dir('gsc_dev_repo') {
-                git url: 'https://github.com/gramineproject/gsc.git'
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "${git_branch}"]],
+                    userRemoteConfigs: [[
+                        url: env.git_repo
+                    ]]
+                ])
             }
         }
     
