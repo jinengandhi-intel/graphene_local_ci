@@ -301,6 +301,13 @@ class Test_Workload_Results():
         assert("error: " not in gsc_helloworld_log)
 
     @pytest.mark.gsc
+    def test_gsc_helloworld_direct_workload(self):
+        gsc_helloworld_result = open("helloworld_direct_result", "r")
+        gsc_helloworld_log = gsc_helloworld_result.read()
+        assert('"Hello World! Let\'s check escaped symbols: < & > "' in gsc_helloworld_log)
+        assert("error: " not in gsc_helloworld_log)
+
+    @pytest.mark.gsc
     @pytest.mark.skipif(distro_ver != "debian:11", reason='java-simple is enabled only on debian11 currently')
     def test_gsc_java_simple_workload(self):
         gsc_java_simple_result = open("openjdk-simple_result", "r")

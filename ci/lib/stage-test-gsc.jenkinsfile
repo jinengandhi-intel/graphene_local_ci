@@ -29,6 +29,14 @@ stage('Test') {
     } catch (Exception e) {}
 
     try {
+        sh '''
+            docker run --device=/dev/sgx_enclave --env GRAMINE_MODE=direct \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                --security-opt seccomp=unconfined gsc-helloworld-test 2>&1 | tee helloworld_direct_result
+        '''
+    } catch (Exception e) {}
+
+    try {
         if ((env.os_release_id == "debian") || env.os_release_id.contains("redhat") || (env.os_release_id == "quay.io/centos/centos")) {
             env.runtime_args = "-c ls"
         } else {
