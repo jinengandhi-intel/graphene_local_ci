@@ -29,8 +29,7 @@ class Test_Workload_Results():
         assert("Success 5/7" in bash_contents)
         assert("Success 6/7" in bash_contents)
         assert("error: " not in bash_contents)
-        if (os_release_id != "alpine"):
-            assert("Success 7/7" in bash_contents)
+        assert("Success 7/7" in bash_contents)
 
     @pytest.mark.examples
     def test_python_workload(self):
@@ -72,7 +71,6 @@ class Test_Workload_Results():
         assert("error: " not in nginx_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(os_release_id == "alpine", reason='Blender is not enabled for Alpine')
     def test_blender(self):
         blender_result_file = "CI-Examples/blender/data/images/simple_scene.blend0001.png"
         assert(path.exists(blender_result_file))
@@ -171,8 +169,8 @@ class Test_Workload_Results():
         assert("error: " not in nodejs_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((base_os in ["ubuntu24.04", "alpine3.18"]) or (node_label == "graphene_22.04_5.19")),
-                    reason="Pytorch not compatible for musl.")
+    @pytest.mark.skipif(((base_os in ["ubuntu24.04"]) or (node_label == "graphene_22.04_5.19")),
+                    reason="Pytorch not compatible for Ubuntu 24.04.")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
         pytorch_contents = pytorch_result_file.read()
@@ -191,7 +189,7 @@ class Test_Workload_Results():
         assert("error: " not in r1_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id not in ["ubuntu", "debian", "alpine"]),
+    @pytest.mark.skipif((os_release_id not in ["ubuntu", "debian"]),
                     reason="GCC not enabled for RPM configurations.")
     def test_gcc_workload(self):
         gcc_result_file = open("CI-Examples/gcc/OUTPUT", "r")
@@ -324,8 +322,8 @@ class Test_Workload_Results():
         assert("error: " not in gsc_java_springboot_log)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((base_os in ["ubuntu24.04", "alpine3.18"]) or ((int(no_cores) < 16) and sgx_mode == '1')),
-                    reason="MongoDB not enabled for alpine distribution")
+    @pytest.mark.skipif(((base_os in ["ubuntu24.04"]) or ((int(no_cores) < 16) and sgx_mode == '1')),
+                    reason="MongoDB not enabled for Ubuntu 24.04")
     def test_mongodb_workload(self):
         mongodb_result = open("CI-Examples/mongodb/OUTPUT", "r")
         mongodb_contents = mongodb_result.read()

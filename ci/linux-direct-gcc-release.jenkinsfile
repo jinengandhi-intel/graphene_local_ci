@@ -27,11 +27,8 @@ node(node_label) {
                 load '.ci/lib/config.jenkinsfile'
 
                 switch(env.os_release_id) {
-                    case ['centos', 'almalinux', 'rockylinux', 'rhel']:
+                    case ['centos', 'rhel']:
                         load '../ci/config/config-centos8.jenkinsfile'
-                        break
-                    case ['alpine']:
-                        load '../ci/config/config-alpine.jenkinsfile'
                         break
                     case ['debian']:
                         load '../ci/config/config-debian.jenkinsfile'

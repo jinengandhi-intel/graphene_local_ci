@@ -6,20 +6,11 @@ ARG BUILD_OS
 
 RUN echo 'proxy=http://proxy-dmz.intel.com:911' >> /etc/yum.conf
 
-RUN if [[ $BUILD_OS = *"stream8"* ]]; then \
-        sed -i 's|^mirrorlist=|#mirrorlist=|g' /etc/yum.repos.d/CentOS-* && \
-        sed -i 's|^#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-*; \
-    fi
-
 RUN dnf update -y
 
 RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
 
-RUN if [[ $BUILD_OS = *"stream8"* ]]; then \
-        dnf config-manager --set-enabled -y powertools; \
-    else \
-        dnf config-manager --set-enabled -y crb; \
-    fi
+RUN dnf config-manager --set-enabled -y crb
 
 RUN yum install -y yum-utils epel-release
 
@@ -38,10 +29,6 @@ RUN yum update -y && yum install -y \
     sshpass \
     sudo \
     wget
-
-RUN if [[ $BUILD_OS = "stream8" ]]; then \
-        yum install -y curl; \
-    fi
 
 RUN python3 -m pip install -U 'meson>=0.56,<0.57'
 

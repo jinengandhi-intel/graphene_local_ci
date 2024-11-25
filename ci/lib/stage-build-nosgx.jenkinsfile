@@ -8,11 +8,7 @@ stage('build') {
 
     if (env.build_type == "manual") {
         try {
-            if (env.base_os == "alpine3.18") {
-                env.MESON_OPTIONS += " -Dlibc=musl"
-            } else {
-                env.MESON_OPTIONS += " -Dtests=enabled"
-            }
+            env.MESON_OPTIONS += " -Dtests=enabled"
 
             sh '''
                 meson setup build/ \

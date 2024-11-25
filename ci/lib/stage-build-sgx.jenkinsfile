@@ -12,27 +12,17 @@ stage('build') {
             env.MESON_OPTIONS += ' --prefix=' + env.PREFIX
         }
 
-        if (env.node_label == "graphene_oot") {
-            sh '''
-                cd /opt/intel
-                git clone https://github.com/intel/linux-sgx-driver.git
-                cd linux-sgx-driver
-                git checkout 276c5c6a064d22358542f5e0aa96b1c0ace5d695
-            '''
-            env.MESON_OPTIONS += " -Dsgx_driver=oot"
-        } else if (env.node_label.contains("dcap")) {
+        if (env.node_label.contains("dcap")) {
             sh '''
                 curl -fsSL https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
-                echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
+                echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu noble main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
                 sudo apt-get update
                 echo N | sudo apt-get install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev libsgx-dcap-quote-verify libsgx-dcap-quote-verify-dev
             '''
             env.MESON_OPTIONS += " -Ddcap=enabled"
         }
 
-        if (env.base_os == "alpine3.18") {
-            env.MESON_OPTIONS += " -Dlibc=musl"
-        } else if (env.GRAMINE_MUSL == "1") {
+        if (env.GRAMINE_MUSL == "1") {
             env.MESON_OPTIONS += " -Dlibc=musl -Dtests=enabled"
         } else {
             env.MESON_OPTIONS += " --werror -Dtests=enabled"

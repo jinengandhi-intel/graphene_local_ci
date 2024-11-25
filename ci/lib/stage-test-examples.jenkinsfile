@@ -58,8 +58,7 @@ stage('test-examples') {
         timeout(time: (env.EDMM ? 45 : 20), unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/r
-                if [ "${os_release_id}" != 'ubuntu' ] && [ "${os_release_id}" != 'debian' ]  && \
-                [ "${os_release_id}" != 'alpine' ]
+                if [ "${os_release_id}" != 'ubuntu' ] && [ "${os_release_id}" != 'debian' ]
                 then
                     export R_HOME=/usr/lib64/R
                     sed -i \'/^sgx.trusted_files = \\[.*/a "file:/usr/bin/which",\' R.manifest.template
@@ -78,7 +77,7 @@ stage('test-examples') {
         }
     } catch (Exception e) { }
 
-    if (["ubuntu", "debian", "alpine"].contains(os_release_id)) {
+    if (["ubuntu", "debian"].contains(os_release_id)) {
         try {
             timeout(time: (env.EDMM ? 60 : 10), unit: 'MINUTES') {
                 sh '''
@@ -87,10 +86,6 @@ stage('test-examples') {
                     then                   
                         sed -i -e '/^sgx.trusted_files = \\[.*/a \\"file:/usr/libexec/gcc/x86_64-linux-gnu\\/\\",' gcc.manifest.template
                     fi
-                    if [ "${os_release_id}" == 'alpine' ]
-                    then
-                        sed -i "/file:\\/lib64/d" gcc.manifest.template
-                    fi
                     make ${MAKEOPTS} all
                     make ${MAKEOPTS} check 2>&1 | tee OUTPUT
                 '''
@@ -98,7 +93,7 @@ stage('test-examples') {
         } catch (Exception e) { }
     }
 
-    if ((!["ubuntu24.04", "alpine3.18"].contains(env.base_os)) && (env.node_label != "graphene_22.04_5.19")) {
+    if ((!["ubuntu24.04"].contains(env.base_os)) && (env.node_label != "graphene_22.04_5.19")) {
         try {
             timeout(time: 30, unit: 'MINUTES') {
                 sh '''
@@ -121,11 +116,6 @@ stage('test-examples') {
                     echo "Killing $PID"
                     kill -9 $PID
                 fi
-                if [ "${os_release_id}" = "alpine" ]
-                then
-                    sed -i -e '/^fs.mounts = \\[.*/a \\{ path = "\\/usr\\/{{ arch_libdir }}", uri="file:\\/usr\\/{{ arch_libdir }}" },' rust-hyper-http-server.manifest.template
-                    sed -i -e "/^sgx.trusted_files = \\[.*/a \\"file:\\/usr\\/{{ arch_libdir }}\\/\\"," rust-hyper-http-server.manifest.template
-                fi
                 if [ "${base_os}" = 'debian12' ]
                 then
                     rustup default stable
@@ -139,7 +129,7 @@ stage('test-examples') {
     } catch (Exception e) { }
 
     if (!((env.no_cpu.toInteger() < 16) && (env.SGX == '1'))) {
-        if (!["ubuntu24.04", "alpine3.18"].contains(env.base_os)) {
+        if (!["ubuntu24.04"].contains(env.base_os)) {
             try {
                 timeout(time: 30, unit: 'MINUTES') {
                     sh '''

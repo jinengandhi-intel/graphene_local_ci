@@ -21,8 +21,8 @@ node (node_label) {
             ).inside("${env.DOCKER_ARGS_COMMON} ${env.DOCKER_ARGS_SGX}") {
                 load '.ci/lib/config.jenkinsfile'
 
-                switch(params.base_os) {
-                    case 'centos8':
+                switch(env.os_release_id) {
+                    case 'centos':
                         load '../ci/config/config-centos8.jenkinsfile'
                         break
                 }

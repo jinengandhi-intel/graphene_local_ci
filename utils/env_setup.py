@@ -8,8 +8,6 @@ import base64
 node_name = os.environ.get('NODE_NAME')
 
 priviledge = "sudo -S"
-if node_name == "graphene_icl_alpine":
-    priviledge = "doas "
 
 class ConnectionDetails:
     '''This is class contains parameter/data for setting time''' 
@@ -44,10 +42,7 @@ class TimeSyncCMD:
 
 
     def set_timezone_cmd(self, time_zone):
-        if node_name == "graphene_icl_alpine":
-            cmd = " setup-timezone -z "
-        else:
-            cmd = " timedatectl set-timezone "
+        cmd = " timedatectl set-timezone "
         try:
             subprocess.run(f"{priviledge} {cmd} {time_zone}", timeout=5, shell=True)
         except Exception as e:
