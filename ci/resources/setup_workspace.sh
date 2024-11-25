@@ -33,16 +33,14 @@ if [[ "$base_os" == *"centos"* ]]; then
   cp -rf $WORKSPACE/utils/rust_centos_setup/* CI-Examples/rust/
 fi
 
-if [[ "$GRAMINE_MUSL" == "1" ]] || [[ "$base_os" = *"alpine"* ]]; then
+if [[ "$GRAMINE_MUSL" == "1" ]]; then
   chmod +x $WORKSPACE/ci/resources/setup_musl.sh
   bash $WORKSPACE/ci/resources/setup_musl.sh
 fi
 
-if [[ "$base_os" != *"alpine"* ]]; then
-  cd $WORKSPACE
-  chmod +x $WORKSPACE/ci/resources/setup_ltp.sh
-  bash $WORKSPACE/ci/resources/setup_ltp.sh
-fi
+cd $WORKSPACE
+chmod +x $WORKSPACE/ci/resources/setup_ltp.sh
+bash $WORKSPACE/ci/resources/setup_ltp.sh
 
 # Temporary fix
 cd $WORKSPACE/gramine

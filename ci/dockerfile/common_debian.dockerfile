@@ -24,21 +24,10 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get i
 
 RUN mkdir -p /etc/apt/keyrings
 
-RUN if [ "$(lsb_release -sc)" = "bullseye" ]; then \
-        # if you don't already have backports repo enabled:
-        echo "deb http://deb.debian.org/debian $(lsb_release -sc)-backports main" \
-        | sudo tee /etc/apt/sources.list.d/backports.list; \
-    fi
-
 RUN curl -fsSLo /etc/apt/keyrings/intel-sgx-deb.asc https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
 
-RUN if [ "$(lsb_release -sc)" = "bullseye" ]; then \
-        echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu focal main' \
+RUN echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main' \
         | tee /etc/apt/sources.list.d/intel-sgx.list; \
-    else \
-        echo 'deb [arch=amd64 signed-by=/etc/apt/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main' \
-        | tee /etc/apt/sources.list.d/intel-sgx.list; \
-    fi
 
 RUN curl -fsSLo /etc/apt/keyrings/gramine-keyring-$(lsb_release -sc).gpg https://packages.gramineproject.io/gramine-keyring-`lsb_release -sc`.gpg
 
