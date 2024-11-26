@@ -15,7 +15,7 @@ endif
 .PHONY: all
 all: sd-test.manifest
 ifeq ($(SGX),1)
-all: sd-test.manifest.sgx sd-test.sig sd-test.token
+all: sd-test.manifest.sgx sd-test.sig
 endif
 
 sd-test.manifest: sd-test.manifest.template
@@ -24,14 +24,11 @@ sd-test.manifest: sd-test.manifest.template
 		-Darch_libdir=$(ARCH_LIBDIR) \
 		$< > $@
 
-sd-test.manifest.sgx: sd-test.manifest sd-test
+sd-test.manifest.sgx: sd-test.manifest
 		gramine-sgx-sign \
 		--manifest $< --output $@
 
 sd-test.sig: sd-test.manifest.sgx
-
-sd-test.token: sd-test.sig
-	gramine-sgx-get-token --output sd-test.token --sig sd-test.sig
 
 
 .PHONY: start-sd-test
