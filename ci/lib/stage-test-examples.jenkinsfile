@@ -211,7 +211,7 @@ stage('test-examples') {
                             kill -9 $PID
                         fi
                         cd CI-Examples/tfserving
-                        sudo make install-dependencies
+                        sudo -E make install-dependencies
                         make all
                         make ${MAKEOPTS} check 2>&1 | tee RESULT
                     '''
