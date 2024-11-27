@@ -61,7 +61,7 @@ stage('test-sgx') {
         timeout(time: 15, unit: 'MINUTES') {
             sh '''
                 cd CI-Examples/memcached
-                make ${MAKEOPTS} all
+                MEMCACHED_SHA256=4ab234219865191e8d1ba57a2f9167d8b573248fa4ff00b4d8296be13d24a82c MEMCACHED_SRC=memcached-1.6.32.tar.gz make ${MAKEOPTS} all
                 make SGX=1 start-gramine-server &
                 ../../scripts/wait_for_server 300 127.0.0.1 11211
                 # memcslap populates server but doesn't report errors, use
@@ -102,14 +102,19 @@ stage('test-sgx') {
             sh '''
                 # TODO this logic is to check both epoll and select varants, and probably
                 # should be split to check both of those separately and on all distros
-                if .ci/isdistro xenial
-                then
-                    USE_SELECT=1
-                    export USE_SELECT
-                fi
+                #if .ci/isdistro xenial
+                #then
+                #    USE_SELECT=1
+                #    export USE_SELECT
+                #fi
 
                 cd CI-Examples/redis
-                make ${MAKEOPTS}
+                wget https://github.com/redis/redis/archive/refs/tags/7.4.1.tar.gz -O redis.tar.gz
+                mkdir src
+                tar -C src --strip-components=1 -xf redis.tar.gz
+                make -C src
+                cp src/src/redis-server redis-server
+                make redis-server.manifest.sgx redis-server.sig
                 make ${MAKEOPTS} SGX=1 start-gramine-server &
                 ../../scripts/wait_for_server 300 127.0.0.1 6379
                 ./src/src/redis-benchmark 2>&1 | tee OUTPUT
