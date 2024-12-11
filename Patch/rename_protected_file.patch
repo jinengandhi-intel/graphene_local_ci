@@ -1,23 +1,22 @@
 diff --git a/libos/test/fs/manifest.template b/libos/test/fs/manifest.template
-index 3470be82..5c5c8150 100644
+index 612873c0..b7a33db1 100644
 --- a/libos/test/fs/manifest.template
 +++ b/libos/test/fs/manifest.template
-@@ -10,7 +10,7 @@ fs.mounts = [
-   { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
+@@ -10,6 +10,7 @@ fs.mounts = [
    { path = "/usr/{{ arch_libdir }}", uri = "file:/usr/{{ arch_libdir }}" },
    { path = "/mounted", uri = "file:tmp" },
--
+ 
 +  { type = "encrypted", path = "/protected", uri = "file:protected" , key_name = "_sgx_mrenclave"},
    { type = "encrypted", path = "/tmp/enc_input", uri = "file:tmp/enc_input" },
    { type = "encrypted", path = "/tmp/enc_output", uri = "file:tmp/enc_output" },
    { type = "encrypted", path = "/mounted/enc_input", uri = "file:tmp/enc_input" },
 diff --git a/libos/test/fs/meson.build b/libos/test/fs/meson.build
-index ce3f8b2e..7d587dde 100644
+index 02c68830..c17c1e6e 100644
 --- a/libos/test/fs/meson.build
 +++ b/libos/test/fs/meson.build
-@@ -43,6 +43,7 @@ tests = {
-     'open_close': {},
+@@ -44,6 +44,7 @@ tests = {
      'open_flags': {},
+     'read_append': {},
      'read_write': {},
 +    'rename_pf': {},
      'read_write_mmap': {},
@@ -25,10 +24,10 @@ index ce3f8b2e..7d587dde 100644
      'seek_tell_truncate': {},
 diff --git a/libos/test/fs/rename_pf.c b/libos/test/fs/rename_pf.c
 new file mode 100644
-index 00000000..62e52f6f
+index 00000000..5439841d
 --- /dev/null
 +++ b/libos/test/fs/rename_pf.c
-@@ -0,0 +1,22 @@
+@@ -0,0 +1,23 @@
 +#include <stdio.h>
 +#include <stdlib.h>
 +#define FILENAME "protected/data"
@@ -51,8 +50,9 @@ index 00000000..62e52f6f
 +    printf("TEST OK\n");
 +    return 0;
 +}
++
 diff --git a/libos/test/fs/test_enc.py b/libos/test/fs/test_enc.py
-index ee90890a..f53006cc 100644
+index 3b83a338..74fca8d0 100644
 --- a/libos/test/fs/test_enc.py
 +++ b/libos/test/fs/test_enc.py
 @@ -81,6 +81,12 @@ class TC_50_EncryptedFiles(test_fs.TC_00_FileSystem):
@@ -69,12 +69,12 @@ index ee90890a..f53006cc 100644
      def test_100_open_close(self):
          input_path = self.ENCRYPTED_FILES[-1] # existing file
 diff --git a/libos/test/fs/tests.toml b/libos/test/fs/tests.toml
-index 362b7373..cd6d5ee4 100644
+index 2e982fdb..9e70ea88 100644
 --- a/libos/test/fs/tests.toml
 +++ b/libos/test/fs/tests.toml
-@@ -14,6 +14,7 @@ manifests = [
-   "open_close",
+@@ -15,6 +15,7 @@ manifests = [
    "open_flags",
+   "read_append",
    "read_write",
 +  "rename_pf",
    "read_write_mmap",

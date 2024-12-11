@@ -38,12 +38,26 @@ stage('test') {
                 sh '''
                     cd libos/test/fs
                     gramine-test build -v
-                    python3 -m pytest -v --junit-xml fs.xml
+                    python3 -m pytest -v -k "not test_099_rename_pf" --junit-xml fs.xml
                 '''
             }
         } catch (Exception e) { } finally {
             archiveArtifacts 'libos/test/fs/fs.xml'
             junit 'libos/test/fs/*.xml'
+        }
+
+        // Running test_099_rename_pf separetly to ensure rename_protected_file.patch is applied
+        try {
+            timeout(time: 15, unit: 'MINUTES') {
+                sh '''
+                    cd libos/test/fs
+                    gramine-test build -v
+                    python3 -m pytest -v -k test_099_rename_pf --junit-xml pf.xml
+                '''
+            }
+        } catch (Exception e) { } finally {
+            archiveArtifacts 'libos/test/fs/pf.xml'
+            junit 'libos/test/fs/pf.xml'
         }
     }
 
