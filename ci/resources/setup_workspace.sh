@@ -10,13 +10,10 @@ do
 done;
 
 cd $WORKSPACE/gramine
-cp -rf $WORKSPACE/stress-ng CI-Examples/
-cp -rf $WORKSPACE/sd-test CI-Examples/
-cp -rf $WORKSPACE/go-helloworld CI-Examples/
+cp -rf $WORKSPACE/workloads/* CI-Examples/
 cp -rf $WORKSPACE/examples/* CI-Examples/
-cp -rf $WORKSPACE/test_workloads.py . 
-cp -rf $WORKSPACE/utils/openvino_setup.sh CI-Examples/openvino/
-cp -rf $WORKSPACE/utils/tfserving CI-Examples/
+cp -rf $WORKSPACE/test_workloads.py .
+mv CI-Examples/openvino_setup.sh CI-Examples/openvino/
 
 if [[ "$SGX" == 1 ]]; then
   if [[ -d ~/jenkins/sd-test ]]; then
