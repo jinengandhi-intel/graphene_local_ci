@@ -52,7 +52,7 @@ stage('test-examples') {
                 make ${MAKEOPTS} check 2>&1 | tee RESULT
             '''
         }
-    } catch (Exception e) { }
+i    } catch (Exception e) { }
 
     try {
         timeout(time: (env.EDMM ? 45 : 20), unit: 'MINUTES') {
@@ -219,6 +219,19 @@ stage('test-examples') {
             } catch (Exception e) { }
         }
     }
+    if (["ubuntu", "debian"].contains(env.os_release_id)) {
+            try {
+                    sh '''
+                        cd CI-Examples/tfserving
+                        sudo -E make install-dependencies
+                        make all
+                        make ${MAKEOPTS} check 2>&1 | tee RESULT
+                    '''
+                }
+            } catch (Exception e) { }
+        }
+    }
+
 
     try {
         timeout(time: 20, unit: 'MINUTES') {

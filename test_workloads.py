@@ -274,6 +274,14 @@ class Test_Workload_Results():
         assert("Success" in tfserving_contents)
         assert("error: " not in tfserving_contents)
 
+    
+	@pytest.mark.examples
+	def test_mysql_workload(self):
+        	mysql_result = open("CI-Examples/mysql/RESULT", "r")
+        	mysql_contents = mysql_result.read()
+        	assert("Success" in mysql_contents)
+        	assert("error: " not in mysql_contents)
+
     @pytest.mark.gsc
     def test_gsc_bash_workload(self):
         gsc_bash_result = open("bash_result", "r")
