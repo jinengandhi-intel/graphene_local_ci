@@ -52,7 +52,7 @@ stage('test-examples') {
                 make ${MAKEOPTS} check 2>&1 | tee RESULT
             '''
         }
-i    } catch (Exception e) { }
+    } catch (Exception e) { }
 
     try {
         timeout(time: (env.EDMM ? 45 : 20), unit: 'MINUTES') {
@@ -222,7 +222,7 @@ i    } catch (Exception e) { }
     if (["ubuntu", "debian"].contains(env.os_release_id)) {
             try {
                     sh '''
-                        cd CI-Examples/tfserving
+                        cd CI-Examples/mysql
                         sudo -E make install-dependencies
                         make all
                         make ${MAKEOPTS} check 2>&1 | tee RESULT
