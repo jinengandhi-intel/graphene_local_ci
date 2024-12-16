@@ -1,6 +1,4 @@
 # MySQL manifest example
-
-#loader.entrypoint = "file:{{ gramine.libos }}"
 libos.entrypoint = "{{ entrypoint }}"
 
 loader.log_level = "{{ log_level }}"
@@ -10,7 +8,6 @@ loader.env.LD_LIBRARY_PATH = "/lib:{{ arch_libdir }}:/usr/lib:/usr/{{ arch_libdi
 loader.insecure__use_cmdline_argv = true
 sys.enable_sigterm_injection = true
 
-#sgx.nonpie_binary = true
 sgx.enclave_size = "8G"
 sgx.max_threads = {{ '1' if env.get('EDMM', '0') == '1' else '128' }}
 
@@ -29,7 +26,6 @@ fs.mounts = [
 ]
 
 sgx.trusted_files = [
-  "file:{{ gramine.libos }}",
   "file:{{ entrypoint }}",
   "file:{{ gramine.runtimedir() }}/",
   "file:{{ arch_libdir }}/",

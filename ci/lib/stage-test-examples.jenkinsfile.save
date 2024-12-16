@@ -219,16 +219,16 @@ stage('test-examples') {
             } catch (Exception e) { }
         }
     }
-
     try {
-           sh '''
-                  cd CI-Examples/mysql
-                  sudo -E make install-dependencies
-                  make all
-                  make ${MAKEOPTS} check 2>&1 | tee RESULT
-           '''
-        } catch (Exception e) { }
-
+            sh '''
+                   cd CI-Examples/mysql
+                   sudo -E make install-dependencies
+                   make all
+                   make ${MAKEOPTS} check 2>&1 | tee RESULT
+                '''
+          } catch (Exception e) { }
+        }
+    }
     try {
         timeout(time: 20, unit: 'MINUTES') {
             sh '''

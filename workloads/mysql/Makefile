@@ -16,12 +16,12 @@ endif
 
 mysqld.manifest: mysqld.manifest.template
 	gramine-manifest \
-        -Dlog_level=$(GRAMINE_LOG_LEVEL) \
-        -Darch_libdir=$(ARCH_LIBDIR) \
-        -Duid=$(UID) \
-        -Dgid=$(GID) \
-        -Dentrypoint=$(realpath $(shell sh -c "command -v mysqld")) \
-         $< >$@
+	-Dlog_level=$(GRAMINE_LOG_LEVEL) \
+	-Darch_libdir=$(ARCH_LIBDIR) \
+	-Duid=$(UID) \
+	-Dgid=$(GID) \
+	-Dentrypoint=$(realpath $(shell sh -c "command -v mysqld")) \
+	$< >$@
 
 # Make on Ubuntu <= 20.04 doesn't support "Rules with Grouped Targets" (`&:`),
 # for details on this workaround see
@@ -32,8 +32,8 @@ mysqld.manifest.sgx mysqld.sig: sgx_sign
 .INTERMEDIATE: sgx_sign
 sgx_sign: mysqld.manifest
 	gramine-sgx-sign \
-        --manifest $< \
-        --output $<.sgx
+	--manifest $< \
+	--output $<.sgx
 
 
 ifeq ($(SGX),)
@@ -44,26 +44,25 @@ endif
 
 .PHONY: check
 check: all
-	$(GRAMINE) mysqld --initialize --datadir /tmp/mysql-data > OUTPUT
-	@grep -q 'Connections are not ready' OUTPUT && echo [ "Success" ]
+	$(GRAMINE) mysqld --initialize --datadir /tmp/mysql-data > OUTPUT \
+	@grep -q '\[Server\] A temporary password is generated for' OUTPUT && echo [ "Success" ]
 	@rm OUTPUT
 
 
 .PHONY: run-native
 run-native: all
 	mysqld --initialize --datadir /tmp/mysql-data > OUTPUT \
-	@grep -q 'Connections are not ready' OUTPUT && echo [ "Success" ]
+	@grep -q '\[Server\] A temporary password is generated for' OUTPUT && echo [ "Success" ]
 	@rm OUTPUT
 
 .PHONY: install-dependencies
 install-dependencies:
-        sudo apt install -y mysql-server
-        sudo sed -i "s|^\(log_error.*\)|#\1|g" /etc/mysql/mysql.conf.d/mysqld.cnf
-        sudo systemctl stop mysql.service
-        sudo mkdir -p /var/run/mysqld
-        sudo chown -R $$USER:$$USER /var/run/mysqld
-        sudo chown -R $$USER:$$USER /var/lib/mysql-files
-        mysqld --initialize --datadir=/tmp/mysql-data
+	sudo apt install -y mysql-server
+	sudo sed -i "s|^\(log_error.*\)|#\1|g" /etc/mysql/mysql.conf.d/mysqld.cnf
+	sudo systemctl stop mysql.service
+	sudo mkdir -p /var/run/mysqld
+	sudo chown -R $$USER:$$USER /var/run/mysqld
+	sudo chown -R $$USER:$$USER /var/lib/mysql-files
 
 .PHONY: clean
 clean:
