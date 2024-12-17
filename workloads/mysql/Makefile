@@ -44,16 +44,17 @@ endif
 
 .PHONY: check
 check: all
-	$(GRAMINE) mysqld --initialize --datadir /tmp/mysql-data > OUTPUT \
-	@grep -q '\[Server\] A temporary password is generated for' OUTPUT && echo [ "Success" ]
-	@rm OUTPUT
-
+	$(GRAMINE) mysqld --initialize --datadir /tmp/mysql-data 2>&1 | tee OUTPUT
+	@grep -q '\[Server\] A temporary password is generated for' OUTPUT && echo [ "Success 1/2" ]
+	sudo mysql -u root --skip-password -e 'SELECT DATABASE();' 2>&1 | tee OUTPUT1
+	@grep -q 'DATABASE()' OUTPUT1 && grep -q 'NULL' OUTPUT1 && echo "Success 2/2"
 
 .PHONY: run-native
 run-native: all
-	mysqld --initialize --datadir /tmp/mysql-data > OUTPUT \
-	@grep -q '\[Server\] A temporary password is generated for' OUTPUT && echo [ "Success" ]
-	@rm OUTPUT
+	mysqld --initialize --datadir /tmp/mysql-data 2>&1 | tee OUTPUT
+	@grep -q '\[Server\] A temporary password is generated for' OUTPUT && echo [ "Success 1/2" ]
+	sudo mysql -u root --skip-password -e 'SELECT DATABASE();' 2>&1 | tee OUTPUT1
+	@grep -q 'DATABASE()' OUTPUT1 && grep -q 'NULL' OUTPUT1 && echo [ "Success 2/2" ]
 
 .PHONY: install-dependencies
 install-dependencies:
@@ -63,10 +64,12 @@ install-dependencies:
 	sudo mkdir -p /var/run/mysqld
 	sudo chown -R $$USER:$$USER /var/run/mysqld
 	sudo chown -R $$USER:$$USER /var/lib/mysql-files
+	sudo /etc/init.d/mysql start
 
 .PHONY: clean
 clean:
-	$(RM) *.sig *.manifest.sgx *.manifest OUTPUT
+	$(RM) *.sig *.manifest.sgx *.manifest OUTPUT OUTPUT1
+	$(RM) -r /tmp/mysql-data
 
 .PHONY: distclean
 distclean: clean

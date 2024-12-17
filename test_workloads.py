@@ -51,7 +51,7 @@ class Test_Workload_Results():
         expected_output = ["2", "18"]
         assert(any(n in memcached_contents for n in expected_output))
         assert("error: " not in memcached_contents)
-        
+
     @pytest.mark.examples
     def test_lighttpd_workload(self):
         for filename in glob.glob("CI-Examples/lighttpd/result-*"):
@@ -91,7 +91,7 @@ class Test_Workload_Results():
                 and ("row 2" in sqlite_contents) \
                 and ("row 1" in sqlite_contents))
         assert("error: " not in sqlite_contents)
-    
+
     @pytest.mark.examples
     def test_busybox_workload(self):
         busybox_result_file = open("CI-Examples/busybox/result.txt", "r")
@@ -107,7 +107,7 @@ class Test_Workload_Results():
         go_helloworld_contents = go_helloworld_result_file.read()
         assert("Hello, world" in go_helloworld_contents)
         assert("error: " not in go_helloworld_contents)
-    
+
     @pytest.mark.sdtest
     @pytest.mark.skipif((int(no_cores) < 16 or sgx_mode != '1'),
                     reason="Sandstone is enabled on servers with SGX")
@@ -274,13 +274,14 @@ class Test_Workload_Results():
         assert("Success" in tfserving_contents)
         assert("error: " not in tfserving_contents)
 
-    
-	@pytest.mark.examples
-	def test_mysql_workload(self):
-        	mysql_result = open("CI-Examples/mysql/RESULT", "r")
-        	mysql_contents = mysql_result.read()
-        	assert("Success" in mysql_contents)
-        	assert("error: " not in mysql_contents)
+
+    @pytest.mark.examples
+    def test_mysql_workload(self):
+        mysql_result = open("CI-Examples/mysql/RESULT", "r")
+        mysql_contents = mysql_result.read()
+        assert("Success 1/2" in mysql_contents)
+        assert("Success 2/2" in mysql_contents)
+        assert("error: " not in mysql_contents)
 
     @pytest.mark.gsc
     def test_gsc_bash_workload(self):
