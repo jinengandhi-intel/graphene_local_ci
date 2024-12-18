@@ -68,7 +68,7 @@ install-dependencies:
 
 .PHONY: clean
 clean:
-	$(RM) *.sig *.manifest.sgx *.manifest OUTPUT OUTPUT1
+	$(RM) *.sig *.manifest.sgx *.manifest
 	$(RM) -r /tmp/mysql-data
 
 .PHONY: distclean
