@@ -93,4 +93,5 @@ env.DOCKER_BUILDKIT=0
 env.COMPOSE_DOCKER_CLI_BUILD=0
 
 // CleanUp Docker Environment
-sh 'docker system prune -af'
+//Commentedfortesting
+//sh 'docker system prune -af'
