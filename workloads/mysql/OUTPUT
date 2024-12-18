@@ -1,4 +1,0 @@
-2024-12-17T18:39:56.001146Z 0 [System] [MY-013169] [Server] /usr/sbin/mysqld (mysqld 8.0.40-0ubuntu0.22.04.1) initializing of server in progress as process 83113
-2024-12-17T18:39:56.189545Z 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
-2024-12-17T18:39:56.553349Z 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
-2024-12-17T18:39:57.910035Z 6 [Note] [MY-010454] [Server] A temporary password is generated for root@localhost: san=Fgg>-68H
