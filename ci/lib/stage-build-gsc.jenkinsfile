@@ -14,13 +14,13 @@ stage('Build Workloads') {
             sh 'cp -rf test/suse-bash.dockerfile test/bash.dockerfile'
         } else {
             sh '''
-                cp -rf test/ubuntu20.04-bash.dockerfile test/bash.dockerfile
-                sed -i -e "s/FROM ubuntu:20.04/FROM $distro_ver/g" test/bash.dockerfile
+                cp -rf test/ubuntu24.04-bash.dockerfile test/bash.dockerfile
+                sed -i -e "s/FROM ubuntu:24.04/FROM $distro_ver/g" test/bash.dockerfile
             '''
         }
         sh '''
             docker build --tag bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
-            ./gsc build -nc --insecure-args bash-test test/ubuntu20.04-bash.manifest
+            ./gsc build -nc --insecure-args bash-test test/ubuntu24.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps bash-test enclave-key.pem
             ./gsc info-image gsc-bash-test
         '''
@@ -56,13 +56,13 @@ stage('Build Workloads') {
             sh 'cp -rf test/suse-helloworld.dockerfile test/helloworld.dockerfile'
         } else {
             sh '''
-                cp -rf test/ubuntu22.04-hello-world.dockerfile test/helloworld.dockerfile
-                sed -i -e "s/FROM ubuntu:22.04/FROM $distro_ver/g" test/helloworld.dockerfile
+                cp -rf test/ubuntu24.04-hello-world.dockerfile test/helloworld.dockerfile
+                sed -i -e "s/FROM ubuntu:24.04/FROM $distro_ver/g" test/helloworld.dockerfile
             '''
         }
         sh '''
             docker build --tag helloworld-test --build-arg BUILD_OS=${distro_ver} --file test/helloworld.dockerfile .
-            ./gsc build -nc --insecure-args helloworld-test test/ubuntu22.04-hello-world.manifest
+            ./gsc build -nc --insecure-args helloworld-test test/ubuntu24.04-hello-world.manifest
             ./gsc sign-image --remove-gramine-deps helloworld-test enclave-key.pem
             ./gsc info-image gsc-helloworld-test
         '''
@@ -76,17 +76,17 @@ stage('Build Workloads') {
             sh 'cp -rf test/suse-bash.dockerfile test/bash.dockerfile'
         } else {
             sh '''
-                cp -rf test/ubuntu20.04-bash.dockerfile test/bash.dockerfile
-                sed -i -e "s/FROM ubuntu:20.04/FROM $distro_ver/g" test/bash.dockerfile
+                cp -rf test/ubuntu24.04-bash.dockerfile test/bash.dockerfile
+                sed -i -e "s/FROM ubuntu:24.04/FROM $distro_ver/g" test/bash.dockerfile
             '''
         }
         sh '''
             docker build --tag gramine-build-bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
-            ./gsc build-gramine bash20.04
+            ./gsc build-gramine bash24.04
             sed -i 's|Repository: "https://github.com/gramineproject/gramine.git"|#Repository: "https://github.com/gramineproject/gramine.git"|g' config.yaml
             sed -i 's|Branch:     "master"|#Branch:     "master"|g' config.yaml
-            sed -i 's|Gramine:|Gramine:\\n    Image: "bash20.04"|g' config.yaml
-            ./gsc build -nc --insecure-args gramine-build-bash-test test/ubuntu20.04-bash.manifest
+            sed -i 's|Gramine:|Gramine:\\n    Image: "bash24.04"|g' config.yaml
+            ./gsc build -nc --insecure-args gramine-build-bash-test test/ubuntu24.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps gramine-build-bash-test enclave-key.pem
             ./gsc info-image gsc-gramine-build-bash-test
         '''
