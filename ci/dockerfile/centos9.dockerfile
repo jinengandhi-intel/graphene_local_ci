@@ -72,6 +72,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         python3-protobuf \
         python3-pyelftools \
         python3-pytest \
+        python3-venv \
         python3-voluptuous \
         R-core \
         strace \
@@ -100,8 +101,6 @@ RUN python3 -m pip install -U \
     six \
     numpy \
     scipy \
-    torchvision==0.19.1 \
-    pillow \
     'tomli>=1.1.0' \
     'tomli-w>=0.4.0' \
     'meson>=0.56' \

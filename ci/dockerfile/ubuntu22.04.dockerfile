@@ -80,7 +80,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-recommonmark \
     python3-scipy \
     python3-sphinx-rtd-theme \
-    python3-torchvision \
+    python3-venv \
     python3-voluptuous \
     r-base \
     shellcheck \
