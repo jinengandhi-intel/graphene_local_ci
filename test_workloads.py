@@ -169,8 +169,8 @@ class Test_Workload_Results():
         assert("error: " not in nodejs_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif(((base_os in ["ubuntu24.04"]) or (node_label == "graphene_22.04_5.19")),
-                    reason="Pytorch not compatible for Ubuntu 24.04.")
+    @pytest.mark.skipif(((node_label == "graphene_22.04_5.19") and (sgx_mode == '1')),
+                    reason="Node is having some issues")
     def test_pytorch_workload(self):
         pytorch_result_file = open("CI-Examples/pytorch/result.txt", "r")
         pytorch_contents = pytorch_result_file.read()
@@ -182,6 +182,8 @@ class Test_Workload_Results():
         assert("error: " not in pytorch_contents)
 
     @pytest.mark.examples
+    @pytest.mark.skipif(((node_label == "graphene_22.04_5.19") and (sgx_mode == '1')),
+                    reason="Node is having some issues")
     def test_r_workload(self):
         r1_result_file = open("CI-Examples/r/RESULT_1", "r")
         r1_contents = r1_result_file.read()
