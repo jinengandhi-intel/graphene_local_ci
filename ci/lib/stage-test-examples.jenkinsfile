@@ -238,4 +238,17 @@ stage('test-examples') {
             '''
         }
     } catch (Exception e) { }
+
+    if (["ubuntu22.04", "ubuntu22.04", "centos9", "rhel9"].contains(env.base_os)) {
+        try(time: 20, unit: 'MINUTES') {
+            sh '''
+                echo "Running Test with gramine-${mode}}"
+                cd CI-Examples/mariadb
+                sudo -E make install-mariadb
+                make clean && make ${MAKEOPTS} 
+                make ${MAKEOPTS} test-gramine 2>&1 | tee RESULT
+            '''
+            } 
+        catch (Exception e) { }
+    }
 }
