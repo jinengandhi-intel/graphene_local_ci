@@ -238,4 +238,18 @@ stage('test-examples') {
             '''
         }
     } catch (Exception e) { }
+
+    if (env.no_cpu.toInteger() > 16)  {
+        try {
+            timeout(time: 20, unit: 'MINUTES') {
+                sh '''
+                    echo "Running Test with gramine-${MODE}"
+                    cd CI-Examples/mariadb
+                    sudo -E make install-mariadb
+                    make clean && make ${MAKEOPTS} 
+                    make ${MAKEOPTS} test-gramine 2>&1 | tee RESULT
+                '''
+                }
+            }  catch (Exception e) { }         
+        }
 }
