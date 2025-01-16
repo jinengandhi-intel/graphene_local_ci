@@ -3,19 +3,17 @@ UID ?= $(shell id -u)
 GID ?= $(shell id -g)
 TIMEOUT = 60
 
-# Detect the  Package Manager
-ifeq (, $(shell command -v apt-get))
-  ifeq (, $(shell command -v dnf))
-    $(error No supported package manager found)
-  else
-    MARIADB_RUNTIME_FOLDER = /var/run/mariadb
-    MARIADB_LIB_FOLDER = /var/lib/mysql
-    PKG_MANAGER = dnf	
-  endif
-else
+# Detect the Package Manager
+ifneq ($(shell command -v apt-get),)
   PKG_MANAGER = apt-get
-  MARIADB_LIB_FOLDER = /var/lib/mysql
   MARIADB_RUNTIME_FOLDER = /var/run/mysqld
+  MARIADB_LIB_FOLDER = /var/lib/mysql
+else ifneq ($(shell command -v dnf),)
+  PKG_MANAGER = dnf
+  MARIADB_RUNTIME_FOLDER = /var/run/mariadb
+  MARIADB_LIB_FOLDER = /var/lib/mysql
+else
+  $(error No supported package manager found)
 endif
 
 # Set log level to DEBUG if DEBUG=1 is given in cmdline
@@ -78,20 +76,6 @@ remove-mariadb:
 clean:
 	$(RM) *.sig *.manifest.sgx *.manifest *_output
 	$(RM) -r /tmp/mysql-data
-
-# This is only for Testing locally
-.PHONY: test-native
-test-native:
-	sudo chmod -R 777 $(MARIADB_RUNTIME_FOLDER)
-	sudo chmod -R 777 $(MARIADB_LIB_FOLDER)
-	sudo chown -R mysql:mysql $(MARIADB_LIB_FOLDER)
-	sudo chown -R mysql:mysql $(MARIADB_RUNTIME_FOLDER)
-	-sudo pkill -9 mysqld
-	mysqld --skip-grant-tables --bind-address=127.0.0.1 > server_output 2>&1 &
-	echo "Running MariaDB Server"
-	echo "Running MariaDB Client after 2 seconds"
-	sleep 2 && sudo mysql -h 127.0.0.1 --batch -N -e "SELECT 'SUCCESS';" > client_output
-	-sudo pkill -9 mysqld
 
 # This target is for testing mariadb with gramine-direct and gramine-sgx
 .PHONY: test-gramine
