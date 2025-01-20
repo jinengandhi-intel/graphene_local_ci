@@ -50,6 +50,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     lsof \
     musl \
     musl-tools \ 
+    mysql-server \
     nasm \
     net-tools \
     netcat-openbsd \
@@ -87,6 +88,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     sphinx-doc \
     stress-ng \
     sqlite3 \
+    sysbench \
     texinfo \
     uthash-dev \
     vim \

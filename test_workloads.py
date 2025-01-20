@@ -91,7 +91,7 @@ class Test_Workload_Results():
                 and ("row 2" in sqlite_contents) \
                 and ("row 1" in sqlite_contents))
         assert("error: " not in sqlite_contents)
-    
+
     @pytest.mark.examples
     def test_busybox_workload(self):
         busybox_result_file = open("CI-Examples/busybox/result.txt", "r")
@@ -107,7 +107,7 @@ class Test_Workload_Results():
         go_helloworld_contents = go_helloworld_result_file.read()
         assert("Hello, world" in go_helloworld_contents)
         assert("error: " not in go_helloworld_contents)
-    
+
     @pytest.mark.sdtest
     @pytest.mark.skipif((int(no_cores) < 16 or sgx_mode != '1'),
                     reason="Sandstone is enabled on servers with SGX")
@@ -153,6 +153,31 @@ class Test_Workload_Results():
             and (re.search("\d+: 835 suit", tensorflow_contents)) \
             and (re.search("\d+: 458 bow tie", tensorflow_contents)))
         assert("error: " not in tensorflow_contents)
+
+    @pytest.mark.examples
+    @pytest.mark.skipif( (os_release_id not in ["ubuntu", "debian"]) and
+                       not(int(no_cores) > 16), reason="Run only on Ubuntu / Debian server machines")
+    def test_mysql_workload(self):
+        mysql_result = open("CI-Examples/mysql/OUTPUT", "r")
+        mysql_contents = mysql_result.read()
+        assert("root@localhost is created with an empty password !" in mysql_contents)
+        assert("error: " not in mysql_contents)
+        mysql_result = open("CI-Examples/mysql/CREATE_RESULT", "r")
+        mysql_contents = mysql_result.read()
+        assert("Creating table 'sbtest2'..." in mysql_contents)
+        assert("Creating table 'sbtest1'..." in mysql_contents)
+        assert("Inserting 100000 records into 'sbtest2'" in mysql_contents)
+        assert("Inserting 100000 records into 'sbtest1'" in mysql_contents)
+        assert("error: " not in mysql_contents)
+        mysql_result = open("CI-Examples/mysql/RUN_RESULT", "r")
+        mysql_contents = mysql_result.read()
+        assert("Threads fairness:" in mysql_contents)
+        assert("error: " not in mysql_contents)
+        mysql_result = open("CI-Examples/mysql/DELETE_RESULT", "r")
+        mysql_contents = mysql_result.read()
+        assert("Dropping table 'sbtest1'..." in mysql_contents)
+        assert("Dropping table 'sbtest2'..." in mysql_contents)
+        assert("error: " not in mysql_contents)
 
     @pytest.mark.examples
     def test_curl_workload(self):
@@ -314,7 +339,7 @@ class Test_Workload_Results():
         gsc_java_simple_log = gsc_java_simple_result.read()
         assert("Hello from Graminized Java application!" in gsc_java_simple_log)
         assert("error: " not in gsc_java_simple_log)
-    
+
     @pytest.mark.gsc
     @pytest.mark.skipif(distro_ver != "debian:11", reason='java-spring-boot is enabled only on debian11 currently')
     def test_gsc_java_spring_boot_workload(self):
@@ -351,7 +376,7 @@ class Test_Workload_Results():
         assert(re.search("connected to (.*) port 5201", iperf_contents) and \
                ("iperf Done" in iperf_contents))
         assert("error: " not in iperf_contents)
-    
+
     @pytest.mark.examples
     @pytest.mark.skipif(not(int(no_cores) > 16), reason="Run only on servers")
     def test_mariadb_workload(self):
