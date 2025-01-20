@@ -52,14 +52,13 @@ index 00000000..5439841d
 +}
 +
 diff --git a/libos/test/fs/test_enc.py b/libos/test/fs/test_enc.py
-index 3b83a338..74fca8d0 100644
+index 0a9e99bb..6f2dcc9d 100644
 --- a/libos/test/fs/test_enc.py
 +++ b/libos/test/fs/test_enc.py
-@@ -81,6 +81,12 @@ class TC_50_EncryptedFiles(test_fs.TC_00_FileSystem):
+@@ -73,6 +73,11 @@ class TC_50_EncryptedFiles(test_fs.TC_00_FileSystem):
              self.__decrypt_file(self.OUTPUT_FILES[i], dec_path)
              self.assertTrue(filecmp.cmp(self.INPUT_FILES[i], dec_path, shallow=False))
  
-+    @unittest.skipIf(os.environ.get('SGX') != '1', 'Checking renaming of protected files for SGX only')
 +    def test_099_rename_pf(self):
 +        os.makedirs('protected', exist_ok=True)
 +        stdout, stderr = self.run_binary(['rename_pf'])

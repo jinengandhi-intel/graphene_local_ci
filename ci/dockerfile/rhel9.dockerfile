@@ -77,7 +77,7 @@ RUN dnf update -y \
         python3-pkg-resources \
         python3-pyelftools \
         python3-pytest \
-        python3-venv \
+        python3-virtualenv \
         python3-voluptuous \
         R-core \
         strace \
