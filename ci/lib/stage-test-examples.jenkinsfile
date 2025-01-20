@@ -246,7 +246,6 @@ stage('test-examples') {
         try {
             timeout(time: 20, unit: 'MINUTES') {
                 sh '''
-                    echo "Running Test with gramine-${MODE}"
                     cd CI-Examples/mariadb
                     sudo -E make install-mariadb
                     make clean && make ${MAKEOPTS} 

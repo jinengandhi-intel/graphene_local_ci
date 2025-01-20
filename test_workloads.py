@@ -354,7 +354,7 @@ class Test_Workload_Results():
     
     @pytest.mark.examples
     @pytest.mark.skipif(not(int(no_cores) > 16), reason="Run only on servers")
-    def test_mariadb_workload_gramine(self):
+    def test_mariadb_workload(self):
         # NOT is added in the skip condition to improve readability
         # Test Sequence - Spawn mariadb server in background, run mariadb client, print SUCCESS if successfully launched
         # Check if the string "SUCCESS" is present in and client_output which generated after running the Makefile

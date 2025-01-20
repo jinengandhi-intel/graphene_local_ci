@@ -72,7 +72,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         python3-protobuf \
         python3-pyelftools \
         python3-pytest \
-        python3-venv \
+        python3-virtualenv \
         python3-voluptuous \
         R-core \
         strace \
