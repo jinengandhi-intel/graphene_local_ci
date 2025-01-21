@@ -4,6 +4,8 @@ stage('Build Workloads') {
         docker system prune -af
         openssl genrsa -3 -out enclave-key.pem 3072
         cp -f config.yaml.template config.yaml
+        # Following sed statement can be removed after GSC bug is fixed.
+        sed -i -E 's/Branch:[ ]+"master"/Branch:     "v1.8"/g' config.yaml
     '''
 
     // Build Bash Workload
@@ -114,6 +116,26 @@ stage('Build Workloads') {
                 ./gsc build java-spring-boot-test Examples/java-spring-boot/java-spring-boot.manifest
                 ./gsc sign-image java-spring-boot-test enclave-key.pem
                 ./gsc info-image gsc-java-spring-boot-test
+            '''
+        } catch (Exception e) {}
+    }
+
+    if (env.distro_ver == "ubuntu:24.04") {
+        try {
+            sh '''
+                CUR_DIR=$(pwd)
+                echo "Curr working dir:" $CUR_DIR
+                ./verifier/helper.sh "done" "y" "/keys/encryption_key"
+
+                ./Examples/pytorch/base_image_helper/helper.sh
+                ./gsc build pytorch-encrypted Examples/pytorch/pytorch.manifest
+                ./gsc sign-image --remove-gramine-deps pytorch-encrypted enclave-key.pem
+                ./gsc info-image gsc-pytorch-encrypted | tee gsc-pytorch-info.log
+
+                MR_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc-pytorch-info.log`
+                MR_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc-pytorch-info.log`
+                docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_ENCLAVE -e RA_TLS_MRSIGNER=$MR_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 -v $CUR_DIR/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $CUR_DIR/Examples/pytorch/base_image_helper:/keys -dt verifier:latest >/dev/null 2>&1 | tee verifier_output.log
+                docker run --net=host --rm --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=localhost:4433 -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -t gsc-pytorch-encrypted
             '''
         } catch (Exception e) {}
     }
