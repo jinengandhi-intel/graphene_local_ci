@@ -1,6 +1,6 @@
 # MySQL example
 
-This example was tested with MySQL version 8.0.35 and Ubuntu 20.04.
+This example was tested with MySQL version 8.0.35 and Ubuntu 24.04.
 
 This directory contains an example for running MySQL server in Gramine,
 including the Makefile and a template for generating the manifest.
