@@ -4,6 +4,8 @@ stage('Build Workloads') {
         docker system prune -af
         openssl genrsa -3 -out enclave-key.pem 3072
         cp -f config.yaml.template config.yaml
+        # Following sed statement can be removed after GSC bug is fixed.
+        sed -i -E 's/Branch:[ ]+"master"/Branch:     "v1.8"/g' config.yaml
     '''
 
     // Build Bash Workload
@@ -117,4 +119,25 @@ stage('Build Workloads') {
             '''
         } catch (Exception e) {}
     }
+
+    // GSC build for ovms
+    // Build Bash Workload
+    try {
+        if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
+            // Get the corresponding centos or redhat dockerfile.
+        } else if (env.os_release_id.contains("suse")) {
+            // Get the corresponding suse linux dockerfile.
+        } else {
+            sh '''
+                cp -rf test/ubuntu24.04-bash.dockerfile test/bash.dockerfile
+                sed -i -e "s/FROM ubuntu:24.04/FROM $distro_ver/g" test/bash.dockerfile
+            '''
+        }
+        sh '''
+            docker build --tag bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
+            ./gsc build -nc --insecure-args bash-test test/ubuntu24.04-bash.manifest
+            ./gsc sign-image --remove-gramine-deps bash-test enclave-key.pem
+            ./gsc info-image gsc-bash-test
+        '''
+    } catch (Exception e) {}
 }
