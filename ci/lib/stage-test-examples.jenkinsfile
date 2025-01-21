@@ -223,6 +223,23 @@ stage('test-examples') {
         }
     }
 
+    if (["ubuntu", "debian"].contains(env.os_release_id)) {
+       if (env.no_cpu.toInteger() > 16) {
+            try {
+                timeout(time:30,unit: 'MINUTES') {
+                  sh '''
+                        cd CI-Examples/mysql
+                        make privileges
+                        make ${MAKEOPTS} all && make ${MAKEOPTS} check
+                        sleep 150s
+                        make conncheck
+                        make clean
+                    '''
+                }
+         } catch (Exception e) { }
+       }
+    }
+
     try {
         timeout(time: 20, unit: 'MINUTES') {
             sh '''
