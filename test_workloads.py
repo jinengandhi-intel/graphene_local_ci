@@ -155,8 +155,8 @@ class Test_Workload_Results():
         assert("error: " not in tensorflow_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif( (os_release_id not in ["ubuntu", "debian"]) and
-                       not(int(no_cores) > 16), reason="Run only on Ubuntu / Debian server machines")
+    @pytest.mark.skipif((os_release_id not in ["ubuntu"]) or
+                       not(int(no_cores) > 16), reason="Run only on Ubuntu Server machines")
     def test_mysql_workload(self):
         mysql_result = open("CI-Examples/mysql/OUTPUT", "r")
         mysql_contents = mysql_result.read()
