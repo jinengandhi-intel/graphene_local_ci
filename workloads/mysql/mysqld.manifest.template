@@ -9,7 +9,7 @@ loader.insecure__use_cmdline_argv = true
 sys.enable_sigterm_injection = true
 
 sgx.enclave_size = "8G"
-sgx.max_threads = {{ '1' if env.get('EDMM', '0') == '1' else '128' }}
+sgx.max_threads = 512
 
 loader.uid = {{ uid }}
 loader.gid = {{ gid }}
