@@ -349,3 +349,14 @@ class Test_Workload_Results():
         assert(re.search("connected to (.*) port 5201", iperf_contents) and \
                ("iperf Done" in iperf_contents))
         assert("error: " not in iperf_contents)
+
+    @pytest.mark.gsc
+    def test_gsc_pytorch_workload(self):
+        gsc_pytorch_verifier_output = open("gsc_pytorch_verifier_result", "r")
+        gsc_pytorch_verifier_log = gsc_pytorch_verifier_output.read()
+        assert("error: " not in gsc_pytorch_verifier_log)
+
+        gsc_pytorch_output = open("gsc_pytorch_result", "r")
+        gsc_pytorch_log = gsc_pytorch_output.read()
+        assert("Done. The result was written to `result.txt`." in gsc_pytorch_log)
+        assert("error: " not in gsc_pytorch_log)
