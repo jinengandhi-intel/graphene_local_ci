@@ -18,6 +18,7 @@ mysqld.manifest: mysqld.manifest.template
 	gramine-manifest \
 	-Dlog_level=$(GRAMINE_LOG_LEVEL) \
 	-Darch_libdir=$(ARCH_LIBDIR) \
+	-Dsql_libdir=$(SQL_LIBDIR) \
 	-Duid=$(UID) \
 	-Dgid=$(GID) \
 	-Dentrypoint=$(realpath $(shell sh -c "command -v mysqld")) \
@@ -44,30 +45,30 @@ endif
 
 .PHONY: check
 check: all
-	rm -rf OUTPUT
-	mysqld --initialize-insecure --datadir=/tmp/mysql-data 2>&1 | tee OUTPUT
-	@grep -q '\[Server\] root@localhost is created with an empty password !' OUTPUT && echo [ "Success" ]
-	sleep 5s && ($(GRAMINE) mysqld --datadir /tmp/mysql-data &)
+	mysqld --initialize-insecure --datadir=$(DATA_DIR)
+	sleep 5s && ($(GRAMINE) mysqld --datadir $(DATA_DIR) &)
 
-.PHONY: install-dependencies
-install-dependencies:
-	sudo -E apt-get install -y mysql-server
-	sudo -E apt-get install -y sysbench
+.PHONY: privileges-rhel
+privileges-rhel:
+	sudo mkdir -p /var/lib/mysql
+	sudo mkdir -p /var/log/mysql
+	sudo chown -R $$USER:$$USER /var/lib/mysql
+	sudo chmod -R 777 /var/lib/mysql
+	sudo chmod -R 777 /var/log/mysql
+	sudo chmod -R 777 /usr/sbin/mysqld
+	sudo chown -R intel:intel /usr/libexec/mysqld
+	sudo chown -R intel:intel /usr/sbin/mysqld
 
 .PHONY: privileges
 privileges:
-	sudo sed -i "s|^\(log_error.*\)|#\1|g" /etc/mysql/mysql.conf.d/mysqld.cnf
-	-sudo systemctl stop mysql.service
+	sudo sed -i "s|^\(log_error.*\)|#\1|g" $(LOG_FILE)
+	-sudo systemctl stop $(MYSQL_SERVICE)
 	sudo mkdir -p /var/run/mysqld
 	sudo mkdir -p /var/lib/mysql-files
 	sudo chown -R $$USER:$$USER /var/run/mysqld
 	sudo chown -R $$USER:$$USER /var/lib/mysql-files
 	sudo chmod 777 /var/run/mysqld
 	sudo chmod 777 /var/lib/mysql-files
-
-.PHONY: uninstall-mysql
-uninstall-mysql:
-	rm -rf /var/run/mysqld /tmp/mysql-data /var/lib/mysql-files *.sig *.manifest.sgx *.manifest
 
 .PHONY: conncheck
 conncheck:

@@ -44,6 +44,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         libXfixes \
         libXrender \
         lsof \
+        mysql-server \
         nasm \
         nc \
         ncurses-devel \
@@ -79,6 +80,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         stress-ng \
         sqlite \
         sudo \
+        sysbench \
         vim  \
         texinfo \
         wget \

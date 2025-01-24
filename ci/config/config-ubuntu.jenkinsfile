@@ -1,0 +1,5 @@
+//Environment for MYSQL Workload
+env.MYSQL_SERVICE="mysql.service"
+env.DATA_DIR="/tmp/mysql-data"
+env.LOG_FILE="/etc/mysql/mysql.conf.d/mysqld.cnf"
+env.SQL_LIBDIR="/usr/lib/mysql"

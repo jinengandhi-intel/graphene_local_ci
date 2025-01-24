@@ -1,4 +1,4 @@
-stage('test-examples') {
+ stage('test-examples') {
 
     if (env.SGX == "1") {
         env.MODE = "sgx"
@@ -222,23 +222,27 @@ stage('test-examples') {
             } catch (Exception e) { }
         }
     }
-
-    if (["ubuntu", "debian"].contains(env.os_release_id)) {
-       if (env.no_cpu.toInteger() > 16) {
-            try {
-                timeout(time:30,unit: 'MINUTES') {
-                  sh '''
-                        cd CI-Examples/mysql
-                        make privileges
-                        make ${MAKEOPTS} all && make ${MAKEOPTS} check
-                        sleep 150s
-                        make conncheck
-                        make clean
-                    '''
+    
+    if (["ubuntu", "rhel", "centos"].contains(env.os_release_id)) {
+     if (env.no_cpu.toInteger() > 16) {
+        try {
+               timeout(time:30,unit: 'MINUTES') {
+                sh '''
+                  cd CI-Examples/mysql
+                  make privileges
+                  if [ "${os_release_id}" != 'ubuntu' ]
+                  then
+                        make privileges-rhel
+                  fi
+                  make ${MAKEOPTS} all && make ${MAKEOPTS} check
+                  sleep 150s
+                  make conncheck
+                  make clean
+                 '''
                 }
-         } catch (Exception e) { }
+           } catch (Exception e) {}
        }
-    }
+   }
 
     try {
         timeout(time: 20, unit: 'MINUTES') {

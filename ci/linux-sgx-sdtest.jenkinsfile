@@ -36,6 +36,9 @@ node (node_label) {
                     case ['debian']:
                         load '../ci/config/config-debian.jenkinsfile'
                         break
+                    case ['ubuntu']:
+                        load '../ci/config/config-ubuntu.jenkinsfile'
+                        break
                 }
 
                 load '.ci/lib/config-release.jenkinsfile'
