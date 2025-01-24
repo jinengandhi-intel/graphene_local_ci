@@ -19,10 +19,11 @@ fs.mounts = [
   { path = "{{ arch_libdir }}", uri = "file:{{ arch_libdir }}" },
   { path = "/usr/{{ arch_libdir }}", uri = "file:/usr/{{ arch_libdir }}" },
   { path = "{{ entrypoint }}", uri = "file:{{ entrypoint }}" },
-  { path = "/usr/lib/mysql", uri = "file:/usr/lib/mysql" },
+  { path = "{{ sql_libdir }}", uri = "file:{{ sql_libdir }}" },
   { path = "/var/lib/mysql-files", uri = "file:/var/lib/mysql-files" },
   { path = "/var/run/mysqld", uri = "file:/var/run/mysqld" },
   { path = "/tmp", uri = "file:/tmp" },
+  { path = "/var/tmp" , uri = "file:/var/tmp" },
 ]
 
 sgx.trusted_files = [
@@ -30,10 +31,12 @@ sgx.trusted_files = [
   "file:{{ gramine.runtimedir() }}/",
   "file:{{ arch_libdir }}/",
   "file:/usr/{{ arch_libdir }}/",
-  "file:/usr/lib/mysql/",
+  "file:{{ sql_libdir }}/",
 ]
 
 sgx.allowed_files = [
   "file:/var/run/mysqld/",
   "file:/tmp/",     # MySQL data will be stored in plaintext; this is insecure!
+  "file:{{ sql_libdir }}/",
+  "file:/var/tmp/",
 ]
