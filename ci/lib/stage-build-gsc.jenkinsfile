@@ -125,7 +125,7 @@ stage('Build Workloads') {
 
                 ./Examples/pytorch/base_image_helper/helper.sh
                 ./gsc build pytorch-encrypted Examples/pytorch/pytorch.manifest
-                ./gsc sign-image --remove-gramine-deps pytorch-encrypted enclave-key.pem
+                ./gsc sign-image pytorch-encrypted enclave-key.pem
                 ./gsc info-image gsc-pytorch-encrypted | tee gsc_pytorch_image_info
             '''
         } catch (Exception e) {}
