@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (C) 2022 Intel Corporation
+
+FROM ubuntu:22.04
+
+RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
+    && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    build-essential \
+    git \
+    pkg-config
+
+COPY keys/* /usr/share/keyrings/
+
+RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-sgx-deb.asc] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main" \
+    | tee /etc/apt/sources.list.d/intel-sgx.list
+
+RUN echo 'deb [arch=amd64 signed-by=/usr/share/keyrings/gramine-keyring.gpg] https://packages.gramineproject.io/ jammy main' \
+    | tee /etc/apt/sources.list.d/gramine.list
+
+RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
+    && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    libsgx-dcap-default-qpl=1.16.100.2-jammy1 \
+    gramine
+
+RUN sed -i "s|^\(  \"pccs_url\": \"https://\).*\(/sgx/certification.*\)|\1api.trustedservices.intel.com\2|g" \
+    /etc/sgx_default_qcnl.conf
+
+RUN git clone https://github.com/gramineproject/gramine.git \
+    && cd gramine && git checkout $(git tag --list 'v*.*' --sort=taggerdate | tail -1)
+
+ARG server_dcap_type="secret_prov_minimal"
+RUN if [ $server_dcap_type="secret_prov_pf" ]; then \
+        sed -i "s|verify_measurements_callback,|NULL,|g" \
+        "gramine/CI-Examples/ra-tls-secret-prov/secret_prov_pf/server.c"; \
+    fi
+
+RUN mkdir -p /ra-tls-secret-prov/$server_dcap_type
+RUN cd gramine/CI-Examples/ra-tls-secret-prov/ \
+    && make clean && make dcap \
+    && cp $server_dcap_type/server_dcap /ra-tls-secret-prov/$server_dcap_type/
+
+RUN rm -rf gramine >/dev/null 2>&1
+
+WORKDIR /ra-tls-secret-prov/$server_dcap_type
+
+ENTRYPOINT ["./server_dcap"]

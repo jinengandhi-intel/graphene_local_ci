@@ -68,6 +68,26 @@ stage('Test') {
             '''
         } catch (Exception e) {}
    }
+
+   if (env.distro_ver == "ubuntu:22.04") {
+        try {
+            sh '''
+                MR_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc_pytorch_image_info`
+                MR_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc_pytorch_image_info`
+                docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_ENCLAVE \
+                    -e RA_TLS_MRSIGNER=$MR_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
+                    -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/Examples/pytorch/base_image_helper:/keys \
+                    -dt verifier:latest 2>&1 | tee gsc_pytorch_verifier_result
+            '''
+        } catch (Exception e) {}
+
+        try {
+            sh '''
+                docker run --net=host --rm --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=localhost:4433 \
+                    -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -t gsc-pytorch-encrypted 2>&1 | tee gsc_pytorch_result
+            '''
+        } catch (Exception e) {}
+   }
 }
 
 stage ('verification') {

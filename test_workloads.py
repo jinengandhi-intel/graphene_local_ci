@@ -384,3 +384,16 @@ class Test_Workload_Results():
         # Test Sequence - Spawn mariadb server in background, run mariadb client, print SUCCESS if successfully launched
         # Check if the string "SUCCESS" is present in and client_output which generated after running the Makefile
         assert "SUCCESS" in open("CI-Examples/mariadb/client_output", "r").read()
+
+    @pytest.mark.gsc
+    @pytest.mark.skipif(distro_ver != "ubuntu22.04", reason='GSC pytorch base image version is compatible with Ubuntu 22.04')
+    def test_gsc_pytorch_workload(self):
+        gsc_pytorch_verifier_output = open("gsc_pytorch_verifier_result", "r")
+        gsc_pytorch_verifier_log = gsc_pytorch_verifier_output.read()
+        assert("error: " not in gsc_pytorch_verifier_log)
+
+        gsc_pytorch_output = open("gsc_pytorch_result", "r")
+        gsc_pytorch_log = gsc_pytorch_output.read()
+        assert("Done. The result was written to `result.txt`." in gsc_pytorch_log)
+        assert("error: " not in gsc_pytorch_log)
+

@@ -117,4 +117,17 @@ stage('Build Workloads') {
             '''
         } catch (Exception e) {}
     }
+
+    if (env.distro_ver == "ubuntu:22.04") {
+        try {
+            sh '''
+                ./verifier/helper.sh "done" "y" "/keys/encryption_key"
+
+                ./Examples/pytorch/base_image_helper/helper.sh
+                ./gsc build pytorch-encrypted Examples/pytorch/pytorch.manifest
+                ./gsc sign-image pytorch-encrypted enclave-key.pem
+                ./gsc info-image gsc-pytorch-encrypted | tee gsc_pytorch_image_info
+            '''
+        } catch (Exception e) {}
+    }
 }
