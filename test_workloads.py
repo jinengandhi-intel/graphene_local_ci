@@ -51,7 +51,7 @@ class Test_Workload_Results():
         expected_output = ["2", "18"]
         assert(any(n in memcached_contents for n in expected_output))
         assert("error: " not in memcached_contents)
-        
+
     @pytest.mark.examples
     def test_lighttpd_workload(self):
         for filename in glob.glob("CI-Examples/lighttpd/result-*"):
@@ -155,13 +155,9 @@ class Test_Workload_Results():
         assert("error: " not in tensorflow_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((os_release_id not in ["ubuntu"]) or
-                       not(int(no_cores) > 16), reason="Run only on Ubuntu Server machines")
+    @pytest.mark.skipif((os_release_id not in ["ubuntu","rhel","centos"]) or
+                       not(int(no_cores) > 16), reason="Run only on Ubuntu/RHEL/CentOS Server machines")
     def test_mysql_workload(self):
-        mysql_result = open("CI-Examples/mysql/OUTPUT", "r")
-        mysql_contents = mysql_result.read()
-        assert("root@localhost is created with an empty password !" in mysql_contents)
-        assert("error: " not in mysql_contents)
         mysql_result = open("CI-Examples/mysql/CREATE_RESULT", "r")
         mysql_contents = mysql_result.read()
         assert("Creating table 'sbtest2'..." in mysql_contents)

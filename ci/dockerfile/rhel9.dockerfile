@@ -50,6 +50,7 @@ RUN dnf update -y \
         libXrender \
         libunwind \
         make \
+        mysql-server \
         nasm \
         nc \
         net-tools \
@@ -84,6 +85,7 @@ RUN dnf update -y \
         stress-ng \
         sqlite \
         sudo \
+        sysbench \
         vim  \
         texinfo \
         unzip \
