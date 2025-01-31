@@ -382,7 +382,7 @@ class Test_Workload_Results():
         assert "SUCCESS" in open("CI-Examples/mariadb/client_output", "r").read()
 
     @pytest.mark.gsc
-    @pytest.mark.skipif(distro_ver != "ubuntu22.04", reason='GSC pytorch base image version is compatible with Ubuntu 22.04')
+    @pytest.mark.skipif(distro_ver != "ubuntu:22.04", reason='GSC pytorch base image version is compatible with Ubuntu 22.04')
     def test_gsc_pytorch_workload(self):
         gsc_pytorch_verifier_output = open("gsc_pytorch_verifier_result", "r")
         gsc_pytorch_verifier_log = gsc_pytorch_verifier_output.read()
