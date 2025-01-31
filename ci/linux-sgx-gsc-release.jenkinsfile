@@ -36,6 +36,7 @@ node(node_label) {
             sh 'cp -rf $WORKSPACE/gsc/test/* test'
             sh 'cp -rf $WORKSPACE/gsc/test/pytorch Examples'
             sh 'cp -rf $WORKSPACE/gsc/verifier .'
+            sh 'cp -rf $WORKSPACE/gsc/keys/* keys'
             env.WORKSPACE = env.WORKSPACE + "/gsc_dev_repo"
             env.os_release_id=distro_ver.split(":")[0].trim()
             env.os_version=distro_ver.split(":")[1].trim()
