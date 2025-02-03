@@ -223,11 +223,16 @@
         }
     }
     
-    if (["ubuntu", "rhel", "centos"].contains(env.os_release_id)) {
-     if (env.no_cpu.toInteger() > 16) {
+    if ((["ubuntu", "rhel", "centos"].contains(env.os_release_id)) && (env.no_cpu.toInteger() > 16)) {
         try {
                timeout(time:30,unit: 'MINUTES') {
-                sh '''
+               sh '''
+                  export PID=$(lsof -t -i:3306)
+                  if [ "$PID" != "" ]
+                  then
+                     echo "Killing $PID"
+                     sudo kill -9 $PID
+                  fi
                   cd CI-Examples/mysql
                   make privileges
                   if [ "${os_release_id}" != 'ubuntu' ]
@@ -237,12 +242,11 @@
                   make ${MAKEOPTS} all && make ${MAKEOPTS} check
                   sleep 150s
                   make conncheck
-                  make clean
+                  make uninstall-mysql
                  '''
                 }
-           } catch (Exception e) {}
-       }
-   }
+           } catch (Exception e) { }
+      }
 
     try {
         timeout(time: 20, unit: 'MINUTES') {
@@ -267,6 +271,12 @@
         try {
             timeout(time: 20, unit: 'MINUTES') {
                 sh '''
+                   export PID=$(lsof -t -i:3306)
+                   if [ "$PID" != "" ]
+                   then
+                     echo "Killing $PID"
+                     sudo kill -9 $PID
+                    fi
                     cd CI-Examples/mariadb
                     sudo -E make install-mariadb
                     make clean && make ${MAKEOPTS} 

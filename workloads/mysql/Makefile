@@ -72,16 +72,21 @@ privileges:
 
 .PHONY: conncheck
 conncheck:
-	rm -rf CREATE_RESULT RUN_RESULT DELETE_RESULT
-	sudo -E mysqladmin -h 127.0.0.1 -P 3306 create sbtest
-	sysbench --db-driver=mysql --mysql-host=127.0.0.1 --mysql-port=3306 --mysql-user=root --mysql-db=sbtest --time=20 --report-interval=5 oltp_read_write --tables=2 --table_size=100000 --threads=32 prepare 2>&1 | tee CREATE_RESULT
-	sysbench --db-driver=mysql --mysql-host=127.0.0.1 --mysql-port=3306 --mysql-user=root --mysql-db=sbtest --time=20 --report-interval=5 oltp_read_write --tables=2 --table_size=100000 --threads=32 run 2>&1 | tee RUN_RESULT
-	sysbench --db-driver=mysql --mysql-host=127.0.0.1 --mysql-port=3306 --mysql-user=root --mysql-db=sbtest --time=20 --report-interval=5 oltp_read_write --tables=2 --table_size=100000 --threads=32 cleanup 2>&1 | tee DELETE_RESULT
+	-rm -rf CREATE_RESULT RUN_RESULT DELETE_RESULT
+	-sudo -E mysqladmin -h 127.0.0.1 -P 3306 create sbtest
+	-sysbench --db-driver=mysql --mysql-host=127.0.0.1 --mysql-port=3306 --mysql-user=root --mysql-db=sbtest --time=20 --report-interval=5 oltp_read_write --tables=2 --table_size=100000 --threads=32 prepare 2>&1 | tee CREATE_RESULT
+	-sysbench --db-driver=mysql --mysql-host=127.0.0.1 --mysql-port=3306 --mysql-user=root --mysql-db=sbtest --time=20 --report-interval=5 oltp_read_write --tables=2 --table_size=100000 --threads=32 run 2>&1 | tee RUN_RESULT
+	-sysbench --db-driver=mysql --mysql-host=127.0.0.1 --mysql-port=3306 --mysql-user=root --mysql-db=sbtest --time=20 --report-interval=5 oltp_read_write --tables=2 --table_size=100000 --threads=32 cleanup 2>&1 | tee DELETE_RESULT
+
+.PHONY: uninstall-mysql
+uninstall-mysql:
+	-sudo $(PKG_MGR) remove -y mysql-server sysbench
+	-sudo $(PKG_MGR) autoremove -y
+	-sudo rm -rf $(RM_DIR) $(LOG_FILE) $(DATA_DIR)
 
 .PHONY: clean
 clean:
 	$(RM) *.sig *.manifest.sgx *.manifest
-	$(RM) -rf /tmp/mysql-data
 
 .PHONY: distclean
 distclean: clean
