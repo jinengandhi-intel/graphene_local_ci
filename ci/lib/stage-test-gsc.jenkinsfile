@@ -98,13 +98,6 @@ stage('Test') {
                     -e RA_TLS_MRSIGNER=$MR_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
                     -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/Examples/ovms/base_image_helper:/keys \
                     -dt verifier:latest 2>&1 | tee gsc_ovms_verifier_result
-            '''
-        } catch (Exception e) {
-                sh 'Exception in ovms verifier'
-        }
-
-        try {
-            sh '''
                 docker run -u $(id -u):$(id -g) -p 9000:9000 -v /mnt/tmpfs/model_encrypted:/mnt/tmpfs/model_encrypted \
                 -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket --net=host --rm --device=/dev/sgx/enclave \
                 -e SECRET_PROVISION_SERVERS=localhost:4433 \
@@ -112,11 +105,9 @@ stage('Test') {
                 bash Examples/ovms/commands.sh
             '''
         } catch (Exception e) {
-
-             sh '''
-                 echo 'Exception in ovms test'
-             '''
+                sh 'Exception while starting verifier or ovms'
         }
+
    }
 
 }
