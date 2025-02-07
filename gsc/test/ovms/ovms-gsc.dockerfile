@@ -6,7 +6,7 @@
 # etc. into the graminized OpenVINO Model Server image.
 
 # The curation script fills the <base_image_name> during curation.
-FROM openvino/model_server:2023.0
+FROM openvino/model_server:2024.3
 
 # Below line copies cert files into the image if user selects remote attestation
 #COPY ca.crt /
