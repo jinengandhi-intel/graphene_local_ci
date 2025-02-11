@@ -48,5 +48,5 @@ if [ ! -z "$3" ]; then
 fi
 
 cd ..
-cp -f verifier/ssl_common/ca.crt Examples/pytorch/base_image_helper/
+cp -f verifier/ssl_common/ca.crt $4
 docker build -f verifier/verifier.dockerfile -t verifier $args .
