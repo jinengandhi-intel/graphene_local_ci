@@ -393,3 +393,10 @@ class Test_Workload_Results():
         assert("Done. The result was written to `result.txt`." in gsc_pytorch_log)
         assert("error: " not in gsc_pytorch_log)
 
+    @pytest.mark.gsc
+    def test_gsc_ovms_workload(self):
+        gsc_ovms_verifier_output = open("gsc_ovms_verifier_result", "r")
+        gsc_ovms_verifier_log = gsc_ovms_verifier_output.read()
+        assert("error: " not in gsc_ovms_verifier_log)
+        assert "SUCCESS" in open("test/ovms/ovms_result.txt", "r").read()
+
