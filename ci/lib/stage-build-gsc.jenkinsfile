@@ -107,6 +107,23 @@ stage('Build Workloads') {
         } catch (Exception e) {}
     }
 
+    // Build OVMs Workload
+    if (env.distro_ver == "ubuntu:22.04") {
+        try {
+            sh '''
+                bash verifier/helper.sh "not" "y" "/keys/encryption_key" "test/ovms"
+                bash test/ovms/ovms_helper.sh
+                ./gsc build ovms-image test/ovms/ovms.manifest
+                ./gsc sign-image ovms-image enclave-key.pem
+                ./gsc info-image gsc-ovms-image | tee gsc_ovms_image_info
+            '''
+        } catch (Exception e) {
+            sh '''
+                echo 'Exception during OVMS build'
+            '''
+        }
+     }
+
     // This should be the last test, any other test should be added above
     // GSC build-gramine Bash Workload
     try {
