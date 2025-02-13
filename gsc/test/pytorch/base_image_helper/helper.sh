@@ -8,7 +8,15 @@ CUR_DIR=$(pwd)
 MY_PATH=$(dirname "$0")
 cd $MY_PATH
 
-image_name='pytorch-encrypted'
+
+if [ "$1"  = "debug" ]; then
+     image_name='pytorch-encrypted-debug'
+elif [ "$1" = "debugoptimized" ]; then
+     image_name='pytorch-encrypted-debugoptimized'
+else
+     image_name='pytorch-encrypted'
+fi
+
 rm -rf examples
 git clone https://github.com/gramineproject/examples.git
 cd examples/pytorch

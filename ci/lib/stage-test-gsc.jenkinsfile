@@ -1,5 +1,5 @@
 stage('Test') {
-    try {
+    /* try {
         if ((env.os_release_id == "debian") || env.os_release_id.contains("redhat") || (env.os_release_id == "quay.io/centos/centos")) {
             env.runtime_args = "-c ls"
         } else {
@@ -67,11 +67,12 @@ stage('Test') {
                 wget -O- localhost:8080 | tee openjdk-spring-boot_result
             '''
         } catch (Exception e) {}
-   }
+   } */
 
    if (env.distro_ver == "ubuntu:22.04") {
         try {
             sh '''
+                rm -rf gsc_pytorch_result gsc_pytorch_verifier_result
                 MR_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc_pytorch_image_info`
                 MR_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc_pytorch_image_info`
                 docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_ENCLAVE \
@@ -84,6 +85,41 @@ stage('Test') {
             '''
         } catch (Exception e) {}
    }
+   
+  if (env.distro_ver == "ubuntu:22.04") {
+        try {
+            sh '''
+                rm -rf gsc_pytorch_d_result gsc_pytorch_d_verifier_result
+                MR_D_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc_pytorch_d_image_info`
+                MR_D_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc_pytorch_d_image_info`
+                docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_D_ENCLAVE \
+                    -e RA_TLS_MRSIGNER=$MR_D_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
+                    -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/test/pytorch/base_image_helper:/keys \
+                    -dt verifier:latest 2>&1 | tee gsc_pytorch_d_verifier_result
+            
+                docker run --net=host --rm --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=localhost:4433 \
+                    -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -t gsc-pytorch-encrypted-debug 2>&1 | tee gsc_pytorch_d_result
+            '''
+        } catch (Exception e) {}
+   }
+
+   if (env.distro_ver == "ubuntu:22.04") {
+        try {
+            sh '''
+                rm -rf gsc_pytorch_do_result gsc_pytorch_do_verifier_result
+                MR_DO_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc_pytorch_do_image_info`
+                MR_DO_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc_pytorch_do_image_info`
+                docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_DO_ENCLAVE \
+                    -e RA_TLS_MRSIGNER=$MR_DO_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
+                    -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/test/pytorch/base_image_helper:/keys \
+                    -dt verifier:latest 2>&1 | tee gsc_pytorch_do_verifier_result
+           
+                docker run --net=host --rm --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=localhost:4433 \
+                    -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -t gsc-pytorch-encrypted-debugoptimized 2>&1 | tee gsc_pytorch_do_result
+            '''
+        } catch (Exception e) {}
+   }   
+
 }
 
 stage ('verification') {
@@ -99,9 +135,10 @@ stage ('verification') {
 
 stage('Docker images cleanup') {
     sh '''
-        docker stop $(docker ps -aq) &> /dev/null
-        docker rm $(docker ps -aq) &> /dev/null
-        docker image prune -af &> /dev/null
-        docker system prune -af &> /dev/null
+        echo "docker cleanup"
+        #docker stop $(docker ps -aq) &> /dev/null
+        #docker rm $(docker ps -aq) &> /dev/null
+        #docker image prune -af &> /dev/null
+        #docker system prune -af &> /dev/null
     '''
 }

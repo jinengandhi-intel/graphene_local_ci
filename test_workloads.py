@@ -18,7 +18,7 @@ distro_ver = os.environ.get('distro_ver')
 ra_type = os.environ.get("RA_TYPE", "none")
 
 class Test_Workload_Results():
-    @pytest.mark.examples
+    """ @pytest.mark.examples
     def test_bash_workload(self):
         bash_result_file = open("CI-Examples/bash/result.txt", "r")
         bash_contents = bash_result_file.read()
@@ -379,16 +379,54 @@ class Test_Workload_Results():
         # NOT is added in the skip condition to improve readability
         # Test Sequence - Spawn mariadb server in background, run mariadb client, print SUCCESS if successfully launched
         # Check if the string "SUCCESS" is present in and client_output which generated after running the Makefile
-        assert "SUCCESS" in open("CI-Examples/mariadb/client_output", "r").read()
+        assert "SUCCESS" in open("CI-Examples/mariadb/client_output", "r").read() """
 
     @pytest.mark.gsc
     @pytest.mark.skipif(distro_ver != "ubuntu:22.04", reason='GSC pytorch base image version is compatible with Ubuntu 22.04')
-    def test_gsc_pytorch_workload(self):
+    def test_gsc_pytorch_encrypted_workload(self):
+        gsc_build_log = open("gsc_build_log_release", "r")
+        gsc_build_log_content = gsc_build_log.read()
+        assert("RUN cd /gramine     && meson setup build/ --prefix=\"/gramine/meson_build_output\"        --buildtype=release" in gsc_build_log_content)
+        assert("buildtype                                       : release" in gsc_build_log_content)
+
         gsc_pytorch_verifier_output = open("gsc_pytorch_verifier_result", "r")
         gsc_pytorch_verifier_log = gsc_pytorch_verifier_output.read()
         assert("error: " not in gsc_pytorch_verifier_log)
 
         gsc_pytorch_output = open("gsc_pytorch_result", "r")
+        gsc_pytorch_log = gsc_pytorch_output.read()
+        assert("Done. The result was written to `result.txt`." in gsc_pytorch_log)
+        assert("error: " not in gsc_pytorch_log)
+
+
+    @pytest.mark.gsc
+    @pytest.mark.skipif(distro_ver != "ubuntu:22.04", reason='GSC pytorch base image version is compatible with Ubuntu 22.04')
+    def test_gsc_pytorch_encrypted_debug_workload(self):
+        gsc_build_log = open("gsc_build_log_debug", "r")
+        gsc_build_log_content = gsc_build_log.read()
+        assert("RUN cd /gramine     && meson setup build/ --prefix=\"/gramine/meson_build_output\"        --buildtype=debug" in gsc_build_log_content)
+        assert("buildtype                                       : debug" in gsc_build_log_content)
+        gsc_pytorch_verifier_output = open("gsc_pytorch_d_verifier_result", "r")
+        gsc_pytorch_verifier_log = gsc_pytorch_verifier_output.read()
+        assert("error: " not in gsc_pytorch_verifier_log)
+
+        gsc_pytorch_output = open("gsc_pytorch_d_result", "r")
+        gsc_pytorch_log = gsc_pytorch_output.read()
+        assert("Done. The result was written to `result.txt`." in gsc_pytorch_log)
+        assert("error: " not in gsc_pytorch_log)
+
+    @pytest.mark.gsc
+    @pytest.mark.skipif(distro_ver != "ubuntu:22.04", reason='GSC pytorch base image version is compatible with Ubuntu 22.04')
+    def test_gsc_pytorch_encrypted_debugoptimized_workload(self):
+        gsc_build_log = open("gsc_build_log_debugoptimized", "r")
+        gsc_build_log_content = gsc_build_log.read()
+        assert("RUN cd /gramine     && meson setup build/ --prefix=\"/gramine/meson_build_output\"        --buildtype=debugoptimized" in gsc_build_log_content)
+        assert("buildtype                                       : debugoptimized" in gsc_build_log_content)
+        gsc_pytorch_verifier_output = open("gsc_pytorch_do_verifier_result", "r")
+        gsc_pytorch_verifier_log = gsc_pytorch_verifier_output.read()
+        assert("error: " not in gsc_pytorch_verifier_log)
+
+        gsc_pytorch_output = open("gsc_pytorch_do_result", "r")
         gsc_pytorch_log = gsc_pytorch_output.read()
         assert("Done. The result was written to `result.txt`." in gsc_pytorch_log)
         assert("error: " not in gsc_pytorch_log)

@@ -15,7 +15,7 @@ node(node_label) {
             }
 
             if (["", null].contains(env.gsc_branch)) {
-                env.git_branch = 'master'
+                env.git_branch = 'v1.8'
             } else {
                 env.git_branch = env.gsc_branch
             }
@@ -46,7 +46,8 @@ node(node_label) {
         }
     } finally {
         stage('Workspace cleanup'){
-            sh 'rm -rf $ORIG_WKSP/*'
+            sh 'echo "Cleanup" '
+            //sh 'rm -rf $ORIG_WKSP/*'
         }
     }
 
