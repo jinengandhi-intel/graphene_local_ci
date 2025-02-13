@@ -84,6 +84,32 @@ stage('Test') {
             '''
         } catch (Exception e) {}
    }
+
+   if (env.distro_ver == "ubuntu:22.04") {
+        try {
+            sh '''
+                MR_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc_ovms_image_info`
+                MR_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc_ovms_image_info`
+                docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_ENCLAVE \
+                    -e RA_TLS_MRSIGNER=$MR_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
+                    -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/test/pytorch/base_image_helper:/keys \
+                    -dt verifier:latest 2>&1 | tee gsc_ovms_verifier_result
+
+                docker run -u $(id -u):$(id -g) -p 9000:9000 -v /mnt/tmpfs/model_encrypted:/mnt/tmpfs/model_encrypted \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket --net=host --rm --device=/dev/sgx/enclave \
+                -e SECRET_PROVISION_SERVERS=localhost:4433 \
+                -dt gsc-ovms-image 2>&1 | tee gsc_ovms_result
+
+                sleep 60
+
+                bash test/ovms/commands.sh
+            '''
+        } catch (Exception e) {
+                sh 'Exception while starting verifier or ovms'
+        }
+
+   }
+
 }
 
 stage ('verification') {
