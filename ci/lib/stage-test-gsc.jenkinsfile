@@ -105,7 +105,6 @@ stage('Test') {
                 bash test/ovms/commands.sh
             '''
         } catch (Exception e) {
-                sh 'Exception while starting verifier or ovms'
         }
 
    }
