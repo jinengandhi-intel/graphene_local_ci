@@ -394,6 +394,7 @@ class Test_Workload_Results():
         assert("error: " not in gsc_pytorch_log)
 
     @pytest.mark.gsc
+    @pytest.mark.skipif(distro_ver != "ubuntu:22.04", reason='GSC OVMS image version is compatible with Ubuntu 22.04')
     def test_gsc_ovms_workload(self):
         gsc_ovms_verifier_output = open("gsc_ovms_verifier_result", "r")
         gsc_ovms_verifier_log = gsc_ovms_verifier_output.read()
