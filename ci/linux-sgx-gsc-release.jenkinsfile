@@ -43,7 +43,7 @@ node(node_label) {
             env.os_version=distro_ver.split(":")[1].trim()
 
             load '../ci/lib/stage-build-gsc.jenkinsfile'
-            load '../ci/lib/stage-test-gsc.jenkinsfile'
+            load '../ci/lib/stage-verification-gsc.jenkinsfile'
         }
     } finally {
         stage('Workspace cleanup'){
