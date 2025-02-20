@@ -1,10 +1,16 @@
-stage('Build Workloads') {
+stage('Build and Test Workloads') {
     env.config_os = distro_ver.replace("/", "\\/")
     sh '''
         docker system prune -af
         openssl genrsa -3 -out enclave-key.pem 3072
         cp -f config.yaml.template config.yaml
     '''
+
+    if ((env.os_release_id == "debian") || env.os_release_id.contains("redhat") || (env.os_release_id == "quay.io/centos/centos")) {
+        env.runtime_args = "-c ls"
+    } else {
+        env.runtime_args = "-c free"
+    }
 
     // Build Bash Workload
     try {
@@ -23,6 +29,10 @@ stage('Build Workloads') {
             ./gsc build -nc --insecure-args bash-test test/ubuntu24.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps bash-test enclave-key.pem
             ./gsc info-image gsc-bash-test
+
+            docker run --device=/dev/sgx_enclave \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                gsc-bash-test ${runtime_args} 2>&1 | tee bash_result
         '''
     } catch (Exception e) {}
 
@@ -41,9 +51,104 @@ stage('Build Workloads') {
             ./gsc build -nc --insecure-args python-test test/generic.manifest
             ./gsc sign-image --remove-gramine-deps python-test enclave-key.pem
             ./gsc info-image gsc-python-test
+
+            docker run --device=/dev/sgx_enclave \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                gsc-python-test -c 'print("HelloWorld!")' 2>&1 | tee python_result
         '''
     } catch (Exception e) {}
 
+    
+    // Build JAVA Simple and Java Spring Boot Workload
+    if (env.distro_ver == "debian:11") {
+        try {
+            sh '''
+                cd Examples/java-simple
+                docker build --tag java-simple-test .
+                cd ../../
+                ./gsc build java-simple-test Examples/java-simple/java-simple.manifest
+                ./gsc sign-image java-simple-test enclave-key.pem
+                ./gsc info-image gsc-java-simple-test
+
+                docker run --device=/dev/sgx_enclave \
+                    -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                    gsc-java-simple-test 2>&1 | tee openjdk-simple_result
+            '''
+        } catch (Exception e) {}
+
+        try {
+            sh '''
+                cd Examples/java-spring-boot
+                export PATH=$PATH:/opt/gradle/gradle-7.6.4/bin
+                cd spring-boot-web-service/ && gradle build -Dhttp.proxyHost=proxy-iind.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-iind.intel.com -Dhttps.proxyPort=912
+                cd ../ && docker build --tag java-spring-boot-test .
+                cd ../../
+                ./gsc build java-spring-boot-test Examples/java-spring-boot/java-spring-boot.manifest
+                ./gsc sign-image java-spring-boot-test enclave-key.pem
+                ./gsc info-image gsc-java-spring-boot-test
+
+                docker run --device=/dev/sgx_enclave \
+                    -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                    -p 8080:8080 \
+                    -d gsc-java-spring-boot-test 2>&1 | tee openjdk-spring-boot_result
+                wget -O- localhost:8080 | tee openjdk-spring-boot_result
+            '''
+        } catch (Exception e) {}
+    }
+
+    if (env.distro_ver == "ubuntu:22.04") {
+
+        // Build Pytorch-encrypted Workload
+        try {
+            sh '''
+                ./verifier/helper.sh "not-done" "y" "/keys/encryption_key" "test/pytorch/base_image_helper/"
+
+                bash ./test/pytorch/base_image_helper/helper.sh
+                ./gsc build pytorch-encrypted test/pytorch/pytorch.manifest
+                ./gsc sign-image pytorch-encrypted enclave-key.pem
+                ./gsc info-image gsc-pytorch-encrypted 2>&1 | tee gsc_pytorch_image_info
+
+                MR_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc_pytorch_image_info`
+                MR_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc_pytorch_image_info`
+                docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_ENCLAVE \
+                    -e RA_TLS_MRSIGNER=$MR_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
+                    -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/test/pytorch/base_image_helper:/keys \
+                    -dt verifier:latest 2>&1 | tee gsc_pytorch_verifier_result
+
+                docker run --net=host --rm --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=localhost:4433 \
+                    -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -t gsc-pytorch-encrypted 2>&1 | tee gsc_pytorch_result
+            '''
+        } catch (Exception e) {}
+
+        // Build OVMS Workload
+        try {
+            sh '''
+                bash verifier/helper.sh "not" "y" "/keys/encryption_key" "test/ovms"
+                bash test/ovms/ovms_helper.sh
+                ./gsc build ovms-image test/ovms/ovms.manifest
+                ./gsc sign-image ovms-image enclave-key.pem
+                ./gsc info-image gsc-ovms-image | tee gsc_ovms_image_info
+
+                MR_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc_ovms_image_info`
+                MR_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc_ovms_image_info`
+                docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_ENCLAVE \
+                    -e RA_TLS_MRSIGNER=$MR_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
+                    -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/test/pytorch/base_image_helper:/keys \
+                    -dt verifier:latest 2>&1 | tee gsc_ovms_verifier_result
+
+                docker run -u $(id -u):$(id -g) -p 9000:9000 -v /mnt/tmpfs/model_encrypted:/mnt/tmpfs/model_encrypted \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket --net=host --rm --device=/dev/sgx/enclave \
+                -e SECRET_PROVISION_SERVERS=localhost:4433 \
+                -dt gsc-ovms-image 2>&1 | tee gsc_ovms_result
+
+                sleep 60
+
+                bash test/ovms/commands.sh
+            '''
+        } catch (Exception e) {}
+     }
+
+    // This should be the last tests, any other test should be added above
     sh '''
         sed -i -E 's/Distro: "(.+)"/Distro: "'"$config_os"'"/g' config.yaml
     '''
@@ -65,63 +170,24 @@ stage('Build Workloads') {
             ./gsc build -nc --insecure-args helloworld-test test/ubuntu24.04-hello-world.manifest
             ./gsc sign-image --remove-gramine-deps helloworld-test enclave-key.pem
             ./gsc info-image gsc-helloworld-test
+
+            docker run --device=/dev/sgx_enclave \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                gsc-helloworld-test 2>&1 | tee helloworld_result
         '''
     } catch (Exception e) {}
-    
-    if (env.distro_ver == "debian:11") {
-        try {
-            sh '''
-                cd Examples/java-simple
-                docker build --tag java-simple-test .
-                cd ../../
-                ./gsc build java-simple-test Examples/java-simple/java-simple.manifest
-                ./gsc sign-image java-simple-test enclave-key.pem
-                ./gsc info-image gsc-java-simple-test
-            '''
-        } catch (Exception e) {}
 
-        try {
-            sh '''
-                cd Examples/java-spring-boot
-                export PATH=$PATH:/opt/gradle/gradle-7.6.4/bin
-                cd spring-boot-web-service/ && gradle build -Dhttp.proxyHost=proxy-iind.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-iind.intel.com -Dhttps.proxyPort=912
-                cd ../ && docker build --tag java-spring-boot-test .
-                cd ../../
-                ./gsc build java-spring-boot-test Examples/java-spring-boot/java-spring-boot.manifest
-                ./gsc sign-image java-spring-boot-test enclave-key.pem
-                ./gsc info-image gsc-java-spring-boot-test
-            '''
-        } catch (Exception e) {}
-    }
+    // Run Bash HelloWorld Workload for Gramine-Direct
+    try {
+        sh '''
+            docker tag gsc-helloworld-test gsc-helloworld-direct-test
+            docker run --device=/dev/sgx_enclave --env GRAMINE_MODE=direct \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                --security-opt seccomp=unconfined gsc-helloworld-direct-test 2>&1 | tee helloworld_direct_result
+        '''
+    } catch (Exception e) {}
 
-    if (env.distro_ver == "ubuntu:22.04") {
-        try {
-            sh '''
-                ./verifier/helper.sh "not-done" "y" "/keys/encryption_key" "test/pytorch/base_image_helper/"
 
-                bash ./test/pytorch/base_image_helper/helper.sh
-                ./gsc build pytorch-encrypted test/pytorch/pytorch.manifest
-                ./gsc sign-image pytorch-encrypted enclave-key.pem
-                ./gsc info-image gsc-pytorch-encrypted 2>&1 | tee gsc_pytorch_image_info
-            '''
-        } catch (Exception e) {}
-    }
-
-    // Build OVMs Workload
-    if (env.distro_ver == "ubuntu:22.04") {
-        try {
-            sh '''
-                bash verifier/helper.sh "not" "y" "/keys/encryption_key" "test/ovms"
-                bash test/ovms/ovms_helper.sh
-                ./gsc build ovms-image test/ovms/ovms.manifest
-                ./gsc sign-image ovms-image enclave-key.pem
-                ./gsc info-image gsc-ovms-image | tee gsc_ovms_image_info
-            '''
-        } catch (Exception e) {
-        }
-     }
-
-    // This should be the last test, any other test should be added above
     // GSC build-gramine Bash Workload
     try {
         if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
@@ -143,6 +209,10 @@ stage('Build Workloads') {
             ./gsc build -nc --insecure-args gramine-build-bash-test test/ubuntu24.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps gramine-build-bash-test enclave-key.pem
             ./gsc info-image gsc-gramine-build-bash-test
+
+            docker run --device=/dev/sgx_enclave \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                gsc-gramine-build-bash-test ${runtime_args} 2>&1 | tee gramine_build_bash_result
         '''
     } catch (Exception e) {}
 }

@@ -1,0 +1,19 @@
+stage ('verification') {
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh 'python3 -m pytest -v -m gsc --disable-warnings --junit-xml gsc-workload.xml test_workloads.py'
+        }
+    } catch (Exception e) {
+    } finally {
+        junit 'gsc-workload.xml'
+    }
+}
+
+stage ('Docker images cleanup') {
+    sh '''
+        docker stop $(docker ps -aq) &> /dev/null
+        docker rm $(docker ps -aq) &> /dev/null
+        docker image prune -af &> /dev/null
+        docker system prune -af &> /dev/null
+    '''
+}
