@@ -1,65 +1,29 @@
-[sgx]
-enclave_size = "4G"
-max_threads = 128
-remote_attestation = "dcap"
-debug = false
-trusted_files = [
-    "file:/gramine/app_files/trusted_argv",
+# SPDX-License-Identifier: LGPL-3.0-or-later
+# Copyright (C) 2022 Intel Corporation
+
+sgx.enclave_size = "4G"
+sgx.max_threads = 128
+# This is required to run workload as non-root user, any number works except `0` which is for root.
+loader.uid = 999
+loader.gid = 999
+
+sys.enable_extra_runtime_domain_names_conf = true
+
+
+fs.mounts = [
+  { path = "/workspace/classes.txt", uri = "file:classes.txt", type = "encrypted" },
+  { path = "/workspace/input.jpg", uri = "file:input.jpg", type = "encrypted" },
+  { path = "/workspace/alexnet-pretrained.pt", uri = "file:alexnet-pretrained.pt", type = "encrypted" },
+  { path = "/workspace/result.txt", uri = "file:result.txt", type = "encrypted" },
 ]
 
-[loader]
-uid = 999
-gid = 999
-entrypoint = "file:/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/libsysdb.so"
-log_level = "error"
-argv_src_file = "file:/gramine/app_files/trusted_argv"
-
-[loader.env]
-LD_PRELOAD = "/gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_attest.so"
-SECRET_PROVISION_CONSTRUCTOR = "1"
-SECRET_PROVISION_CA_CHAIN_PATH = "/ca.crt"
-SECRET_PROVISION_SET_KEY = "default"
-LD_LIBRARY_PATH = "/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/runtime/glibc:/usr/lib/x86_64-linux-gnu:{{library_paths}}:/usr/local/nvidia/lib:/usr/local/nvidia/lib64"
-PATH = "{{env_path}}:/opt/conda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-NVIDIA_VISIBLE_DEVICES = "all"
-NVIDIA_DRIVER_CAPABILITIES = "compute,utility"
-PYTORCH_VERSION = "2.0.1"
-
-[loader.env.SECRET_PROVISION_SERVERS]
-passthrough = true
-
-[sys]
-enable_extra_runtime_domain_names_conf = true
-
-[fs]
-start_dir = "/workspace/"
-
-[[fs.mounts]]
-path = "/workspace/classes.txt"
-uri = "file:classes.txt"
-type = "encrypted"
-
-[[fs.mounts]]
-path = "/workspace/input.jpg"
-uri = "file:input.jpg"
-type = "encrypted"
-
-[[fs.mounts]]
-path = "/workspace/alexnet-pretrained.pt"
-uri = "file:alexnet-pretrained.pt"
-type = "encrypted"
-
-[[fs.mounts]]
-path = "/workspace/result.txt"
-uri = "file:result.txt"
-type = "encrypted"
-
-[fs.insecure__keys]
-default = "f9bc253ac8a50e60f5d7335693056697"
-
-[fs.root]
-type = "chroot"
-uri = "file:/"
-
-[libos]
-entrypoint = "/gramine/app_files/python3"
+# FIXME: `LD_PRELOAD` should be replaced with `loader.env.LD_LIBRARY_PATH = "/ovms/lib"` when GSC
+# has the concat logic for `loader.env.LD_LIBRARY_PATH`.
+loader.env.LD_PRELOAD = "/gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_attest.so"
+# Attestation related entries
+sgx.remote_attestation = "dcap"
+loader.env.SECRET_PROVISION_SERVERS = { passthrough = true }
+loader.env.SECRET_PROVISION_CONSTRUCTOR = "1"
+loader.env.SECRET_PROVISION_CA_CHAIN_PATH = "/ca.crt"
+loader.env.SECRET_PROVISION_SET_KEY = "default"
+fs.insecure__keys.default = "f9bc253ac8a50e60f5d7335693056697"
