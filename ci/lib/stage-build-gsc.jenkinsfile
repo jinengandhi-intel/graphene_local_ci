@@ -93,8 +93,8 @@ stage('Build and Test Workloads') {
                     -d gsc-java-spring-boot-test 2>&1 | tee openjdk-spring-boot_result
                 wget -O- localhost:8080 | tee openjdk-spring-boot_result
             '''
-        } catch (Exception e) {
-        } finally {
+        } catch (Exception e) { } 
+        finally {
             sh '''
                 docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-java-spring-boot-test) &>/dev/null) &>/dev/null
             '''
@@ -102,14 +102,13 @@ stage('Build and Test Workloads') {
     }
 
     if (env.distro_ver == "ubuntu:22.04") {
-
         // Build Pytorch-encrypted Workload
         try {
             sh '''
                 ./verifier/helper.sh "not-done" "y" "/keys/encryption_key" "test/pytorch/base_image_helper/"
 
                 bash ./test/pytorch/base_image_helper/helper.sh
-                ./gsc build pytorch-encrypted test/pytorch/pytorch.manifest
+                ./gsc build --rm pytorch-encrypted test/pytorch/pytorch.manifest | tee gsc_build_log_release
                 ./gsc sign-image pytorch-encrypted enclave-key.pem
                 ./gsc info-image gsc-pytorch-encrypted 2>&1 | tee gsc_pytorch_image_info
 
@@ -119,15 +118,74 @@ stage('Build and Test Workloads') {
                     -e RA_TLS_MRSIGNER=$MR_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
                     -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/test/pytorch/base_image_helper:/keys \
                     -dt verifier:latest 2>&1 | tee gsc_pytorch_verifier_result
+                sleep 1m
 
                 docker run --net=host --rm --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=localhost:4433 \
                     -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -t gsc-pytorch-encrypted 2>&1 | tee gsc_pytorch_result
             '''
-        } catch (Exception e) {
-        } finally {
+        } catch (Exception e) { } 
+        finally {
             sh '''
-                docker rm $(docker stop $(docker ps -a -q --filter ancestor=verifier) &>/dev/null) &>/dev/null
-                docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-ovms-image) &>/dev/null) &>/dev/null
+                docker rm $(docker stop $(docker ps -a -q) &>/dev/null) &>/dev/null 
+                docker rmi verifier:latest &>/dev/null
+            '''
+        }
+
+        // Build Pytorch-encrypted Workload in Debug Mode
+        try {
+            sh '''
+                ./verifier/helper.sh "not-done" "y" "/keys/encryption_key" "test/pytorch/base_image_helper/"
+
+                bash ./test/pytorch/base_image_helper/helper.sh debug
+                ./gsc build --rm -b debug pytorch-encrypted-debug test/pytorch/pytorch.manifest | tee gsc_build_log_debug
+                ./gsc sign-image pytorch-encrypted-debug enclave-key.pem
+                ./gsc info-image gsc-pytorch-encrypted-debug 2>&1 | tee gsc_pytorch_d_image_info
+
+                MR_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc_pytorch_d_image_info`
+                MR_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc_pytorch_d_image_info`
+                docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_ENCLAVE \
+                    -e RA_TLS_MRSIGNER=$MR_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
+                    -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/test/pytorch/base_image_helper:/keys \
+                    -dt verifier:latest 2>&1 | tee gsc_pytorch_d_verifier_result
+                sleep 1m
+
+                docker run --net=host --rm --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=localhost:4433 \
+                    -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -t gsc-pytorch-encrypted-debug 2>&1 | tee gsc_pytorch_d_result
+            '''
+        } catch (Exception e) { } 
+        finally {
+            sh '''
+                docker rm $(docker stop $(docker ps -a -q) &>/dev/null) &>/dev/null 
+                docker rmi verifier:latest &>/dev/null
+            '''
+        }
+
+        // Build Pytorch-encrypted Workload in Debugoptimized Mode
+        try {
+            sh '''
+                ./verifier/helper.sh "not-done" "y" "/keys/encryption_key" "test/pytorch/base_image_helper/"
+
+                bash ./test/pytorch/base_image_helper/helper.sh debugoptimized 
+                ./gsc build --rm -b debugoptimized pytorch-encrypted-debugoptimized test/pytorch/pytorch.manifest | tee gsc_build_log_debugoptimized
+                ./gsc sign-image pytorch-encrypted-debugoptimized enclave-key.pem
+                ./gsc info-image gsc-pytorch-encrypted-debugoptimized 2>&1 | tee gsc_pytorch_do_image_info
+
+                MR_ENCLAVE=`awk -F '"' '/mr_enclave/{print $2}' gsc_pytorch_do_image_info`
+                MR_SIGNER=`awk -F '"' '/mr_signer/{print $2}' gsc_pytorch_do_image_info`
+                docker run --net=host  --device=/dev/sgx/enclave -e RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 -e RA_TLS_MRENCLAVE=$MR_ENCLAVE \
+                    -e RA_TLS_MRSIGNER=$MR_SIGNER -e RA_TLS_ISV_PROD_ID=0 -e RA_TLS_ISV_SVN=0  -e RA_TLS_ALLOW_SW_HARDENING_NEEDED=1 \
+                    -e RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 -v $WORKSPACE/verifier/ssl_common:/ra-tls-secret-prov/ssl -v $WORKSPACE/test/pytorch/base_image_helper:/keys \
+                    -dt verifier:latest 2>&1 | tee gsc_pytorch_do_verifier_result
+                sleep 1m
+
+                docker run --net=host --rm --device=/dev/sgx/enclave -e SECRET_PROVISION_SERVERS=localhost:4433 \
+                    -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket -t gsc-pytorch-encrypted-debugoptimized 2>&1 | tee gsc_pytorch_do_result
+            '''
+        } catch (Exception e) { } 
+        finally {
+            sh '''
+                docker rm $(docker stop $(docker ps -a -q) &>/dev/null) &>/dev/null 
+                docker rmi verifier:latest &>/dev/null
             '''
         }
 
@@ -156,14 +214,15 @@ stage('Build and Test Workloads') {
 
                 bash test/ovms/commands.sh
             '''
-        } catch (Exception e) {
-        } finally {
+        } catch (Exception e) { } 
+        finally {
             sh '''
                 docker rm $(docker stop $(docker ps -a -q --filter ancestor=verifier) &>/dev/null) &>/dev/null
                 docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-ovms-image) &>/dev/null) &>/dev/null
+                docker rmi verifier:latest gsc-ovms-image &>/dev/null
             '''
         }
-     }
+    }
 
     // This should be the last tests, any other test should be added above
     sh '''
@@ -203,7 +262,6 @@ stage('Build and Test Workloads') {
                 --security-opt seccomp=unconfined gsc-helloworld-direct-test 2>&1 | tee helloworld_direct_result
         '''
     } catch (Exception e) {}
-
 
     // GSC build-gramine Bash Workload
     try {
