@@ -329,7 +329,7 @@ class Test_Workload_Results():
         assert("error: " not in gsc_helloworld_log)
 
     @pytest.mark.gsc
-    @pytest.mark.skipif(distro_ver != "debian:11", reason='java-simple is enabled only on debian11 currently')
+    @pytest.mark.skipif(distro_ver != "debian:12", reason='java-simple is enabled only on debian12 currently')
     def test_gsc_java_simple_workload(self):
         gsc_java_simple_result = open("openjdk-simple_result", "r")
         gsc_java_simple_log = gsc_java_simple_result.read()
@@ -337,7 +337,7 @@ class Test_Workload_Results():
         assert("error: " not in gsc_java_simple_log)
 
     @pytest.mark.gsc
-    @pytest.mark.skipif(distro_ver != "debian:11", reason='java-spring-boot is enabled only on debian11 currently')
+    @pytest.mark.skipif(distro_ver != "debian:12", reason='java-spring-boot is enabled only on debian12 currently')
     def test_gsc_java_spring_boot_workload(self):
         gsc_java_springboot_result = open("openjdk-spring-boot_result", "r")
         gsc_java_springboot_log = gsc_java_springboot_result.read()
