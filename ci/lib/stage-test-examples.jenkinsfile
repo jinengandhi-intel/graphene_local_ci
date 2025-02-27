@@ -98,10 +98,6 @@
             timeout(time: 30, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/pytorch
-                    python3 -m venv my_venv
-                    . my_venv/bin/activate
-                    pip3 install torchvision pillow
-                    python3 download-pretrained-model.py
                     make ${MAKEOPTS} all
                     gramine-${MODE} ./pytorch ./pytorchexample.py
                 '''
