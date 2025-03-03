@@ -25,6 +25,7 @@ stage('Build and Test Workloads') {
             '''
         }
         sh '''
+            echo 'Executing Build gsc-bash-test'
             docker build --tag bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build -nc --insecure-args bash-test test/ubuntu24.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps bash-test enclave-key.pem
@@ -39,6 +40,7 @@ stage('Build and Test Workloads') {
     // Build Python Latest Workload
     try {
         sh '''
+            echo 'Executing Build gsc-python-test'
             if [ "${os_release_id}" != "debian" ]
             then
                 docker build --tag python-test --build-arg BUILD_OS=${distro_ver} --file test/python.dockerfile .
@@ -63,6 +65,7 @@ stage('Build and Test Workloads') {
     if (env.distro_ver == "debian:12") {
         try {
             sh '''
+                echo 'Executing Build gsc-java-simple-test'
                 cd Examples/java-simple
                 docker build --tag java-simple-test .
                 cd ../../
@@ -78,6 +81,7 @@ stage('Build and Test Workloads') {
 
         try {
             sh '''
+                echo 'Executing Build gsc-java-spring-boot-test'
                 cd Examples/java-spring-boot
                 export PATH=$PATH:/opt/gradle/gradle-7.6.4/bin
                 cd spring-boot-web-service/ && gradle build -Dhttp.proxyHost=proxy-iind.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-iind.intel.com -Dhttps.proxyPort=912
@@ -106,6 +110,7 @@ stage('Build and Test Workloads') {
         // Build Pytorch-encrypted Workload
         try {
             sh '''
+                echo 'Executing Build gsc-pytorch-encrypted'
                 ./verifier/helper.sh "not-done" "y" "/keys/encryption_key" "test/pytorch/base_image_helper/"
 
                 bash ./test/pytorch/base_image_helper/helper.sh
@@ -134,6 +139,7 @@ stage('Build and Test Workloads') {
         // Build OVMS Workload
         try {
             sh '''
+                echo 'Executing Build gsc-ovms-image'
                 bash verifier/helper.sh "not" "y" "/keys/encryption_key" "test/ovms"
                 bash test/ovms/ovms_helper.sh
                 ./gsc build ovms-image test/ovms/ovms.manifest
@@ -183,6 +189,7 @@ stage('Build and Test Workloads') {
             '''
         }
         sh '''
+            echo 'Executing Build gsc-helloworld-test'
             docker build --tag helloworld-test --build-arg BUILD_OS=${distro_ver} --file test/helloworld.dockerfile .
             ./gsc build -nc --insecure-args helloworld-test test/ubuntu24.04-hello-world.manifest
             ./gsc sign-image --remove-gramine-deps helloworld-test enclave-key.pem
@@ -218,6 +225,7 @@ stage('Build and Test Workloads') {
             '''
         }
         sh '''
+            echo 'Executing Build gsc-gramine-build-bash-test'
             docker build --tag gramine-build-bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build-gramine bash24.04
             sed -i 's|Repository: "https://github.com/gramineproject/gramine.git"|#Repository: "https://github.com/gramineproject/gramine.git"|g' config.yaml
