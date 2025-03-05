@@ -12,7 +12,6 @@ stage('Build and Test Workloads') {
         env.runtime_args = "-c free"
     }
 
-    // Build Bash Workload
     try {
         if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
             sh 'cp -rf test/centos-bash.dockerfile test/bash.dockerfile'
@@ -25,6 +24,7 @@ stage('Build and Test Workloads') {
             '''
         }
         sh '''
+            echo 'Executing Build gsc-bash'
             docker build --tag bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build -nc --insecure-args bash-test test/ubuntu24.04-bash.manifest
             ./gsc sign-image --remove-gramine-deps bash-test enclave-key.pem
@@ -36,9 +36,9 @@ stage('Build and Test Workloads') {
         '''
     } catch (Exception e) {}
 
-    // Build Python Latest Workload
     try {
         sh '''
+            echo 'Executing Build gsc-python'
             if [ "${os_release_id}" != "debian" ]
             then
                 docker build --tag python-test --build-arg BUILD_OS=${distro_ver} --file test/python.dockerfile .
@@ -58,11 +58,10 @@ stage('Build and Test Workloads') {
         '''
     } catch (Exception e) {}
 
-    
-    // Build JAVA Simple and Java Spring Boot Workload
     if (env.distro_ver == "debian:12") {
         try {
             sh '''
+                echo 'Executing Build gsc-java-simple'
                 cd Examples/java-simple
                 docker build --tag java-simple-test .
                 cd ../../
@@ -78,6 +77,7 @@ stage('Build and Test Workloads') {
 
         try {
             sh '''
+                echo 'Executing Build gsc-java-spring-boot'
                 cd Examples/java-spring-boot
                 export PATH=$PATH:/opt/gradle/gradle-7.6.4/bin
                 cd spring-boot-web-service/ && gradle build -Dhttp.proxyHost=proxy-iind.intel.com -Dhttp.proxyPort=911 -Dhttps.proxyHost=proxy-iind.intel.com -Dhttps.proxyPort=912
@@ -102,9 +102,9 @@ stage('Build and Test Workloads') {
     }
 
     if (env.distro_ver == "ubuntu:22.04") {
-        // Build Pytorch-encrypted Workload
         try {
             sh '''
+                echo 'Executing Build gsc-pytorch-encrypted'
                 ./verifier/helper.sh "not-done" "y" "/keys/encryption_key" "test/pytorch/base_image_helper/"
 
                 bash ./test/pytorch/base_image_helper/helper.sh
@@ -131,9 +131,9 @@ stage('Build and Test Workloads') {
             '''
         }
 
-        // Build Pytorch-encrypted Workload in Debug Mode
         try {
             sh '''
+                echo 'Executing Build gsc-pytorch-encrypted-debug'
                 ./verifier/helper.sh "not-done" "y" "/keys/encryption_key" "test/pytorch/base_image_helper/"
 
                 bash ./test/pytorch/base_image_helper/helper.sh debug
@@ -160,9 +160,9 @@ stage('Build and Test Workloads') {
             '''
         }
 
-        // Build Pytorch-encrypted Workload in Debugoptimized Mode
         try {
             sh '''
+                echo 'Executing Build gsc-pytorch-encrypted-debugoptimized'
                 ./verifier/helper.sh "not-done" "y" "/keys/encryption_key" "test/pytorch/base_image_helper/"
 
                 bash ./test/pytorch/base_image_helper/helper.sh debugoptimized 
@@ -189,9 +189,9 @@ stage('Build and Test Workloads') {
             '''
         }
 
-        // Build OVMS Workload
         try {
             sh '''
+                echo 'Executing Build gsc-ovms'
                 bash verifier/helper.sh "not" "y" "/keys/encryption_key" "test/ovms"
                 bash test/ovms/ovms_helper.sh
                 ./gsc build ovms-image test/ovms/ovms.manifest
@@ -229,7 +229,6 @@ stage('Build and Test Workloads') {
         sed -i -E 's/Distro: "(.+)"/Distro: "'"$config_os"'"/g' config.yaml
     '''
 
-    // Build Bash HelloWorld Workload
     try {
         if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
             sh 'cp -rf test/centos-helloworld.dockerfile test/helloworld.dockerfile'
@@ -242,6 +241,7 @@ stage('Build and Test Workloads') {
             '''
         }
         sh '''
+            echo 'Executing Build gsc-helloworld'
             docker build --tag helloworld-test --build-arg BUILD_OS=${distro_ver} --file test/helloworld.dockerfile .
             ./gsc build -nc --insecure-args helloworld-test test/ubuntu24.04-hello-world.manifest
             ./gsc sign-image --remove-gramine-deps helloworld-test enclave-key.pem
@@ -253,9 +253,9 @@ stage('Build and Test Workloads') {
         '''
     } catch (Exception e) {}
 
-    // Run Bash HelloWorld Workload for Gramine-Direct
     try {
         sh '''
+            echo 'Executing Build gsc-helloworld-direct'
             docker tag gsc-helloworld-test gsc-helloworld-direct-test
             docker run --device=/dev/sgx_enclave --env GRAMINE_MODE=direct \
                 -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
@@ -263,7 +263,6 @@ stage('Build and Test Workloads') {
         '''
     } catch (Exception e) {}
 
-    // GSC build-gramine Bash Workload
     try {
         if (env.os_release_id.contains("centos") || env.os_release_id.contains("redhat")) {
             sh 'cp -rf test/centos-bash.dockerfile test/bash.dockerfile'
@@ -276,6 +275,7 @@ stage('Build and Test Workloads') {
             '''
         }
         sh '''
+            echo 'Executing Build gsc-gramine-build-bash'
             docker build --tag gramine-build-bash-test --build-arg BUILD_OS=${distro_ver} --file test/bash.dockerfile .
             ./gsc build-gramine bash24.04
             sed -i 's|Repository: "https://github.com/gramineproject/gramine.git"|#Repository: "https://github.com/gramineproject/gramine.git"|g' config.yaml
