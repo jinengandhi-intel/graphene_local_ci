@@ -222,6 +222,26 @@ stage('Build and Test Workloads') {
                 docker rmi verifier:latest gsc-ovms-image &>/dev/null
             '''
         }
+
+
+        try {
+            sh '''
+                echo 'Executing Build Openvino Example'
+                docker build --tag ubuntu24.04-openvino --file test/openvino/ubuntu24.04-openvino.dockerfile test/openvino/
+                ./gsc build ubuntu24.04-openvino test/openvino/ubuntu24.04-openvino.manifest
+                ./gsc sign-image ubuntu24.04-openvino enclave-key.pem
+                 // For Throughput Benchmarking tests
+                 docker run --cpuset-cpus="0-71" --cpuset-mems="0" --device /dev/sgx_enclave gsc-ubuntu24.04-openvino -m /model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
+                   -d CPU -b 1 -t 20 -api sync -hint none | tee openvino_throughput_result
+                 docker run --rm --device /dev/sgx_enclave gsc-ubuntu24.04-openvino -m /model/public/resnet-50-tf/FP16/resnet-50-tf.xml -d CPU -b 1 -t 20 -nstreams 2 \
+                   -nthreads 2 -nireq 2 -hint none
+                 // For Latency Benchmarking tests
+                 docker run --cpuset-cpus="0-71" --cpuset-mems="0" --device /dev/sgx_enclave gsc-ubuntu24.04-openvino -m /model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
+                   -d CPU -b 1 -t 20 -api sync -hint none
+                 docker run --rm --device /dev/sgx_enclave gsc-ubuntu24.04-openvino -m /model/public/resnet-50-tf/FP16/resnet-50-tf.xml -d CPU -b 1 -t 20 -api sync -hint none \
+                 | tee openvino_latency_result
+            '''
+        } catch (Exception e) { }
     }
 
     // This should be the last tests, any other test should be added above

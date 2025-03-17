@@ -436,3 +436,10 @@ class Test_Workload_Results():
         gsc_ovms_verifier_log = gsc_ovms_verifier_output.read()
         assert("error: " not in gsc_ovms_verifier_log)
         assert "SUCCESS" in open("test/ovms/ovms_result.txt", "r").read()
+
+    @pytest.mark.gsc
+    @pytest.mark.skipif(distro_ver != "ubuntu:24.04", reason='Openvino is compatible with Ubuntu 24.04')
+    def test_openvino_workload(self):
+        assert "SUCCESS" in open("test/openvino/openvino_throughput_result.txt", "r").read()
+        assert "SUCCESS" in open("test/openvino/openvino_latency_result.txt", "r").read()
+
