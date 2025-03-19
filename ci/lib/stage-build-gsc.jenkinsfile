@@ -222,8 +222,9 @@ stage('Build and Test Workloads') {
                 docker rmi verifier:latest gsc-ovms-image &>/dev/null
             '''
         }
+    }
 
-
+    if (env.distro_ver == "ubuntu:24.04") {
         try {
             sh '''
                 echo 'Executing Build gsc-openvino'
