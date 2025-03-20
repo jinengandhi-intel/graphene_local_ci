@@ -67,7 +67,7 @@ run-native: all
 .PHONY: install-dependencies
 install-dependencies:
 	../common_tools/download --output tensorflow-model-server_2.18.0_all.deb --sha256 $(TFSERVING_HASH) \
-	--url https://storage.googleapis.com/tensorflow-serving-apt/pool/tensorflow-model-server/t/tensorflow-model-server/tensorflow-model-server_2.18.0_all.deb
+	--url https://storage.googleapis.com/tensorflow-serving-apt/pool/tensorflow-model-server-2.18.0/t/tensorflow-model-server/tensorflow-model-server_2.18.0_all.deb
 	sudo dpkg -i ./tensorflow-model-server_2.18.0_all.deb
 
 .PHONY: clean
