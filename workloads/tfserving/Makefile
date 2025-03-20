@@ -4,7 +4,7 @@ CURR_DIR =$(shell pwd)
 SERVING=serving
 
 SERVING_HASH=652d6e2caab2b0d8729fe92ed11134222a1ba886d315b113b979155250864950
-TFSERVING_HASH=8c96f4398ee19dfd3d3617e615eea251fe5e2e768c8fba83157d10a3dfe1ed7e
+TFSERVING_HASH=80178166aba17617f2ea7b515cbe1417766a317dda4255ac0bdbbe46c03ea8fe
 
 ifeq ($(DEBUG),1)
 GRAMINE_LOG_LEVEL = debug
@@ -67,7 +67,7 @@ run-native: all
 .PHONY: install-dependencies
 install-dependencies:
 	../common_tools/download --output tensorflow-model-server_2.18.0_all.deb --sha256 $(TFSERVING_HASH) \
-	--url https://storage.googleapis.com/tensorflow-serving-apt/pool/tensorflow-model-server/t/tensorflow-model-server/tensorflow-model-server_2.18.0_all.deb
+	--url https://storage.googleapis.com/tensorflow-serving-apt/pool/tensorflow-model-server-2.18.0/t/tensorflow-model-server/tensorflow-model-server_2.18.0_all.deb
 	sudo dpkg -i ./tensorflow-model-server_2.18.0_all.deb
 
 .PHONY: clean
