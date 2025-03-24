@@ -96,7 +96,9 @@ stage('Build and Test Workloads') {
         } catch (Exception e) { } 
         finally {
             sh '''
-                docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-java-spring-boot-test) &>/dev/null) &>/dev/null
+                if [ -n "$(docker ps -a -q --filter ancestor=gsc-java-spring-boot-test)" ]; then
+                    docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-java-spring-boot-test) &>/dev/null) &>/dev/null
+                fi
             '''
         }
     }
@@ -217,8 +219,14 @@ stage('Build and Test Workloads') {
         } catch (Exception e) { } 
         finally {
             sh '''
-                docker rm $(docker stop $(docker ps -a -q --filter ancestor=verifier) &>/dev/null) &>/dev/null
-                docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-ovms-image) &>/dev/null) &>/dev/null
+                if [ -n "$(docker ps -a -q --filter ancestor=verifier) " ]; then
+                    docker rm $(docker stop $(docker ps -a -q --filter ancestor=verifier) &>/dev/null) &>/dev/null
+                fi
+
+                if [ -n "$(docker ps -a -q --filter ancestor=gsc-ovms-image) " ]; then
+                    docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-ovms-image) &>/dev/null) &>/dev/null
+                fi
+                
                 docker rmi verifier:latest gsc-ovms-image &>/dev/null
             '''
         }
