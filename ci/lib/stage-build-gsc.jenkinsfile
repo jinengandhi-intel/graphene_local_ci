@@ -96,9 +96,7 @@ stage('Build and Test Workloads') {
         } catch (Exception e) { } 
         finally {
             sh '''
-                if [ -n "$(docker ps -a -q --filter ancestor=gsc-java-spring-boot-test)" ]; then
-                    docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-java-spring-boot-test) &>/dev/null) &>/dev/null
-                fi
+                docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-java-spring-boot-test) 2>/dev/null) > /dev/null 2>&1
             '''
         }
     }
@@ -128,8 +126,8 @@ stage('Build and Test Workloads') {
         } catch (Exception e) { } 
         finally {
             sh '''
-                docker rm $(docker stop $(docker ps -a -q) &>/dev/null) &>/dev/null 
-                docker rmi verifier:latest &>/dev/null
+                docker rm $(docker stop $(docker ps -a -q) 2>/dev/null) > /dev/null 2>&1
+                docker rmi verifier:latest > /dev/null 2>&1
             '''
         }
 
@@ -157,8 +155,8 @@ stage('Build and Test Workloads') {
         } catch (Exception e) { } 
         finally {
             sh '''
-                docker rm $(docker stop $(docker ps -a -q) &>/dev/null) &>/dev/null 
-                docker rmi verifier:latest &>/dev/null
+                docker rm $(docker stop $(docker ps -a -q) 2>/dev/null) > /dev/null 2>&1
+                docker rmi verifier:latest > /dev/null 2>&1
             '''
         }
 
@@ -186,8 +184,8 @@ stage('Build and Test Workloads') {
         } catch (Exception e) { } 
         finally {
             sh '''
-                docker rm $(docker stop $(docker ps -a -q) &>/dev/null) &>/dev/null 
-                docker rmi verifier:latest &>/dev/null
+                docker rm $(docker stop $(docker ps -a -q) 2>/dev/null) > /dev/null 2>&1
+                docker rmi verifier:latest > /dev/null 2>&1
             '''
         }
 
@@ -219,15 +217,9 @@ stage('Build and Test Workloads') {
         } catch (Exception e) { } 
         finally {
             sh '''
-                if [ -n "$(docker ps -a -q --filter ancestor=verifier) " ]; then
-                    docker rm $(docker stop $(docker ps -a -q --filter ancestor=verifier) &>/dev/null) &>/dev/null
-                fi
-
-                if [ -n "$(docker ps -a -q --filter ancestor=gsc-ovms-image) " ]; then
-                    docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-ovms-image) &>/dev/null) &>/dev/null
-                fi
-                
-                docker rmi verifier:latest gsc-ovms-image &>/dev/null
+                docker rm $(docker stop $(docker ps -a -q --filter ancestor=verifier) 2>/dev/null) > /dev/null 2>&1
+                docker rm $(docker stop $(docker ps -a -q --filter ancestor=gsc-ovms-image) 2>/dev/null) > /dev/null 2>&1
+                docker rmi verifier:latest gsc-ovms-image > /dev/null 2>&1
             '''
         }
     }
