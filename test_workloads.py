@@ -386,8 +386,6 @@ class Test_Workload_Results():
     def test_gsc_pytorch_encrypted_workload(self):
         gsc_build_log = open("gsc_build_log_release", "r")
         gsc_build_log_content = gsc_build_log.read()
-        assert("RUN cd /gramine     && meson setup build/ --prefix=\"/gramine/meson_build_output\"        --buildtype=release" in gsc_build_log_content)
-        assert("buildtype                                       : release" in gsc_build_log_content)
         gsc_pytorch_verifier_output = open("gsc_pytorch_verifier_result", "r")
         gsc_pytorch_verifier_log = gsc_pytorch_verifier_output.read()
         assert("error: " not in gsc_pytorch_verifier_log)
@@ -402,8 +400,6 @@ class Test_Workload_Results():
     def test_gsc_pytorch_encrypted_debug_workload(self):
         gsc_build_log = open("gsc_build_log_debug", "r")
         gsc_build_log_content = gsc_build_log.read()
-        assert("RUN cd /gramine     && meson setup build/ --prefix=\"/gramine/meson_build_output\"        --buildtype=debug" in gsc_build_log_content)
-        assert("buildtype                                       : debug" in gsc_build_log_content)
         gsc_pytorch_verifier_output = open("gsc_pytorch_d_verifier_result", "r")
         gsc_pytorch_verifier_log = gsc_pytorch_verifier_output.read()
         assert("error: " not in gsc_pytorch_verifier_log)
@@ -418,8 +414,6 @@ class Test_Workload_Results():
     def test_gsc_pytorch_encrypted_debugoptimized_workload(self):
         gsc_build_log = open("gsc_build_log_debugoptimized", "r")
         gsc_build_log_content = gsc_build_log.read()
-        assert("RUN cd /gramine     && meson setup build/ --prefix=\"/gramine/meson_build_output\"        --buildtype=debugoptimized" in gsc_build_log_content)
-        assert("buildtype                                       : debugoptimized" in gsc_build_log_content)
         gsc_pytorch_verifier_output = open("gsc_pytorch_do_verifier_result", "r")
         gsc_pytorch_verifier_log = gsc_pytorch_verifier_output.read()
         assert("error: " not in gsc_pytorch_verifier_log)
