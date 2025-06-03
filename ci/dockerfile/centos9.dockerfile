@@ -5,6 +5,7 @@ RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
 RUN dnf config-manager --set-enabled -y crb && \
     dnf install -y yum-utils && \
     dnf install -y epel-release && \
+    dnf update -y && \
     dnf install -y \
         libunwind \
         ncurses-devel \
