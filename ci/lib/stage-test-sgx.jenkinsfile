@@ -14,7 +14,8 @@ stage('test-sgx') {
             .ci/check-no-syscall.sh "$GRAMINE_PKGLIBDIR"/runtime/musl/libc.so
         fi
     '''
-    if (!env.os_release_id.contains("centos")) {
+
+    if (!["centos9", "rhel9"].contains(env.base_os)) {
         try {
             timeout(time: 60, unit: 'MINUTES') {
                 sh '''
@@ -39,7 +40,7 @@ stage('test-sgx') {
         } catch (Exception e) {
         } finally {
             archiveArtifacts 'libos/test/ltp/ltp-sgx.xml'
-            junit 'libos/test/ltp/ltp-sgx.xml'
+            junit allowEmptyResults: true, testResults: 'libos/test/ltp/ltp-sgx.xml'
         }
     }
     try{

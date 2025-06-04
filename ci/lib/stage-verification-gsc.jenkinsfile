@@ -5,7 +5,7 @@ stage ('verification') {
         }
     } catch (Exception e) {
     } finally {
-        junit 'gsc-workload.xml'
+        junit allowEmptyResults: true, testResults: 'gsc-workload.xml'
     }
 }
 

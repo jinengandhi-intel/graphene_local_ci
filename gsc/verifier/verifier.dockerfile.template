@@ -38,7 +38,7 @@ RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-sgx-deb.asc] https
 
 RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-    libsgx-dcap-default-qpl=1.16.100.2-jammy1 libsgx-dcap-quote-verify-dev
+    libsgx-dcap-default-qpl libsgx-dcap-quote-verify-dev
 
 RUN sed -i "s|^\(  \"pccs_url\": \"https://\).*\(/sgx/certification.*\)|\1api.trustedservices.intel.com\2|g" \
     /etc/sgx_default_qcnl.conf

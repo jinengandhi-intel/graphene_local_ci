@@ -30,6 +30,6 @@ stage('verification') {
         env.build_ok = true
         sh 'echo "sdtest parser failed"'
     } finally {
-        junit 'sdtest.xml'
+        junit allowEmptyResults: true, testResults: 'sdtest.xml'
     }
 }

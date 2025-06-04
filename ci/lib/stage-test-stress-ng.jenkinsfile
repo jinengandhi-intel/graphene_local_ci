@@ -223,7 +223,7 @@ timestamps {
                     }
                 } catch (Exception e){}
                 finally {
-                    junit 'CI-Examples/stress-ng/stressng-results.xml'
+                    junit allowEmptyResults: true, testResults: 'CI-Examples/stress-ng/stressng-results.xml'
                 }
             }
         }

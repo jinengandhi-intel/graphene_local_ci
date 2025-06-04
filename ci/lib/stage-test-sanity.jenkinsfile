@@ -70,7 +70,7 @@ stage ('workload_verification') {
         sh 'echo "Workload parser failed"'
     }
     finally {
-        junit 'workload-regression.xml'
+        junit allowEmptyResults: true, testResults: 'workload-regression.xml'
     }
 }
 

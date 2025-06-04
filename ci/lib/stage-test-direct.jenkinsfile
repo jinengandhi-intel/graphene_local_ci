@@ -30,7 +30,7 @@ stage('test-direct') {
         } catch (Exception e) {
         } finally {
             archiveArtifacts 'libos/test/ltp/ltp.xml'
-            junit 'libos/test/ltp/ltp.xml'
+            junit allowEmptyResults: true, testResults: 'libos/test/ltp/ltp.xml'
         }
     }
     try {

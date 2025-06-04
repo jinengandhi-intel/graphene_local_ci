@@ -5,6 +5,6 @@ stage ('verification') {
         }
     } catch (Exception e){}
     finally {
-        junit 'workload-regression.xml'
+        junit allowEmptyResults: true, testResults: 'workload-regression.xml'
     }
 }

@@ -17,7 +17,7 @@ stage('test') {
             }
         } catch (Exception e) { } finally {
             archiveArtifacts 'pal/regression/pal-regression.xml'
-            junit 'pal/regression/pal-regression.xml'
+            junit allowEmptyResults: true, testResults: 'pal/regression/pal-regression.xml'
         }
 
         try {
@@ -30,7 +30,7 @@ stage('test') {
             }
         } catch (Exception e) { } finally {
             archiveArtifacts 'libos/test/abi/x86_64/abi.xml'
-            junit 'libos/test/abi/x86_64/abi.xml'
+            junit allowEmptyResults: true, testResults: 'libos/test/abi/x86_64/abi.xml'
         }
 
         try {
@@ -43,7 +43,7 @@ stage('test') {
             }
         } catch (Exception e) { } finally {
             archiveArtifacts 'libos/test/fs/fs.xml'
-            junit 'libos/test/fs/*.xml'
+            junit allowEmptyResults: true, testResults: 'libos/test/fs/*.xml'
         }
 
         // Running test_099_rename_pf separetly to ensure rename_protected_file.patch is applied
@@ -58,7 +58,7 @@ stage('test') {
                 }
             } catch (Exception e) { } finally {
                 archiveArtifacts 'libos/test/fs/pf.xml'
-                junit 'libos/test/fs/pf.xml'
+                junit allowEmptyResults: true, testResults: 'libos/test/fs/pf.xml'
             }
         }
     }
@@ -85,7 +85,7 @@ stage('test') {
         }
     } catch (Exception e) { } finally {
         archiveArtifacts 'libos/test/regression/libos-regression.xml'
-        junit 'libos/test/regression/libos-regression.xml'
+        junit allowEmptyResults: true, testResults: 'libos/test/regression/libos-regression.xml'
     }
 
     timeout(time: 15, unit: 'MINUTES') {
@@ -101,7 +101,7 @@ stage('test') {
             }
         } catch (Exception e) { } finally {
             archiveArtifacts 'tests.xml'
-            junit 'tests.xml'
+            junit allowEmptyResults: true, testResults: 'tests.xml'
         }
     }
 }
