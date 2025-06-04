@@ -8,7 +8,7 @@ index 612873c0..b7a33db1 100644
  
 +  { type = "encrypted", path = "/protected", uri = "file:protected" , key_name = "_sgx_mrenclave"},
    { type = "encrypted", path = "/tmp/enc_input", uri = "file:tmp/enc_input" },
-   { type = "encrypted", path = "/tmp/enc_output", uri = "file:tmp/enc_output" },
+   { type = "encrypted", path = "/tmp/enc_output", uri = "file:tmp/enc_output", enable_recovery = true },
    { type = "encrypted", path = "/mounted/enc_input", uri = "file:tmp/enc_input" },
 diff --git a/libos/test/fs/meson.build b/libos/test/fs/meson.build
 index 02c68830..c17c1e6e 100644
