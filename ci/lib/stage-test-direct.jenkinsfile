@@ -5,7 +5,7 @@ stage('test-direct') {
             cut -d':' -f1 | \
             xargs -L1 .ci/check-rwx.py
     '''
-    if (!env.os_release_id.contains("centos")) {
+    if (!["centos9", "rhel9"].contains(env.base_os)) {
         try {
             timeout(time: 30, unit: 'MINUTES') {
                 sh '''
