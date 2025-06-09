@@ -69,7 +69,6 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-cryptography \
     python3-jinja2 \
     python3-lxml \
-    python3-numpy \
     python3-pandas \
     python3-pil \
     python3-pip \
@@ -79,7 +78,6 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-pytest \
     python3-pytest-xdist \
     python3-recommonmark \
-    python3-scipy \
     python3-sphinx-rtd-theme \
     python3-venv \
     python3-voluptuous \
@@ -116,6 +114,8 @@ RUN python3 -m pip install --upgrade pip --user
 RUN python3 -m pip install -U \
     'docutils>=0.17,<0.18' \
     'meson>=0.56'  \
+    numpy \
+    scipy \
     'recommonmark>=0.5.0,<=0.7.1' \
     'scikit-learn-intelex' \
     'tomli>=1.1.0' \
