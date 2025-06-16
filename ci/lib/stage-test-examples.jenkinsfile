@@ -221,28 +221,34 @@
     
     if ((["ubuntu", "rhel", "centos"].contains(env.os_release_id)) && (env.no_cpu.toInteger() > 16)) {
         try {
-               timeout(time:30,unit: 'MINUTES') {
-               sh '''
-                  export PID=$(lsof -t -i:3306)
-                  if [ "$PID" != "" ]
-                  then
-                     echo "Killing $PID"
-                     sudo kill -9 $PID
-                  fi
-                  cd CI-Examples/mysql
-                  make privileges
-                  if [ "${os_release_id}" != 'ubuntu' ]
-                  then
+            timeout(time:30,unit: 'MINUTES') {
+                sh '''
+                    export PID=$(lsof -t -i:3306)
+                    if [ "$PID" != "" ]
+                    then
+                        echo "Killing $PID"
+                        sudo kill -9 $PID
+                    fi
+                    export PID=$(sudo lsof -t -i:3306)
+                    if [ "$PID" != "" ]
+                    then
+                        echo "Killing $PID"
+                        sudo kill -9 $PID
+                    fi
+                    cd CI-Examples/mysql
+                    make privileges
+                    if [ "${os_release_id}" != 'ubuntu' ]
+                    then
                         make privileges-rhel
-                  fi
-                  make ${MAKEOPTS} all && make ${MAKEOPTS} check
-                  sleep 150s
-                  make conncheck
-                  make uninstall-mysql
-                 '''
-                }
-           } catch (Exception e) { }
-      }
+                    fi
+                    make ${MAKEOPTS} all && make ${MAKEOPTS} check
+                    sleep 150s
+                    make conncheck
+                    make uninstall-mysql
+                '''
+            }
+        } catch (Exception e) { }
+    }
 
     try {
         timeout(time: 20, unit: 'MINUTES') {
@@ -265,13 +271,19 @@
 
     if (env.no_cpu.toInteger() > 16)  {
         try {
-            timeout(time: 20, unit: 'MINUTES') {
+            timeout(time: 30, unit: 'MINUTES') {
                 sh '''
                    export PID=$(lsof -t -i:3306)
                    if [ "$PID" != "" ]
                    then
                      echo "Killing $PID"
                      sudo kill -9 $PID
+                    fi
+                    export PID=$(sudo lsof -t -i:3306)
+                    if [ "$PID" != "" ]
+                    then
+                      echo "Killing $PID"
+                      sudo kill -9 $PID
                     fi
                     cd CI-Examples/mariadb
                     sudo -E make install-mariadb

@@ -69,7 +69,6 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-cryptography \
     python3-jinja2 \
     python3-lxml \
-    python3-pandas \
     python3-pil \
     python3-pip \
     python3-pkg-resources \
@@ -115,6 +114,7 @@ RUN python3 -m pip install -U \
     'docutils>=0.17,<0.18' \
     'meson>=0.56'  \
     numpy \
+    pandas \
     scipy \
     'recommonmark>=0.5.0,<=0.7.1' \
     'scikit-learn-intelex' \

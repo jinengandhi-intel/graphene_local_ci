@@ -57,7 +57,7 @@ class TimeSyncCMD:
 class HostSetup():
     def setup():
         try:
-            subprocess.run(f"{priviledge} service docker restart", timeout=50, shell=True)
+            subprocess.run(f"{priviledge} systemctl restart docker", timeout=50, shell=True)
             subprocess.run("sleep 10s", shell=True)
             subprocess.run(f"{priviledge} chown $USER /var/run/docker.sock", timeout=5, shell=True)
             subprocess.run(f"{priviledge} chmod 777 /dev/cpu_dma_latency", timeout=5, shell=True)
