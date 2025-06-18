@@ -1,7 +1,7 @@
 ARCH_LIBDIR ?= /lib/$(shell $(CC) -dumpmachine)
 UID ?= $(shell id -u)
 GID ?= $(shell id -g)
-TIMEOUT = 60
+TIMEOUT = 120
 
 # Detect the Package Manager
 ifneq ($(shell command -v apt-get),)
