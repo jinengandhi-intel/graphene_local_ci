@@ -120,7 +120,7 @@ RUN git clone https://github.com/giltene/wrk2.git \
 RUN usermod -aG sudo ubuntu
 
 RUN echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-RUN echo 'http_proxy="http://proxy-dmz.intel.com:911/"\nhttps_proxy="http://proxy-dmz.intel.com:912/"' >> /etc/environment
+RUN echo -e 'http_proxy="http://proxy-dmz.intel.com:911/"\nhttps_proxy="http://proxy-dmz.intel.com:912/"' >> /etc/environment
 
 # Define default command.
 CMD ["bash"]

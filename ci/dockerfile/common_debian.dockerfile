@@ -40,8 +40,8 @@ RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G sudo -m -d /inte
 RUN chown 1000 /intel 
 
 RUN echo 'intel ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
-RUN echo 'http_proxy="http://proxy-dmz.intel.com:911/"\nhttps_proxy="http://proxy-dmz.intel.com:912/"' >> /etc/environment
-RUN echo 'Acquire::http::proxy "http://proxy-dmz.intel.com:911/";\nAcquire::http::proxy "http://proxy-dmz.intel.com:911/";' >> /etc/apt/apt.conf.d/80proxy
+RUN echo -e 'http_proxy="http://proxy-dmz.intel.com:911/"\nhttps_proxy="http://proxy-dmz.intel.com:912/"' >> /etc/environment
+RUN echo -e 'Acquire::http::proxy "http://proxy-dmz.intel.com:911/";\nAcquire::https::proxy "http://proxy-dmz.intel.com:912/";' >> /etc/apt/apt.conf.d/80proxy
 
 # Blow away any random state
 RUN rm -f /intel/.rnd
