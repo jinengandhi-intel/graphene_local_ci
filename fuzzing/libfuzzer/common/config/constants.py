@@ -34,9 +34,9 @@ GRAMINE_BUILD_MESON_CMD = "meson setup build/ --werror " + \
                         " -Ddirect=enabled -Dsgx=enabled > " + \
                         LOGS_DIR + "/gramine_build_meson_cmd_output.txt"
 
-GRAMINE_NINJA_BUILD_CMD = "ninja -vC build > " + LOGS_DIR + "/gramine_ninja_build_cmd_output.txt"
+GRAMINE_NINJA_BUILD_CMD = "meson compile -vC build > " + LOGS_DIR + "/gramine_ninja_build_cmd_output.txt"
 
-GRAMINE_NINJA_INSTALL_CMD = "ninja -vC build install > " + LOGS_DIR + "/gramine_ninja_install_cmd_output.txt"
+GRAMINE_NINJA_INSTALL_CMD = "meson install -C build > " + LOGS_DIR + "/gramine_ninja_install_cmd_output.txt"
 
 PYTHONPATH_CMD = "gramine/scripts/get-python-platlib.py " + BUILD_PREFIX
 

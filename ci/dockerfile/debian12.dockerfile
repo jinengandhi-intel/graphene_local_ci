@@ -55,7 +55,6 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     nasm \
     net-tools \
     netcat-openbsd \
-    ninja-build \
     nodejs \
     pkg-config \
     protobuf-c-compiler \

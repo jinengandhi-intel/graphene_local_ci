@@ -37,6 +37,7 @@ RUN yum update -y && yum install -y \
     gcc\
     git \
     make \
+    meson \
     python3-pip \
     python3-setuptools \
     python3-pytest \
@@ -44,8 +45,6 @@ RUN yum update -y && yum install -y \
     sudo \
     wget \
     yum-utils
-
-RUN python3 -m pip install -U 'meson>=0.56,<0.57'
 
 RUN yum-config-manager --add-repo https://packages.gramineproject.io/rpm/gramine.repo 
 

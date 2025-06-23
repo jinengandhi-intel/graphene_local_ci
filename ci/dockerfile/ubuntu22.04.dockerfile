@@ -48,6 +48,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libipsec-mb-dev \
     lsb-release \
     lsof \
+    meson \
     musl \
     musl-tools \ 
     mysql-server \
@@ -55,7 +56,6 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     net-tools \
     netcat-openbsd \
     nginx \
-    ninja-build \
     nodejs \
     openjdk-11-jdk \
     pkg-config \
@@ -78,6 +78,8 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3-pytest-xdist \
     python3-recommonmark \
     python3-sphinx-rtd-theme \
+    python3-tomli \
+    python3-tomli-w \
     python3-venv \
     python3-voluptuous \
     r-base \
@@ -112,14 +114,11 @@ RUN python3 -m pip install --upgrade pip --user
 
 RUN python3 -m pip install -U \
     'docutils>=0.17,<0.18' \
-    'meson>=0.56'  \
     numpy \
     pandas \
     scipy \
     'recommonmark>=0.5.0,<=0.7.1' \
-    'scikit-learn-intelex' \
-    'tomli>=1.1.0' \
-    'tomli-w>=0.4.0' --timeout 120
+    'scikit-learn-intelex' --timeout 120
 
 # Add mongodb repo installation
 RUN curl -fsSL https://pgp.mongodb.com/server-7.0.asc | \

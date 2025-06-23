@@ -104,10 +104,10 @@ def build_and_install_gramine():
     print("\n-- Executing below mentioned gramine build meson build cmd..\n", GRAMINE_BUILD_MESON_CMD)
     utils.exec_shell_cmd(GRAMINE_BUILD_MESON_CMD)
     
-    print("\n-- Executing below mentioned gramine ninja build cmd..\n", GRAMINE_NINJA_BUILD_CMD)
+    print("\n-- Executing below mentioned gramine meson compile build cmd..\n", GRAMINE_NINJA_BUILD_CMD)
     utils.exec_shell_cmd(GRAMINE_NINJA_BUILD_CMD)
 
-    print("\n-- Executing below mentioned gramine ninja build install cmd..\n", GRAMINE_NINJA_INSTALL_CMD)
+    print("\n-- Executing below mentioned gramine meson install build cmd..\n", GRAMINE_NINJA_INSTALL_CMD)
     utils.exec_shell_cmd(GRAMINE_NINJA_INSTALL_CMD)
      
     os.chdir(FRAMEWORK_HOME_DIR)

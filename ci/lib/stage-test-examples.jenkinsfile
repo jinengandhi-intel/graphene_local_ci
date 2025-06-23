@@ -98,6 +98,7 @@
             timeout(time: 30, unit: 'MINUTES') {
                 sh '''
                     cd CI-Examples/pytorch
+                    sed -i 's/sgx.enclave_size = "4G"/sgx.enclave_size = "8G"/g' pytorch.manifest.template
                     make ${MAKEOPTS} all
                     gramine-${MODE} ./pytorch ./pytorchexample.py
                 '''

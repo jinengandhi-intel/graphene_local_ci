@@ -7,8 +7,8 @@ stage('build-kw') {
         sh '''
         sed -i "/uname/ a '/usr/src/linux-headers-@0@/arch/x86/include/uapi'.format(run_command('uname', '-r').stdout().split('-generic')[0].strip())," meson.build
         meson setup build --prefix=/home/intel/gramine_install/usr --buildtype=release -Ddirect=enabled -Dsgx=enabled
-        $KW_INSTALL/kwinject -o $WORKSPACE/kwinject_graphene.out ninja -vC build
-        ninja -vC build install
+        $KW_INSTALL/kwinject -o $WORKSPACE/kwinject_graphene.out meson compile -vC build
+        meson install -C build
         '''
     } catch (Exception e) {}
 

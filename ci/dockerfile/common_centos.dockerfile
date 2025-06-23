@@ -23,14 +23,13 @@ RUN yum update -y && yum install -y \
     gcc\
     git \
     make \
+    meson \
     python3-pip \
     python3-setuptools \
     python3-pytest \
     sshpass \
     sudo \
     wget
-
-RUN python3 -m pip install -U 'meson>=0.56,<0.57'
 
 # Add the user UID:1000, GID:1000, home at /intel
 RUN groupadd -r intel -g 1000 && useradd -u 1000 -r -g intel -G wheel -m -d /intel -c "intel Jenkins" intel && \

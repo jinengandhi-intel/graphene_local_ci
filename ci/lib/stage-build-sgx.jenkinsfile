@@ -38,12 +38,12 @@ stage('build') {
                     -Ddirect=disabled \
                     -Dsgx=enabled \
                     $MESON_OPTIONS > meson_cmd_output.txt
-                ninja -vC build > ninja_build_log.txt
+                meson compile -vC build > ninja_build_log.txt
                 if [ "$build_prefix" = "0" ]
                 then
-                    sudo ninja -vC build install > ninja_install_log.txt
+                    sudo meson install -C build > ninja_install_log.txt
                 else
-                    ninja -vC build install > ninja_install_log.txt
+                    meson install -C build > ninja_install_log.txt
                 fi
                 gramine-sgx-gen-private-key
             '''

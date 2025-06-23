@@ -12,7 +12,7 @@ stage('coverity-scan') {
         cov-configure --config config.xml --compiler cc --comptype gcc --template --xml-option=skip_file:"/subprojects/"
         cov-configure --config config.xml --compiler c++ --comptype gcc --template --xml-option=skip_file:"/subprojects/"
         cov-configure --config config.xml --python --xml-option=skip_file:"/subprojects/"
-        cov-build --config config.xml --dir int_dir --fs-capture-search . ninja -vC build
+        cov-build --config config.xml --dir int_dir --fs-capture-search . meson compile -C build
         '''
     } catch (Exception e) {}
 

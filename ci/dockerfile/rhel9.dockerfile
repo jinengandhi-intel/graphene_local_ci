@@ -50,6 +50,7 @@ RUN dnf update -y \
         libXrender \
         libunwind \
         make \
+        meson \
         mysql-server \
         nasm \
         nc \
@@ -58,7 +59,6 @@ RUN dnf update -y \
         nss-mdns \
         nss-myhostname \
         ncurses-devel \
-        ninja-build \
         openssl-devel \
         patch \
         pkg-config \
@@ -78,6 +78,8 @@ RUN dnf update -y \
         python3-pkg-resources \
         python3-pyelftools \
         python3-pytest \
+        python3-tomli \
+        python3-tomli-w \
         python3-virtualenv \
         python3-voluptuous \
         R-core \
@@ -95,9 +97,6 @@ RUN dnf update -y \
         wget
 
 RUN python3 -B -m pip install -U \
-    'tomli>=1.1.0' \
-    'tomli-w>=0.4.0' \
-    'meson>=0.56' \
     six \
     numpy \
     scipy 

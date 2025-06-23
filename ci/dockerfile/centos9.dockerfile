@@ -45,13 +45,13 @@ RUN dnf config-manager --set-enabled -y crb && \
         libXfixes \
         libXrender \
         lsof \
+        meson \
         mysql-server \
         nasm \
         nc \
         ncurses-devel \
         ncurses-libs \
         net-tools \
-        ninja-build \
         nodejs \
         # nss_nis \
         nss-mdns \
@@ -74,6 +74,8 @@ RUN dnf config-manager --set-enabled -y crb && \
         python3-protobuf \
         python3-pyelftools \
         python3-pytest \
+        python3-tomli \
+        python3-tomli-w \
         python3-virtualenv \
         python3-voluptuous \
         R-core \
@@ -104,9 +106,6 @@ RUN python3 -m pip install -U \
     six \
     numpy \
     scipy \
-    'tomli>=1.1.0' \
-    'tomli-w>=0.4.0' \
-    'meson>=0.56' \
     dataclasses
 
 # Add mongodb workload

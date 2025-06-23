@@ -12,6 +12,7 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get i
     lsb-release \
     lsof \
     make \
+    meson \
     nginx \
     pkg-config \
     python3-pip \
@@ -22,10 +23,9 @@ RUN apt-get update -y && env DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get i
     wget
 
 RUN if [ "$(lsb_release -sc)" = "noble" ]; then \
-        apt install -y netcat-openbsd meson && \
+        apt install -y netcat-openbsd && \
         userdel -r ubuntu; \
     else \
-        python3 -m pip install -U 'meson>=0.56,<0.57' && \
         apt install -y netcat; \
     fi
 
