@@ -45,11 +45,11 @@ pipeline {
                     }
                 }
 
-                stage ('Invoke GSC with SUSE Linux Enterprise Server 15.4') {
-                    steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_suse_15.4'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gsc_repo', value: gsc_repo], [$class: 'StringParameterValue', name: 'gsc_branch', value: gsc_branch], [$class: 'StringParameterValue', name: 'distro_ver', value: "registry.suse.com/suse/sle15:15.4"]], propagate: true, wait: true
-                    }
-                }
+                // stage ('Invoke GSC with SUSE Linux Enterprise Server 15.4') {
+                //     steps {
+                //         build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_suse_15.4'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gsc_repo', value: gsc_repo], [$class: 'StringParameterValue', name: 'gsc_branch', value: gsc_branch], [$class: 'StringParameterValue', name: 'distro_ver', value: "registry.suse.com/suse/sle15:15.4"]], propagate: true, wait: true
+                //     }
+                // }
             }
         }
     }
