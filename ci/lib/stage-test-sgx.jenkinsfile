@@ -183,66 +183,64 @@ stage('test-sgx') {
         }
     } catch (Exception e) { }
 
-    if ((env.node_label.contains("dcap")) && (env.SGX == '1')) {
-        try {
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    export PID=$(lsof -t -i:4433)
-                    if [ "$PID" != "" ]
-                    then
-                        echo "Killing $PID"
-                        kill -9 $PID
-                    fi
-                    cd CI-Examples/ra-tls-mbedtls
-                    export RA_TLS_MRSIGNER=any
-                    export RA_TLS_MRENCLAVE=any
-                    export RA_TLS_ISV_PROD_ID=any
-                    export RA_TLS_ISV_SVN=any
-                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
-                    make check_dcap 2>&1 | tee mbedtls_result.txt
-                '''
-            }
-        } catch (Exception e) { }
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                export PID=$(lsof -t -i:4433)
+                if [ "$PID" != "" ]
+                then
+                    echo "Killing $PID"
+                    kill -9 $PID
+                fi
+                cd CI-Examples/ra-tls-mbedtls
+                export RA_TLS_MRSIGNER=any
+                export RA_TLS_MRENCLAVE=any
+                export RA_TLS_ISV_PROD_ID=any
+                export RA_TLS_ISV_SVN=any
+                RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
+                make check_dcap 2>&1 | tee mbedtls_result.txt
+            '''
+        }
+    } catch (Exception e) { }
 
-        try {
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    export PID=$(lsof -t -i:4433)
-                    if [ "$PID" != "" ]
-                    then
-                        echo "Killing $PID"
-                        kill -9 $PID
-                    fi
-                    cd CI-Examples/ra-tls-secret-prov
-                    export RA_TLS_MRSIGNER=any
-                    export RA_TLS_MRENCLAVE=any
-                    export RA_TLS_ISV_PROD_ID=any
-                    export RA_TLS_ISV_SVN=any
-                    RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
-                    make check_dcap 2>&1 | tee secret_prov_result.txt
-                '''
-            }
-        } catch (Exception e) { }
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                export PID=$(lsof -t -i:4433)
+                if [ "$PID" != "" ]
+                then
+                    echo "Killing $PID"
+                    kill -9 $PID
+                fi
+                cd CI-Examples/ra-tls-secret-prov
+                export RA_TLS_MRSIGNER=any
+                export RA_TLS_MRENCLAVE=any
+                export RA_TLS_ISV_PROD_ID=any
+                export RA_TLS_ISV_SVN=any
+                RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE=1 RA_TLS_ALLOW_OUTDATED_TCB_INSECURE=1 RA_TYPE=dcap \
+                make check_dcap 2>&1 | tee secret_prov_result.txt
+            '''
+        }
+    } catch (Exception e) { }
 
-        try {
-            timeout(time: 2, unit: 'MINUTES') {
-                sh '''
-                    export PID=$(lsof -t -i:8000)
-                    if [ "$PID" != "" ]
-                    then
-                        echo "Killing $PID"
-                        kill -9 $PID
-                    fi
-                    cd CI-Examples/ra-tls-nginx
-                    export RA_TLS_MRSIGNER=any
-                    export RA_TLS_MRENCLAVE=any
-                    export RA_TLS_ISV_PROD_ID=any
-                    export RA_TLS_ISV_SVN=any
-                    make check 2>&1 | tee nginx_result.txt
-                '''
-            }
-        } catch (Exception e) { }
-    }
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh '''
+                export PID=$(lsof -t -i:8000)
+                if [ "$PID" != "" ]
+                then
+                    echo "Killing $PID"
+                    kill -9 $PID
+                fi
+                cd CI-Examples/ra-tls-nginx
+                export RA_TLS_MRSIGNER=any
+                export RA_TLS_MRENCLAVE=any
+                export RA_TLS_ISV_PROD_ID=any
+                export RA_TLS_ISV_SVN=any
+                make check 2>&1 | tee nginx_result.txt
+            '''
+        }
+    } catch (Exception e) { }
 
     try{
         timeout(time: 10, unit: 'MINUTES') {

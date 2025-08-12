@@ -16,19 +16,6 @@ pipeline {
                         build job: 'local_ci_graphene_sgx_22.04_6.2', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_22.04_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'EDMM', value: '1'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu22.04"]], propagate: true, wait: true
                     }
                 }
-
-                stage ('Invoke Ubuntu 24.04 with 6.8 Graphene SGX Suite') {
-                    steps {
-                        sleep(time: 5, unit: "MINUTES")
-                        build job: 'local_ci_graphene_sgx_24.04_6.8', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'EDMM', value: '1'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "ubuntu24.04"]], propagate: true, wait: true
-                    }
-                }
-
-                stage ('Invoke RHEL 9 with 6.7 Graphene SGX Suite ') {
-                    steps {
-                        build job: 'local_ci_graphene_sgx_rhel9_server_6.7', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel9_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'stress_ng_run', value: 'False'], [$class: 'StringParameterValue', name: 'EDMM', value: '1'], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "rhel9"]], propagate: true, wait: true
-                    }
-                }
             }
         }
     }

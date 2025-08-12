@@ -140,9 +140,8 @@ class Test_Workload_Results():
         assert("error: " not in jdk_contents)
 
     @pytest.mark.examples
-    @pytest.mark.skipif((base_os not in ["ubuntu20.04"]) \
-                or (("dcap" in node_label) and sgx_mode == '1'), \
-                    reason="Bazel Build fails for Ubuntu 21 and Gramine DCAP")
+    @pytest.mark.skipif((base_os not in ["ubuntu20.04"]),
+                    reason="Bazel Build fails for Ubuntu 21 and Gramine")
     def test_tensorflow_lite_workload(self):
         tensorflow_result_file = open("CI-Examples/tensorflow-lite/OUTPUT", "r")
         tensorflow_contents = tensorflow_result_file.read()
@@ -238,7 +237,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not((ra_type == "dcap") and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif((sgx_mode != "1"), reason="Enabled only for Gramine SGX")
     def test_ra_tls_mbedtls_workload(self):
         mbedtls_result_file = open("CI-Examples/ra-tls-mbedtls/mbedtls_result.txt", "r")
         mbedtls_contents = mbedtls_result_file.read()
@@ -250,7 +249,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not((ra_type == "dcap") and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif((sgx_mode != "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_secret_prov_workload(self):
         secret_prov_result_file = open("CI-Examples/ra-tls-secret-prov/secret_prov_result.txt", "r")
         secret_prov_contents = secret_prov_result_file.read()
@@ -262,7 +261,7 @@ class Test_Workload_Results():
 
     @pytest.mark.examples
     @pytest.mark.sanity
-    @pytest.mark.skipif(not((ra_type == "dcap") and sgx_mode == "1"), reason="Enabled only for Gramine SGX Dcap")
+    @pytest.mark.skipif((sgx_mode != "1"), reason="Enabled only for Gramine SGX Dcap")
     def test_ra_tls_nginx_workload(self):
         nginx_result_file = open("CI-Examples/ra-tls-nginx/nginx_result.txt", "r")
         nginx_contents = nginx_result_file.read()

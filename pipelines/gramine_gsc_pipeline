@@ -15,41 +15,11 @@ pipeline {
                     }
                 }
 
-                stage ('Invoke GSC with Ubuntu 24.04') {
+                stage ('Invoke GSC with CentOS Stream 10') {
                     steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_24.04_6.8_WilsonCity'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gsc_repo', value: gsc_repo], [$class: 'StringParameterValue', name: 'gsc_branch', value: gsc_branch], [$class: 'StringParameterValue', name: 'distro_ver', value: "ubuntu:24.04"]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['gramine_centos_stream10'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gsc_repo', value: gsc_repo], [$class: 'StringParameterValue', name: 'gsc_branch', value: gsc_branch], [$class: 'StringParameterValue', name: 'distro_ver', value: "quay.io/centos/centos:stream10"]], propagate: true, wait: true
                     }
                 }
-
-                stage ('Invoke GSC with CentOS Stream 9') {
-                    steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_almalinux9_server_6.2'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gsc_repo', value: gsc_repo], [$class: 'StringParameterValue', name: 'gsc_branch', value: gsc_branch], [$class: 'StringParameterValue', name: 'distro_ver', value: "quay.io/centos/centos:stream9"]], propagate: true, wait: true
-                    }
-                }
-
-                stage ('Invoke GSC with Debian 12') {
-                    steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_debian11_6.1'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gsc_repo', value: gsc_repo], [$class: 'StringParameterValue', name: 'gsc_branch', value: gsc_branch], [$class: 'StringParameterValue', name: 'distro_ver', value: "debian:12"]], propagate: true, wait: true
-                    }
-                }
-
-                stage ('Invoke GSC with Redhat UBI9-Minimal') {
-                    steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel9_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gsc_repo', value: gsc_repo], [$class: 'StringParameterValue', name: 'gsc_branch', value: gsc_branch], [$class: 'StringParameterValue', name: 'distro_ver', value: "redhat/ubi9-minimal:9.4"]], propagate: true, wait: true
-                    }
-                }
-
-                stage ('Invoke GSC with Redhat UBI9') {
-                    steps {
-                        build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_icl_rhel9_6.7'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gsc_repo', value: gsc_repo], [$class: 'StringParameterValue', name: 'gsc_branch', value: gsc_branch], [$class: 'StringParameterValue', name: 'distro_ver', value: "redhat/ubi9:9.4"]], propagate: true, wait: true
-                    }
-                }
-
-                // stage ('Invoke GSC with SUSE Linux Enterprise Server 15.4') {
-                //     steps {
-                //         build job: 'local_ci_graphene_gsc', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene_suse_15.4'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gsc_repo', value: gsc_repo], [$class: 'StringParameterValue', name: 'gsc_branch', value: gsc_branch], [$class: 'StringParameterValue', name: 'distro_ver', value: "registry.suse.com/suse/sle15:15.4"]], propagate: true, wait: true
-                //     }
-                // }
             }
         }
     }

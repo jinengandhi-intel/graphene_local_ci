@@ -80,7 +80,7 @@ conncheck:
 
 .PHONY: uninstall-mysql
 uninstall-mysql:
-	-sudo $(PKG_MGR) remove -y mysql-server sysbench
+	-sudo $(PKG_MGR) remove -y mysql-server sysbench mysql8.4-server
 	-sudo $(PKG_MGR) autoremove -y
 	-sudo rm -rf $(RM_DIR) $(LOG_FILE) $(DATA_DIR)
 

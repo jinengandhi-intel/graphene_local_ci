@@ -1,31 +1,40 @@
 stage('build') {
     env.MESON_OPTIONS = ''
 
-    if (env.node_label.contains("dcap")) {
-        env.RA_TYPE = "dcap"
-    } else {
-        env.RA_TYPE = "none"
-    }
+    env.RA_TYPE = "dcap"
 
     if (env.build_type == "manual") {
         if (env.build_prefix != "0") {
             env.MESON_OPTIONS += ' --prefix=' + env.PREFIX
         }
 
-        if (env.node_label.contains("dcap")) {
+        if (env.os_release_id.contains("centos")) {
+            sh '''
+                sudo mkdir -p /opt/intel
+                cd /opt/intel
+                sudo wget https://download.01.org/intel-sgx/latest/dcap-latest/linux/distro/centos-stream9/sgx_rpm_local_repo.tgz
+                sudo tar xvf sgx_rpm_local_repo.tgz
+                sudo yum-config-manager --add-repo file:///opt/intel/sgx_rpm_local_repo
+                sudo yum install -y --nogpgcheck libsgx-dcap-default-qpl libsgx-dcap-default-qpl-devel libsgx-dcap-quote-verify libsgx-dcap-quote-verify-devel
+            '''
+        } else {
             sh '''
                 curl -fsSL https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key | sudo apt-key add -
-                echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu noble main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
+                echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu jammy main' | sudo tee /etc/apt/sources.list.d/intel-sgx.list
                 sudo apt-get update
-                echo N | sudo apt-get install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev libsgx-dcap-quote-verify libsgx-dcap-quote-verify-dev
+                sudo apt-get install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev libsgx-dcap-quote-verify libsgx-dcap-quote-verify-dev
             '''
-            env.MESON_OPTIONS += " -Ddcap=enabled"
         }
+        sh 'sudo cp -f /etc/sgx_default_qcnl.conf.backup /etc/sgx_default_qcnl.conf'
+        env.MESON_OPTIONS += " -Ddcap=enabled"
 
         if (env.GRAMINE_MUSL == "1") {
             env.MESON_OPTIONS += " -Dlibc=musl -Dtests=enabled"
         } else {
-            env.MESON_OPTIONS += " --werror -Dtests=enabled"
+            if (!(env.base_os == "centos10")) {
+                env.MESON_OPTIONS += " --werror "
+            }
+            env.MESON_OPTIONS += " -Dtests=enabled"
         }
 
         try {
