@@ -3,7 +3,7 @@ set -ex
 
 if [[ "$BUILD_OS" = *"ubuntu"* ]]; then
     apt-get update && env DEBIAN_FRONTEND=noninteractive apt-get install -y python3
-elif [[ "$BUILD_OS" = "redhat/ubi9:9.4" ]] || [[ "$BUILD_OS" = "quay.io/centos/centos:stream9" ]]; then
+elif [[ "$BUILD_OS" = "redhat/ubi9:9.4" ]] || [[ "$BUILD_OS" = *"quay.io/centos/centos"* ]]; then
     yum update -y && yum install -y python3
 elif [[ "$BUILD_OS" = "redhat/ubi9-minimal:9.4" ]]; then
     microdnf install -y python3;
