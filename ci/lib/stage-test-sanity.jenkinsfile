@@ -1,4 +1,14 @@
 stage('test') {
+    env.RA_TYPE='dcap'
+    env.RA_TLS_MRSIGNER='any'
+    env.RA_TLS_MRENCLAVE='any'
+    env.RA_TLS_ISV_PROD_ID='any'
+    env.RA_TLS_ISV_SVN='any'
+    env.RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE='1'
+    env.RA_TLS_ALLOW_OUTDATED_TCB_INSECURE='1'
+    env.RA_TLS_ALLOW_SW_HARDENING_NEEDED='1'
+    env.RA_TLS_ALLOW_HW_CONFIG_NEEDED='1'
+
     try {
         timeout(time: 5, unit: 'MINUTES') {
             sh '''
@@ -14,50 +24,38 @@ stage('test') {
         }
     } catch (Exception e) {}
 
-    if (env.node_label.contains("dcap")) {
-        env.RA_TYPE='dcap'
-        env.RA_TLS_MRSIGNER='any'
-        env.RA_TLS_MRENCLAVE='any'
-        env.RA_TLS_ISV_PROD_ID='any'
-        env.RA_TLS_ISV_SVN='any'
-        env.RA_TLS_ALLOW_DEBUG_ENCLAVE_INSECURE='1'
-        env.RA_TLS_ALLOW_OUTDATED_TCB_INSECURE='1'
-        env.RA_TLS_ALLOW_SW_HARDENING_NEEDED='1'
-        env.RA_TLS_ALLOW_HW_CONFIG_NEEDED='1'
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/ra-tls-mbedtls
+                make check_dcap 2>&1 | tee mbedtls_result.txt
+            '''
+        }
+    } catch (Exception e) {}
 
-        try {
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/ra-tls-mbedtls
-                    make check_dcap 2>&1 | tee mbedtls_result.txt
-                '''
-            }
-        } catch (Exception e) {}
+    try {
+        timeout(time: 5, unit: 'MINUTES') {
+            sh '''
+                cd CI-Examples/ra-tls-secret-prov
+                make check_dcap 2>&1 | tee secret_prov_result.txt
+            '''
+        }
+    } catch (Exception e) {}
 
-        try {
-            timeout(time: 5, unit: 'MINUTES') {
-                sh '''
-                    cd CI-Examples/ra-tls-secret-prov
-                    make check_dcap 2>&1 | tee secret_prov_result.txt
-                '''
-            }
-        } catch (Exception e) {}
-
-        try {
-            timeout(time: 2, unit: 'MINUTES') {
-                sh '''
-                    export PID=$(lsof -t -i:8000)
-                    if [ "$PID" != "" ]
-                    then
-                        echo "Killing $PID"
-                        kill -9 $PID
-                    fi
-                    cd CI-Examples/ra-tls-nginx
-                    make check 2>&1 | tee nginx_result.txt
-                '''
-            }
-        } catch (Exception e) { }
-    }
+    try {
+        timeout(time: 2, unit: 'MINUTES') {
+            sh '''
+                export PID=$(lsof -t -i:8000)
+                if [ "$PID" != "" ]
+                then
+                    echo "Killing $PID"
+                    kill -9 $PID
+                fi
+                cd CI-Examples/ra-tls-nginx
+                make check 2>&1 | tee nginx_result.txt
+            '''
+        }
+    } catch (Exception e) { }
 }
 
 stage ('workload_verification') {

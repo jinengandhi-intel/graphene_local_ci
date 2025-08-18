@@ -32,7 +32,7 @@ pipeline {
                 stage ('Invoke CentOS Stream 10 with 6.12 Gramine Native Suite ') {
                     steps {
                         sleep(time: 30, unit: "MINUTES")
-                        build job: 'local_ci_graphene_sgx_centos_10_6.12', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "centos10"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
+                        build job: 'local_ci_graphene_native_centos_10_6.12', parameters: [[$class: 'NodeParameterValue', name: 'node_label', labels: ['graphene'], nodeEligibility: [$class: 'AllNodeEligibility']], [$class: 'StringParameterValue', name: 'gramine_repo', value: gramine_repo], [$class: 'StringParameterValue', name: 'gramine_branch', value: gramine_branch], [$class: 'StringParameterValue', name: 'base_os', value: "centos10"], [$class: 'StringParameterValue', name: 'EDMM', value: EDMM]], propagate: true, wait: true
                     }
                 }
 

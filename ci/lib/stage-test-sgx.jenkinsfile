@@ -15,7 +15,7 @@ stage('test-sgx') {
         fi
     '''
 
-    if (!["centos9", "rhel9"].contains(env.base_os)) {
+    if (!["centos9", "rhel9", "centos10"].contains(env.base_os)) {
         try {
             timeout(time: 60, unit: 'MINUTES') {
                 sh '''

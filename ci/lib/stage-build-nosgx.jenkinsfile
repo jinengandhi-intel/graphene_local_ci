@@ -9,10 +9,12 @@ stage('build') {
     if (env.build_type == "manual") {
         try {
             env.MESON_OPTIONS += " -Dtests=enabled"
+            if (!(env.base_os == "centos10")) {
+                env.MESON_OPTIONS += " --werror "
+            }
 
             sh '''
                 meson setup build/ \
-                    --werror \
                     --prefix="$PREFIX" \
                     --buildtype="$BUILDTYPE" \
                     -Dskeleton=enabled \

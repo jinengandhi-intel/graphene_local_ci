@@ -25,6 +25,7 @@ stage('build') {
                 sudo apt-get install -y libsgx-dcap-default-qpl libsgx-dcap-default-qpl-dev libsgx-dcap-quote-verify libsgx-dcap-quote-verify-dev
             '''
         }
+
         sh 'sudo cp -f /etc/sgx_default_qcnl.conf.backup /etc/sgx_default_qcnl.conf'
         env.MESON_OPTIONS += " -Ddcap=enabled"
 
