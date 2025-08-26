@@ -51,6 +51,7 @@ RUN dnf config-manager --set-enabled -y crb && \
         ncurses-devel \
         ncurses-libs \
         net-tools \
+        nginx \
         nodejs \
         # nss_nis \
         nss-mdns \
