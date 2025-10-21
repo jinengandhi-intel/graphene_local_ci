@@ -140,6 +140,7 @@ stage('build') {
             }
         }
         sh 'gramine-sgx-gen-private-key'
+        sh 'sudo cp -f /etc/sgx_default_qcnl.conf.backup /etc/sgx_default_qcnl.conf'
     }
 }
 

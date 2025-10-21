@@ -81,6 +81,10 @@ if __name__=='__main__':
         obj_tsc.execute_time_cmd(time_stamp)
         obj_tsc.sync_hw_clock()
         print('Successfully updated system time!')
-        HostSetup.setup()
     except Exception as e:
         print('Failed to update system time!' + e)
+
+    try:
+        HostSetup.setup()
+    except Exception as e:
+        print('Failed to update priviledge' + e)
